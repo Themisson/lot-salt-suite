@@ -3,13 +3,13 @@
 Este repositório moderniza, corrige, documenta e integra simuladores de
 Leak-Off Test (LOT), Annular Pressure Buildup (APB) e fluência de sal (Salt Creep).
 O código principal é C++20. O pós-processamento é Python. O repositório
-`external/saltcreep` é a principal referência moderna para modelos constitutivos de sal.
+`external/saltcreep` é a dependência vendorizada ativa para o solver moderno de sal.
 
 ## Fontes legadas (CONGELADAS — não editar)
 
 - `legance/LOT_Tese/` — código usado na tese. Muitos `main` de caso hard-coded. **NÃO EDITAR.**
 - `legance/LOT_APB_v5/` — versão mais moderna com entrada JSON. **NÃO EDITAR DIRETAMENTE.**
-- `external/saltcreep/` — solver FEM moderno de fluência; referência técnica. **NÃO DUPLICAR.**
+- `external/saltcreep/` — solver FEM moderno de fluência; dependência vendorizada ativa. **EDIÇÃO CONTROLADA, NÃO DUPLICAR.**
 - `legacy/` — espelho organizacional (não-editável) apontando para os legados acima.
 
 > **ATENÇÃO:** O diretório físico é `legance/` (não `legacy/`). Isso é herança histórica.
@@ -29,18 +29,19 @@ Criar uma arquitetura modular C++ com:
 
 ## Regras invioláveis
 
-1. **Não editar** qualquer arquivo em `legance/` ou `external/saltcreep/`.
-2. **Não apagar** resultados ou baselines existentes.
-3. **Não alterar formulação física** sem registrar em `docs/08_known_issues.md` e `docs/15_changelog.md`.
-4. **Não misturar** refatoração estrutural com mudança de formulação no mesmo commit.
-5. **Não mudar** convenção de sinais sem documentação explícita.
-6. **Não mudar** unidades internas sem documentação explícita.
-7. **Internamente, sempre SI** (Pa, m, kg, K, s). Conversões somente em `include/units/`.
-8. **Conversões de unidade** devem ficar exclusivamente em `include/units/units.hpp`.
-9. **Todo novo módulo** deve ter pelo menos um teste Catch2 antes do merge.
-10. **Toda migração de caso** deve comparar resultado novo contra baseline legado.
-11. **`docs/12_validation_results.md`** nunca deve declarar validações como executadas sem rodá-las.
-12. **`docs/index.html`** status de seção = "validado" somente após CI verde documentado.
+1. **Não editar** qualquer arquivo em `legance/` ou `legacy/`.
+2. **Não editar** `external/saltcreep/` sem escopo explícito de integração de sal, testes, documentação e registro em `docs/dev-log.md`.
+3. **Não apagar** resultados ou baselines existentes.
+4. **Não alterar formulação física** sem registrar em `docs/08_known_issues.md` e `docs/15_changelog.md`.
+5. **Não misturar** refatoração estrutural com mudança de formulação no mesmo commit.
+6. **Não mudar** convenção de sinais sem documentação explícita.
+7. **Não mudar** unidades internas sem documentação explícita.
+8. **Internamente, sempre SI** (Pa, m, kg, K, s). Conversões somente em `include/units/`.
+9. **Conversões de unidade** devem ficar exclusivamente em `include/units/units.hpp`.
+10. **Todo novo módulo** deve ter pelo menos um teste Catch2 antes do merge.
+11. **Toda migração de caso** deve comparar resultado novo contra baseline legado.
+12. **`docs/12_validation_results.md`** nunca deve declarar validações como executadas sem rodá-las.
+13. **`docs/index.html`** status de seção = "validado" somente após CI verde documentado.
 
 ## Antes de modificar código
 
@@ -95,6 +96,9 @@ Depois: produza um plano curto e implemente apenas a tarefa solicitada.
 - Adapter: `SaltCreepSaltcreepAdapter` usando modelos do `external/saltcreep`.
 - Adapter legado: `SaltCreepSESTSALAdapter` para compatibilidade com SESTSAL interno.
 - Proibido: copiar código de `external/saltcreep/src/constitutive/` para `src/salt/`.
+- Permitido: evoluir `external/saltcreep/` para pressao de parede, dano,
+  pos-processamento e acoplamento quando houver tarefa explicita, testes e
+  documentacao.
 
 ## Critério de conclusão de qualquer tarefa
 

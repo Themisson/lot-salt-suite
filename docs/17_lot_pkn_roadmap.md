@@ -1,0 +1,73 @@
+# 17. Roadmap LOT/PKN
+
+## Decisao de prioridade
+
+A migracao de LOT deve priorizar o caminho PKN observado nos legados antes de
+implementar familias de fratura adicionais. O motivo e pratico: o PKN e o
+caminho com casos e arquivos de resultado mais diretamente conectados aos LOTs
+auditados, especialmente em `legance/LOT_Tese/`.
+
+Os modelos circular, eliptico e penny-shaped permanecem catalogados, mas nao
+devem bloquear a primeira implementacao moderna.
+
+## Escopo da primeira entrega LOT/PKN
+
+A primeira implementacao moderna deve criar contratos e testes, nao apenas
+transcrever equacoes do legado.
+
+Componentes esperados:
+
+| Componente | Responsabilidade |
+|------------|------------------|
+| `lot::PknModel` | Calcular abertura, comprimento e volume de fratura PKN com entradas SI. |
+| `lot::BreakdownDetector` | Detectar inicio de fratura quando a pressao de parede excede o limite definido pela convencao do projeto. |
+| `lot::InjectionSchedule` | Representar taxa de injecao, tempo de simulacao, `dt` e tempo de acomodacao/no-injection. |
+| `lot::LeakoffState` | Acumular volume vazado/fraturado e expor serie temporal para APB/coupling. |
+| Testes Catch2 | Cobrir unidades, monotonias, ativacao de breakdown e conservacao dimensional basica. |
+
+## Contrato de tempo
+
+O `dt` deve ser coerente com a taxa usada pelo modelo fisico. Se a lei de
+deformacao ou fluencia estiver expressa por segundo, o `dt` deve estar em
+segundos no solver; se a taxa estiver por minuto ou hora, a conversao deve ser
+explicita no parser ou no adapter.
+
+O usuario deve poder definir:
+
+- `dt`;
+- politica adaptativa futura, quando implementada;
+- tempo total de simulacao;
+- tempo de acomodacao, definido como periodo sem incrementos termicos nem
+  injecao de fluidos.
+
+No codigo moderno, o parser deve converter unidades de campo para SI antes de
+entregar os dados ao solver.
+
+## Caminho de migracao
+
+1. Congelar a interpretacao tecnica do PKN legado em `docs/audits/pkn_legacy_path.md`.
+2. Criar tipos de entrada LOT em `include/lot/`, separados de parsing.
+3. Implementar `PknModel` com entradas SI e sem acesso direto a YAML/JSON.
+4. Implementar `BreakdownDetector` seguindo FA01-FA04 e os riscos registrados.
+5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
+6. Conectar ao CLI apenas depois que o contrato numerico estiver testado.
+7. Comparar com arquivos legados somente quando o pipeline moderno produzir
+   series equivalentes e documentar em `docs/12_validation_results.md`.
+
+## Fora de escopo nesta fase
+
+Nesta Fase 6.1 nao foram implementados `PknModel`, `BreakdownDetector`,
+executavel novo ou comparacao numerica. A fase e de auditoria, governanca e
+roadmap para reduzir risco antes da codificacao.
+
+## Riscos tecnicos a resolver antes da implementacao
+
+- O legado usa conversoes de vazao com fatores geometricos embutidos e ao menos
+  uma expressao suspeita (`/ M_PI / 22`) que deve ser auditada antes de servir
+  como referencia numerica.
+- O tempo de fratura mistura `t` absoluto e tempo desde breakdown em trechos do
+  legado; o modelo moderno deve escolher uma unica convencao.
+- O volume PKN legado usa uma forma simplificada (`w0 * L1 * pi`) e mantem uma
+  alternativa comentada; a escolha precisa ser documentada antes de validar.
+- A convencao de tensao circunferencial deve respeitar FA01-FA04 e nao pode ser
+  reinterpretada sem registro em `docs/08_known_issues.md`.

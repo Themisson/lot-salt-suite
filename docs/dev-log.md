@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 5 em andamento (units + schema + CaseParser + CLI inspect)
+Fase ativa  : 6.0/6.1 em andamento (governanca saltcreep + auditoria LOT/PKN)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
@@ -19,14 +19,14 @@ Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ```
 
-### Próximas tarefas (Fase 5)
+### Próximas tarefas (Fase 6)
 
-- [x] R08 pendente: verificar unidade de `dt` em `legance/LOT_APB_v5/src/apb/apb_salt_1d.cpp`
-- [x] `schemas/lot_case.schema.yaml`
-- [x] `include/units/units.hpp` (conversões PPG→kg/m³, pol→m, etc.)
-- [x] `include/core/types.hpp` (CaseData struct)
-- [x] `include/io/CaseParser.hpp` + `src/io/CaseParser.cpp`
-- [x] `apps/lot-sim.cpp` com subcomando `inspect`
+- [x] Definir governanca de `external/saltcreep/` como dependencia vendorizada ativa
+- [x] Auditar caminho LOT/PKN nos legados sem modificar `legance/`
+- [x] Catalogar modelos nao PKN como nao prioritarios
+- [ ] Implementar `lot::PknModel` com entradas SI e testes Catch2
+- [ ] Implementar `lot::BreakdownDetector` com convencoes FA01-FA04
+- [ ] Conectar LOT/PKN ao CLI somente apos contrato numerico testado
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
 
@@ -40,6 +40,33 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.0/6.1 — Governanca saltcreep e auditoria LOT/PKN — Codex
+**Status:** Documentacao e auditoria implementadas nesta sessão.
+**Testes:** `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`, `cmake --build build -j` e `ctest --test-dir build --output-on-failure` executados; 15/15 passaram. Nenhuma validacao numerica declarada.
+**Escopo:** nenhum arquivo em `legance/`, `legacy/` ou `external/saltcreep/` foi alterado.
+
+**Decisoes:**
+- `external/saltcreep/` passa a ser dependencia vendorizada ativa, com edicao controlada por escopo explicito, testes, documentacao e dev-log.
+- A primeira migracao moderna de LOT deve priorizar o caminho PKN auditado em `legance/LOT_Tese/`.
+- Modelos circular, eliptico e penny-shaped ficam catalogados, mas fora do primeiro caminho critico.
+
+**Achados principais:**
+- O caminho PKN passa por `Fluids::setLeakoffProps(..., "pkn")`, `idTypeFracture == 2` e `APB1da::calculateLOTFracturedSaltRock(...)`.
+- O legado mistura conversao de vazao com fator geometrico; uma conversao contem expressao suspeita `/ M_PI / 22`.
+- O bloco PKN mistura tempo absoluto e tempo desde breakdown em trechos auditados.
+- O volume PKN legado usa forma simplificada e tem alternativa comentada, exigindo decisao documentada antes de validacao.
+
+**Arquivos adicionados/alterados:**
+- `docs/16_saltcreep_governance.md` — politica de dependencia ativa para saltcreep
+- `docs/17_lot_pkn_roadmap.md` — roadmap da primeira entrega LOT/PKN
+- `docs/audits/lot_legacy_inventory.md` — inventario LOT nos legados
+- `docs/audits/pkn_legacy_path.md` — rota tecnica PKN legado
+- `docs/audits/non_pkn_models_status.md` — status dos modelos nao PKN
+- `AGENTS.md` e `CLAUDE.md` — regras ajustadas para saltcreep vendorizado ativo
+- `docs/07_target_architecture.md` e `docs/13_coupling_lot_apb_salt.md` — arquitetura e acoplamento atualizados
 
 ---
 

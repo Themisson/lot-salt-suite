@@ -19,8 +19,8 @@ phases:
   phase_2_docs:             in_progress
   phase_3_agents:           in_progress
   phase_4_baselines:        not_started
-  phase_5_cli:              not_started
-  phase_6_migration:        not_started
+  phase_5_cli:              in_progress
+  phase_6_migration:        in_progress
   phase_7_refactor:         not_started
   phase_8_integration:      not_started
   phase_9_postprocess:      not_started
@@ -48,6 +48,11 @@ docs:
   coupling:               planned
   developer_guide:        planned
   changelog:              in_progress
+  saltcreep_governance:   implemented
+  lot_pkn_roadmap:        implemented
+  lot_legacy_inventory:   implemented
+  pkn_legacy_path:        implemented
+  non_pkn_models_status:  implemented
 
 # ============================================================
 # Status de módulos C++
@@ -87,9 +92,9 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 0          # Catch2 — verde
+  cpp_tests: 15         # Catch2 — verde na ultima execucao registrada
   python_tests: 0       # pytest — verde
-  regression_baselines: 0
+  regression_baselines: 4
 
 # ============================================================
 # Metadados

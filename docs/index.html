@@ -63,6 +63,11 @@
 <li><a href="#coupling" style="color:#3b82f6">13 Coupling Lot Apb Salt</a></li>
 <li><a href="#devguide" style="color:#6b7280">14 Developer Workflow</a></li>
 <li><a href="#changelog" style="color:#f59e0b">15 Changelog</a></li>
+<li><a href="#saltcreep_governance" style="color:#8b5cf6">16 Saltcreep Governance</a></li>
+<li><a href="#lot_pkn_roadmap" style="color:#8b5cf6">17 Lot Pkn Roadmap</a></li>
+<li><a href="#lot_legacy_inventory" style="color:#8b5cf6">Audits/Lot Legacy Inventory</a></li>
+<li><a href="#pkn_legacy_path" style="color:#8b5cf6">Audits/Pkn Legacy Path</a></li>
+<li><a href="#non_pkn_models_status" style="color:#8b5cf6">Audits/Non Pkn Models Status</a></li>
 </ul>
 </nav>
 <main id="main">
@@ -77,8 +82,8 @@
     <p>Simulador integrado de LOT, APB e fluência de sal para poços em formações salinas.</p>
     
     <div class="hero-stats">
-      <div class="stat"><span class="stat-num">4/13</span><span class="stat-label">Fases ativas</span></div>
-      <div class="stat"><span class="stat-num">0</span><span class="stat-label">Testes C++</span></div>
+      <div class="stat"><span class="stat-num">6/13</span><span class="stat-label">Fases ativas</span></div>
+      <div class="stat"><span class="stat-num">15</span><span class="stat-label">Testes C++</span></div>
       <div class="stat"><span class="stat-num">0</span><span class="stat-label">Testes Python</span></div>
       <div class="stat"><span class="stat-num">0/10</span><span class="stat-label">Validações V0-V9</span></div>
     </div>
@@ -1058,6 +1063,10 @@ public:
     // NÃO copia código de saltcreep — usa via include
 };
 </code></pre>
+<p><code>external/saltcreep/</code> e tratado como dependencia vendorizada ativa, com edicao
+controlada. O adapter deve preferir superficies existentes do solver, como
+campos de pressao de parede, diagnosticos de dano e saidas de pos-processamento,
+antes de criar rotas paralelas no <code>lot-salt-suite</code>.</p>
 <h3 id="adapter-para-sestsal-legado">Adapter para SESTSAL legado</h3>
 <pre><code class="language-cpp">class SaltCreepSESTSALAdapter : public SaltCreepInterface {
     // Compatibilidade com modelo interno dos legados
@@ -1090,6 +1099,18 @@ Subcomandos:
    f. salvar saída se (passo % output_every == 0)
 8. pós-processamento: invocar script Python se configurado
 </code></pre>
+<h2 id="prioridade-lotpkn">Prioridade LOT/PKN</h2>
+<p>A primeira entrega moderna do modulo <code>lot/</code> deve priorizar PKN, conforme a
+auditoria em <code>docs/audits/pkn_legacy_path.md</code>. Os modelos circular, eliptico e
+penny-shaped permanecem catalogados, mas fora do primeiro caminho critico.</p>
+<p>O contrato minimo para LOT/PKN deve separar:</p>
+<ul>
+<li>calendario de injecao e acomodacao;</li>
+<li>deteccao de breakdown;</li>
+<li>modelo PKN com entradas SI;</li>
+<li>acumulacao de leakoff/fratura;</li>
+<li>serializacao de series temporais para comparacao.</li>
+</ul>
 </section>
 
 <section id="issues" class="doc-section">
@@ -1116,8 +1137,10 @@ vrock.push_back(new Rock(..., 1.8792e-06 / 60, 9.92e+06, 86., 3.36, 7.55));
 </code></pre>
 <p><code>material.h</code> declara <code>double e0; // [1/h]</code> — <strong>INCORRETO</strong>.
 O valor passado é <code>e0_literatura [1/h] ÷ 60</code> = <code>e0 [1/min]</code>.</p>
-<p><strong>Conclusão:</strong> A unidade interna de tempo do modelo SESTSAL é <strong>minutos [min]</strong>, não horas.
-O <code>dt</code> passado para <code>solveThermalViscoStep(dt)</code> deve estar em [min] ou há conversão interna.</p>
+<p><strong>Conclusão:</strong> No legado da tese, o valor passado para <code>e0</code> foi convertido para <strong>[1/min]</strong>.
+O incremento <code>dt</code> usado por qualquer backend deve ser coerente com a unidade temporal da
+taxa de fluência ativa; quando o backend usa <code>e0</code> em [1/min], o passo equivalente deve estar
+em minutos ou deve haver conversão explícita na fronteira.</p>
 <p><strong>Impacto para o código novo:</strong>
 - Todo <code>e0</code> lido de YAML deve ser convertido: se o usuário informa <code>[1/h]</code>, o parser divide por 60 antes de passar ao modelo SESTSAL legado.
 - Na nova arquitetura: armazenar <code>e0</code> em SI ([1/s]) internamente; converter na fronteira do SESTSAL adapter.
@@ -1291,6 +1314,31 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 </tr>
 </tbody>
 </table>
+<h2 id="r08-unidade-de-dt-coerente-com-a-taxa-de-fluencia-lot_apb_v5-usa-h">R08 — Unidade de <code>dt</code>: coerente com a taxa de fluência; LOT_APB_v5 usa [h]</h2>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado em 2026-06-01</p>
+<p>Arquivos auditados:
+- <code>legance/LOT_APB_v5/include/apb/apb_salt_1d.h</code>
+- <code>legance/LOT_APB_v5/src/apb/apb_salt_1d.cpp</code>
+- <code>legance/LOT_APB_v5/include/sestsal/solver.h</code>
+- <code>legance/LOT_APB_v5/src/sestsal/solver.cpp</code>
+- <code>legance/LOT_APB_v5/src/sestsal/element.cpp</code>
+- <code>legance/LOT_APB_v5/main/main.cpp</code></p>
+<p><strong>Evidência direta:</strong>
+- <code>APBSalt1D::solveThermalViscoStep(double dt_h)</code> recebe <code>dt_h</code> explicitamente nomeado em horas.
+- <code>APBSalt1D</code> armazena <code>time_h</code> e <code>dt_h</code> como membros.
+- <code>Solver::dt</code> é comentado como <code>last time increment, [h]</code>.
+- <code>Element::incrementalViscousForces(double _dt)</code> multiplica diretamente a taxa de fluência por <code>_dt</code>.
+- O APB principal usa <code>tac = 80 * 7 * 24</code> e escreve tempo como <code>t / 24 / 7</code>, consistente com <code>t</code> em horas.</p>
+<p><strong>Conclusão específica do <code>LOT_APB_v5</code>:</strong> O <code>dt</code> passado para <code>solveThermalViscoStep(dt)</code> está em <strong>horas [h]</strong>. O solver SESTSAL desse ramo espera taxa de fluência compatível com hora, e o passo interno adaptativo do wrapper (<code>dt = 1.e-6</code>, <code>dt_max = 0.001</code>) também está em horas.</p>
+<p><strong>Regra geral:</strong> <code>dt</code> é o incremento temporal numérico do modelo constitutivo e deve ser coerente com a unidade da taxa de deformação ativa. Se a taxa estiver em <code>[1/s]</code>, o <code>dt</code> correspondente deve estar em segundos; se estiver em <code>[1/h]</code>, em horas; se estiver em <code>[1/min]</code>, em minutos. Esse incremento pode ser definido pelo usuário, escolhido adaptativamente ou previamente inicializado pelo backend.</p>
+<p><strong>Tempo de simulação e acomodação:</strong> O tempo total de simulação é definido pelo usuário. O tempo de acomodação (<code>tac</code>/<code>stabilization_h</code>) representa o intervalo inicial decorrido sem incrementos térmicos ou injeção/variação operacional de fluidos, permitindo a acomodação mecânica/viscosa antes do carregamento principal.</p>
+<p><strong>Impacto para o código novo:</strong>
+- <code>time.dt_h</code> permanece em horas no YAML e no <code>CaseData</code> como escala de entrada do APB/LOT.
+- Um futuro <code>SaltCreepSESTSALAdapter</code> deve converter o passo de tempo para a unidade esperada pelo backend chamado.
+- Para o wrapper <code>LOT_APB_v5</code>, passar <code>dt_h</code> em horas.
+- Para uma implementação SESTSAL ou saltcreep que opere com taxa em segundos/minutos, converter explicitamente na fronteira para manter consistência dimensional.</p>
+<p><strong>Risco lateral observado:</strong> A versão ativa de <code>APBSalt1D::solveThermalViscoStep</code> não atribui <code>this-&gt;dt_h = dt_h</code>; <code>storeResults()</code> usa o membro <code>dt_h</code>, que fica inicializado em <code>0</code>. Isto sugere que o armazenamento temporal interno do wrapper pode estar incorreto nessa versão, embora o incremento mecânico passado ao solver ainda use o <code>dt</code> interno em horas. Não corrigir no legado; tratar no futuro adapter.</p>
+<hr />
 <h2 id="riscos-de-formulacao-atualizados-apos-auditoria">Riscos de formulação (atualizados após auditoria)</h2>
 <table>
 <thead>
@@ -1346,9 +1394,9 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 </tr>
 <tr>
 <td>R08</td>
-<td><code>dt</code> passado a <code>solveThermalViscoStep</code> em horas ou minutos?</td>
+<td>Unidade de <code>dt</code> em modelos de fluência</td>
 <td>Alto</td>
-<td>Pendente — verificar implementação do solver SESTSAL</td>
+<td><strong>CONFIRMADO</strong> — <code>dt</code> deve ser coerente com a taxa de deformação; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]</td>
 </tr>
 </tbody>
 </table>
@@ -1358,8 +1406,7 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 <li>[x] Temperatura no modelo: °C, não K → FA02</li>
 <li>[x] Unidade de e0: [1/min] internamente → FA01</li>
 <li>[x] Mecanismo de acoplamento sal→APB → FA04</li>
-<li>[ ] <strong>R08 PENDENTE:</strong> verificar se <code>dt</code> em <code>solveThermalViscoStep</code> é [h] ou [min]
-      — arquivo a verificar: <code>legance/LOT_APB_v5/src/apb/apb_salt_1d.cpp</code></li>
+<li>[x] <strong>R08:</strong> <code>dt</code> deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]</li>
 <li>[ ] Confirmar convenção de sinal de <code>u_wall</code> (positivo = inward ou outward?)
       — arquivo: <code>legance/LOT_APB_v5/include/apb/apb_salt_1d.h</code></li>
 <li>[ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)</li>
@@ -1965,6 +2012,9 @@ comparando os legados antes de implementar o módulo <code>coupling/</code>.</p>
    aumenta pressão no anular (APB)</li>
 <li><strong>APB → Sal:</strong> pressão anular muda a tensão efetiva na rocha salina</li>
 </ol>
+<p>Na arquitetura atual, o caminho LOT inicial deve ser PKN. O acoplamento com sal
+deve passar pelo adapter para <code>external/saltcreep/</code>, que e uma dependencia
+vendorizada ativa com governanca descrita em <code>docs/16_saltcreep_governance.md</code>.</p>
 <h2 id="algoritmo-proposto-a-verificar-com-formulacao-do-legado">Algoritmo proposto (a verificar com formulação do legado)</h2>
 <pre><code>Para cada passo de tempo dt:
   1. Atualizar campo térmico T(z, t)
@@ -2013,6 +2063,16 @@ comparando os legados antes de implementar o módulo <code>coupling/</code>.</p>
 <td>Médio</td>
 <td><code>legance/LOT_APB_v5/main/main.cpp</code></td>
 </tr>
+<tr>
+<td>Semantica de tempo PKN (<code>t</code> absoluto vs. tempo desde breakdown)</td>
+<td>Alto</td>
+<td><code>legance/LOT_Tese/src/apb_code/APB1da.cpp</code></td>
+</tr>
+<tr>
+<td>Conversoes de vazao com fator geometrico embutido</td>
+<td>Alto</td>
+<td><code>legance/LOT_Tese/src/apb_code/APB1da.cpp</code></td>
+</tr>
 </tbody>
 </table>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
@@ -2040,6 +2100,19 @@ private:
     ApbSolver&amp; apb_;
 };
 </code></pre>
+<h2 id="contrato-pknsaltcreep">Contrato PKN/saltcreep</h2>
+<p>O <code>coupling/</code> nao deve conhecer detalhes internos do PKN legado nem do FEM de
+sal. O fluxo esperado e:</p>
+<ol>
+<li><code>lot/</code> calcula pressao, breakdown, abertura/comprimento PKN e volume de
+   leakoff/fratura.</li>
+<li><code>coupling/</code> transforma a pressao anular/LOT em condicoes de contorno para sal.</li>
+<li><code>SaltCreepSaltcreepAdapter</code> delega para o <code>external/saltcreep/</code>, usando
+   mecanismos existentes de pressao de parede quando aplicaveis.</li>
+<li>O retorno do sal atualiza fechamento radial, volume anular e diagnosticos de
+   dano.</li>
+<li><code>apb/</code> atualiza pressao anular a partir do volume e compressibilidade.</li>
+</ol>
 </section>
 
 <section id="devguide" class="doc-section">
@@ -2140,6 +2213,469 @@ private:
 <li>Analisado: external/saltcreep/ (120 testes C++ + 21 Python)</li>
 <li>Criados: ANALISE_INICIAL.md, NOVA_ESTRUTURA_REPOSITORIO.md (em versão anterior)</li>
 <li>Criados: target_repo/ com rascunhos de AGENTS.md, CLAUDE.md, docs/, skills/</li>
+</ul>
+</section>
+
+<section id="saltcreep_governance" class="doc-section">
+<div class="section-header"><span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Implementado</span></div>
+<h1 id="16-governanca-do-saltcreep">16. Governanca do saltcreep</h1>
+<h2 id="decisao-de-governanca">Decisao de governanca</h2>
+<p><code>external/saltcreep/</code> passa a ser tratado como dependencia vendorizada ativa do
+<code>lot-salt-suite</code>, e nao apenas como referencia imutavel. Isso corrige a tensao
+entre a arquitetura alvo, que depende de um resolvedor de fluencia de sal
+operacional, e a regra anterior que impedia qualquer evolucao controlada no
+codigo de sal.</p>
+<p>Essa decisao nao autoriza edicoes livres. O diretorio continua protegido por
+contrato tecnico: qualquer alteracao deve ter escopo explicito, testes,
+documentacao e registro no <code>docs/dev-log.md</code>.</p>
+<h2 id="politica-operacional">Politica operacional</h2>
+<table>
+<thead>
+<tr>
+<th>Tema</th>
+<th>Politica</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uso normal</td>
+<td>Consumir <code>external/saltcreep/</code> por adapter em <code>src/salt/</code>, sem copiar codigo constitutivo.</td>
+</tr>
+<tr>
+<td>Edicoes permitidas</td>
+<td>Apenas quando o objetivo depender diretamente do solver de sal: pressao de parede, dano, pos-processamento, acoplamento ou I/O necessario.</td>
+</tr>
+<tr>
+<td>Edicoes proibidas</td>
+<td>Mudancas oportunistas, refatoracoes cosmeticas, alteracao de formulacao fisica sem registro em <code>docs/08_known_issues.md</code> e sem validação dedicada.</td>
+</tr>
+<tr>
+<td>Testes</td>
+<td>Toda mudanca em <code>external/saltcreep/</code> exige testes do proprio saltcreep quando existentes e testes de integracao no <code>lot-salt-suite</code> quando houver adapter afetado.</td>
+</tr>
+<tr>
+<td>Rastreabilidade</td>
+<td>Registrar motivacao, arquivos, testes e riscos em <code>docs/dev-log.md</code>; se a formulacao mudar, registrar tambem em <code>docs/08_known_issues.md</code>.</td>
+</tr>
+<tr>
+<td>Legado LOT/APB</td>
+<td><code>legance/</code> e <code>legacy/</code> continuam congelados e somente leitura.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="fronteira-de-responsabilidade">Fronteira de responsabilidade</h2>
+<p>O <code>lot-salt-suite</code> deve conter a orquestracao, parsing, conversoes de unidade,
+contratos de dados e adapters. O <code>external/saltcreep/</code> deve continuar contendo
+o nucleo numerico de fluencia, dano e campos de pressao aplicados a parede.</p>
+<p>O adapter esperado e:</p>
+<ol>
+<li>Receber casos ja convertidos para SI pelo parser do <code>lot-salt-suite</code>.</li>
+<li>Construir os campos de pressao/temperatura requeridos pelo saltcreep.</li>
+<li>Executar ou acionar o solver de sal.</li>
+<li>Retornar deslocamento, fechamento radial, tensoes/dano diagnostico e series
+   temporais necessarias para LOT/APB.</li>
+<li>Nunca expor parsing YAML/JSON do caso principal para dentro do solver.</li>
+</ol>
+<h2 id="pontos-tecnicos-ja-existentes-no-saltcreep">Pontos tecnicos ja existentes no saltcreep</h2>
+<p>A auditoria de Fase 6.0 identificou capacidades relevantes ja presentes:</p>
+<ul>
+<li><code>WallPressureField</code> para aplicar perfil de pressao na parede.</li>
+<li>Casos APB com gradiente de lama em <code>cases/apb/</code>.</li>
+<li>Saidas de diagnostico de dano, incluindo eventos e campos associados.</li>
+<li>Pos-processamento de pressao de parede e fechamento/diametro.</li>
+</ul>
+<p>Esses pontos devem ser preferidos como superficie de integracao antes de criar
+novas rotas paralelas.</p>
+<h2 id="regras-para-futuras-alteracoes-no-saltcreep">Regras para futuras alteracoes no saltcreep</h2>
+<p>Antes de alterar <code>external/saltcreep/</code>, abrir uma tarefa tecnica com:</p>
+<ul>
+<li>objetivo fisico/numerico;</li>
+<li>arquivos esperados;</li>
+<li>testes que serao executados;</li>
+<li>impacto no contrato do adapter;</li>
+<li>risco de regressao;</li>
+<li>necessidade ou nao de atualizar <code>docs/08_known_issues.md</code>.</li>
+</ul>
+<p>Ao finalizar, registrar:</p>
+<ul>
+<li>arquivos alterados;</li>
+<li>testes executados;</li>
+<li>diferencas numericas observadas;</li>
+<li>risco remanescente;</li>
+<li>proximo passo de validacao.</li>
+</ul>
+<h2 id="estado-nesta-fase">Estado nesta fase</h2>
+<p>Nesta Fase 6.0, <code>external/saltcreep/</code> foi auditado em modo somente leitura. Nenhum
+arquivo do saltcreep foi alterado.</p>
+</section>
+
+<section id="lot_pkn_roadmap" class="doc-section">
+<div class="section-header"><span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Implementado</span></div>
+<h1 id="17-roadmap-lotpkn">17. Roadmap LOT/PKN</h1>
+<h2 id="decisao-de-prioridade">Decisao de prioridade</h2>
+<p>A migracao de LOT deve priorizar o caminho PKN observado nos legados antes de
+implementar familias de fratura adicionais. O motivo e pratico: o PKN e o
+caminho com casos e arquivos de resultado mais diretamente conectados aos LOTs
+auditados, especialmente em <code>legance/LOT_Tese/</code>.</p>
+<p>Os modelos circular, eliptico e penny-shaped permanecem catalogados, mas nao
+devem bloquear a primeira implementacao moderna.</p>
+<h2 id="escopo-da-primeira-entrega-lotpkn">Escopo da primeira entrega LOT/PKN</h2>
+<p>A primeira implementacao moderna deve criar contratos e testes, nao apenas
+transcrever equacoes do legado.</p>
+<p>Componentes esperados:</p>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Responsabilidade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lot::PknModel</code></td>
+<td>Calcular abertura, comprimento e volume de fratura PKN com entradas SI.</td>
+</tr>
+<tr>
+<td><code>lot::BreakdownDetector</code></td>
+<td>Detectar inicio de fratura quando a pressao de parede excede o limite definido pela convencao do projeto.</td>
+</tr>
+<tr>
+<td><code>lot::InjectionSchedule</code></td>
+<td>Representar taxa de injecao, tempo de simulacao, <code>dt</code> e tempo de acomodacao/no-injection.</td>
+</tr>
+<tr>
+<td><code>lot::LeakoffState</code></td>
+<td>Acumular volume vazado/fraturado e expor serie temporal para APB/coupling.</td>
+</tr>
+<tr>
+<td>Testes Catch2</td>
+<td>Cobrir unidades, monotonias, ativacao de breakdown e conservacao dimensional basica.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="contrato-de-tempo">Contrato de tempo</h2>
+<p>O <code>dt</code> deve ser coerente com a taxa usada pelo modelo fisico. Se a lei de
+deformacao ou fluencia estiver expressa por segundo, o <code>dt</code> deve estar em
+segundos no solver; se a taxa estiver por minuto ou hora, a conversao deve ser
+explicita no parser ou no adapter.</p>
+<p>O usuario deve poder definir:</p>
+<ul>
+<li><code>dt</code>;</li>
+<li>politica adaptativa futura, quando implementada;</li>
+<li>tempo total de simulacao;</li>
+<li>tempo de acomodacao, definido como periodo sem incrementos termicos nem
+  injecao de fluidos.</li>
+</ul>
+<p>No codigo moderno, o parser deve converter unidades de campo para SI antes de
+entregar os dados ao solver.</p>
+<h2 id="caminho-de-migracao">Caminho de migracao</h2>
+<ol>
+<li>Congelar a interpretacao tecnica do PKN legado em <code>docs/audits/pkn_legacy_path.md</code>.</li>
+<li>Criar tipos de entrada LOT em <code>include/lot/</code>, separados de parsing.</li>
+<li>Implementar <code>PknModel</code> com entradas SI e sem acesso direto a YAML/JSON.</li>
+<li>Implementar <code>BreakdownDetector</code> seguindo FA01-FA04 e os riscos registrados.</li>
+<li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
+<li>Conectar ao CLI apenas depois que o contrato numerico estiver testado.</li>
+<li>Comparar com arquivos legados somente quando o pipeline moderno produzir
+   series equivalentes e documentar em <code>docs/12_validation_results.md</code>.</li>
+</ol>
+<h2 id="fora-de-escopo-nesta-fase">Fora de escopo nesta fase</h2>
+<p>Nesta Fase 6.1 nao foram implementados <code>PknModel</code>, <code>BreakdownDetector</code>,
+executavel novo ou comparacao numerica. A fase e de auditoria, governanca e
+roadmap para reduzir risco antes da codificacao.</p>
+<h2 id="riscos-tecnicos-a-resolver-antes-da-implementacao">Riscos tecnicos a resolver antes da implementacao</h2>
+<ul>
+<li>O legado usa conversoes de vazao com fatores geometricos embutidos e ao menos
+  uma expressao suspeita (<code>/ M_PI / 22</code>) que deve ser auditada antes de servir
+  como referencia numerica.</li>
+<li>O tempo de fratura mistura <code>t</code> absoluto e tempo desde breakdown em trechos do
+  legado; o modelo moderno deve escolher uma unica convencao.</li>
+<li>O volume PKN legado usa uma forma simplificada (<code>w0 * L1 * pi</code>) e mantem uma
+  alternativa comentada; a escolha precisa ser documentada antes de validar.</li>
+<li>A convencao de tensao circunferencial deve respeitar FA01-FA04 e nao pode ser
+  reinterpretada sem registro em <code>docs/08_known_issues.md</code>.</li>
+</ul>
+</section>
+
+<section id="lot_legacy_inventory" class="doc-section">
+<div class="section-header"><span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Implementado</span></div>
+<h1 id="inventario-lot-nos-legados">Inventario LOT nos legados</h1>
+<h2 id="escopo">Escopo</h2>
+<p>Auditoria somente leitura dos caminhos LOT nos legados, com foco em arquivos
+relacionados a fratura, leakoff, injecao e resultados PKN. Nenhum arquivo em
+<code>legance/</code>, <code>legacy/</code> ou <code>external/saltcreep/</code> foi alterado.</p>
+<h2 id="principais-regioes">Principais regioes</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Papel observado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>legance/LOT_Tese/include/apb_code/Fluids.h</code></td>
+<td>Define propriedades de fluido e <code>LeakoffProps</code>, incluindo tipo de fratura.</td>
+</tr>
+<tr>
+<td><code>legance/LOT_Tese/src/apb_code/Fluids.cpp</code></td>
+<td>Converte viscosidade e registra o tipo de fratura por string.</td>
+</tr>
+<tr>
+<td><code>legance/LOT_Tese/include/apb_code/APB1da.h</code></td>
+<td>Declara controle LOT, vazao, tempo sem injecao e funcoes de fratura.</td>
+</tr>
+<tr>
+<td><code>legance/LOT_Tese/src/apb_code/APB1da.cpp</code></td>
+<td>Contem injecao LOT, deteccao de pressao acima do limite e modelos de fratura/leakoff.</td>
+</tr>
+<tr>
+<td><code>legance/LOT_Tese/main/</code></td>
+<td>Casos executaveis hard-coded para pocos e geometrias.</td>
+</tr>
+<tr>
+<td><code>legance/LOT_Tese/Teste/</code></td>
+<td>Resultados, figuras e dados comparativos de LOT.</td>
+</tr>
+<tr>
+<td><code>legance/LOT_APB_v5/</code></td>
+<td>Caminho moderno JSON/APB/sal, mas sem ser o eixo prioritario para PKN LOT.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="strings-de-geometria">Strings de geometria</h2>
+<p><code>Fluids::idTypeFracture()</code> mapeia:</p>
+<table>
+<thead>
+<tr>
+<th>String</th>
+<th>ID</th>
+<th>Status para migracao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>circular</code></td>
+<td>0</td>
+<td>Catalogado, nao prioritario.</td>
+</tr>
+<tr>
+<td><code>elliptical</code></td>
+<td>1</td>
+<td>Catalogado, nao prioritario.</td>
+</tr>
+<tr>
+<td><code>pkn</code></td>
+<td>2</td>
+<td>Prioridade da primeira migracao LOT.</td>
+</tr>
+<tr>
+<td><code>penny-shaped</code></td>
+<td>3</td>
+<td>Catalogado, nao prioritario.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="casos-pkn-observados">Casos PKN observados</h2>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Observacao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp</code></td>
+<td>Caso PKN explicito para 8-BUZ-67D, com injecao LOT em minutos.</td>
+</tr>
+<tr>
+<td><code>legance/LOT_Tese/9-BUZ-39DA-RJS-VISCO-2.cpp</code></td>
+<td>Caso PKN para 9-BUZ-39DA, gravando <code>results/9-BUZ-39DA-RJS_PKN2.dat</code>.</td>
+</tr>
+<tr>
+<td><code>legance/LOT_Tese/Teste/8-BUZ-67D-PKN*.dat</code></td>
+<td>Familia de resultados e comparacoes PKN.</td>
+</tr>
+<tr>
+<td><code>legance/LOT_Tese/Teste/Dados do artigo/</code></td>
+<td>Dados derivados usados em material de artigo.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sinais-de-inconsistencias">Sinais de inconsistencias</h2>
+<ul>
+<li>Alguns arquivos nomeados como circular, eliptico ou penny-shaped apresentam
+  configuracoes aparentes copiadas de PKN em trechos auditados. Isso deve ser
+  tratado como risco de inventario, nao como verdade fisica.</li>
+<li>As conversoes de vazao no legado incluem fator <code>M_PI / 2</code>; uma funcao de
+  conversao para <code>bb/min -&gt; m3/h</code> contem <code>M_PI / 22</code>, que parece erro de digito.</li>
+<li>A saida <code>Momento da quebra</code> existe no fluxo de escrita, mas a semantica exata
+  deve ser preservada por testes antes de ser usada como benchmark.</li>
+</ul>
+<h2 id="conclusao">Conclusao</h2>
+<p>O caminho PKN em <code>legance/LOT_Tese</code> e o candidato correto para a primeira
+migracao LOT. <code>LOT_APB_v5</code> continua importante para APB/JSON/sal, mas nao deve
+ser usado como fonte principal da formulacao PKN.</p>
+</section>
+
+<section id="pkn_legacy_path" class="doc-section">
+<div class="section-header"><span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Implementado</span></div>
+<h1 id="caminho-pkn-legado">Caminho PKN legado</h1>
+<h2 id="entrada-do-caso">Entrada do caso</h2>
+<p>O caso PKN mais direto auditado e <code>legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp</code>.
+Ele configura:</p>
+<ul>
+<li>profundidade de teste;</li>
+<li>fluido anular com densidade, expansibilidade e compressibilidade;</li>
+<li><code>setLeakoffProps("pa_min", 3., "pkn")</code>;</li>
+<li>geometria de pocos, revestimentos, cimentos e rochas;</li>
+<li>simulacao em minutos com <code>dt = 0.5</code>, tempo final <code>12.5</code>, vazao <code>0.5 bpm</code> e
+  tempo sem injecao <code>9.5</code>.</li>
+</ul>
+<p>Ha tambem o caso <code>legance/LOT_Tese/9-BUZ-39DA-RJS-VISCO-2.cpp</code>, que usa PKN com
+viscosidade <code>1 cP</code> convertida para <code>pa_min</code> e escreve resultado PKN proprio.</p>
+<h2 id="rota-de-execucao">Rota de execucao</h2>
+<ol>
+<li>O caso chama <code>Fluids::setLeakoffProps(...)</code>.</li>
+<li>A string <code>pkn</code> e convertida para <code>idTypeFracture == 2</code>.</li>
+<li><code>APB1da::getLOT(...)</code> injeta fluido nos elementos anulares durante a janela
+   ativa de injecao.</li>
+<li><code>APB1da::calculateLOTFracturedSaltRock(...)</code> avalia a parede anular contra a
+   rocha vizinha.</li>
+<li>Quando a pressao de parede excede o limite usado pelo legado, o tempo de
+   quebra e registrado.</li>
+<li>Para <code>idTypeFracture == 2</code>, o bloco PKN calcula altura, abertura, comprimento
+   e volume de leakoff/fratura.</li>
+<li><code>getdV(...)</code> incorpora <code>dV_leakoff</code> ao balanco volumetrico.</li>
+<li><code>saveFile(...)</code> grava series de pressao, volume, deslocamento, leakoff e
+   momento da quebra.</li>
+</ol>
+<h2 id="variaveis-fisicas-observadas">Variaveis fisicas observadas</h2>
+<table>
+<thead>
+<tr>
+<th>Variavel legado</th>
+<th>Sentido observado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pw</code></td>
+<td>Pressao na parede/anular apos incremento.</td>
+</tr>
+<tr>
+<td><code>sigmaTheta</code></td>
+<td>Tensao circunferencial usada como limite, com inversao de sinal no legado.</td>
+</tr>
+<tr>
+<td><code>Qinj</code></td>
+<td>Vazao convertida pela familia <code>ConvflowRate()</code>.</td>
+</tr>
+<tr>
+<td><code>mu</code></td>
+<td>Viscosidade convertida para a unidade temporal escolhida.</td>
+</tr>
+<tr>
+<td><code>time</code></td>
+<td>Tempo desde o primeiro excesso de pressao, embora trechos PKN tambem usem <code>t</code>.</td>
+</tr>
+<tr>
+<td><code>h</code></td>
+<td>Altura efetiva calculada para PKN.</td>
+</tr>
+<tr>
+<td><code>w0</code></td>
+<td>Abertura caracteristica.</td>
+</tr>
+<tr>
+<td><code>L1</code></td>
+<td>Comprimento caracteristico.</td>
+</tr>
+<tr>
+<td><code>dV_leakoff</code></td>
+<td>Volume que entra no balanco APB/LOT.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="pontos-que-nao-devem-ser-copiados-cegamente">Pontos que nao devem ser copiados cegamente</h2>
+<ul>
+<li>A conversao de vazao mistura unidade e fator geometrico; o modelo moderno deve
+  separar conversao SI de convencao geometrica.</li>
+<li>O bloco PKN usa <code>time</code> em algumas formulas e <code>t</code> absoluto em outra. Isso deve
+  ser resolvido antes de declarar equivalencia.</li>
+<li>O volume PKN usa <code>w0 * L1 * M_PI</code>; ha alternativa comentada no legado. A
+  escolha moderna precisa ser documentada.</li>
+<li>O criterio de breakdown deve obedecer as convencoes FA01-FA04 ja registradas.</li>
+</ul>
+<h2 id="referencia-para-implementacao-moderna">Referencia para implementacao moderna</h2>
+<p>A implementacao futura deve reproduzir o comportamento relevante por contrato:</p>
+<ul>
+<li>entrada SI;</li>
+<li>calendario de injecao e acomodacao explicito;</li>
+<li>deteccao de breakdown testavel;</li>
+<li>modelo PKN isolado de parsing;</li>
+<li>saida temporal comparavel aos arquivos <code>.dat</code> legados;</li>
+<li>documentacao de qualquer divergencia fisica.</li>
+</ul>
+</section>
+
+<section id="non_pkn_models_status" class="doc-section">
+<div class="section-header"><span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Implementado</span></div>
+<h1 id="status-dos-modelos-nao-pkn">Status dos modelos nao PKN</h1>
+<h2 id="objetivo">Objetivo</h2>
+<p>Catalogar modelos de fratura encontrados nos legados que nao devem entrar na
+primeira entrega moderna de LOT/PKN.</p>
+<h2 id="modelos-encontrados">Modelos encontrados</h2>
+<table>
+<thead>
+<tr>
+<th>Modelo</th>
+<th>ID legado</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Circular/KGD circular</td>
+<td>0</td>
+<td>Catalogado; nao prioritario.</td>
+</tr>
+<tr>
+<td>Eliptico/KGD elliptic</td>
+<td>1</td>
+<td>Catalogado; nao prioritario.</td>
+</tr>
+<tr>
+<td>Penny-shaped</td>
+<td>3</td>
+<td>Catalogado; nao prioritario.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="motivo-para-nao-priorizar">Motivo para nao priorizar</h2>
+<p>O objetivo imediato e migrar um caminho LOT suficientemente rastreavel para
+servir de base de validacao. O PKN tem casos e resultados legados mais diretos
+para essa finalidade. Implementar todos os modelos simultaneamente aumentaria o
+risco de misturar convencoes, unidades e erros historicos.</p>
+<h2 id="condicoes-para-reabrir">Condicoes para reabrir</h2>
+<p>Um modelo nao PKN pode virar prioridade quando houver:</p>
+<ul>
+<li>caso legado inequivoco;</li>
+<li>saida congelada disponivel;</li>
+<li>formulacao documentada;</li>
+<li>criterio de breakdown claro;</li>
+<li>testes Catch2 propostos;</li>
+<li>justificativa de uso no acoplamento LOT/APB/sal.</li>
+</ul>
+<h2 id="riscos-conhecidos">Riscos conhecidos</h2>
+<ul>
+<li>Arquivos de caso podem ter nomes de geometria inconsistentes com a string
+  efetivamente passada para <code>setLeakoffProps</code>.</li>
+<li>Parte das constantes empiricas aparece diretamente no bloco de calculo, sem
+  fonte explicita no codigo.</li>
+<li>A semantica de volume varia entre geometrias e precisa de auditoria dedicada
+  antes de migracao.</li>
 </ul>
 </section>
 

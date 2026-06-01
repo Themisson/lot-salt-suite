@@ -23,6 +23,11 @@ Documentação técnica do lot-salt-suite.
 | `13_coupling_lot_apb_salt.md` | Algoritmo de acoplamento |
 | `14_developer_workflow.md` | Guia do desenvolvedor |
 | `15_changelog.md` | Log de mudanças |
+| `16_saltcreep_governance.md` | Governanca de `external/saltcreep/` como dependencia vendorizada ativa |
+| `17_lot_pkn_roadmap.md` | Roadmap da migracao LOT/PKN |
+| `audits/lot_legacy_inventory.md` | Inventario LOT nos legados |
+| `audits/pkn_legacy_path.md` | Caminho tecnico PKN legado |
+| `audits/non_pkn_models_status.md` | Status dos modelos nao PKN |
 
 ## Regras críticas
 

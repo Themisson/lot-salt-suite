@@ -58,6 +58,11 @@ class SaltCreepSaltcreepAdapter : public SaltCreepInterface {
 };
 ```
 
+`external/saltcreep/` e tratado como dependencia vendorizada ativa, com edicao
+controlada. O adapter deve preferir superficies existentes do solver, como
+campos de pressao de parede, diagnosticos de dano e saidas de pos-processamento,
+antes de criar rotas paralelas no `lot-salt-suite`.
+
 ### Adapter para SESTSAL legado
 
 ```cpp
@@ -98,3 +103,17 @@ Subcomandos:
    f. salvar saída se (passo % output_every == 0)
 8. pós-processamento: invocar script Python se configurado
 ```
+
+## Prioridade LOT/PKN
+
+A primeira entrega moderna do modulo `lot/` deve priorizar PKN, conforme a
+auditoria em `docs/audits/pkn_legacy_path.md`. Os modelos circular, eliptico e
+penny-shaped permanecem catalogados, mas fora do primeiro caminho critico.
+
+O contrato minimo para LOT/PKN deve separar:
+
+- calendario de injecao e acomodacao;
+- deteccao de breakdown;
+- modelo PKN com entradas SI;
+- acumulacao de leakoff/fratura;
+- serializacao de series temporais para comparacao.

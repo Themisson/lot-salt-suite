@@ -15,6 +15,10 @@ O LOT, APB e fluência de sal são fenômenos que se influenciam mutuamente:
    aumenta pressão no anular (APB)
 3. **APB → Sal:** pressão anular muda a tensão efetiva na rocha salina
 
+Na arquitetura atual, o caminho LOT inicial deve ser PKN. O acoplamento com sal
+deve passar pelo adapter para `external/saltcreep/`, que e uma dependencia
+vendorizada ativa com governanca descrita em `docs/16_saltcreep_governance.md`.
+
 ## Algoritmo proposto (a verificar com formulação do legado)
 
 ```
@@ -44,6 +48,8 @@ Para cada passo de tempo dt:
 | Definição de tensão efetiva no sal | Crítico | `legance/LOT_Tese/include/sestsal/material.h` |
 | Coordenadas: tensão radial × tangencial × axial | Alto | `legance/LOT_Tese/src/apb_code/APB1da.cpp` |
 | Critério de convergência do loop | Médio | `legance/LOT_APB_v5/main/main.cpp` |
+| Semantica de tempo PKN (`t` absoluto vs. tempo desde breakdown) | Alto | `legance/LOT_Tese/src/apb_code/APB1da.cpp` |
+| Conversoes de vazao com fator geometrico embutido | Alto | `legance/LOT_Tese/src/apb_code/APB1da.cpp` |
 
 ## Interface proposta para coupling/
 
@@ -72,3 +78,17 @@ private:
     ApbSolver& apb_;
 };
 ```
+
+## Contrato PKN/saltcreep
+
+O `coupling/` nao deve conhecer detalhes internos do PKN legado nem do FEM de
+sal. O fluxo esperado e:
+
+1. `lot/` calcula pressao, breakdown, abertura/comprimento PKN e volume de
+   leakoff/fratura.
+2. `coupling/` transforma a pressao anular/LOT em condicoes de contorno para sal.
+3. `SaltCreepSaltcreepAdapter` delega para o `external/saltcreep/`, usando
+   mecanismos existentes de pressao de parede quando aplicaveis.
+4. O retorno do sal atualiza fechamento radial, volume anular e diagnosticos de
+   dano.
+5. `apb/` atualiza pressao anular a partir do volume e compressibilidade.

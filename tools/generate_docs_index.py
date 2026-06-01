@@ -56,6 +56,11 @@ SECTION_MAP = {
     "coupling":        "13_coupling_lot_apb_salt.md",
     "devguide":        "14_developer_workflow.md",
     "changelog":       "15_changelog.md",
+    "saltcreep_governance": "16_saltcreep_governance.md",
+    "lot_pkn_roadmap": "17_lot_pkn_roadmap.md",
+    "lot_legacy_inventory": "audits/lot_legacy_inventory.md",
+    "pkn_legacy_path": "audits/pkn_legacy_path.md",
+    "non_pkn_models_status": "audits/non_pkn_models_status.md",
 }
 
 STATUS_LABELS = {

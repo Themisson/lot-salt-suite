@@ -10,20 +10,23 @@ O repositório tem três bases: código legado da tese (`legance/LOT_Tese/`), ve
 moderna com JSON (`legance/LOT_APB_v5/`) e um solver FEM moderno de sal (`external/saltcreep/`).
 
 O objetivo é criar código novo nos diretórios `src/`, `include/`, `apps/`, `cases/` etc.,
-**sem modificar nenhum arquivo legado**.
+**sem modificar nenhum arquivo legado**. O diretório `external/saltcreep/` é uma
+dependência vendorizada ativa: pode evoluir somente com escopo explícito, testes,
+documentação e registro em `docs/dev-log.md`.
 
 ## Regras invioláveis para agentes
 
-1. **PROIBIDO** editar qualquer arquivo em `legance/` ou `external/saltcreep/`.
-2. **PROIBIDO** apagar arquivos existentes.
-3. **PROIBIDO** mudar formulação física sem documentar em `docs/08_known_issues.md`.
-4. **PROIBIDO** declarar validações como executadas em `docs/12_validation_results.md` sem rodar.
-5. **PROIBIDO** copiar código de `external/saltcreep/src/` para `src/salt/` — use interface/adapter.
-6. **PROIBIDO** misturar lógica de solver com parsing de entrada no mesmo arquivo.
-7. **OBRIGATÓRIO** criar testes Catch2 para todo módulo C++ novo.
-8. **OBRIGATÓRIO** validar YAML de caso contra schema antes de commitar.
-9. **OBRIGATÓRIO** converter todas as unidades de campo para SI no parser (não no solver).
-10. **OBRIGATÓRIO** informar arquivos alterados, testes executados e riscos ao final da tarefa.
+1. **PROIBIDO** editar qualquer arquivo em `legance/` ou `legacy/`.
+2. **PROIBIDO** editar `external/saltcreep/` sem tarefa explícita de integração de sal, testes próprios e atualização documental.
+3. **PROIBIDO** apagar arquivos existentes.
+4. **PROIBIDO** mudar formulação física sem documentar em `docs/08_known_issues.md`.
+5. **PROIBIDO** declarar validações como executadas em `docs/12_validation_results.md` sem rodar.
+6. **PROIBIDO** copiar código de `external/saltcreep/src/` para `src/salt/` — use interface/adapter.
+7. **PROIBIDO** misturar lógica de solver com parsing de entrada no mesmo arquivo.
+8. **OBRIGATÓRIO** criar testes Catch2 para todo módulo C++ novo.
+9. **OBRIGATÓRIO** validar YAML de caso contra schema antes de commitar.
+10. **OBRIGATÓRIO** converter todas as unidades de campo para SI no parser (não no solver).
+11. **OBRIGATÓRIO** informar arquivos alterados, testes executados e riscos ao final da tarefa.
 
 ## Leitura obrigatória antes de qualquer tarefa
 
@@ -62,7 +65,7 @@ lot-salt-suite/
 ├── tools/                   ← Scripts utilitários
 ├── docs/                    ← Documentação técnica + index.html
 ├── legance/                 ← CONGELADO (legado físico, NÃO EDITAR)
-└── external/saltcreep/      ← REFERÊNCIA (NÃO EDITAR, NÃO DUPLICAR)
+└── external/saltcreep/      ← DEPENDÊNCIA VENDORIZADA ATIVA (EDIÇÃO CONTROLADA, NÃO DUPLICAR)
 ```
 
 ## Módulos C++ e suas responsabilidades
