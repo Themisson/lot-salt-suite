@@ -137,7 +137,7 @@ lot-salt-suite/
 - Smart pointers, RAII; sem `new`/`delete` em código novo
 - Headers em `include/<modulo>/`; `.cpp` em `src/<modulo>/`
 - Um executável principal: `apps/lot-sim.cpp`
-- Eigen: referenciar de `external/saltcreep/include/Eigen/` via CMakeLists.txt
+- Eigen: `include/Eigen/` é o Eigen oficial do `lot-salt-suite`; `external/saltcreep/include/Eigen/` permanece preservado para o saltcreep
 - yaml-cpp e Catch2 via FetchContent
 
 ## Formato de entrega ao final de cada tarefa

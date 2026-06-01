@@ -94,7 +94,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 46         # Catch2 — verde na ultima execucao registrada
+  cpp_tests: 47         # Catch2 — verde na ultima execucao registrada
   python_tests: 3       # unittest — verde; pytest indisponivel no ambiente local
   regression_baselines: 4
 

@@ -97,8 +97,9 @@ Depois: produza um plano curto e implemente apenas a tarefa solicitada.
 - Evitar `new`/`delete` em código novo — usar RAII e smart pointers.
 - Classes públicas em `include/<modulo>/`; implementações em `src/<modulo>/`.
 - Único executável principal: `apps/lot-sim.cpp`.
-- Eigen: não duplicar; referenciar o vendorizado em `external/saltcreep/include/Eigen/`
-  ou criar um único include path no CMakeLists.txt apontando para ele.
+- Eigen: `include/Eigen/` é o Eigen oficial do `lot-salt-suite`. Preserve
+  `external/saltcreep/include/Eigen/` para o saltcreep e não misture os dois
+  include paths no mesmo target.
 - yaml-cpp via FetchContent (ver CMakeLists.txt).
 - Catch2 v3 via FetchContent para testes.
 - Não usar `printf`; preferir `std::format` (C++20) ou streams com flags.

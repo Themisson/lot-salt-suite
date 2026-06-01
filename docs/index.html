@@ -266,7 +266,7 @@
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
       <div class="stat"><div class="n coppc">6/13</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">46</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n tealc">47</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2390,7 +2390,8 @@ comparação com <code>legance/LOT_APB_v5</code> nem alteração de baselines. R
 <li><code>.\build\lot-sim.exe validate --case cases\validation\lot_pkn_with_leakoff.yaml</code></li>
 <li><code>.\build\lot-sim.exe validate --case cases\lot_tese_migrated\buz67d_pkn.yaml</code></li>
 </ul>
-<p><strong>Resultado CTest:</strong> 46 testes Catch2 executados, 46 passaram.</p>
+<p><strong>Resultado CTest:</strong> 47 testes Catch2 executados, 47 passaram na revisao do
+commit <code>9048683</code>.</p>
 <p><strong>Resultado CLI validate:</strong></p>
 <table>
 <thead>
@@ -2417,8 +2418,8 @@ comparação com <code>legance/LOT_APB_v5</code> nem alteração de baselines. R
 <p><strong>Modelo coberto por teste:</strong> <code>lot::LeakoffModel</code> calcula incrementos e volumes
 acumulados para <code>none</code>, <code>constant_rate</code>, <code>carter</code> e <code>synthetic_constant</code>. Os
 testes cobrem incremento zero, taxa constante, rejeicao de taxa/coeficiente
-negativos, <code>dt &lt;= 0</code>, <code>NaN</code>/<code>Inf</code>, monotonicidade Carter e integracao com
-<code>PknModel</code>.</p>
+negativos, <code>dt &lt;= 0</code>, <code>NaN</code>/<code>Inf</code>, monotonicidade Carter, integracao com
+<code>PknModel</code> e rejeicao de campos estruturados negativos em <code>PknInput</code>.</p>
 <p><strong>Importante:</strong> o Carter desta fase e estrutural/minimo e nao constitui
 calibracao fisica dependente de pressao. Nao houve regressao numerica contra
 legado, uso de <code>.dat</code>, APB, sal ou dano.</p>
@@ -2792,6 +2793,12 @@ documentacao e registro no <code>docs/dev-log.md</code>.</p>
 <p>O <code>lot-salt-suite</code> deve conter a orquestracao, parsing, conversoes de unidade,
 contratos de dados e adapters. O <code>external/saltcreep/</code> deve continuar contendo
 o nucleo numerico de fluencia, dano e campos de pressao aplicados a parede.</p>
+<h2 id="politica-eigen">Politica Eigen</h2>
+<p><code>include/Eigen/</code> e o Eigen oficial do <code>lot-salt-suite</code> e deve ser exposto aos
+targets modernos pelo target CMake <code>lss::eigen</code>. A copia em
+<code>external/saltcreep/include/Eigen/</code> deve permanecer preservada para o saltcreep.
+Nenhum target deve receber simultaneamente <code>include/</code> e
+<code>external/saltcreep/include/</code> apenas para resolver Eigen.</p>
 <p>O adapter esperado e:</p>
 <ol>
 <li>Receber casos ja convertidos para SI pelo parser do <code>lot-salt-suite</code>.</li>

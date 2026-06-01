@@ -29,6 +29,14 @@ O `lot-salt-suite` deve conter a orquestracao, parsing, conversoes de unidade,
 contratos de dados e adapters. O `external/saltcreep/` deve continuar contendo
 o nucleo numerico de fluencia, dano e campos de pressao aplicados a parede.
 
+## Politica Eigen
+
+`include/Eigen/` e o Eigen oficial do `lot-salt-suite` e deve ser exposto aos
+targets modernos pelo target CMake `lss::eigen`. A copia em
+`external/saltcreep/include/Eigen/` deve permanecer preservada para o saltcreep.
+Nenhum target deve receber simultaneamente `include/` e
+`external/saltcreep/include/` apenas para resolver Eigen.
+
 O adapter esperado e:
 
 1. Receber casos ja convertidos para SI pelo parser do `lot-salt-suite`.

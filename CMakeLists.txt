@@ -45,8 +45,14 @@ endif()
 # ============================================================
 # Eigen header-only para cálculos do simulador
 # ============================================================
-# Eigen está em include/Eigen/ e é usado como header-only sem target separado.
-set(EIGEN_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
+# include/Eigen e o Eigen oficial do lot-salt-suite.
+# external/saltcreep/include/Eigen permanece preservado para o saltcreep.
+set(LSS_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
+add_library(lss_eigen INTERFACE)
+add_library(lss::eigen ALIAS lss_eigen)
+target_include_directories(lss_eigen INTERFACE
+  ${LSS_INCLUDE_DIR}
+)
 
 # ============================================================
 # OpenMP (opcional)
@@ -75,10 +81,9 @@ set(LSS_CORE_SOURCES
 if(LSS_BUILD_APPS AND LSS_CORE_SOURCES)
   add_executable(lot-sim apps/lot-sim.cpp ${LSS_CORE_SOURCES})
   target_include_directories(lot-sim PRIVATE
-    include
-    ${EIGEN_INCLUDE_DIR}
+    ${LSS_INCLUDE_DIR}
   )
-  target_link_libraries(lot-sim PRIVATE yaml-cpp)
+  target_link_libraries(lot-sim PRIVATE yaml-cpp lss::eigen)
   if(LSS_ENABLE_OPENMP AND OpenMP_CXX_FOUND)
     target_link_libraries(lot-sim PRIVATE OpenMP::OpenMP_CXX)
   endif()
@@ -99,10 +104,9 @@ if(LSS_BUILD_TESTS)
     ${LSS_CORE_SOURCES}
   )
   target_include_directories(lot_sim_tests PRIVATE
-    include
-    ${EIGEN_INCLUDE_DIR}
+    ${LSS_INCLUDE_DIR}
   )
-  target_link_libraries(lot_sim_tests PRIVATE Catch2::Catch2WithMain yaml-cpp)
+  target_link_libraries(lot_sim_tests PRIVATE Catch2::Catch2WithMain yaml-cpp lss::eigen)
   if(TARGET lot-sim)
     add_dependencies(lot_sim_tests lot-sim)
   endif()

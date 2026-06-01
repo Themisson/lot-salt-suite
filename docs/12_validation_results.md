@@ -250,7 +250,8 @@ comparação com `legance/LOT_APB_v5` nem alteração de baselines. R09 continua
 - `.\build\lot-sim.exe validate --case cases\validation\lot_pkn_with_leakoff.yaml`
 - `.\build\lot-sim.exe validate --case cases\lot_tese_migrated\buz67d_pkn.yaml`
 
-**Resultado CTest:** 46 testes Catch2 executados, 46 passaram.
+**Resultado CTest:** 47 testes Catch2 executados, 47 passaram na revisao do
+commit `9048683`.
 
 **Resultado CLI validate:**
 
@@ -263,8 +264,8 @@ comparação com `legance/LOT_APB_v5` nem alteração de baselines. R09 continua
 **Modelo coberto por teste:** `lot::LeakoffModel` calcula incrementos e volumes
 acumulados para `none`, `constant_rate`, `carter` e `synthetic_constant`. Os
 testes cobrem incremento zero, taxa constante, rejeicao de taxa/coeficiente
-negativos, `dt <= 0`, `NaN`/`Inf`, monotonicidade Carter e integracao com
-`PknModel`.
+negativos, `dt <= 0`, `NaN`/`Inf`, monotonicidade Carter, integracao com
+`PknModel` e rejeicao de campos estruturados negativos em `PknInput`.
 
 **Importante:** o Carter desta fase e estrutural/minimo e nao constitui
 calibracao fisica dependente de pressao. Nao houve regressao numerica contra

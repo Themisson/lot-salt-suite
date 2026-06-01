@@ -131,3 +131,18 @@ TEST_CASE("PknModel integration accumulates structured leakoff") {
     CHECK(result.leakoff_volume_series_m3[i] >= result.leakoff_volume_series_m3[i - 1]);
   }
 }
+
+TEST_CASE("PknModel integration rejects negative structured leakoff inputs") {
+  auto bad_coefficient = pkn_input();
+  bad_coefficient.leakoff.enabled = true;
+  bad_coefficient.leakoff.model = lss::lot::LeakoffModel::Carter;
+  bad_coefficient.leakoff.coefficient_m_sqrt_s = -1.0e-6;
+  CHECK_THROWS_AS(lss::lot::PknModel{}.simulate(bad_coefficient),
+                  std::invalid_argument);
+
+  auto bad_rate = pkn_input();
+  bad_rate.leakoff.enabled = true;
+  bad_rate.leakoff.model = lss::lot::LeakoffModel::ConstantRate;
+  bad_rate.leakoff.constant_rate_m3_s = -1.0e-6;
+  CHECK_THROWS_AS(lss::lot::PknModel{}.simulate(bad_rate), std::invalid_argument);
+}

@@ -13,7 +13,7 @@ Fase ativa  : 6.9 implementada (LeakoffModel C++ estruturado)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
-Testes C++  : 46 Catch2 (46 passaram em 2026-06-01)
+Testes C++  : 47 Catch2 (47 passaram em 2026-06-01)
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
@@ -47,6 +47,23 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Revisao commit 9048683 — LeakoffModel e Eigen/CMake — Codex
+**Status:** Aprovado com ressalvas corrigidas nesta sessao.
+**Commit revisado:** `9048683 feat(lot): add structured leakoff model`.
+**Testes/comandos:** `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`, `cmake --build build -j`, `ctest --test-dir build --output-on-failure`, `lot-sim validate --case` para os tres contratos LOT/PKN e `lot-sim run --mode lot-pkn` para os dois casos modernos de validacao.
+**Resultado:** 47/47 testes Catch2 passaram; validates e runs retornaram `OK` e geraram `result.json`/`timeseries.csv` em `results\lot_pkn_minimal_leakoff_review` e `results\lot_pkn_with_leakoff_review`.
+**Escopo:** nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/`, `tests/baselines/` ou `postprocess/scripts/` foi alterado.
+
+**Patches de revisao:**
+- `CMakeLists.txt` agora formaliza `lss_eigen`/`lss::eigen` apontando para `include/Eigen`, sem adicionar `external/saltcreep/include` aos targets modernos.
+- `AGENTS.md`, `CLAUDE.md`, `include/AGENTS.md` e `docs/16_saltcreep_governance.md` documentam que `include/Eigen` e o Eigen oficial do `lot-salt-suite` e que a copia do saltcreep deve ficar preservada.
+- `PknModel` passa a rejeitar tambem `input.leakoff.coefficient_m_sqrt_s` e `input.leakoff.constant_rate_m3_s` negativos.
+- `tests/cpp/test_leakoff_model.cpp` cobre a rejeicao dos campos estruturados negativos.
+
+**Ressalva remanescente:** ainda nao existe um target `saltcreep_eigen` no CMake raiz porque `external/saltcreep` nao e buildado por este target nesta fase. Registrar como candidata a Fase 6.10 se o adapter saltcreep entrar no build.
 
 ---
 

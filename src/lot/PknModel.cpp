@@ -45,6 +45,12 @@ void validate_input(const PknInput& input) {
   if (input.leakoff.enabled && input.leakoff_constant_rate_m3_s < 0.0) {
     throw std::invalid_argument("PknModel: leakoff constant rate must be non-negative");
   }
+  if (input.leakoff.enabled && input.leakoff.coefficient_m_sqrt_s < 0.0) {
+    throw std::invalid_argument("PknModel: leakoff.coefficient_m_sqrt_s must be non-negative");
+  }
+  if (input.leakoff.enabled && input.leakoff.constant_rate_m3_s < 0.0) {
+    throw std::invalid_argument("PknModel: leakoff.constant_rate_m3_s must be non-negative");
+  }
 }
 
 PknResult make_point(const PknInput& input, double elapsed_time_s,
