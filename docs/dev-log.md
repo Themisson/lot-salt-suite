@@ -43,6 +43,17 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 
 ---
 
+### [2026-06-01 15:25] `75adb3c` — Themisson
+**Commit:** `docs: patch review Fase 6.0/6.1 — R09 blocker + roadmap step 4.5`
+**Testes C++:** 2 arquivos | **Testes Python:** 0 arquivos
+**Último resultado ctest:** All tests passed (2 assertions in 1 test case)
+**Arquivos alterados:**
+- `docs/08_known_issues.md`
+- `docs/17_lot_pkn_roadmap.md`
+- `docs/index.html`
+
+---
+
 ### [2026-06-01] Fase 6.0/6.1 — Governanca saltcreep e auditoria LOT/PKN — Codex
 **Status:** Documentacao e auditoria implementadas nesta sessão.
 **Testes:** `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`, `cmake --build build -j` e `ctest --test-dir build --output-on-failure` executados; 15/15 passaram. Nenhuma validacao numerica declarada.
