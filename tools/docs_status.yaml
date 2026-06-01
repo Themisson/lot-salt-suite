@@ -1,0 +1,99 @@
+# docs_status.yaml — Fonte de verdade para status das seções do docs/index.html
+#
+# Valores permitidos:
+#   not_started   — seção não começou
+#   planned       — plano existe mas implementação não iniciou
+#   in_progress   — em desenvolvimento ativo
+#   implemented   — implementado mas não validado
+#   validated     — validado com execução real documentada (com data e resultados)
+#   risk          — risco conhecido identificado
+#
+# REGRA: 'validated' somente após execução real com output em docs/12_validation_results.md
+
+# ============================================================
+# Fases do projeto
+# ============================================================
+phases:
+  phase_0_inventory:        completed
+  phase_1_structure:        in_progress
+  phase_2_docs:             in_progress
+  phase_3_agents:           in_progress
+  phase_4_baselines:        not_started
+  phase_5_cli:              not_started
+  phase_6_migration:        not_started
+  phase_7_refactor:         not_started
+  phase_8_integration:      not_started
+  phase_9_postprocess:      not_started
+  phase_10_validation:      not_started
+  phase_11_packaging:       not_started
+  phase_12_github:          not_started
+
+# ============================================================
+# Status de documentação por seção
+# ============================================================
+docs:
+  overview:               planned
+  inventory:              planned
+  lot_formulation:        planned
+  apb_formulation:        planned
+  salt_models:            planned
+  input_formats:          planned
+  validation_plan:        planned
+  architecture:           planned
+  known_issues:           in_progress
+  migration_plan:         planned
+  postprocessing:         planned
+  cli_usage:              planned
+  validation_results:     not_started    # NUNCA mudar para validated sem execução real
+  coupling:               planned
+  developer_guide:        planned
+  changelog:              in_progress
+
+# ============================================================
+# Status de módulos C++
+# ============================================================
+modules:
+  core:           not_started
+  io:             not_started
+  units:          not_started
+  wellbore:       not_started
+  fluids:         not_started
+  thermal:        not_started
+  rocks:          not_started
+  salt:           not_started
+  lot:            not_started
+  apb:            not_started
+  geomechanics:   not_started
+  coupling:       not_started
+  validation:     not_started
+  cli:            not_started
+
+# ============================================================
+# Status de validação
+# ============================================================
+validation:
+  V0_parser:           not_started
+  V1_fluid_analytic:   not_started
+  V2_lame_elastic:     not_started
+  V3_lot_no_salt:      not_started
+  V4_apb_no_salt:      not_started
+  V5_salt_isolated:    not_started
+  V6_lot_salt:         not_started
+  V7_apb_salt:         not_started
+  V8_coupled:          not_started
+  V9_regression_suite: not_started
+
+# ============================================================
+# Contagem de testes (atualizar após cada execução)
+# ============================================================
+test_counts:
+  cpp_tests: 0          # Catch2 — verde
+  python_tests: 0       # pytest — verde
+  regression_baselines: 0
+
+# ============================================================
+# Metadados
+# ============================================================
+last_updated: "2026-06-01"
+updated_by: "claude-sonnet-4-6"
+project_version: "0.1.0"
