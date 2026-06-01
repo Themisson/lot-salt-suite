@@ -75,6 +75,22 @@ em relação ao compilador original. Documentado em `docs/08_known_issues.md`.
 PKN legado x moderno. O caso `buz67d_pkn.yaml` e contrato sintatico/migratorio,
 nao baseline numerico.
 
+## Fase 6.3 — Auditoria documental R09
+
+**Data:** 2026-06-01
+
+**Executado nesta fase:**
+
+- Inspecao somente leitura de `legance/LOT_Tese/`.
+- Inspecao somente leitura de `legance/LOT_APB_v5/`.
+- Relatorio tecnico em `docs/audits/R09_pkn_mpi22_audit.md`.
+
+**Resultado:** auditoria concluida, sem validacao numerica. A expressao
+`/ M_PI / 22` foi localizada em `Conv_bbmin_m3h`, ramo `idQ == 4`; os casos PKN
+auditados usam `idQ == 6`, que chama outra conversao. R09 permanece blocker para
+regressao PKN legado x moderno ate ensaio numerico comparativo ou documentacao
+fisica adicional.
+
 ## Baselines capturados
 
 | Baseline | Arquivo | Status | Data |

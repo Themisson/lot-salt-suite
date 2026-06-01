@@ -55,6 +55,10 @@ entregar os dados ao solver.
    Este caso é a ponte entre o contrato numérico e o pipeline YAML→CLI.
 4.6. Fase 6.2: criar contrato YAML/C++ LOT/PKN, detector sintético e esqueleto
    minimo de `PknModel` sem regressao contra legado enquanto R09 estiver aberto.
+4.7. Fase 6.3: auditar R09. Resultado: `/ M_PI / 22` existe em
+   `Conv_bbmin_m3h(idQ == 4)`, mas os PKN auditados usam `idQ == 6`. R09 segue
+   aberto para regressao numerica porque o fator nao tem justificativa
+   documental e o caminho PKN ainda exige ensaio comparativo controlado.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -76,12 +80,30 @@ entregar os dados ao solver.
 - `buz67d_pkn.yaml` é contrato sintático/migratório — NÃO é baseline numérico.
 - R09 (`/ M_PI / 22`) permanece blocker para qualquer regressão PKN legado × moderno.
 
+**Fase 6.3 (auditoria R09):**
+- Relatorio criado em `docs/audits/R09_pkn_mpi22_audit.md`.
+- A expressao suspeita foi localizada em `Conv_bbmin_m3h`, ramo `idQ == 4`.
+- Os casos PKN BUZ67D e 9-BUZ-39DA auditados usam `idQ == 6`, que chama
+  `Conv_bbmin_m3min` com `/ M_PI / 2`.
+- R09 continua aberto para regressao numerica legado x moderno; a proxima etapa
+  deve ser ensaio comparativo controlado ou formulacao fisica minima em SI sem
+  usar o legado como baseline.
+
 ## Fora de escopo até R09 ser resolvido
 
 - Comparação numérica com `legance/LOT_Tese` ou `legance/LOT_APB_v5`.
 - Uso de `buz67d_pkn.yaml` como referência de resultado.
 - Conexão do subcomando `run` ao `PknModel`.
 - Acoplamento com sal ou APB.
+
+## Proxima fase recomendada
+
+Enquanto R09 permanecer aberto, seguir um destes caminhos:
+
+1. Ensaio comparativo controlado das variantes de conversao (`/(pi*22)` versus
+   `/(pi*2)`) em ferramenta externa ao legado congelado.
+2. Implementacao fisica minima do `PknModel` em SI, com testes dimensionais e
+   sinteticos, sem regressao contra os `.dat` legados.
 
 ## Riscos tecnicos a resolver antes da implementacao
 

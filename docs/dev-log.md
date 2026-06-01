@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.2 em andamento (contrato YAML/C++ LOT/PKN + detector sintetico)
+Fase ativa  : 6.3 em andamento (auditoria fisica/dimensional R09)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
@@ -27,7 +27,8 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 - [x] Criar contrato YAML/C++ LOT/PKN com casos sintaticos e migrado BUZ67D
 - [x] Implementar `lot::BreakdownDetector` sintetico com testes Catch2
 - [x] Criar esqueleto sintetico de `lot::PknModel` com testes Catch2
-- [ ] Auditar R09 antes de regressao numerica PKN legado x moderno
+- [x] Auditar R09 antes de regressao numerica PKN legado x moderno
+- [ ] Executar ensaio comparativo controlado R09 (`/(pi*22)` vs `/(pi*2)`) sem alterar legado
 - [ ] Conectar LOT/PKN ao CLI somente apos contrato numerico testado
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
@@ -42,6 +43,30 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.3 — Auditoria R09 `/ M_PI / 22` — Codex
+**Status:** Auditoria documental implementada nesta sessão.
+**Testes:** `git diff --name-only` executado; `ctest` nao executado porque apenas documentacao/status foram alterados.
+**Escopo:** nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/`, `include/lot/`, `src/lot/` ou `tests/baselines/` foi alterado.
+
+**Classificacao R09:** `NAO RESOLVIDO: requer ensaio numerico comparativo`.
+
+**Achados principais:**
+- `/ M_PI / 22` aparece uma unica vez em `legance/LOT_Tese/src/apb_code/APB1da.cpp`, funcao `Conv_bbmin_m3h(double Q)`, ramo `idQ == 4`.
+- Os casos PKN auditados (`8-BUZ-67D-RJS-VISCO-pkn.cpp` e `9-BUZ-39DA-RJS-VISCO-2.cpp`) usam `idQ == 6`, que chama `Conv_bbmin_m3min(Q) = Q * 0.158987 / M_PI / 2`.
+- `LOT_APB_v5` nao contem `/ M_PI / 22` no caminho auditado.
+- Dimensionalmente, `22` e adimensional; preserva unidade, mas muda `Qinj` por fator 11 contra a hipotese `/ M_PI / 2`.
+
+**Arquivos criados/alterados:**
+- `docs/audits/R09_pkn_mpi22_audit.md` — relatorio completo da auditoria
+- `docs/08_known_issues.md` — R09 atualizado: escopo reduzido, ainda blocker
+- `docs/17_lot_pkn_roadmap.md` — fase 6.3 e proximos passos
+- `docs/12_validation_results.md` — auditoria registrada sem validacao numerica
+- `docs/dev-log.md`, `tools/docs_status.yaml`, `docs/index.html` — status/indice atualizados
+
+**Proxima etapa recomendada:** ensaio comparativo controlado fora de `legance/` ou implementacao fisica minima em SI sem usar `.dat` legado como baseline.
 
 ---
 

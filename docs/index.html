@@ -1519,33 +1519,44 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 </tr>
 <tr>
 <td>R09</td>
-<td>Expressão suspeita <code>/ M_PI / 22</code> na conversão de vazão PKN</td>
+<td>Expressão suspeita <code>/ M_PI / 22</code> na conversão de vazão</td>
 <td>Alto</td>
-<td><strong>BLOCKER para validação numérica</strong> — ver abaixo</td>
+<td><strong>BLOCKER para validação numérica PKN legado × moderno</strong> — auditoria Fase 6.3 reduziu o escopo, mas nao resolveu</td>
 </tr>
 </tbody>
 </table>
 <h2 id="r09-expressao-suspeita-m_pi-22-na-conversao-de-vazao-pkn">R09 — Expressão suspeita <code>/ M_PI / 22</code> na conversão de vazão PKN</h2>
-<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> BLOCKER para validação numérica PKN</p>
-<p><strong>Localização:</strong> <code>legance/LOT_Tese/src/apb_code/</code> — função de conversão de vazão
-(<code>bb/min → m³/h</code> ou equivalente), auditada em Fase 6.0.</p>
-<p><strong>Evidência:</strong> A função de conversão de vazão para PKN contém <code>/ M_PI / 22</code>.
-O divisor <code>22</code> parece erro de digitação: fisicamente, a conversão de barris por minuto
-para m³/s usa fatores tabelados sem <code>M_PI / 22</code> — o fator geométrico de PKN é separado.
-A hipótese mais provável é que deveria ser <code>/ M_PI / 2</code> (metade da circunferência ou
-fator de fratura bilateral).</p>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> BLOCKER para validação numérica PKN legado × moderno</p>
+<p><strong>Localização:</strong> <code>legance/LOT_Tese/src/apb_code/APB1da.cpp</code>, linha aproximada 8,
+função <code>Conv_bbmin_m3h(double Q)</code>.</p>
+<p><strong>Evidência:</strong> A função <code>Conv_bbmin_m3h</code> contém:</p>
+<pre><code class="language-cpp">constexpr double Conv_bbmin_m3h(double Q) { return Q * 9.53924 / M_PI / 22; }
+</code></pre>
+<p>A auditoria Fase 6.3 (<code>docs/audits/R09_pkn_mpi22_audit.md</code>) mostrou que:
+- <code>9.53924</code> é compatível com <code>bbl/min -&gt; m³/h</code>;
+- <code>/ M_PI / 22</code> é equivalente a <code>/ (M_PI * 22)</code> e preserva unidade, mas aplica
+  fator adimensional não documentado;
+- as demais conversões equivalentes usam <code>/ M_PI / 2</code>;
+- os casos PKN auditados (<code>8-BUZ-67D-RJS-VISCO-pkn.cpp</code> e
+  <code>9-BUZ-39DA-RJS-VISCO-2.cpp</code>) usam <code>idQ == 6</code>, portanto chamam
+  <code>Conv_bbmin_m3min(Q) = Q * 0.158987 / M_PI / 2</code>, não <code>Conv_bbmin_m3h</code>.</p>
 <p><strong>Impacto:</strong>
-- Se <code>/ M_PI / 22</code> estiver incorreto, o volume de leakoff PKN estará errado por fator ≈ 11×.
-- Qualquer comparação numérica com o legado que use essa função como referência pode
-  estar errada no próprio legado.</p>
+- Se um caso usar <code>idQ == 4</code>, <code>/ M_PI / 22</code> reduz <code>Qinj</code> por fator 11 em relação
+  ao padrão <code>/ M_PI / 2</code>.
+- Para os PKN auditados com <code>idQ == 6</code>, o impacto direto dessa linha específica
+  é nulo, mas a família de conversões do legado continua misturando unidade e
+  fator geométrico.
+- A regressão PKN legado × moderno continua bloqueada porque ainda não há prova
+  documental/física para reproduzir ou substituir o fator, e o caminho PKN tem
+  outros pontos pendentes (<code>t</code> absoluto, <code>time</code> desde breakdown e volume
+  <code>w0 * L1 * M_PI</code>).</p>
 <p><strong>Condição para desbloquear:</strong>
-1. Auditar a função de conversão no legado (<code>legance/LOT_Tese/src/apb_code/APB1da.cpp</code>
-   ou <code>Fluids.cpp</code>) e registrar o valor exato e o contexto.
-2. Verificar se os resultados <code>.dat</code> em <code>legance/LOT_Tese/Teste/</code> são consistentes
-   com a fórmula como está (possível que o legado seja auto-consistente mesmo com o
-   fator aparentemente errado).
-3. Documentar a escolha para o modelo moderno <strong>antes</strong> de usar o legado como baseline
-   numérico PKN.</p>
+1. Confirmar, por ensaio comparativo controlado ou metadado de geração, quais
+   <code>idQ</code> foram usados nos <code>.dat</code> PKN existentes.
+2. Comparar variantes isoladas <code>/ (M_PI * 22)</code> e <code>/ (M_PI * 2)</code> fora do legado
+   congelado, sem alterar <code>legance/</code>.
+3. Documentar a formulação física moderna de PKN em SI antes de usar qualquer
+   baseline legado.</p>
 <p><strong>Não bloqueia:</strong> implementação de tipos de entrada, estrutura do <code>PknModel</code> e testes
 unitários com entradas sintéticas. <strong>Bloqueia:</strong> comparação com baseline legado PKN.</p>
 <hr />
@@ -1556,7 +1567,7 @@ unitários com entradas sintéticas. <strong>Bloqueia:</strong> comparação com
 <li>[x] Unidade de e0: [1/min] internamente → FA01</li>
 <li>[x] Mecanismo de acoplamento sal→APB → FA04</li>
 <li>[x] <strong>R08:</strong> <code>dt</code> deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]</li>
-<li>[ ] <strong>R09:</strong> Auditar <code>/ M_PI / 22</code> antes de usar baseline PKN legado</li>
+<li>[ ] <strong>R09:</strong> Auditoria documental executada em Fase 6.3; requer ensaio numerico comparativo antes de usar baseline PKN legado</li>
 <li>[ ] Confirmar convenção de sinal de <code>u_wall</code> (positivo = inward ou outward?)
       — arquivo: <code>legance/LOT_APB_v5/include/apb/apb_salt_1d.h</code></li>
 <li>[ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)</li>
@@ -2101,6 +2112,19 @@ em relação ao compilador original. Documentado em <code>docs/08_known_issues.m
 <code>legance/LOT_APB_v5</code>. R09 (<code>/ M_PI / 22</code>) permanece blocker para regressao
 PKN legado x moderno. O caso <code>buz67d_pkn.yaml</code> e contrato sintatico/migratorio,
 nao baseline numerico.</p>
+<h2 id="fase-63-auditoria-documental-r09">Fase 6.3 — Auditoria documental R09</h2>
+<p><strong>Data:</strong> 2026-06-01</p>
+<p><strong>Executado nesta fase:</strong></p>
+<ul>
+<li>Inspecao somente leitura de <code>legance/LOT_Tese/</code>.</li>
+<li>Inspecao somente leitura de <code>legance/LOT_APB_v5/</code>.</li>
+<li>Relatorio tecnico em <code>docs/audits/R09_pkn_mpi22_audit.md</code>.</li>
+</ul>
+<p><strong>Resultado:</strong> auditoria concluida, sem validacao numerica. A expressao
+<code>/ M_PI / 22</code> foi localizada em <code>Conv_bbmin_m3h</code>, ramo <code>idQ == 4</code>; os casos PKN
+auditados usam <code>idQ == 6</code>, que chama outra conversao. R09 permanece blocker para
+regressao PKN legado x moderno ate ensaio numerico comparativo ou documentacao
+fisica adicional.</p>
 <h2 id="baselines-capturados">Baselines capturados</h2>
 <table>
 <thead>
@@ -2545,7 +2569,11 @@ entregar os dados ao solver.</p>
    contra <code>schemas/lot_case.schema.yaml</code> antes de conectar ao CLI.
    Este caso é a ponte entre o contrato numérico e o pipeline YAML→CLI.
 4.6. Fase 6.2: criar contrato YAML/C++ LOT/PKN, detector sintético e esqueleto
-   minimo de <code>PknModel</code> sem regressao contra legado enquanto R09 estiver aberto.</li>
+   minimo de <code>PknModel</code> sem regressao contra legado enquanto R09 estiver aberto.
+4.7. Fase 6.3: auditar R09. Resultado: <code>/ M_PI / 22</code> existe em
+   <code>Conv_bbmin_m3h(idQ == 4)</code>, mas os PKN auditados usam <code>idQ == 6</code>. R09 segue
+   aberto para regressao numerica porque o fator nao tem justificativa
+   documental e o caminho PKN ainda exige ensaio comparativo controlado.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -2564,6 +2592,14 @@ entregar os dados ao solver.</p>
 - Três casos YAML validados pelo parser: <code>lot_pkn_minimal.yaml</code>, <code>lot_pkn_with_leakoff.yaml</code>, <code>buz67d_pkn.yaml</code>.
 - <code>buz67d_pkn.yaml</code> é contrato sintático/migratório — NÃO é baseline numérico.
 - R09 (<code>/ M_PI / 22</code>) permanece blocker para qualquer regressão PKN legado × moderno.</p>
+<p><strong>Fase 6.3 (auditoria R09):</strong>
+- Relatorio criado em <code>docs/audits/R09_pkn_mpi22_audit.md</code>.
+- A expressao suspeita foi localizada em <code>Conv_bbmin_m3h</code>, ramo <code>idQ == 4</code>.
+- Os casos PKN BUZ67D e 9-BUZ-39DA auditados usam <code>idQ == 6</code>, que chama
+  <code>Conv_bbmin_m3min</code> com <code>/ M_PI / 2</code>.
+- R09 continua aberto para regressao numerica legado x moderno; a proxima etapa
+  deve ser ensaio comparativo controlado ou formulacao fisica minima em SI sem
+  usar o legado como baseline.</p>
 <h2 id="fora-de-escopo-ate-r09-ser-resolvido">Fora de escopo até R09 ser resolvido</h2>
 <ul>
 <li>Comparação numérica com <code>legance/LOT_Tese</code> ou <code>legance/LOT_APB_v5</code>.</li>
@@ -2571,6 +2607,14 @@ entregar os dados ao solver.</p>
 <li>Conexão do subcomando <code>run</code> ao <code>PknModel</code>.</li>
 <li>Acoplamento com sal ou APB.</li>
 </ul>
+<h2 id="proxima-fase-recomendada">Proxima fase recomendada</h2>
+<p>Enquanto R09 permanecer aberto, seguir um destes caminhos:</p>
+<ol>
+<li>Ensaio comparativo controlado das variantes de conversao (<code>/(pi*22)</code> versus
+   <code>/(pi*2)</code>) em ferramenta externa ao legado congelado.</li>
+<li>Implementacao fisica minima do <code>PknModel</code> em SI, com testes dimensionais e
+   sinteticos, sem regressao contra os <code>.dat</code> legados.</li>
+</ol>
 <h2 id="riscos-tecnicos-a-resolver-antes-da-implementacao">Riscos tecnicos a resolver antes da implementacao</h2>
 <ul>
 <li>O legado usa conversoes de vazao com fatores geometricos embutidos e ao menos

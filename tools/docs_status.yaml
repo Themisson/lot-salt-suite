@@ -53,6 +53,7 @@ docs:
   lot_legacy_inventory:   implemented
   pkn_legacy_path:        implemented
   non_pkn_models_status:  implemented
+  r09_pkn_mpi22_audit:    implemented
 
 # ============================================================
 # Status de módulos C++
