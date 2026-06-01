@@ -45,6 +45,17 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 
 ---
 
+### [2026-06-01 15:44] `d41076e` — Themisson
+**Commit:** `docs: patch review Fase 6.2 — README saltcreep policy + roadmap fora de escopo`
+**Testes C++:** 4 arquivos | **Testes Python:** 0 arquivos
+**Último resultado ctest:** All tests passed (2 assertions in 1 test case)
+**Arquivos alterados:**
+- `README.md`
+- `docs/17_lot_pkn_roadmap.md`
+- `docs/index.html`
+
+---
+
 ### [2026-06-01] Fase 6.2 — Contrato LOT/PKN YAML+C++ — Codex
 **Status:** Implementado nesta sessão.
 **Testes C++:** 27 Catch2 | **Resultado ctest:** 27 passaram.
