@@ -41,5 +41,30 @@
       "Bash(git push --force:*)"
     ]
   },
-  "model": "sonnet"
+  "model": "sonnet",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python tools/update_devlog.py",
+            "if": "Bash(git commit:*)",
+            "timeout": 30,
+            "statusMessage": "Atualizando dev-log...",
+            "async": true
+          },
+          {
+            "type": "command",
+            "command": "python tools/update_devlog.py",
+            "if": "Bash(git push:*)",
+            "timeout": 30,
+            "statusMessage": "Atualizando dev-log após push...",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
 }

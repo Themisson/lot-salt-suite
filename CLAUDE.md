@@ -44,10 +44,14 @@ Criar uma arquitetura modular C++ com:
 
 ## Antes de modificar código
 
-Leia obrigatoriamente, nesta ordem:
+**Primeira leitura — sempre:** `docs/dev-log.md`
+(contém o estado atual do projeto, fase ativa, próximas tarefas e achados críticos)
 
-1. `docs/00_project_overview.md`
-2. `docs/01_repository_inventory.md`
+Depois leia na ordem abaixo conforme a tarefa:
+
+1. `docs/dev-log.md` ← **OBRIGATÓRIO, SEMPRE**
+2. `docs/00_project_overview.md`
+3. `docs/01_repository_inventory.md`
 3. `docs/02_lot_formulation.md` (se tocar em LOT)
 4. `docs/03_apb_formulation.md` (se tocar em APB)
 5. `docs/04_salt_creep_models.md` (se tocar em sal)

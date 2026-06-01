@@ -28,10 +28,15 @@ O objetivo é criar código novo nos diretórios `src/`, `include/`, `apps/`, `c
 ## Leitura obrigatória antes de qualquer tarefa
 
 ```
+docs/dev-log.md              ← SEMPRE, PRIMEIRO (estado atual, fase ativa, próximas tarefas)
 docs/00_project_overview.md
 docs/01_repository_inventory.md
-docs/08_known_issues.md
+docs/08_known_issues.md      ← FA01-FA04: convenções físicas invioláveis
 ```
+
+O `docs/dev-log.md` contém o estado atual do projeto, fase ativa,
+achados críticos da auditoria (FA01-FA04) e próximas tarefas.
+**Leia-o primeiro em toda sessão.**
 
 Para tarefas específicas:
 
