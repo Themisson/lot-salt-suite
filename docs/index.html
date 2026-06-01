@@ -254,7 +254,7 @@
 </div>
 <div class="nav-group">
   <div class="label">LOT/PKN e auditorias</div>
-  <a href="#saltcreep_governance" data-title="16. governanca do saltcreep"><span>16. Governanca do saltcreep</span><span class="nav-dot pill-impl"></span></a><a href="#lot_pkn_roadmap" data-title="17. roadmap lot/pkn"><span>17. Roadmap LOT/PKN</span><span class="nav-dot pill-impl"></span></a><a href="#lot_legacy_inventory" data-title="inventario lot nos legados"><span>Inventario LOT nos legados</span><span class="nav-dot pill-impl"></span></a><a href="#pkn_legacy_path" data-title="caminho pkn legado"><span>Caminho PKN legado</span><span class="nav-dot pill-impl"></span></a><a href="#non_pkn_models_status" data-title="status dos modelos nao pkn"><span>Status dos modelos nao PKN</span><span class="nav-dot pill-impl"></span></a><a href="#r09_pkn_conversion_experiment" data-title="r09 — ensaio comparativo controlado das conversões pkn"><span>R09 — Ensaio comparativo controlado das conversões PKN</span><span class="nav-dot pill-impl"></span></a>
+  <a href="#saltcreep_governance" data-title="16. governanca do saltcreep"><span>16. Governanca do saltcreep</span><span class="nav-dot pill-impl"></span></a><a href="#lot_pkn_roadmap" data-title="17. roadmap lot/pkn"><span>17. Roadmap LOT/PKN</span><span class="nav-dot pill-impl"></span></a><a href="#saltcreep_eigen_migration_plan" data-title="20. plano de migracao eigen do saltcreep"><span>20. Plano de migracao Eigen do saltcreep</span><span class="nav-dot pill-impl"></span></a><a href="#saltcreep_eigen_compatibility_audit" data-title="auditoria de compatibilidade eigen do saltcreep"><span>Auditoria de compatibilidade Eigen do saltcreep</span><span class="nav-dot pill-impl"></span></a><a href="#lot_legacy_inventory" data-title="inventario lot nos legados"><span>Inventario LOT nos legados</span><span class="nav-dot pill-impl"></span></a><a href="#pkn_legacy_path" data-title="caminho pkn legado"><span>Caminho PKN legado</span><span class="nav-dot pill-impl"></span></a><a href="#non_pkn_models_status" data-title="status dos modelos nao pkn"><span>Status dos modelos nao PKN</span><span class="nav-dot pill-impl"></span></a><a href="#r09_pkn_conversion_experiment" data-title="r09 — ensaio comparativo controlado das conversões pkn"><span>R09 — Ensaio comparativo controlado das conversões PKN</span><span class="nav-dot pill-impl"></span></a>
 </div>
   </nav>
 </aside>
@@ -2504,7 +2504,11 @@ comparando os legados antes de implementar o módulo <code>coupling/</code>.</p>
 </ol>
 <p>Na arquitetura atual, o caminho LOT inicial deve ser PKN. O acoplamento com sal
 deve passar pelo adapter para <code>external/saltcreep/</code>, que e uma dependencia
-vendorizada ativa com governanca descrita em <code>docs/16_saltcreep_governance.md</code>.</p>
+vendorizada ativa com governanca descrita em <code>docs/16_saltcreep_governance.md</code>.
+O adapter nao deve depender de scripts Python em runtime e nao deve assumir que
+o <code>saltcreep</code> ja usa o Eigen oficial do repositorio principal. Ate existir uma
+opcao CMake explicita e validada, <code>external/saltcreep/include/Eigen/</code> continua
+preservado para os builds do proprio solver.</p>
 <h2 id="politica-de-implementacao">Política de implementação</h2>
 <p>O acoplamento LOT/APB/sal deve ser implementado em C++.</p>
 <p>Python não deve atuar como intermediário runtime entre LOT e sal, nem montar
@@ -2615,6 +2619,13 @@ sal. O fluxo esperado e:</p>
    dano.</li>
 <li><code>apb/</code> atualiza pressao anular a partir do volume e compressibilidade.</li>
 </ol>
+<h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
+<p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
+aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser
+feito por adapter e contrato de dados, sem misturar include paths apenas para
+resolver headers Eigen. A auditoria de Fase 6.10 recomenda manter a migracao do
+<code>saltcreep</code> para <code>include/Eigen</code> como opcao experimental futura, nao como
+pre-condicao para LOT/APB/sal.</p>
 </div>
 </section>
 
@@ -2799,6 +2810,13 @@ targets modernos pelo target CMake <code>lss::eigen</code>. A copia em
 <code>external/saltcreep/include/Eigen/</code> deve permanecer preservada para o saltcreep.
 Nenhum target deve receber simultaneamente <code>include/</code> e
 <code>external/saltcreep/include/</code> apenas para resolver Eigen.</p>
+<p>A Fase 6.10 confirmou que o <code>saltcreep</code> compila, testa e executa casos auditados
+com a copia vendorizada preservada. Um build experimental com <code>include/Eigen</code> no
+include path tambem passou, mas o gerador Visual Studio manteve
+<code>external/saltcreep/include</code> antes de <code>include/</code>, entao a migracao real para o
+Eigen oficial deve continuar atras de uma opcao CMake explicita futura. Ver
+<code>docs/audits/saltcreep_eigen_compatibility_audit.md</code> e
+<code>docs/20_saltcreep_eigen_migration_plan.md</code>.</p>
 <p>O adapter esperado e:</p>
 <ol>
 <li>Receber casos ja convertidos para SI pelo parser do <code>lot-salt-suite</code>.</li>
@@ -2837,8 +2855,9 @@ novas rotas paralelas.</p>
 <li>proximo passo de validacao.</li>
 </ul>
 <h2 id="estado-nesta-fase">Estado nesta fase</h2>
-<p>Nesta Fase 6.0, <code>external/saltcreep/</code> foi auditado em modo somente leitura. Nenhum
-arquivo do saltcreep foi alterado.</p>
+<p>Na Fase 6.10, <code>external/saltcreep/</code> foi auditado em modo somente leitura para a
+compatibilidade Eigen. Nenhum arquivo do saltcreep foi alterado e as duas copias
+de Eigen foram preservadas.</p>
 </div>
 </section>
 
@@ -2941,7 +2960,11 @@ entregar os dados ao solver.</p>
    comparação com legado e com aviso explícito de ausência de regressão.
 4.12. Fase 6.9: implementar <code>LeakoffModel</code> C++ estruturado com modelos
    <code>none</code>, <code>constant_rate</code>, <code>carter</code> minimo e <code>synthetic_constant</code> de
-   compatibilidade, integrado ao <code>PknModel</code> e coberto por Catch2.</li>
+   compatibilidade, integrado ao <code>PknModel</code> e coberto por Catch2.
+4.13. Fase 6.10: auditar compatibilidade Eigen do <code>external/saltcreep/</code> sem
+   alterar o solver. Resultado: baseline e build experimental passaram 125/125
+   testes Catch2 do saltcreep e casos <code>lame_test</code>/<code>mud_gradient_1d_8p5ppg</code>, mas
+   a migracao real para <code>include/Eigen</code> fica como opcao CMake futura.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -3016,6 +3039,16 @@ entregar os dados ao solver.</p>
 - <code>PknModel</code> passa a chamar o modulo e limita o acumulado por <code>V_inj</code>.
 - Testes Catch2 cobrem o modulo isolado e a integracao PKN; nao houve regressao
   numerica contra legado.</p>
+<p><strong>Fase 6.10 (auditoria Eigen do saltcreep):</strong>
+- <code>docs/audits/saltcreep_eigen_compatibility_audit.md</code> registra inventario,
+  builds, testes e casos executados.
+- <code>docs/20_saltcreep_eigen_migration_plan.md</code> recomenda manter a migracao para
+  <code>include/Eigen</code> atras de opcao CMake experimental futura.
+- <code>external/saltcreep/</code> permaneceu somente leitura; <code>include/Eigen/</code> e
+  <code>external/saltcreep/include/Eigen/</code> foram preservados.
+- <code>ctest</code> do <code>saltcreep</code> passou 125/125 no baseline e 125/125 no build
+  experimental; o build experimental ainda resolveu Eigen pela copia
+  vendorizada devido a precedencia de include do CMake atual.</p>
 <h2 id="fora-de-escopo-ate-r09-ser-totalmente-resolvido">Fora de escopo até R09 ser totalmente resolvido</h2>
 <ul>
 <li>Comparação numérica com <code>legance/LOT_Tese</code> ou <code>legance/LOT_APB_v5</code>.</li>
@@ -3032,6 +3065,8 @@ priorizar desenvolvimento C++ nesta ordem:</p>
    pos-processamento.</li>
 <li>Criar <code>SaltCreepLotAdapter</code>/<code>SaltCreepInterface</code> C++ para integrar
    <code>external/saltcreep</code> sem script Python intermediario.</li>
+<li>Se o adapter exigir unificacao de Eigen, adicionar opcao CMake experimental
+   no <code>saltcreep</code> e repetir a auditoria 6.10 com prova de include order.</li>
 <li>Implementar acoplamento LOT/sal em C++ e só depois ampliar
    pos-processamento ou comparacao externa.</li>
 </ol>
@@ -3052,6 +3087,234 @@ fisica/documental para <code>22</code> ou excluir esse ramo como referencia vali
 <li>A convencao de tensao circunferencial deve respeitar FA01-FA04 e nao pode ser
   reinterpretada sem registro em <code>docs/08_known_issues.md</code>.</li>
 </ul>
+</div>
+</section>
+
+<section id="saltcreep_eigen_migration_plan">
+<div class="section-meta"><span>Documento</span><span class="pill pill-impl">Implementado</span></div>
+<h3>20. Plano de migracao Eigen do saltcreep</h3>
+<div class="doc-body">
+<h2 id="decisao-atual">Decisao atual</h2>
+<p>O Eigen oficial do <code>lot-salt-suite</code> e <code>include/Eigen/</code>, exposto aos targets
+modernos por <code>lss::eigen</code>. A copia em <code>external/saltcreep/include/Eigen/</code>
+permanece preservada porque o <code>saltcreep</code> ainda e um solver vendorizado ativo
+com CMake proprio e includes privados.</p>
+<p>A Fase 6.10 nao migra o <code>saltcreep</code> para <code>include/Eigen</code>. A recomendacao e
+manter uma rota experimental controlada ate existir adapter C++ de sal no build
+principal.</p>
+<h2 id="opcoes-avaliadas">Opcoes avaliadas</h2>
+<table>
+<thead>
+<tr>
+<th>Opcao</th>
+<th>Descricao</th>
+<th>Beneficio</th>
+<th>Risco</th>
+<th>Decisao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Manter <code>external/saltcreep/include/Eigen</code> para builds do saltcreep</td>
+<td>Preserva estabilidade e historico de validacao</td>
+<td>Duplica Eigen no repositorio</td>
+<td>Aceita por enquanto</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Forcar <code>include/Eigen</code> via flags externas</td>
+<td>Teste rapido sem editar <code>external/saltcreep</code></td>
+<td>Nao garante precedencia no Visual Studio</td>
+<td>Apenas diagnostico</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Criar opcao CMake explicita <code>SALTCREEP_USE_LSS_EIGEN</code></td>
+<td>Prova reprodutivel e reversivel</td>
+<td>Exige alteracao governada no CMake do saltcreep</td>
+<td>Recomendada para fase futura</td>
+</tr>
+</tbody>
+</table>
+<h2 id="plano-recomendado">Plano recomendado</h2>
+<ol>
+<li>Manter <code>include/Eigen/</code> e <code>external/saltcreep/include/Eigen/</code> no repositorio.</li>
+<li>Continuar usando <code>lss::eigen</code> nos targets modernos do <code>lot-salt-suite</code>.</li>
+<li>Quando o adapter <code>SaltCreepInterface</code> entrar no build, adicionar opcao
+   explicita no CMake do <code>saltcreep</code>, sem remover a copia vendorizada.</li>
+<li>A opcao futura deve garantir include order verificavel:</li>
+</ol>
+<pre><code class="language-cmake">option(SALTCREEP_USE_LSS_EIGEN &quot;Use lot-salt-suite include/Eigen for saltcreep&quot; OFF)
+</code></pre>
+<ol>
+<li>A aceitacao da opcao deve exigir:</li>
+<li>build baseline com Eigen vendorizado;</li>
+<li>build experimental com <code>include/Eigen</code>;</li>
+<li><code>ctest</code> completo do <code>saltcreep</code>;</li>
+<li>casos <code>lame_test.yaml</code> e <code>mud_gradient_1d_8p5ppg.yaml</code>;</li>
+<li>comparacao numerica de outputs principais;</li>
+<li>registro em <code>docs/audits/</code>.</li>
+</ol>
+<h2 id="criterios-de-rollback">Criterios de rollback</h2>
+<p>Desativar a opcao experimental e voltar ao Eigen vendorizado se ocorrer qualquer
+um destes sinais:</p>
+<ul>
+<li>falha de compilacao em MSVC, GCC ou Clang;</li>
+<li>falha em teste Catch2 do <code>saltcreep</code>;</li>
+<li>diferenca numerica nao explicada em fechamento, deslocamento, tensao ou dano;</li>
+<li>necessidade de alterar modelo constitutivo para compilar;</li>
+<li>conflito com o contrato de adapter C++.</li>
+</ul>
+<h2 id="proximo-passo">Proximo passo</h2>
+<p>Implementar primeiro o adapter C++ de sal no <code>lot-salt-suite</code>. Depois disso,
+introduzir a opcao CMake experimental para o <code>saltcreep</code> como tarefa isolada,
+sem remover diretorios Eigen existentes.</p>
+</div>
+</section>
+
+<section id="saltcreep_eigen_compatibility_audit">
+<div class="section-meta"><span>Documento</span><span class="pill pill-impl">Implementado</span></div>
+<h3>Auditoria de compatibilidade Eigen do saltcreep</h3>
+<div class="doc-body">
+<p><strong>Data:</strong> 2026-06-01<br />
+<strong>Fase:</strong> 6.10<br />
+<strong>Status:</strong> concluida em modo auditoria, sem migracao automatica</p>
+<h2 id="objetivo">Objetivo</h2>
+<p>Verificar se <code>external/saltcreep/</code> pode ser compilado e executado sem degradacao
+aparente quando se considera o Eigen oficial do <code>lot-salt-suite</code> em
+<code>include/Eigen/</code>, preservando a copia vendorizada existente em
+<code>external/saltcreep/include/Eigen/</code>.</p>
+<p>Nenhum arquivo em <code>external/saltcreep/</code>, <code>legance/</code>, <code>legacy/</code> ou
+<code>tests/baselines/</code> foi alterado.</p>
+<h2 id="inventario-eigen">Inventario Eigen</h2>
+<p>O <code>saltcreep</code> inclui Eigen diretamente em headers e fontes C++:</p>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Arquivos observados</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tipos base</td>
+<td><code>external/saltcreep/include/types.hpp</code></td>
+</tr>
+<tr>
+<td>Elementos</td>
+<td><code>include/elements/*.hpp</code>, <code>src/elements/axisym_2d_aq9.cpp</code></td>
+</tr>
+<tr>
+<td>Solver</td>
+<td><code>include/solver/*.hpp</code>, <code>src/solver/ImplicitAdaptiveIntegrator.cpp</code></td>
+</tr>
+<tr>
+<td>Termico</td>
+<td><code>include/thermal/*.hpp</code>, <code>src/thermal/conduction_2d_field.cpp</code></td>
+</tr>
+<tr>
+<td>Malha/erro</td>
+<td><code>include/mesh/mesh_refiner.hpp</code>, <code>src/mesh/error_estimator.cpp</code></td>
+</tr>
+<tr>
+<td>I/O VTU</td>
+<td><code>include/io/VtuWriter.hpp</code></td>
+</tr>
+<tr>
+<td>Testes</td>
+<td><code>tests/cpp/q4_test_helpers.hpp</code></td>
+</tr>
+</tbody>
+</table>
+<p>Includes usados:</p>
+<pre><code class="language-text">&lt;Eigen/Core&gt;
+&lt;Eigen/Sparse&gt;
+&lt;Eigen/SparseCholesky&gt;
+&lt;Eigen/Cholesky&gt;
+&lt;Eigen/LU&gt;
+</code></pre>
+<p>O CMake do <code>saltcreep</code> cria os targets <code>saltcreep</code> e <code>tests_unit</code> com:</p>
+<pre><code class="language-cmake">target_include_directories(saltcreep PRIVATE include)
+target_include_directories(tests_unit PRIVATE include)
+</code></pre>
+<p>Logo, no estado atual, <code>external/saltcreep/include/Eigen/</code> continua tendo
+precedencia natural para builds do proprio <code>saltcreep</code>.</p>
+<h2 id="builds-executados">Builds executados</h2>
+<h3 id="baseline-vendorizado">Baseline vendorizado</h3>
+<pre><code class="language-powershell">cmake -S external/saltcreep -B external/saltcreep/build_baseline -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake --build external/saltcreep/build_baseline -j
+ctest --test-dir external/saltcreep/build_baseline --output-on-failure -j 4
+</code></pre>
+<p>Resultado:</p>
+<pre><code class="language-text">100% tests passed, 0 tests failed out of 125
+Total Test time (real) = 1028.24 sec
+</code></pre>
+<h3 id="build-experimental-com-includeeigen-no-include-path">Build experimental com <code>include/Eigen</code> no include path</h3>
+<pre><code class="language-powershell">cmake -S external/saltcreep -B external/saltcreep/build_lss_eigen -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON &quot;-DCMAKE_CXX_FLAGS=-IC:/Users/themi/Desktop/lot-salt-suite/include&quot;
+cmake --build external/saltcreep/build_lss_eigen -j
+ctest --test-dir external/saltcreep/build_lss_eigen --output-on-failure -j 4
+</code></pre>
+<p>Resultado:</p>
+<pre><code class="language-text">100% tests passed, 0 tests failed out of 125
+Total Test time (real) = 1020.63 sec
+</code></pre>
+<p>Observacao importante: com o gerador Visual Studio, o arquivo <code>.vcxproj</code> gerado
+ainda lista <code>external/saltcreep/include</code> antes de <code>C:/Users/themi/Desktop/lot-salt-suite/include</code>.
+Portanto, este build confirma compatibilidade do estado atual e da convivencia
+dos include paths, mas <strong>nao prova</strong> que o <code>saltcreep</code> foi de fato compilado
+contra <code>include/Eigen</code> em vez da copia vendorizada.</p>
+<h2 id="casos-executados">Casos executados</h2>
+<p>Os casos foram rodados a partir de diretorios temporarios sob <code>tmp/</code>, para evitar
+sobrescrever <code>external/saltcreep/results/</code>.</p>
+<pre><code class="language-powershell">..\..\external\saltcreep\build_baseline\Debug\saltcreep.exe ..\..\external\saltcreep\cases\tcc\lame_test.yaml
+..\..\external\saltcreep\build_baseline\Debug\saltcreep.exe ..\..\external\saltcreep\cases\apb\mud_gradient_1d_8p5ppg.yaml
+..\..\external\saltcreep\build_lss_eigen\Debug\saltcreep.exe ..\..\external\saltcreep\cases\tcc\lame_test.yaml
+..\..\external\saltcreep\build_lss_eigen\Debug\saltcreep.exe ..\..\external\saltcreep\cases\apb\mud_gradient_1d_8p5ppg.yaml
+</code></pre>
+<p>Resultados principais:</p>
+<table>
+<thead>
+<tr>
+<th>Build</th>
+<th>Caso</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td><code>lame_test.yaml</code></td>
+<td><code>Output: "results\\lame_test\\displacements.csv"</code></td>
+</tr>
+<tr>
+<td>baseline</td>
+<td><code>mud_gradient_1d_8p5ppg.yaml</code></td>
+<td><code>[time] t=2h  closure=0.300817%</code></td>
+</tr>
+<tr>
+<td>experimental</td>
+<td><code>lame_test.yaml</code></td>
+<td><code>Output: "results\\lame_test\\displacements.csv"</code></td>
+</tr>
+<tr>
+<td>experimental</td>
+<td><code>mud_gradient_1d_8p5ppg.yaml</code></td>
+<td><code>[time] t=2h  closure=0.300817%</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="conclusao-tecnica">Conclusao tecnica</h2>
+<p>O <code>saltcreep</code> compila, testa e executa seus casos principais auditados com a
+copia vendorizada de Eigen preservada. Tambem tolera a presenca de
+<code>include/Eigen</code> no include path, mas o CMake atual do <code>saltcreep</code> ainda da
+precedencia a <code>external/saltcreep/include</code>.</p>
+<p>Assim, a recomendacao desta auditoria e:</p>
+<pre><code class="language-text">RECOMMEND_EXPERIMENTAL_OPTION_ONLY
+</code></pre>
+<p>A migracao para <code>include/Eigen</code> deve ser feita apenas por opcao explicita de
+CMake em fase futura, com prova de ordem de include e comparacao numerica
+documentada. Ate la, manter as duas copias preservadas.</p>
 </div>
 </section>
 

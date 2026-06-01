@@ -9,14 +9,14 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.9 implementada (LeakoffModel C++ estruturado)
+Fase ativa  : 6.10 concluida (auditoria Eigen do saltcreep)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
 Testes C++  : 47 Catch2 (47 passaram em 2026-06-01)
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
-Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
+Saltcreep   : 125/125 testes Catch2 passaram no baseline e build experimental Eigen
 ```
 
 ### Próximas tarefas (Fase 6)
@@ -34,6 +34,7 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 - [x] Criar pos-processamento moderno minimo LOT/PKN para CSV/JSON sem regressao legado
 - [x] Registrar politica C++ first, Python postprocess only
 - [x] Implementar `LeakoffModel` C++ estruturado com testes Catch2
+- [x] Auditar compatibilidade Eigen do saltcreep sem remover copias Eigen
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
 
@@ -47,6 +48,27 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.10 — Auditoria Eigen do saltcreep — Codex
+**Status:** Concluido nesta sessao.
+**Testes/comandos saltcreep:** `cmake -S external/saltcreep -B external/saltcreep/build_baseline -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`, `cmake --build external/saltcreep/build_baseline -j`, `ctest --test-dir external/saltcreep/build_baseline --output-on-failure -j 4`, build experimental em `external/saltcreep/build_lss_eigen` com `include/Eigen` no include path, e `ctest` equivalente.
+**Resultado saltcreep:** baseline 125/125 testes passaram em 1028.24 s; build experimental 125/125 testes passaram em 1020.63 s.
+**Casos saltcreep executados:** `external/saltcreep/cases/tcc/lame_test.yaml` e `external/saltcreep/cases/apb/mud_gradient_1d_8p5ppg.yaml` nos dois builds. O caso APB reportou `closure=0.300817%` em ambos.
+**Testes/comandos lot-salt-suite:** `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`, `cmake --build build -j`, `ctest --test-dir build --output-on-failure`, `lot-sim validate --case` para `lot_pkn_minimal.yaml` e `lot_pkn_with_leakoff.yaml`, e `lot-sim run --mode lot-pkn` para `lot_pkn_minimal.yaml`.
+**Resultado lot-salt-suite:** 47/47 testes Catch2 passaram; validates retornaram `OK`; run gerou `result.json` e `timeseries.csv` em `results\lot_pkn_minimal_saltcreep_eigen_review`.
+**Escopo:** nenhum arquivo em `external/saltcreep/`, `legance/`, `legacy/`, `tests/baselines/` ou `include/Eigen/` foi removido ou alterado.
+
+**Conclusao:**
+- O `saltcreep` permanece compativel com a copia Eigen vendorizada.
+- O build experimental tolera `include/Eigen` no include path, mas o Visual Studio ainda coloca `external/saltcreep/include` antes de `include/`.
+- A migracao real para `include/Eigen` deve ser opcao CMake futura, nao mudanca implicita.
+
+**Documentos criados/alterados:**
+- `docs/audits/saltcreep_eigen_compatibility_audit.md`.
+- `docs/20_saltcreep_eigen_migration_plan.md`.
+- `docs/16_saltcreep_governance.md`, `docs/13_coupling_lot_apb_salt.md`, `docs/17_lot_pkn_roadmap.md`.
 
 ---
 

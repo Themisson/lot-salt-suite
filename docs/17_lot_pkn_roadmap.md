@@ -84,6 +84,10 @@ entregar os dados ao solver.
 4.12. Fase 6.9: implementar `LeakoffModel` C++ estruturado com modelos
    `none`, `constant_rate`, `carter` minimo e `synthetic_constant` de
    compatibilidade, integrado ao `PknModel` e coberto por Catch2.
+4.13. Fase 6.10: auditar compatibilidade Eigen do `external/saltcreep/` sem
+   alterar o solver. Resultado: baseline e build experimental passaram 125/125
+   testes Catch2 do saltcreep e casos `lame_test`/`mud_gradient_1d_8p5ppg`, mas
+   a migracao real para `include/Eigen` fica como opcao CMake futura.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -167,6 +171,17 @@ entregar os dados ao solver.
 - Testes Catch2 cobrem o modulo isolado e a integracao PKN; nao houve regressao
   numerica contra legado.
 
+**Fase 6.10 (auditoria Eigen do saltcreep):**
+- `docs/audits/saltcreep_eigen_compatibility_audit.md` registra inventario,
+  builds, testes e casos executados.
+- `docs/20_saltcreep_eigen_migration_plan.md` recomenda manter a migracao para
+  `include/Eigen` atras de opcao CMake experimental futura.
+- `external/saltcreep/` permaneceu somente leitura; `include/Eigen/` e
+  `external/saltcreep/include/Eigen/` foram preservados.
+- `ctest` do `saltcreep` passou 125/125 no baseline e 125/125 no build
+  experimental; o build experimental ainda resolveu Eigen pela copia
+  vendorizada devido a precedencia de include do CMake atual.
+
 ## Fora de escopo até R09 ser totalmente resolvido
 
 - Comparação numérica com `legance/LOT_Tese` ou `legance/LOT_APB_v5`.
@@ -184,7 +199,9 @@ priorizar desenvolvimento C++ nesta ordem:
    pos-processamento.
 3. Criar `SaltCreepLotAdapter`/`SaltCreepInterface` C++ para integrar
    `external/saltcreep` sem script Python intermediario.
-4. Implementar acoplamento LOT/sal em C++ e só depois ampliar
+4. Se o adapter exigir unificacao de Eigen, adicionar opcao CMake experimental
+   no `saltcreep` e repetir a auditoria 6.10 com prova de include order.
+5. Implementar acoplamento LOT/sal em C++ e só depois ampliar
    pos-processamento ou comparacao externa.
 
 Antes de qualquer comparacao legado x moderno, confirmar o `idQ` de

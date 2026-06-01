@@ -58,6 +58,8 @@ SECTION_MAP = {
     "changelog":       "15_changelog.md",
     "saltcreep_governance": "16_saltcreep_governance.md",
     "lot_pkn_roadmap": "17_lot_pkn_roadmap.md",
+    "saltcreep_eigen_migration_plan": "20_saltcreep_eigen_migration_plan.md",
+    "saltcreep_eigen_compatibility_audit": "audits/saltcreep_eigen_compatibility_audit.md",
     "lot_legacy_inventory": "audits/lot_legacy_inventory.md",
     "pkn_legacy_path": "audits/pkn_legacy_path.md",
     "non_pkn_models_status": "audits/non_pkn_models_status.md",
@@ -121,6 +123,8 @@ NAV_GROUPS = [
         [
             "saltcreep_governance",
             "lot_pkn_roadmap",
+            "saltcreep_eigen_migration_plan",
+            "saltcreep_eigen_compatibility_audit",
             "lot_legacy_inventory",
             "pkn_legacy_path",
             "non_pkn_models_status",

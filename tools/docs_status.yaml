@@ -50,6 +50,8 @@ docs:
   changelog:              in_progress
   saltcreep_governance:   implemented
   lot_pkn_roadmap:        implemented
+  saltcreep_eigen_migration_plan: implemented
+  saltcreep_eigen_compatibility_audit: implemented
   lot_legacy_inventory:   implemented
   pkn_legacy_path:        implemented
   non_pkn_models_status:  implemented

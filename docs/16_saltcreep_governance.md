@@ -37,6 +37,14 @@ targets modernos pelo target CMake `lss::eigen`. A copia em
 Nenhum target deve receber simultaneamente `include/` e
 `external/saltcreep/include/` apenas para resolver Eigen.
 
+A Fase 6.10 confirmou que o `saltcreep` compila, testa e executa casos auditados
+com a copia vendorizada preservada. Um build experimental com `include/Eigen` no
+include path tambem passou, mas o gerador Visual Studio manteve
+`external/saltcreep/include` antes de `include/`, entao a migracao real para o
+Eigen oficial deve continuar atras de uma opcao CMake explicita futura. Ver
+`docs/audits/saltcreep_eigen_compatibility_audit.md` e
+`docs/20_saltcreep_eigen_migration_plan.md`.
+
 O adapter esperado e:
 
 1. Receber casos ja convertidos para SI pelo parser do `lot-salt-suite`.
@@ -79,5 +87,6 @@ Ao finalizar, registrar:
 
 ## Estado nesta fase
 
-Nesta Fase 6.0, `external/saltcreep/` foi auditado em modo somente leitura. Nenhum
-arquivo do saltcreep foi alterado.
+Na Fase 6.10, `external/saltcreep/` foi auditado em modo somente leitura para a
+compatibilidade Eigen. Nenhum arquivo do saltcreep foi alterado e as duas copias
+de Eigen foram preservadas.

@@ -18,6 +18,10 @@ O LOT, APB e fluência de sal são fenômenos que se influenciam mutuamente:
 Na arquitetura atual, o caminho LOT inicial deve ser PKN. O acoplamento com sal
 deve passar pelo adapter para `external/saltcreep/`, que e uma dependencia
 vendorizada ativa com governanca descrita em `docs/16_saltcreep_governance.md`.
+O adapter nao deve depender de scripts Python em runtime e nao deve assumir que
+o `saltcreep` ja usa o Eigen oficial do repositorio principal. Ate existir uma
+opcao CMake explicita e validada, `external/saltcreep/include/Eigen/` continua
+preservado para os builds do proprio solver.
 
 ## Política de implementação
 
@@ -113,3 +117,12 @@ sal. O fluxo esperado e:
 4. O retorno do sal atualiza fechamento radial, volume anular e diagnosticos de
    dano.
 5. `apb/` atualiza pressao anular a partir do volume e compressibilidade.
+
+## Dependencia Eigen no acoplamento
+
+Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que
+aponta para `include/Eigen/`. O acoplamento com `external/saltcreep/` deve ser
+feito por adapter e contrato de dados, sem misturar include paths apenas para
+resolver headers Eigen. A auditoria de Fase 6.10 recomenda manter a migracao do
+`saltcreep` para `include/Eigen` como opcao experimental futura, nao como
+pre-condicao para LOT/APB/sal.
