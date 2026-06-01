@@ -83,8 +83,20 @@ struct TimeConfig {
 struct LotConfig {
   bool enabled = false;
   double shoe_depth_m = 0.0;
+  std::string model;
   std::string fracture_geometry;
   double fracture_fluid_viscosity_cP = 0.0;
+  double injection_rate_m3_s = 0.0;
+  double injection_total_time_s = 0.0;
+  double injection_dt_s = 0.0;
+  double injection_accommodation_time_s = 0.0;
+  double fracture_height_m = 0.0;
+  double fracture_initial_width_m = 0.0;
+  std::string breakdown_method;
+  double breakdown_pressure_Pa = 0.0;
+  bool leakoff_enabled = false;
+  std::string leakoff_model;
+  std::string detection_method;
 };
 
 struct ApbConfig {

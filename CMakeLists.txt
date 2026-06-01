@@ -63,6 +63,8 @@ endif()
 
 set(LSS_CORE_SOURCES
   src/io/CaseParser.cpp
+  src/lot/BreakdownDetector.cpp
+  src/lot/PknModel.cpp
 )
 
 # ============================================================
@@ -87,6 +89,8 @@ if(LSS_BUILD_TESTS)
   add_executable(lot_sim_tests
     tests/cpp/test_units.cpp
     tests/cpp/test_case_parser.cpp
+    tests/cpp/test_breakdown_detector.cpp
+    tests/cpp/test_pkn_model_synthetic.cpp
     ${LSS_CORE_SOURCES}
   )
   target_include_directories(lot_sim_tests PRIVATE

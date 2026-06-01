@@ -1,0 +1,141 @@
+metadata:
+  name: buz67d_pkn_migrated_contract
+  version: "0.1"
+  mode: lot-pkn
+  legacy_source: legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+
+simulation:
+  mode: lot-pkn
+
+units:
+  length: m
+  pressure: Pa
+  temperature: degC
+  density: ppg
+  viscosity: cP
+
+wellbore:
+  airgap_m: 0.0
+  water_depth_m: 0.0
+  total_depth_m: 4374.0
+  shoe_depth_m: 4374.0
+
+casings:
+  - id: production_casing
+    top_m: 0.0
+    base_m: 4374.0
+    di_in: 13.5
+    de_in: 16.0
+    E_Pa: 210000000000.0
+    nu: 0.30
+
+cements:
+  - id: production_cement
+    top_m: 0.0
+    base_m: 4374.0
+    di_in: 16.0
+    de_in: 20.0
+    E_Pa: 10000000000.0
+    nu: 0.25
+
+annulars:
+  - id: annulus_a
+    fluid: lot_fluid
+    top_m: 0.0
+    base_m: 4374.0
+
+fluids:
+  - id: lot_fluid
+    mode: constant
+    density_ppg: 11.5
+    viscosity_cP: 3.0
+    compressibility_per_Pa: 0.00000000064
+
+temperature:
+  mode: profile
+  data:
+    - depth_m: 0.0
+      temp_C: 25.0
+    - depth_m: 4374.0
+      temp_C: 86.0
+
+layers:
+  - id: salt_test_interval
+    top_m: 0.0
+    base_m: 4374.0
+    rock: halite_double_mechanism
+
+rocks:
+  - id: halite_double_mechanism
+    model: double_mechanism
+    E_Pa: 20400000000.0
+    nu: 0.36
+    density_kg_m3: 2160.0
+    e0_per_h: 0.000000522
+    sig0_Pa: 9920000.0
+    T0_degC: 86.0
+    n1: 3.36
+    n2: 7.55
+
+lot:
+  enabled: true
+  shoe_depth_m: 4374.0
+  model: pkn
+  injection:
+    rate:
+      # R09_PENDING_REVIEW: legacy flow conversion embeds geometry factors.
+      value: 0.5
+      unit: bbl_min
+    schedule:
+      total_time:
+        value: 12.5
+        unit: min
+      dt:
+        value: 0.5
+        unit: min
+      accommodation_time:
+        value: 9.5
+        unit: min
+  fracture:
+    geometry: pkn
+    fluid_viscosity_cP: 3.0
+    height:
+      # R09_PENDING_REVIEW: PKN height is calculated in the legacy path.
+      value: 1.0
+      unit: m
+    initial_width:
+      value: 0.0
+      unit: m
+    breakdown:
+      method: pressure_threshold
+      pressure:
+        # R09_PENDING_REVIEW: placeholder threshold for syntactic contract only.
+        value: 1.0
+        unit: Pa
+  leakoff:
+    enabled: true
+    # R09_PENDING_REVIEW: legacy PKN leakoff volume cannot be used as benchmark yet.
+    model: synthetic_constant
+  detection:
+    method: derivative_drop
+
+apb:
+  enabled: false
+  top_packer_m: 0.0
+  leakage_enabled: false
+  venting_enabled: false
+
+time:
+  total_h: 0.2083333333
+  dt_h: 0.0083333333
+  scheme: explicit
+  solver:
+    tol_pressure_bar: 0.1
+    tol_eq: 0.00000001
+    stabilization_h: 0.1583333333
+
+output:
+  directory: output/buz67d_pkn_contract
+  every_n_steps: 1
+  fields: [pressure, stress, temperature]
+  format: json

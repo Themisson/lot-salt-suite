@@ -56,6 +56,25 @@ em relação ao compilador original. Documentado em `docs/08_known_issues.md`.
 | V8 | Caso acoplado completo | Não executado | — | — |
 | V9 | Regressão automática | Não executado | — | — |
 
+## Fase 6.2 — Testes sintéticos LOT/PKN
+
+**Data:** 2026-06-01
+
+**Executado nesta fase:**
+
+- Testes Catch2 do parser para os YAMLs `lot-pkn`.
+- Testes Catch2 do `BreakdownDetector` com series sintéticas.
+- Testes Catch2 do esqueleto sintético de `PknModel`.
+- Validação via CLI dos casos:
+  - `cases/validation/lot_pkn_minimal.yaml`
+  - `cases/validation/lot_pkn_with_leakoff.yaml`
+  - `cases/lot_tese_migrated/buz67d_pkn.yaml`
+
+**Importante:** nao houve validacao numerica contra `legance/LOT_Tese` ou
+`legance/LOT_APB_v5`. R09 (`/ M_PI / 22`) permanece blocker para regressao
+PKN legado x moderno. O caso `buz67d_pkn.yaml` e contrato sintatico/migratorio,
+nao baseline numerico.
+
 ## Baselines capturados
 
 | Baseline | Arquivo | Status | Data |

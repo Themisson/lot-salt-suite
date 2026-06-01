@@ -65,6 +65,62 @@ double parse_viscosity_Pa_s(const YAML::Node& node, const std::string& path) {
   return require_as<double>(node["viscosity_Pa_s"], path + ".viscosity_Pa_s");
 }
 
+double parse_value_unit(const YAML::Node& node, const std::string& path,
+                        const std::string& quantity) {
+  const double value = require_as<double>(node["value"], path + ".value");
+  const std::string unit = require_as<std::string>(node["unit"], path + ".unit");
+
+  if (quantity == "rate") {
+    if (unit == "m3_s") {
+      return value;
+    }
+    if (unit == "m3_min") {
+      return value / 60.0;
+    }
+    if (unit == "m3_h") {
+      return value / 3600.0;
+    }
+    if (unit == "bbl_min" || unit == "bpm") {
+      return value * 0.158987294928 / 60.0;
+    }
+  }
+
+  if (quantity == "time") {
+    if (unit == "s") {
+      return value;
+    }
+    if (unit == "min") {
+      return value * 60.0;
+    }
+    if (unit == "h") {
+      return value * 3600.0;
+    }
+  }
+
+  if (quantity == "length") {
+    if (unit == "m") {
+      return value;
+    }
+    if (unit == "in") {
+      return units::in_to_m(value);
+    }
+  }
+
+  if (quantity == "pressure") {
+    if (unit == "Pa") {
+      return value;
+    }
+    if (unit == "bar") {
+      return units::bar_to_Pa(value);
+    }
+    if (unit == "psi") {
+      return units::psi_to_Pa(value);
+    }
+  }
+
+  throw std::runtime_error("Unidade invalida em " + path + ": " + unit);
+}
+
 void validate_nonempty(bool condition, const std::string& field) {
   if (!condition) {
     throw std::runtime_error("Validacao falhou: " + field + " deve conter ao menos 1 item");
@@ -110,6 +166,9 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
   data.version = require_as<std::string>(metadata["version"], "metadata.version");
   data.mode = require_as<std::string>(metadata["mode"], "metadata.mode");
   data.legacy_source = optional_string(metadata, "legacy_source");
+  if (root["simulation"] && root["simulation"]["mode"]) {
+    data.mode = root["simulation"]["mode"].as<std::string>();
+  }
 
   for (const auto& node : require_node(root["casings"], "casings")) {
     lss::core::CasingData casing;
@@ -194,12 +253,54 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
   const YAML::Node lot = require_node(root["lot"], "lot");
   data.lot.enabled = require_as<bool>(lot["enabled"], "lot.enabled");
   data.lot.shoe_depth_m = require_as<double>(lot["shoe_depth_m"], "lot.shoe_depth_m");
+  data.lot.model = optional_string(lot, "model");
   const YAML::Node fracture = require_node(lot["fracture"], "lot.fracture");
   data.lot.fracture_geometry =
       require_as<std::string>(fracture["geometry"], "lot.fracture.geometry");
-  data.lot.fracture_fluid_viscosity_cP =
-      require_as<double>(fracture["fluid_viscosity_cP"],
-                         "lot.fracture.fluid_viscosity_cP");
+  if (data.lot.model.empty()) {
+    data.lot.model = data.lot.fracture_geometry;
+  }
+  if (fracture["fluid_viscosity_cP"]) {
+    data.lot.fracture_fluid_viscosity_cP =
+        require_as<double>(fracture["fluid_viscosity_cP"],
+                           "lot.fracture.fluid_viscosity_cP");
+  }
+  if (fracture["height"]) {
+    data.lot.fracture_height_m =
+        parse_value_unit(fracture["height"], "lot.fracture.height", "length");
+  }
+  if (fracture["initial_width"]) {
+    data.lot.fracture_initial_width_m = parse_value_unit(
+        fracture["initial_width"], "lot.fracture.initial_width", "length");
+  }
+  if (fracture["breakdown"]) {
+    const YAML::Node breakdown = fracture["breakdown"];
+    data.lot.breakdown_method =
+        require_as<std::string>(breakdown["method"], "lot.fracture.breakdown.method");
+    data.lot.breakdown_pressure_Pa = parse_value_unit(
+        breakdown["pressure"], "lot.fracture.breakdown.pressure", "pressure");
+  }
+  if (lot["injection"]) {
+    const YAML::Node injection = lot["injection"];
+    data.lot.injection_rate_m3_s =
+        parse_value_unit(injection["rate"], "lot.injection.rate", "rate");
+    const YAML::Node schedule = require_node(injection["schedule"], "lot.injection.schedule");
+    data.lot.injection_total_time_s =
+        parse_value_unit(schedule["total_time"], "lot.injection.schedule.total_time", "time");
+    data.lot.injection_dt_s =
+        parse_value_unit(schedule["dt"], "lot.injection.schedule.dt", "time");
+    data.lot.injection_accommodation_time_s = parse_value_unit(
+        schedule["accommodation_time"], "lot.injection.schedule.accommodation_time", "time");
+  }
+  if (lot["leakoff"]) {
+    const YAML::Node leakoff = lot["leakoff"];
+    data.lot.leakoff_enabled = require_as<bool>(leakoff["enabled"], "lot.leakoff.enabled");
+    data.lot.leakoff_model = optional_string(leakoff, "model", "none");
+  }
+  if (lot["detection"]) {
+    data.lot.detection_method =
+        require_as<std::string>(lot["detection"]["method"], "lot.detection.method");
+  }
 
   const YAML::Node apb = require_node(root["apb"], "apb");
   data.apb.enabled = require_as<bool>(apb["enabled"], "apb.enabled");
@@ -228,6 +329,17 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
   }
   if (data.time.tol_eq <= 0.0) {
     throw std::runtime_error("Validacao falhou: time.solver.tol_eq deve ser > 0");
+  }
+  if (data.mode == "lot-pkn") {
+    if (data.lot.model != "pkn" || data.lot.fracture_geometry != "pkn") {
+      throw std::runtime_error("Validacao falhou: simulation.mode lot-pkn exige lot.model/fracture.geometry pkn");
+    }
+    if (data.lot.injection_dt_s <= 0.0 || data.lot.injection_total_time_s <= 0.0) {
+      throw std::runtime_error("Validacao falhou: lot.injection.schedule exige tempos > 0");
+    }
+    if (data.lot.fracture_height_m <= 0.0 || data.lot.breakdown_pressure_Pa <= 0.0) {
+      throw std::runtime_error("Validacao falhou: LOT/PKN exige altura e pressao de breakdown > 0");
+    }
   }
   validate_nonempty(!data.casings.empty(), "casings");
   validate_nonempty(!data.fluids.empty(), "fluids");

@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.0/6.1 em andamento (governanca saltcreep + auditoria LOT/PKN)
+Fase ativa  : 6.2 em andamento (contrato YAML/C++ LOT/PKN + detector sintetico)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
-Testes C++  : 15 Catch2 (15 passaram em 2026-06-01)
+Testes C++  : 27 Catch2 (27 passaram em 2026-06-01)
 Testes Py   : 0
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
@@ -24,8 +24,10 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 - [x] Definir governanca de `external/saltcreep/` como dependencia vendorizada ativa
 - [x] Auditar caminho LOT/PKN nos legados sem modificar `legance/`
 - [x] Catalogar modelos nao PKN como nao prioritarios
-- [ ] Implementar `lot::PknModel` com entradas SI e testes Catch2
-- [ ] Implementar `lot::BreakdownDetector` com convencoes FA01-FA04
+- [x] Criar contrato YAML/C++ LOT/PKN com casos sintaticos e migrado BUZ67D
+- [x] Implementar `lot::BreakdownDetector` sintetico com testes Catch2
+- [x] Criar esqueleto sintetico de `lot::PknModel` com testes Catch2
+- [ ] Auditar R09 antes de regressao numerica PKN legado x moderno
 - [ ] Conectar LOT/PKN ao CLI somente apos contrato numerico testado
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
@@ -40,6 +42,44 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.2 — Contrato LOT/PKN YAML+C++ — Codex
+**Status:** Implementado nesta sessão.
+**Testes C++:** 27 Catch2 | **Resultado ctest:** 27 passaram.
+**Validação YAML/schema:** `lot_pkn_minimal.yaml`, `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml` validaram contra `schemas/lot_case.schema.yaml`.
+**CLI:** `.\build\lot-sim.exe validate --case ...` executado nos 3 casos LOT/PKN com `OK`.
+**Escopo:** nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/` ou `tests/baselines/` foi alterado.
+
+**Arquivos criados:**
+- `include/lot/LotTypes.hpp`
+- `include/lot/InjectionSchedule.hpp`
+- `include/lot/LeakoffModel.hpp`
+- `include/lot/PknInput.hpp`
+- `include/lot/PknResult.hpp`
+- `include/lot/BreakdownDetector.hpp`
+- `include/lot/PknModel.hpp`
+- `src/lot/BreakdownDetector.cpp`
+- `src/lot/PknModel.cpp`
+- `tests/cpp/test_breakdown_detector.cpp`
+- `tests/cpp/test_pkn_model_synthetic.cpp`
+- `cases/validation/lot_pkn_minimal.yaml`
+- `cases/validation/lot_pkn_with_leakoff.yaml`
+- `cases/lot_tese_migrated/buz67d_pkn.yaml`
+
+**Arquivos alterados:**
+- `schemas/lot_case.schema.yaml` — aceita `simulation.mode: lot-pkn` e contrato LOT/PKN
+- `include/core/types.hpp` — `LotConfig` expandido com campos SI do contrato PKN
+- `src/io/CaseParser.cpp` — parsing e conversao SI para taxa, tempo, comprimento e pressao
+- `tests/cpp/test_case_parser.cpp` — cobertura dos novos YAMLs LOT/PKN
+- `CMakeLists.txt` — inclui modulo `lot` e novos testes
+- `docs/02_lot_formulation.md`, `docs/05_input_output_formats.md`, `docs/12_validation_results.md`, `docs/17_lot_pkn_roadmap.md` — contrato e ressalvas documentados
+- `tools/docs_status.yaml`, `docs/index.html` — status/indice atualizados
+
+**R09:** permanece blocker para validacao numerica contra legado. Nenhuma regressao PKN legado x moderno foi declarada.
+
+**Proxima etapa recomendada:** auditar R09 (`/ M_PI / 22`) ou evoluir `PknModel` com formulacao controlada, ainda sem usar baseline legado como verdade numerica.
 
 ---
 

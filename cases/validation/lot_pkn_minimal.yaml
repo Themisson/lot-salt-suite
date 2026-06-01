@@ -1,0 +1,131 @@
+metadata:
+  name: lot_pkn_minimal_validation
+  version: "0.1"
+  mode: lot-pkn
+
+simulation:
+  mode: lot-pkn
+
+units:
+  length: m
+  pressure: Pa
+  temperature: degC
+  density: ppg
+  viscosity: cP
+
+wellbore:
+  airgap_m: 25.0
+  water_depth_m: 2100.0
+  total_depth_m: 3200.0
+  shoe_depth_m: 3000.0
+
+casings:
+  - id: production_casing
+    top_m: 0.0
+    base_m: 3000.0
+    di_in: 14.75
+    de_in: 16.0
+    E_Pa: 210000000000.0
+    nu: 0.30
+
+cements:
+  - id: production_cement
+    top_m: 2500.0
+    base_m: 3000.0
+    di_in: 16.0
+    de_in: 20.0
+    E_Pa: 10000000000.0
+    nu: 0.25
+
+annulars:
+  - id: annulus_a
+    fluid: drilling_mud
+    top_m: 0.0
+    base_m: 3000.0
+
+fluids:
+  - id: drilling_mud
+    mode: constant
+    density_ppg: 11.5
+    viscosity_cP: 3.0
+    compressibility_per_Pa: 0.00000000045
+
+temperature:
+  mode: profile
+  data:
+    - depth_m: 0.0
+      temp_C: 25.0
+    - depth_m: 3000.0
+      temp_C: 86.0
+
+layers:
+  - id: salt_interval
+    top_m: 2500.0
+    base_m: 3200.0
+    rock: halite_elastic
+
+rocks:
+  - id: halite_elastic
+    model: elastic_isotropic
+    E_Pa: 20400000000.0
+    nu: 0.36
+    density_kg_m3: 2160.0
+
+lot:
+  enabled: true
+  shoe_depth_m: 3000.0
+  model: pkn
+  injection:
+    rate:
+      value: 0.0005
+      unit: m3_s
+    schedule:
+      total_time:
+        value: 600.0
+        unit: s
+      dt:
+        value: 30.0
+        unit: s
+      accommodation_time:
+        value: 0.0
+        unit: s
+  fracture:
+    geometry: pkn
+    fluid_viscosity_cP: 3.0
+    height:
+      value: 20.0
+      unit: m
+    initial_width:
+      value: 0.0
+      unit: m
+    breakdown:
+      method: pressure_threshold
+      pressure:
+        value: 45000000.0
+        unit: Pa
+  leakoff:
+    enabled: false
+    model: none
+  detection:
+    method: derivative_drop
+
+apb:
+  enabled: false
+  top_packer_m: 0.0
+  leakage_enabled: false
+  venting_enabled: false
+
+time:
+  total_h: 0.1666666667
+  dt_h: 0.0083333333
+  scheme: explicit
+  solver:
+    tol_pressure_bar: 1.0
+    tol_eq: 0.00000001
+    stabilization_h: 0.0
+
+output:
+  directory: output/lot_pkn_minimal
+  every_n_steps: 1
+  fields: [pressure, stress, temperature]
+  format: json

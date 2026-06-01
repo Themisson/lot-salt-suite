@@ -29,8 +29,16 @@ properties:
       version: {type: string}
       mode:
         type: string
-        enum: [lot, apb, salt, lot-salt, apb-salt, coupled]
+        enum: [lot, lot-pkn, apb, salt, lot-salt, apb-salt, coupled]
       legacy_source: {type: string}
+  simulation:
+    type: object
+    required: [mode]
+    additionalProperties: false
+    properties:
+      mode:
+        type: string
+        enum: [lot, lot-pkn, apb, salt, lot-salt, apb-salt, coupled]
   units:
     type: object
     required: [length, pressure, temperature, density, viscosity]
@@ -164,15 +172,65 @@ properties:
     properties:
       enabled: {type: boolean}
       shoe_depth_m: {type: number}
+      model: {type: string, enum: [pkn, circular, elliptical, penny_shaped]}
+      injection:
+        type: object
+        required: [rate, schedule]
+        additionalProperties: false
+        properties:
+          rate:
+            $ref: "#/$defs/rate_quantity"
+          schedule:
+            type: object
+            required: [total_time, dt, accommodation_time]
+            additionalProperties: false
+            properties:
+              total_time:
+                $ref: "#/$defs/time_quantity"
+              dt:
+                $ref: "#/$defs/time_quantity"
+              accommodation_time:
+                $ref: "#/$defs/time_quantity"
       fracture:
         type: object
-        required: [geometry, fluid_viscosity_cP]
+        required: [geometry]
         additionalProperties: false
         properties:
           geometry:
             type: string
             enum: [circular, elliptical, penny_shaped, pkn]
           fluid_viscosity_cP: {type: number}
+          height:
+            $ref: "#/$defs/length_quantity"
+          initial_width:
+            $ref: "#/$defs/length_quantity"
+          breakdown:
+            type: object
+            required: [method, pressure]
+            additionalProperties: false
+            properties:
+              method:
+                type: string
+                enum: [pressure_threshold, derivative_drop]
+              pressure:
+                $ref: "#/$defs/pressure_quantity"
+      leakoff:
+        type: object
+        required: [enabled, model]
+        additionalProperties: false
+        properties:
+          enabled: {type: boolean}
+          model:
+            type: string
+            enum: [none, carter, synthetic_constant]
+      detection:
+        type: object
+        required: [method]
+        additionalProperties: false
+        properties:
+          method:
+            type: string
+            enum: [derivative_drop, pressure_threshold]
   apb:
     type: object
     required: [enabled, top_packer_m, leakage_enabled, venting_enabled]
@@ -209,3 +267,32 @@ properties:
         type: array
         items: {type: string, enum: [pressure, displacement, stress, temperature]}
       format: {type: string, enum: [csv, json]}
+$defs:
+  rate_quantity:
+    type: object
+    required: [value, unit]
+    additionalProperties: false
+    properties:
+      value: {type: number}
+      unit: {type: string, enum: [m3_s, m3_min, m3_h, bbl_min, bpm]}
+  time_quantity:
+    type: object
+    required: [value, unit]
+    additionalProperties: false
+    properties:
+      value: {type: number}
+      unit: {type: string, enum: [s, min, h]}
+  length_quantity:
+    type: object
+    required: [value, unit]
+    additionalProperties: false
+    properties:
+      value: {type: number}
+      unit: {type: string, enum: [m, in]}
+  pressure_quantity:
+    type: object
+    required: [value, unit]
+    additionalProperties: false
+    properties:
+      value: {type: number}
+      unit: {type: string, enum: [Pa, bar, psi]}

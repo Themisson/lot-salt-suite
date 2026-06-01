@@ -53,6 +53,8 @@ entregar os dados ao solver.
    extraídos de `legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp` e validar
    contra `schemas/lot_case.schema.yaml` antes de conectar ao CLI.
    Este caso é a ponte entre o contrato numérico e o pipeline YAML→CLI.
+4.6. Fase 6.2: criar contrato YAML/C++ LOT/PKN, detector sintético e esqueleto
+   minimo de `PknModel` sem regressao contra legado enquanto R09 estiver aberto.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.

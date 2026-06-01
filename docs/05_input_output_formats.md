@@ -38,6 +38,55 @@ Campos principais: `id_operation`, `duration`, `duration_unit`, `airgap`,
 
 Mapeamento JSON → YAML em docs/09_migration_plan.md.
 
+## Contrato YAML LOT/PKN (Fase 6.2)
+
+Casos LOT/PKN usam `simulation.mode: lot-pkn` e mantem `metadata.mode: lot-pkn`
+para compatibilidade com o parser atual.
+
+```yaml
+simulation:
+  mode: lot-pkn
+
+lot:
+  enabled: true
+  shoe_depth_m: 3000.0
+  model: pkn
+  injection:
+    rate:
+      value: 0.5
+      unit: bbl_min
+    schedule:
+      total_time: {value: 12.5, unit: min}
+      dt: {value: 0.5, unit: min}
+      accommodation_time: {value: 9.5, unit: min}
+  fracture:
+    geometry: pkn
+    fluid_viscosity_cP: 3.0
+    height: {value: 20.0, unit: m}
+    initial_width: {value: 0.0, unit: m}
+    breakdown:
+      method: pressure_threshold
+      pressure: {value: 45.0e6, unit: Pa}
+  leakoff:
+    enabled: true
+    model: synthetic_constant
+  detection:
+    method: derivative_drop
+```
+
+Unidades aceitas no contrato:
+
+| Quantidade | Unidades aceitas | Unidade interna |
+|------------|------------------|-----------------|
+| Taxa | `m3_s`, `m3_min`, `m3_h`, `bbl_min`, `bpm` | m3/s |
+| Tempo | `s`, `min`, `h` | s |
+| Comprimento | `m`, `in` | m |
+| Pressao | `Pa`, `bar`, `psi` | Pa |
+
+O caso migrado `cases/lot_tese_migrated/buz67d_pkn.yaml` e sintaticamente
+validavel, mas campos marcados como `R09_PENDING_REVIEW` nao podem ser usados
+como baseline numerico enquanto R09 estiver aberto.
+
 ## Formato de saída CSV
 
 `

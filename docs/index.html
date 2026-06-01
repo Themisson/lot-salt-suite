@@ -83,7 +83,7 @@
     
     <div class="hero-stats">
       <div class="stat"><span class="stat-num">6/13</span><span class="stat-label">Fases ativas</span></div>
-      <div class="stat"><span class="stat-num">15</span><span class="stat-label">Testes C++</span></div>
+      <div class="stat"><span class="stat-num">27</span><span class="stat-label">Testes C++</span></div>
       <div class="stat"><span class="stat-num">0</span><span class="stat-label">Testes Python</span></div>
       <div class="stat"><span class="stat-num">0/10</span><span class="stat-label">Validações V0-V9</span></div>
     </div>
@@ -386,14 +386,68 @@ da fratura.</p>
 <p><code>Pressurização linear → Ponto de Leak-Off → Propagação de fratura → Fechamento
      (elástico)           (LOT_pressure)       (leakoff rate)       (closure)</code></p>
 <h2 id="formulacao-de-fratura-a-documentar-apos-auditoria">Formulação de fratura (a documentar após auditoria)</h2>
-<p><strong>Atenção:</strong> A formulação completa deve ser extraída do código legado via skill
-<code>/formulation-audit</code> e documentada aqui antes de implementar o módulo <code>lot/</code>.</p>
+<p><strong>Atenção:</strong> A formulação completa PKN ainda não está validada contra o legado
+porque R09 permanece blocker para regressão numérica. A Fase 6.2 cria apenas o
+contrato de entrada, os tipos C++ e testes sintéticos.</p>
 <p>Campos a documentar:
 - Relação pressão-volume antes da fratura (regime elástico)
 - Critério de iniciação de fratura
 - Geometrias suportadas: circular, elliptical, penny-shaped, PKN
 - Modelo de leakoff (filtração de fluido na parede)
 - Integração com deformação da rocha salina</p>
+<h2 id="contrato-lotpkn-sintetico-fase-62">Contrato LOT/PKN sintético (Fase 6.2)</h2>
+<p>O caminho moderno inicial usa <code>simulation.mode: lot-pkn</code>, <code>lot.model: pkn</code> e
+<code>lot.fracture.geometry: pkn</code>. O parser converte taxa de injecao, tempos,
+comprimentos e pressao de breakdown para SI antes de preencher <code>CaseData</code>.</p>
+<p>Campos principais:</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Unidade interna</th>
+<th>Observacao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lot.injection.rate</code></td>
+<td>m3/s</td>
+<td>Aceita <code>m3_s</code>, <code>m3_min</code>, <code>m3_h</code>, <code>bbl_min</code> e <code>bpm</code>.</td>
+</tr>
+<tr>
+<td><code>lot.injection.schedule.total_time</code></td>
+<td>s</td>
+<td>Tempo total do contrato LOT/PKN.</td>
+</tr>
+<tr>
+<td><code>lot.injection.schedule.dt</code></td>
+<td>s</td>
+<td>Passo coerente com a taxa usada pelo modelo.</td>
+</tr>
+<tr>
+<td><code>lot.injection.schedule.accommodation_time</code></td>
+<td>s</td>
+<td>Tempo sem injecao/variacao operacional antes do carregamento.</td>
+</tr>
+<tr>
+<td><code>lot.fracture.height</code></td>
+<td>m</td>
+<td>Altura PKN de entrada; no legado pode ser calculada e esta sob revisao.</td>
+</tr>
+<tr>
+<td><code>lot.fracture.initial_width</code></td>
+<td>m</td>
+<td>Largura inicial sintética.</td>
+</tr>
+<tr>
+<td><code>lot.fracture.breakdown.pressure</code></td>
+<td>Pa</td>
+<td>Limiar do detector por pressao, quando usado.</td>
+</tr>
+</tbody>
+</table>
+<p>O detector <code>derivative_drop</code> opera em series sintéticas <code>time_s</code>,
+<code>volume_m3</code> e <code>pressure_Pa</code>. Ele nao usa resultados legados.</p>
 <h2 id="parametros-de-referencia-extraidos-do-legado">Parâmetros de referência (extraídos do legado)</h2>
 <table>
 <thead>
@@ -409,7 +463,7 @@ da fratura.</p>
 <td>Viscosidade fluido LOT</td>
 <td>3.0</td>
 <td>cP</td>
-<td><code>setLeakoffProps("pa_min", 3., "elliptical")</code></td>
+<td><code>setLeakoffProps("pa_min", 3., "pkn")</code> em casos PKN auditados</td>
 </tr>
 <tr>
 <td>Profundidade sapata</td>
@@ -419,10 +473,8 @@ da fratura.</p>
 </tr>
 </tbody>
 </table>
-<h2 id="convencao-de-sinais-a-verificar">Convenção de sinais (a verificar)</h2>
-<blockquote>
-<p>PENDENTE — executar skill <code>/formulation-audit</code> para confirmar convenção.</p>
-</blockquote>
+<h2 id="convencao-de-sinais">Convenção de sinais</h2>
+<p>Compressao positiva, conforme FA03 em <code>docs/08_known_issues.md</code>.</p>
 </section>
 
 <section id="apb" class="doc-section">
@@ -589,6 +641,73 @@ postprocess: # Script de pós-processamento</code></p>
 <code>temperature</code>, <code>solids</code>, <code>fluids</code>, <code>rocks</code>, <code>layers</code>, <code>top_packer</code>,
 <code>depressurization</code>, <code>salt_creep_enabled</code>.</p>
 <p>Mapeamento JSON → YAML em docs/09_migration_plan.md.</p>
+<h2 id="contrato-yaml-lotpkn-fase-62">Contrato YAML LOT/PKN (Fase 6.2)</h2>
+<p>Casos LOT/PKN usam <code>simulation.mode: lot-pkn</code> e mantem <code>metadata.mode: lot-pkn</code>
+para compatibilidade com o parser atual.</p>
+<pre><code class="language-yaml">simulation:
+  mode: lot-pkn
+
+lot:
+  enabled: true
+  shoe_depth_m: 3000.0
+  model: pkn
+  injection:
+    rate:
+      value: 0.5
+      unit: bbl_min
+    schedule:
+      total_time: {value: 12.5, unit: min}
+      dt: {value: 0.5, unit: min}
+      accommodation_time: {value: 9.5, unit: min}
+  fracture:
+    geometry: pkn
+    fluid_viscosity_cP: 3.0
+    height: {value: 20.0, unit: m}
+    initial_width: {value: 0.0, unit: m}
+    breakdown:
+      method: pressure_threshold
+      pressure: {value: 45.0e6, unit: Pa}
+  leakoff:
+    enabled: true
+    model: synthetic_constant
+  detection:
+    method: derivative_drop
+</code></pre>
+<p>Unidades aceitas no contrato:</p>
+<table>
+<thead>
+<tr>
+<th>Quantidade</th>
+<th>Unidades aceitas</th>
+<th>Unidade interna</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Taxa</td>
+<td><code>m3_s</code>, <code>m3_min</code>, <code>m3_h</code>, <code>bbl_min</code>, <code>bpm</code></td>
+<td>m3/s</td>
+</tr>
+<tr>
+<td>Tempo</td>
+<td><code>s</code>, <code>min</code>, <code>h</code></td>
+<td>s</td>
+</tr>
+<tr>
+<td>Comprimento</td>
+<td><code>m</code>, <code>in</code></td>
+<td>m</td>
+</tr>
+<tr>
+<td>Pressao</td>
+<td><code>Pa</code>, <code>bar</code>, <code>psi</code></td>
+<td>Pa</td>
+</tr>
+</tbody>
+</table>
+<p>O caso migrado <code>cases/lot_tese_migrated/buz67d_pkn.yaml</code> e sintaticamente
+validavel, mas campos marcados como <code>R09_PENDING_REVIEW</code> nao podem ser usados
+como baseline numerico enquanto R09 estiver aberto.</p>
 <h2 id="formato-de-saida-csv">Formato de saída CSV</h2>
 <p><code>time_h, annular_A_pressure_Pa, annular_B_pressure_Pa,
 lot_pressure_Pa, lot_volume_m3, salt_closure_mm, ...</code>
@@ -1966,6 +2085,22 @@ em relação ao compilador original. Documentado em <code>docs/08_known_issues.m
 </tr>
 </tbody>
 </table>
+<h2 id="fase-62-testes-sinteticos-lotpkn">Fase 6.2 — Testes sintéticos LOT/PKN</h2>
+<p><strong>Data:</strong> 2026-06-01</p>
+<p><strong>Executado nesta fase:</strong></p>
+<ul>
+<li>Testes Catch2 do parser para os YAMLs <code>lot-pkn</code>.</li>
+<li>Testes Catch2 do <code>BreakdownDetector</code> com series sintéticas.</li>
+<li>Testes Catch2 do esqueleto sintético de <code>PknModel</code>.</li>
+<li>Validação via CLI dos casos:</li>
+<li><code>cases/validation/lot_pkn_minimal.yaml</code></li>
+<li><code>cases/validation/lot_pkn_with_leakoff.yaml</code></li>
+<li><code>cases/lot_tese_migrated/buz67d_pkn.yaml</code></li>
+</ul>
+<p><strong>Importante:</strong> nao houve validacao numerica contra <code>legance/LOT_Tese</code> ou
+<code>legance/LOT_APB_v5</code>. R09 (<code>/ M_PI / 22</code>) permanece blocker para regressao
+PKN legado x moderno. O caso <code>buz67d_pkn.yaml</code> e contrato sintatico/migratorio,
+nao baseline numerico.</p>
 <h2 id="baselines-capturados">Baselines capturados</h2>
 <table>
 <thead>
@@ -2408,7 +2543,9 @@ entregar os dados ao solver.</p>
 4.5. Criar <code>cases/lot_tese_migrated/buz67d_pkn.yaml</code> com os parâmetros
    extraídos de <code>legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp</code> e validar
    contra <code>schemas/lot_case.schema.yaml</code> antes de conectar ao CLI.
-   Este caso é a ponte entre o contrato numérico e o pipeline YAML→CLI.</li>
+   Este caso é a ponte entre o contrato numérico e o pipeline YAML→CLI.
+4.6. Fase 6.2: criar contrato YAML/C++ LOT/PKN, detector sintético e esqueleto
+   minimo de <code>PknModel</code> sem regressao contra legado enquanto R09 estiver aberto.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>

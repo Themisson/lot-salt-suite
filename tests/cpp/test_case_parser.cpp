@@ -12,6 +12,9 @@ namespace {
 constexpr const char* kMinimalCasePath = "cases/validation/lot_minimal.yaml";
 constexpr const char* kDoubleMechanismCasePath =
     "cases/validation/lot_double_mechanism_reference.yaml";
+constexpr const char* kPknMinimalCasePath = "cases/validation/lot_pkn_minimal.yaml";
+constexpr const char* kPknLeakoffCasePath = "cases/validation/lot_pkn_with_leakoff.yaml";
+constexpr const char* kBuz67dPknCasePath = "cases/lot_tese_migrated/buz67d_pkn.yaml";
 
 std::string valid_case_yaml() {
   return R"(metadata:
@@ -204,4 +207,43 @@ TEST_CASE("Required nonempty lists are validated") {
 
   CHECK_THROWS_AS(lss::io::parse_yaml(bad_case), std::runtime_error);
   std::filesystem::remove(bad_case);
+}
+
+TEST_CASE("Minimal LOT PKN contract loads and converts schedule to SI") {
+  const auto data = lss::io::parse_yaml(kPknMinimalCasePath);
+
+  CHECK(data.name == "lot_pkn_minimal_validation");
+  CHECK(data.mode == "lot-pkn");
+  CHECK(data.lot.enabled);
+  CHECK(data.lot.model == "pkn");
+  CHECK(data.lot.fracture_geometry == "pkn");
+  CHECK(data.lot.injection_rate_m3_s == Catch::Approx(0.0005));
+  CHECK(data.lot.injection_total_time_s == Catch::Approx(600.0));
+  CHECK(data.lot.injection_dt_s == Catch::Approx(30.0));
+  CHECK(data.lot.fracture_height_m == Catch::Approx(20.0));
+  CHECK(data.lot.breakdown_pressure_Pa == Catch::Approx(45000000.0));
+  CHECK(data.lot.detection_method == "derivative_drop");
+}
+
+TEST_CASE("LOT PKN leakoff case preserves SI and leakoff flags") {
+  const auto data = lss::io::parse_yaml(kPknLeakoffCasePath);
+
+  CHECK(data.lot.leakoff_enabled);
+  CHECK(data.lot.leakoff_model == "synthetic_constant");
+  CHECK(data.lot.injection_rate_m3_s == Catch::Approx(0.25 * 0.158987294928 / 60.0));
+  CHECK(data.lot.injection_accommodation_time_s == Catch::Approx(120.0));
+  CHECK(data.lot.breakdown_pressure_Pa == Catch::Approx(52000000.0));
+}
+
+TEST_CASE("Migrated BUZ67D PKN contract loads without declaring numeric validation") {
+  const auto data = lss::io::parse_yaml(kBuz67dPknCasePath);
+
+  CHECK(data.name == "buz67d_pkn_migrated_contract");
+  CHECK(data.legacy_source == "legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp");
+  CHECK(data.mode == "lot-pkn");
+  CHECK(data.lot.injection_dt_s == Catch::Approx(30.0));
+  CHECK(data.lot.injection_total_time_s == Catch::Approx(750.0));
+  CHECK(data.lot.injection_accommodation_time_s == Catch::Approx(570.0));
+  REQUIRE(data.rocks.size() == 1);
+  CHECK(data.rocks.front().e0_per_min == Catch::Approx(0.000000522 / 60.0));
 }

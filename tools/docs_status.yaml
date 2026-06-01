@@ -37,14 +37,14 @@ docs:
   lot_formulation:        planned
   apb_formulation:        planned
   salt_models:            planned
-  input_formats:          planned
+  input_formats:          in_progress
   validation_plan:        planned
   architecture:           planned
   known_issues:           in_progress
   migration_plan:         planned
   postprocessing:         planned
   cli_usage:              planned
-  validation_results:     not_started    # NUNCA mudar para validated sem execução real
+  validation_results:     in_progress    # NUNCA mudar para validated sem execução real
   coupling:               planned
   developer_guide:        planned
   changelog:              in_progress
@@ -66,7 +66,7 @@ modules:
   thermal:        not_started
   rocks:          not_started
   salt:           not_started
-  lot:            not_started
+  lot:            in_progress
   apb:            not_started
   geomechanics:   not_started
   coupling:       not_started
@@ -92,7 +92,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 15         # Catch2 — verde na ultima execucao registrada
+  cpp_tests: 27         # Catch2 — verde na ultima execucao registrada
   python_tests: 0       # pytest — verde
   regression_baselines: 4
 
