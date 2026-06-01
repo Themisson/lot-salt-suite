@@ -2,6 +2,10 @@
 # lot-salt-suite — .gitignore
 # ============================================================
 
+# --- Código legado físico (400 MB — manter apenas local) ---
+# legance/ contém LOT_Tese e LOT_APB_v5 — congelados, nunca publicar
+legance/
+
 # --- Resultados de simulação (pesados, reproduzíveis pelo caso YAML) ---
 results/
 *.vtu
