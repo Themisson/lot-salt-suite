@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lot-salt-suite — Documentação Técnica</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }
+  #sidebar { width: 260px; min-width: 260px; background: #1e293b; padding: 24px 16px; overflow-y: auto; position: sticky; top: 0; height: 100vh; }
+  #sidebar h1 { font-size: 1rem; font-weight: 700; color: #38bdf8; margin-bottom: 4px; }
+  #sidebar .version { font-size: 0.7rem; color: #64748b; margin-bottom: 20px; }
+  #sidebar ul { list-style: none; }
+  #sidebar li { margin: 4px 0; }
+  #sidebar a { text-decoration: none; font-size: 0.85rem; padding: 4px 8px; display: block; border-radius: 4px; transition: background 0.15s; }
+  #sidebar a:hover { background: #334155; }
+  #main { flex: 1; padding: 32px 40px; overflow-y: auto; max-width: 900px; }
+  .hero { background: linear-gradient(135deg, #1e3a5f, #0f172a); padding: 32px; border-radius: 12px; margin-bottom: 32px; }
+  .hero h2 { font-size: 1.8rem; color: #38bdf8; margin-bottom: 8px; }
+  .hero p { color: #94a3b8; margin-bottom: 16px; }
+  .hero-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-num { display: block; font-size: 1.6rem; font-weight: 700; color: #38bdf8; }
+  .stat-label { font-size: 0.75rem; color: #64748b; }
+  .doc-section { background: #1e293b; border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  .section-header { margin-bottom: 12px; }
+  h1, h2, h3, h4 { color: #f1f5f9; margin: 1rem 0 0.5rem; }
+  h1 { font-size: 1.5rem; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+  h2 { font-size: 1.2rem; color: #38bdf8; }
+  p { line-height: 1.7; color: #cbd5e1; margin: 0.5rem 0; }
+  a { color: #38bdf8; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.85rem; }
+  th { background: #334155; padding: 8px 12px; text-align: left; color: #94a3b8; }
+  td { padding: 6px 12px; border-bottom: 1px solid #1e293b; }
+  tr:hover td { background: #334155; }
+  code { background: #0f172a; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', monospace; font-size: 0.85em; color: #7dd3fc; }
+  pre { background: #0f172a; padding: 16px; border-radius: 6px; overflow-x: auto; margin: 1rem 0; }
+  pre code { padding: 0; background: none; }
+  ul, ol { padding-left: 1.5rem; color: #cbd5e1; }
+  li { margin: 4px 0; line-height: 1.6; }
+  blockquote { border-left: 3px solid #38bdf8; padding: 8px 16px; background: #0f172a; margin: 1rem 0; color: #94a3b8; }
+  footer { color: #475569; font-size: 0.75rem; text-align: center; margin-top: 32px; padding: 16px; }
+</style>
+</head>
+<body>
+<nav id="sidebar">
+  <h1>lot-salt-suite</h1>
+  <div class="version">v0.1.0 · 2026-06-01</div>
+  <ul>
+<li><a href="#overview" style="color:#3b82f6">00 Project Overview</a></li>
+<li><a href="#inventory" style="color:#3b82f6">01 Repository Inventory</a></li>
+<li><a href="#lot" style="color:#6b7280">02 Lot Formulation</a></li>
+<li><a href="#apb" style="color:#6b7280">03 Apb Formulation</a></li>
+<li><a href="#salt" style="color:#6b7280">04 Salt Creep Models</a></li>
+<li><a href="#input" style="color:#6b7280">05 Input Output Formats</a></li>
+<li><a href="#validation_plan" style="color:#3b82f6">06 Validation Plan</a></li>
+<li><a href="#architecture" style="color:#3b82f6">07 Target Architecture</a></li>
+<li><a href="#issues" style="color:#6b7280">08 Known Issues</a></li>
+<li><a href="#migration" style="color:#6b7280">09 Migration Plan</a></li>
+<li><a href="#postprocess" style="color:#6b7280">10 Postprocessing Plan</a></li>
+<li><a href="#cli" style="color:#6b7280">11 Cli Usage</a></li>
+<li><a href="#results" style="color:#6b7280">12 Validation Results</a></li>
+<li><a href="#coupling" style="color:#3b82f6">13 Coupling Lot Apb Salt</a></li>
+<li><a href="#devguide" style="color:#6b7280">14 Developer Workflow</a></li>
+<li><a href="#changelog" style="color:#f59e0b">15 Changelog</a></li>
+</ul>
+</nav>
+<main id="main">
+  
+    <div style="background:#fef3c7;border:1px solid #f59e0b;padding:12px 16px;margin:16px 0;border-radius:6px;">
+      <strong>Aviso:</strong> Nenhuma validação foi executada ainda no código novo.
+      Os resultados em <a href="#results">Resultados de Validação</a> refletem planos,
+      não execuções reais.
+    </div>
+  <div class="hero">
+    <h2>lot-salt-suite</h2>
+    <p>Simulador integrado de LOT, APB e fluência de sal para poços em formações salinas.</p>
+    
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">4/13</span><span class="stat-label">Fases ativas</span></div>
+      <div class="stat"><span class="stat-num">0</span><span class="stat-label">Testes C++</span></div>
+      <div class="stat"><span class="stat-num">0</span><span class="stat-label">Testes Python</span></div>
+      <div class="stat"><span class="stat-num">0/10</span><span class="stat-label">Validações V0-V9</span></div>
+    </div>
+    
+  </div>
+  <section id="overview" class="doc-section">
+<div class="section-header"><span style="background:#3b82f6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Planejado</span></div>
+<h1 id="00-visao-geral-do-projeto">00 — Visão Geral do Projeto</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="objetivo">Objetivo</h2>
+<p>O <code>lot-salt-suite</code> integra três bases de código para criar um simulador modular de:</p>
+<ul>
+<li><strong>Leak-Off Test (LOT)</strong> — determinação de pressão de fratura em poços</li>
+<li><strong>Annular Pressure Buildup (APB)</strong> — pressurização de anulares selados</li>
+<li><strong>Fluência de sal (Salt Creep)</strong> — comportamento viscoelástico de rochas salinas</li>
+</ul>
+<h2 id="motivacao">Motivação</h2>
+<p>O código da tese (<code>legance/LOT_Tese/</code>) usa múltiplos arquivos <code>main.cpp</code> como "casos de simulação",
+com parâmetros físicos inteiramente hard-coded. Isso impossibilita automação, versionamento de casos
+e validação sistemática. A versão <code>LOT_APB_v5/</code> melhorou com entrada JSON, mas o solver ainda
+mistura múltiplas responsabilidades em uma única classe (<code>APB1da</code>).</p>
+<h2 id="bases-do-projeto">Bases do projeto</h2>
+<table>
+<thead>
+<tr>
+<th>Base</th>
+<th>Localização</th>
+<th>Papel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LOT_Tese</td>
+<td><code>legance/LOT_Tese/</code></td>
+<td>Referência histórica — CONGELADA</td>
+</tr>
+<tr>
+<td>LOT_APB_v5</td>
+<td><code>legance/LOT_APB_v5/</code></td>
+<td>Base principal de migração — CONGELADA</td>
+</tr>
+<tr>
+<td>saltcreep</td>
+<td><code>external/saltcreep/</code></td>
+<td>Referência de sal/FEM — NÃO DUPLICAR</td>
+</tr>
+</tbody>
+</table>
+<h2 id="decisoes-arquiteturais">Decisões arquiteturais</h2>
+<ol>
+<li><strong>YAML como formato principal</strong> de caso; JSON aceito por compatibilidade</li>
+<li><strong>Executável único</strong> <code>lot-sim</code> com subcomandos e flags</li>
+<li><strong>Interface/adapter</strong> para integrar saltcreep sem duplicar código</li>
+<li><strong>Baselines obrigatórios</strong> antes de qualquer refatoração</li>
+<li><strong>SI internamente</strong> — conversões somente no parser (<code>include/units/</code>)</li>
+</ol>
+<h2 id="leitura-recomendada">Leitura recomendada</h2>
+<ul>
+<li><a href="07_target_architecture.md">docs/07_target_architecture.md</a> — módulos e interfaces</li>
+<li><a href="02_lot_formulation.md">docs/02_lot_formulation.md</a> — física do LOT</li>
+<li><a href="06_validation_plan.md">docs/06_validation_plan.md</a> — sequência de validação</li>
+</ul>
+</section>
+
+<section id="inventory" class="doc-section">
+<div class="section-header"><span style="background:#3b82f6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Planejado</span></div>
+<h1 id="01-inventario-do-repositorio">01 — Inventário do Repositório</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="nota-sobre-nomenclatura">Nota sobre nomenclatura</h2>
+<blockquote>
+<p>O diretório físico legado se chama <code>legance/</code> (herança histórica).
+Toda documentação usa <code>legacy/</code> como convenção. O diretório <code>legacy/</code> na raiz
+contém apenas <code>README.md</code> organizacional.</p>
+</blockquote>
+<h2 id="estrutura-atual">Estrutura atual</h2>
+<table>
+<thead>
+<tr>
+<th>Diretório</th>
+<th>Status</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>legance/LOT_Tese/</code></td>
+<td>Congelado</td>
+<td>17 arquivos main C++ da tese</td>
+</tr>
+<tr>
+<td><code>legance/LOT_APB_v5/</code></td>
+<td>Congelado</td>
+<td>main.cpp + 10 JSONs de caso</td>
+</tr>
+<tr>
+<td><code>external/saltcreep/</code></td>
+<td>Referência</td>
+<td>Solver FEM moderno de sal</td>
+</tr>
+<tr>
+<td><code>docs/</code></td>
+<td>Em criação</td>
+<td>Documentação técnica</td>
+</tr>
+<tr>
+<td><code>target_repo/</code></td>
+<td>Template</td>
+<td>Rascunhos a mover para raiz</td>
+</tr>
+<tr>
+<td><code>prompts/</code></td>
+<td>Metadoc</td>
+<td>Prompts sequenciais</td>
+</tr>
+<tr>
+<td><code>.agents/skills/</code></td>
+<td>Criado</td>
+<td>6 skills de agentes</td>
+</tr>
+<tr>
+<td><code>.claude/skills/</code></td>
+<td>Criado</td>
+<td>6 skills Claude Code</td>
+</tr>
+</tbody>
+</table>
+<h2 id="inventario-de-arquivos-main-lot_tese">Inventário de arquivos main (LOT_Tese)</h2>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Tipo</th>
+<th>Modelo de sal</th>
+<th>LOT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LOTTeste.cpp</code></td>
+<td>LOT simples</td>
+<td>Viscoelástico</td>
+<td>Padrão</td>
+</tr>
+<tr>
+<td><code>8-BUZ-67D-RJS-VISCO.cpp</code></td>
+<td>LOT+APB+Sal</td>
+<td>Duplo mecanismo</td>
+<td>Elliptical</td>
+</tr>
+<tr>
+<td><code>8-BUZ-67D-RJS-VISCO-FULL-3rd-well.cpp</code></td>
+<td>LOT+APB+Sal completo</td>
+<td>Duplo mecanismo</td>
+<td>Múltiplas</td>
+</tr>
+<tr>
+<td><code>9-BUZ-39DA-RJS-VISCO.cpp</code></td>
+<td>LOT+APB+Sal</td>
+<td>Duplo mecanismo</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>9-BUZ-39DA-RJS-VISCO-2.cpp</code></td>
+<td>LOT+APB+Sal variação</td>
+<td>Duplo mecanismo</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>7-BUZ-60D-RJS-VISCO-2nd-Well.cpp</code></td>
+<td>LOT+APB</td>
+<td>Viscoelástico</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>BUZ29-VISCO-DELL_PC_APTO.cpp</code></td>
+<td>APB+Sal validação</td>
+<td>Duplo mecanismo</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>BUZ29-VISCO-ZAMORA.cpp</code></td>
+<td>APB+Sal+Stress</td>
+<td>Duplo mecanismo</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>BUZ29-VISCO-first-well.cpp</code></td>
+<td>APB+Sal</td>
+<td>Duplo mecanismo</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>BUZ29-CENÁRIO1-PRESC.cpp</code></td>
+<td>APB+Sal cenário 1</td>
+<td>Prescrito</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>BUZ29-CENÁRIO1-ZAMORA.cpp</code></td>
+<td>APB+Sal cenário 1</td>
+<td>Zamora</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>BUZ29-CENÁRIO2-PRESC.cpp</code></td>
+<td>APB+Sal cenário 2</td>
+<td>Prescrito</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>BUZ29-CENÁRIO2-ZAMORA.cpp</code></td>
+<td>APB+Sal cenário 2</td>
+<td>Zamora</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>main/8-BUZ-67D-*-circular.cpp</code></td>
+<td>LOT</td>
+<td>Duplo mecanismo</td>
+<td>Circular</td>
+</tr>
+<tr>
+<td><code>main/8-BUZ-67D-*-elliptical.cpp</code></td>
+<td>LOT</td>
+<td>Duplo mecanismo</td>
+<td>Elliptical</td>
+</tr>
+<tr>
+<td><code>main/8-BUZ-67D-*-penny-shaped.cpp</code></td>
+<td>LOT</td>
+<td>Duplo mecanismo</td>
+<td>Penny-shaped</td>
+</tr>
+<tr>
+<td><code>main/8-BUZ-67D-*-pkn.cpp</code></td>
+<td>LOT</td>
+<td>Duplo mecanismo</td>
+<td>PKN</td>
+</tr>
+</tbody>
+</table>
+<h2 id="inventario-de-casos-json-lot_apb_v5">Inventário de casos JSON (LOT_APB_v5)</h2>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Duração</th>
+<th>Tipo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SCORE-MRO-28_input.json</code></td>
+<td>~33000 min</td>
+<td>Caso completo</td>
+</tr>
+<tr>
+<td><code>SCORE-MRO-28_output.json</code></td>
+<td>—</td>
+<td>Resultado correspondente</td>
+</tr>
+<tr>
+<td><code>SCORE-MRO-28_original_input.json</code></td>
+<td>—</td>
+<td>Versão original</td>
+</tr>
+<tr>
+<td><code>SCORE-MRO-28_elastic_input.json</code></td>
+<td>—</td>
+<td>Sem sal (elástico)</td>
+</tr>
+<tr>
+<td><code>SCORE-MRO-28_Ev_temp_input.json</code></td>
+<td>—</td>
+<td>Com evolução térmica</td>
+</tr>
+<tr>
+<td><code>MRO-28_min_times_input.json</code></td>
+<td>300 min</td>
+<td>Versão reduzida</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section id="lot" class="doc-section">
+<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<h1 id="02-formulacao-do-leak-off-test-lot">02 — Formulação do Leak-Off Test (LOT)</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<blockquote>
+<p>Este documento descreve a formulação matemática implementada no código legado e
+a ser reproduzida no código novo. <strong>Não alterar formulação sem documentar aqui primeiro.</strong></p>
+</blockquote>
+<h2 id="conceito-fisico">Conceito físico</h2>
+<p>O LOT determina a pressão de fratura hidráulica da formação adjacente à sapata
+do revestimento. Fluido é bombeado no poço em taxa controlada; a pressão é monitorada
+enquanto o volume injetado aumenta. O ponto de desvio na curva P×V indica abertura
+da fratura.</p>
+<h2 id="diagrama-de-estados">Diagrama de estados</h2>
+<p><code>Pressurização linear → Ponto de Leak-Off → Propagação de fratura → Fechamento
+     (elástico)           (LOT_pressure)       (leakoff rate)       (closure)</code></p>
+<h2 id="formulacao-de-fratura-a-documentar-apos-auditoria">Formulação de fratura (a documentar após auditoria)</h2>
+<p><strong>Atenção:</strong> A formulação completa deve ser extraída do código legado via skill
+<code>/formulation-audit</code> e documentada aqui antes de implementar o módulo <code>lot/</code>.</p>
+<p>Campos a documentar:
+- Relação pressão-volume antes da fratura (regime elástico)
+- Critério de iniciação de fratura
+- Geometrias suportadas: circular, elliptical, penny-shaped, PKN
+- Modelo de leakoff (filtração de fluido na parede)
+- Integração com deformação da rocha salina</p>
+<h2 id="parametros-de-referencia-extraidos-do-legado">Parâmetros de referência (extraídos do legado)</h2>
+<table>
+<thead>
+<tr>
+<th>Parâmetro</th>
+<th>Valor típico</th>
+<th>Unidade</th>
+<th>Fonte</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Viscosidade fluido LOT</td>
+<td>3.0</td>
+<td>cP</td>
+<td><code>setLeakoffProps("pa_min", 3., "elliptical")</code></td>
+</tr>
+<tr>
+<td>Profundidade sapata</td>
+<td>4374</td>
+<td>m</td>
+<td><code>8-BUZ-67D-RJS-VISCO.cpp</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="convencao-de-sinais-a-verificar">Convenção de sinais (a verificar)</h2>
+<blockquote>
+<p>PENDENTE — executar skill <code>/formulation-audit</code> para confirmar convenção.</p>
+</blockquote>
+</section>
+
+<section id="apb" class="doc-section">
+<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<h1 id="03-formulacao-do-annular-pressure-buildup-apb">03 — Formulação do Annular Pressure Buildup (APB)</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<blockquote>
+<p>Formulação a extrair do legado via <code>/formulation-audit</code> antes de implementar módulo <code>apb/</code>.</p>
+</blockquote>
+<h2 id="conceito-fisico">Conceito físico</h2>
+<p>O APB ocorre em anulares selados quando o fluido se expande devido ao aumento de
+temperatura. A pressão aumenta porque o anular tem volume constante.</p>
+<h2 id="balanco-de-massa-no-anular-a-documentar">Balanço de massa no anular (a documentar)</h2>
+<p>Campos a documentar:
+- Equação de balanço de massa (compressibilidade do fluido × sólidos)
+- Termo de temperatura (dilatação térmica)
+- Leakage (vazamento pelo packer ou cimentação)
+- Ventilação (venting controlado)
+- Integração com deformação viscoelástica do sal</p>
+<h2 id="parametros-de-referencia-lot_apb_v5-hard-coded">Parâmetros de referência (LOT_APB_v5 — hard-coded)</h2>
+<table>
+<thead>
+<tr>
+<th>Parâmetro</th>
+<th>Valor</th>
+<th>Fonte</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dt</td>
+<td>1.0 h</td>
+<td><code>main/main.cpp</code></td>
+</tr>
+<tr>
+<td>ctoldP</td>
+<td>1.0 bar</td>
+<td><code>main/main.cpp</code></td>
+</tr>
+<tr>
+<td>tolEq</td>
+<td>1E-8</td>
+<td><code>main/main.cpp</code></td>
+</tr>
+<tr>
+<td>tac (estabilização)</td>
+<td>80 semanas</td>
+<td><code>main/main.cpp</code></td>
+</tr>
+</tbody>
+</table>
+<p>Estes parâmetros devem migrar para o YAML de caso.</p>
+</section>
+
+<section id="salt" class="doc-section">
+<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<h1 id="04-modelos-de-fluencia-de-sal">04 — Modelos de Fluência de Sal</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="modelos-no-legado-sestsal">Modelos no legado (SESTSAL)</h2>
+<p>O módulo <code>sestsal/</code> em <code>legance/LOT_Tese/</code> e <code>legance/LOT_APB_v5/</code> implementa
+o modelo de mecanismo duplo (double mechanism):</p>
+<p><code>dε/dt = A₁·σⁿ¹·exp(-Q₁/RT) + A₂·σⁿ²·exp(-Q₂/RT)</code></p>
+<p>Parâmetros hard-coded identificados:</p>
+<table>
+<thead>
+<tr>
+<th>Material</th>
+<th>e0 (1/h)</th>
+<th>sig0 (Pa)</th>
+<th>n1</th>
+<th>n2</th>
+<th>T0 (°C)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Halita</td>
+<td>1.8792e-6</td>
+<td>9.92e6</td>
+<td>3.36</td>
+<td>7.55</td>
+<td>86</td>
+</tr>
+<tr>
+<td>Carnalita</td>
+<td>1.581e-4</td>
+<td>5.743e6</td>
+<td>2.868</td>
+<td>7.09</td>
+<td>130</td>
+</tr>
+</tbody>
+</table>
+<h2 id="modelos-no-saltcreep-referencia-moderna">Modelos no saltcreep (referência moderna)</h2>
+<table>
+<thead>
+<tr>
+<th>Modelo</th>
+<th>Tipo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>double_mechanism</code></td>
+<td>Secundária (equivalente ao SESTSAL)</td>
+</tr>
+<tr>
+<td><code>edmt</code></td>
+<td>Primária</td>
+</tr>
+<tr>
+<td><code>isv_sh_dm</code></td>
+<td>Primária sinh-hiperbólica</td>
+</tr>
+<tr>
+<td><code>motta_v1</code></td>
+<td>Terciária + dano Kachanov</td>
+</tr>
+<tr>
+<td><code>wang_2004</code></td>
+<td>CDM não-linear</td>
+</tr>
+<tr>
+<td><code>aubertin_isv_sh_d</code></td>
+<td>Unificada ISV</td>
+</tr>
+</tbody>
+</table>
+<h2 id="estrategia-de-integracao">Estratégia de integração</h2>
+<p>Usar <code>SaltCreepInterface</code> (interface abstrata) + adapters:
+- <code>SaltCreepSaltcreepAdapter</code> — usa saltcreep diretamente
+- <code>SaltCreepSESTSALAdapter</code> — compatibilidade com SESTSAL interno</p>
+<p>Ver docs/13_coupling_lot_apb_salt.md para detalhes de integração.</p>
+</section>
+
+<section id="input" class="doc-section">
+<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<h1 id="05-formatos-de-entrada-e-saida">05 — Formatos de Entrada e Saída</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="formato-principal-yaml">Formato principal: YAML</h2>
+<p>Schema completo definido em <code>schemas/lot_case.schema.yaml</code>.</p>
+<p>Ver exemplo anotado no <a href="index.html">index.html</a> seção #input.</p>
+<h3 id="secoes-do-yaml-de-caso">Seções do YAML de caso</h3>
+<p><code>yaml
+metadata:    # Nome, versão, modo, fonte legada
+units:       # Sistema de unidades de entrada (convertido para SI)
+wellbore:    # Geometria de poço
+casings:     # Revestimentos metálicos
+cements:     # Cimentações
+annulars:    # Anulares selados
+open_hole:   # Intervalo aberto
+fluids:      # Propriedades PVT
+temperature: # Perfil T(z)
+geostatic:   # Tensão geostática inicial
+layers:      # Camadas litológicas
+rocks:       # Propriedades de rocha por material
+lot:         # Parâmetros do LOT
+apb:         # Parâmetros do APB
+time:        # Configuração temporal e solver
+output:      # Configuração de saída
+postprocess: # Script de pós-processamento</code></p>
+<h2 id="formato-legado-json-lot_apb_v5">Formato legado: JSON (LOT_APB_v5)</h2>
+<p>Campos principais: <code>id_operation</code>, <code>duration</code>, <code>duration_unit</code>, <code>airgap</code>,
+<code>temperature</code>, <code>solids</code>, <code>fluids</code>, <code>rocks</code>, <code>layers</code>, <code>top_packer</code>,
+<code>depressurization</code>, <code>salt_creep_enabled</code>.</p>
+<p>Mapeamento JSON → YAML em docs/09_migration_plan.md.</p>
+<h2 id="formato-de-saida-csv">Formato de saída CSV</h2>
+<p><code>time_h, annular_A_pressure_Pa, annular_B_pressure_Pa,
+lot_pressure_Pa, lot_volume_m3, salt_closure_mm, ...</code>
+"@</p>
+<p>System.Collections.Hashtable["06_validation_plan.md"] = @"</p>
+<h1 id="06-plano-de-validacao">06 — Plano de Validação</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="sequencia-v0-v9">Sequência V0-V9</h2>
+<table>
+<thead>
+<tr>
+<th>Nível</th>
+<th>Teste</th>
+<th>Critério</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V0</td>
+<td>Parser YAML: carregar e imprimir caso</td>
+<td>Zero erros de parsing</td>
+</tr>
+<tr>
+<td>V1</td>
+<td>Fluido isolado: PVT analítico</td>
+<td>Erro &lt; 0.01%</td>
+</tr>
+<tr>
+<td>V2</td>
+<td>Elástico isolado: solução de Lamé</td>
+<td>Erro L2 &lt; 1e-6</td>
+</tr>
+<tr>
+<td>V3</td>
+<td>LOT simples sem sal (LOTTeste)</td>
+<td>Curva P×V dentro de 1% do legado</td>
+</tr>
+<tr>
+<td>V4</td>
+<td>APB simples sem sal (BUZ29-VISCO-DELL)</td>
+<td>ΔP máx dentro de 1%</td>
+</tr>
+<tr>
+<td>V5</td>
+<td>Sal isolado (halita, mecanismo duplo)</td>
+<td>Erro &lt; 0.1% vs saltcreep</td>
+</tr>
+<tr>
+<td>V6</td>
+<td>LOT + sal (8-BUZ-67D elliptical)</td>
+<td>Erro &lt; 1% vs LOT_Tese</td>
+</tr>
+<tr>
+<td>V7</td>
+<td>APB + sal (BUZ29 cenário 1)</td>
+<td>Erro &lt; 1% vs LOT_APB_v5</td>
+</tr>
+<tr>
+<td>V8</td>
+<td>Caso acoplado completo</td>
+<td>Comparação com melhor referência</td>
+</tr>
+<tr>
+<td>V9</td>
+<td>Regressão automática (suíte completa)</td>
+<td>100% dentro de tolerância</td>
+</tr>
+</tbody>
+</table>
+<h2 id="status-atual">Status atual</h2>
+<table>
+<thead>
+<tr>
+<th>Nível</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V0-V9</td>
+<td>Não executado</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>REGRA:</strong> Nunca atualizar status para 'executado' sem resultados reais documentados
+em docs/12_validation_results.md.</p>
+</blockquote>
+<h2 id="captura-de-baselines-pre-requisito">Captura de baselines (pré-requisito)</h2>
+<p>Antes de V3-V7, executar os legados e salvar em <code>tests/baselines/</code>:</p>
+<p>`ash</p>
+<h1 id="compilar-e-executar-lot_apb_v5">Compilar e executar LOT_APB_v5</h1>
+<p>cd legance/LOT_APB_v5 &amp;&amp; make main
+./main SCORE-MRO-28_input.json</p>
+<h1 id="salvar-output-como-testsbaselinesapbv5_score_mro_28json">Salvar output como tests/baselines/apbv5_score_mro_28.json</h1>
+<p>`
+"@</p>
+<p>System.Collections.Hashtable["07_target_architecture.md"] = @"</p>
+<h1 id="07-arquitetura-alvo">07 — Arquitetura-Alvo</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="diagrama-de-modulos">Diagrama de módulos</h2>
+<p><code>apps/lot-sim.cpp
+    └── include/cli/         (subcomandos: run, validate, inspect, migrate)
+         └── include/io/     (parser YAML+JSON → CaseData)
+              └── include/units/ (conversão de unidades → SI)
+                   └── Módulos físicos:
+                        ├── include/wellbore/   (geometria)
+                        ├── include/fluids/     (PVT)
+                        ├── include/thermal/    (T(z))
+                        ├── include/rocks/      (elástico)
+                        ├── include/salt/       (SaltCreepInterface + adapters)
+                        ├── include/lot/        (fratura, leakoff)
+                        ├── include/apb/        (balanço anular)
+                        ├── include/geomechanics/ (tensão geostática)
+                        └── include/coupling/   (orquestrador)</code></p>
+<h2 id="interfaces-plugaveis-padrao-do-saltcreep">Interfaces plugáveis (padrão do saltcreep)</h2>
+<ol>
+<li><code>SaltCreepInterface</code> — modelo constitutivo de sal</li>
+<li><code>ThermalFieldInterface</code> — campo de temperatura (futuro)</li>
+<li><code>FractureGeometryInterface</code> — geometrias de LOT</li>
+</ol>
+<h2 id="regra-de-dependencia">Regra de dependência</h2>
+<ul>
+<li><code>core/</code> ← todos os módulos dependem</li>
+<li><code>units/</code> ← <code>io/</code> depende</li>
+<li><code>io/</code> ← <code>cli/</code> depende</li>
+<li>Módulos físicos NÃO dependem entre si diretamente — somente via <code>coupling/</code></li>
+<li><code>coupling/</code> orquestra todos os módulos físicos</li>
+</ul>
+<h2 id="adapter-para-saltcreep">Adapter para saltcreep</h2>
+<p><code>include/salt/
+├── SaltCreepInterface.hpp         (interface abstrata)
+├── SaltCreepSaltcreepAdapter.hpp  (usa external/saltcreep)
+└── SaltCreepSESTSALAdapter.hpp    (usa SESTSAL legado)</code>
+"@</p>
+<p>System.Collections.Hashtable["08_known_issues.md"] = @"</p>
+<h1 id="08-problemas-conhecidos-e-riscos">08 — Problemas Conhecidos e Riscos</h1>
+<p><strong>Status:</strong> Ativo | <strong>Última atualização:</strong> 2026-06-01</p>
+<blockquote>
+<p>Este arquivo deve ser atualizado ANTES de qualquer mudança de formulação ou convenção.</p>
+</blockquote>
+<h2 id="problemas-de-nomenclatura">Problemas de nomenclatura</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Problema</th>
+<th>Impacto</th>
+<th>Mitigação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N01</td>
+<td>Diretório físico é <code>legance/</code> mas docs dizem <code>legacy/</code></td>
+<td>Médio</td>
+<td>Criar <code>legacy/</code> organizacional; não renomear <code>legance/</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="parametros-hard-coded-identificados">Parâmetros hard-coded identificados</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Parâmetro</th>
+<th>Valor</th>
+<th>Arquivo legado</th>
+<th>Impacto na migração</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H01</td>
+<td>dt</td>
+<td>1.0 h</td>
+<td><code>LOT_APB_v5/main/main.cpp</code></td>
+<td>Mover para YAML</td>
+</tr>
+<tr>
+<td>H02</td>
+<td>ctoldP</td>
+<td>1.0 bar</td>
+<td><code>LOT_APB_v5/main/main.cpp</code></td>
+<td>Mover para YAML</td>
+</tr>
+<tr>
+<td>H03</td>
+<td>tac</td>
+<td>80 sem × 7d × 24h</td>
+<td><code>LOT_APB_v5/main/main.cpp</code></td>
+<td>Mover para YAML</td>
+</tr>
+<tr>
+<td>H04</td>
+<td>e0 Halita</td>
+<td>1.8792e-6/h</td>
+<td><code>LOTTeste.cpp</code></td>
+<td>Verificar unidades (h vs min)</td>
+</tr>
+<tr>
+<td>H05</td>
+<td>LOT fluid visc</td>
+<td>3.0 cP</td>
+<td><code>8-BUZ-67D-*.cpp</code></td>
+<td>Converter para Pa·s</td>
+</tr>
+</tbody>
+</table>
+<h2 id="riscos-de-formulacao">Riscos de formulação</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Risco</th>
+<th>Probabilidade</th>
+<th>Mitigação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R01</td>
+<td>Convenção de sinais não documentada (compressão +/-)</td>
+<td>Alta</td>
+<td>Auditar via <code>/formulation-audit</code></td>
+</tr>
+<tr>
+<td>R02</td>
+<td>Unidades mistas nos main.cpp (PPG, pol, Pa, cP)</td>
+<td>Alta</td>
+<td>Módulo <code>units/</code> centralizado</td>
+</tr>
+<tr>
+<td>R03</td>
+<td>SESTSAL duplicado entre LOT_Tese e LOT_APB_v5</td>
+<td>Alta</td>
+<td>Usar interface/adapter</td>
+</tr>
+<tr>
+<td>R04</td>
+<td>APB1da monolítica: sem separação de responsabilidades</td>
+<td>Alta</td>
+<td>Fase 7 dedicada</td>
+</tr>
+<tr>
+<td>R05</td>
+<td>Coeficientes de fluência em h⁻¹ convertidos para min⁻¹ inline</td>
+<td>Média</td>
+<td>Verificar em cada main</td>
+</tr>
+</tbody>
+</table>
+<h2 id="divergencias-identificadas-entre-legados">Divergências identificadas entre legados</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Divergência</th>
+<th>LOT_Tese</th>
+<th>LOT_APB_v5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D01</td>
+<td>SESTSAL (possível versão diferente)</td>
+<td>src/sestsal/</td>
+<td>src/sestsal/</td>
+</tr>
+<tr>
+<td>D02</td>
+<td>Parâmetros solver</td>
+<td>Hard-coded no main</td>
+<td>Maioria no JSON</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section id="validation_plan" class="doc-section">
+<div class="section-header"><span style="background:#3b82f6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Planejado</span></div>
+<h1 id="06-plano-de-validacao">06 — Plano de Validação</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="sequencia-v0-v9">Sequência V0-V9</h2>
+<table>
+<thead>
+<tr>
+<th>Nível</th>
+<th>Teste</th>
+<th>Critério</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V0</td>
+<td>Parser YAML: carregar e imprimir caso</td>
+<td>Zero erros de parsing</td>
+</tr>
+<tr>
+<td>V1</td>
+<td>Fluido isolado: PVT analítico</td>
+<td>Erro &lt; 0.01%</td>
+</tr>
+<tr>
+<td>V2</td>
+<td>Elástico isolado: solução de Lamé</td>
+<td>Erro L2 &lt; 1e-6</td>
+</tr>
+<tr>
+<td>V3</td>
+<td>LOT simples sem sal (LOTTeste)</td>
+<td>Curva P×V dentro de 1% do legado</td>
+</tr>
+<tr>
+<td>V4</td>
+<td>APB simples sem sal (BUZ29-VISCO-DELL)</td>
+<td>ΔP máx dentro de 1%</td>
+</tr>
+<tr>
+<td>V5</td>
+<td>Sal isolado (halita, mecanismo duplo)</td>
+<td>Erro &lt; 0.1% vs saltcreep</td>
+</tr>
+<tr>
+<td>V6</td>
+<td>LOT + sal (8-BUZ-67D elliptical)</td>
+<td>Erro &lt; 1% vs LOT_Tese</td>
+</tr>
+<tr>
+<td>V7</td>
+<td>APB + sal (BUZ29 cenário 1)</td>
+<td>Erro &lt; 1% vs LOT_APB_v5</td>
+</tr>
+<tr>
+<td>V8</td>
+<td>Caso acoplado completo</td>
+<td>Comparação com melhor referência disponível</td>
+</tr>
+<tr>
+<td>V9</td>
+<td>Regressão automática (suíte completa)</td>
+<td>100% dentro de tolerância</td>
+</tr>
+</tbody>
+</table>
+<h2 id="status-atual">Status atual</h2>
+<table>
+<thead>
+<tr>
+<th>Nível</th>
+<th>Status</th>
+<th>Data</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V0-V9</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>REGRA:</strong> Nunca atualizar status para "executado" sem resultados reais documentados
+em <code>docs/12_validation_results.md</code>.</p>
+</blockquote>
+<h2 id="captura-de-baselines-pre-requisito-de-v3-v7">Captura de baselines (pré-requisito de V3-V7)</h2>
+<p>Antes de V3-V7, executar os legados e salvar em <code>tests/baselines/</code>:</p>
+<pre><code class="language-bash"># Compilar e executar LOT_APB_v5
+cd legance/LOT_APB_v5 &amp;&amp; make main
+./main SCORE-MRO-28_input.json
+# Salvar output como tests/baselines/apbv5_score_mro_28.json
+</code></pre>
+<h2 id="tolerancias-por-nivel">Tolerâncias por nível</h2>
+<table>
+<thead>
+<tr>
+<th>Nível</th>
+<th>Métrica</th>
+<th>Tolerância</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V1</td>
+<td>Erro relativo em densidade</td>
+<td>&lt; 0.01%</td>
+</tr>
+<tr>
+<td>V2</td>
+<td>Erro L2 em deslocamento</td>
+<td>&lt; 1e-6</td>
+</tr>
+<tr>
+<td>V3, V4</td>
+<td>Erro L2 em pressão</td>
+<td>&lt; 1%</td>
+</tr>
+<tr>
+<td>V5</td>
+<td>Erro L2 em deslocamento radial</td>
+<td>&lt; 0.1%</td>
+</tr>
+<tr>
+<td>V6, V7</td>
+<td>Erro L2 em pressão + deslocamento</td>
+<td>&lt; 1%</td>
+</tr>
+<tr>
+<td>V8</td>
+<td>A definir após V6+V7</td>
+<td>TBD</td>
+</tr>
+<tr>
+<td>V9</td>
+<td>Todos os critérios acima</td>
+<td>100% dentro</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section id="architecture" class="doc-section">
+<div class="section-header"><span style="background:#3b82f6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Planejado</span></div>
+<h1 id="07-arquitetura-alvo">07 — Arquitetura-Alvo</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="diagrama-de-modulos">Diagrama de módulos</h2>
+<pre><code>apps/lot-sim.cpp
+    └── include/cli/         (subcomandos: run, validate, inspect, migrate)
+         └── include/io/     (parser YAML+JSON → CaseData)
+              └── include/units/ (conversão de unidades → SI)
+                   └── Módulos físicos:
+                        ├── include/wellbore/     (geometria)
+                        ├── include/fluids/       (PVT)
+                        ├── include/thermal/      (T(z))
+                        ├── include/rocks/        (elástico)
+                        ├── include/salt/         (SaltCreepInterface + adapters)
+                        ├── include/lot/          (fratura, leakoff)
+                        ├── include/apb/          (balanço anular)
+                        ├── include/geomechanics/ (tensão geostática)
+                        └── include/coupling/     (orquestrador)
+</code></pre>
+<h2 id="regra-de-dependencia">Regra de dependência</h2>
+<ul>
+<li><code>core/</code> ← todos os módulos dependem</li>
+<li><code>units/</code> ← <code>io/</code> depende</li>
+<li><code>io/</code> ← <code>cli/</code> depende</li>
+<li>Módulos físicos <strong>não</strong> dependem entre si diretamente — somente via <code>coupling/</code></li>
+<li><code>coupling/</code> orquestra todos os módulos físicos</li>
+</ul>
+<h2 id="interfaces-plugaveis">Interfaces plugáveis</h2>
+<h3 id="saltcreepinterface">SaltCreepInterface</h3>
+<pre><code class="language-cpp">class SaltCreepInterface {
+public:
+    struct Result {
+        double strain_rate;   // dε/dt [1/s] — taxa de deformação viscosa
+        double strain;        // ε — deformação acumulada
+    };
+    virtual Result evaluate(
+        double sigma_eff_Pa,  // tensão efetiva [Pa]
+        double T_K,           // temperatura [K]
+        double dt_s           // passo de tempo [s]
+    ) const = 0;
+    virtual ~SaltCreepInterface() = default;
+};
+</code></pre>
+<h3 id="adapter-para-saltcreep">Adapter para saltcreep</h3>
+<pre><code class="language-cpp">class SaltCreepSaltcreepAdapter : public SaltCreepInterface {
+    // Delega para modelo de external/saltcreep por interface
+    // NÃO copia código de saltcreep — usa via include
+};
+</code></pre>
+<h3 id="adapter-para-sestsal-legado">Adapter para SESTSAL legado</h3>
+<pre><code class="language-cpp">class SaltCreepSESTSALAdapter : public SaltCreepInterface {
+    // Compatibilidade com modelo interno dos legados
+    // Útil para verificar que novo código = legado para mesma formulação
+};
+</code></pre>
+<h2 id="estrutura-do-executavel-lot-sim">Estrutura do executável lot-sim</h2>
+<pre><code class="language-bash">lot-sim &lt;subcomando&gt; [flags]
+
+Subcomandos:
+  run       --case &lt;yaml&gt; --mode &lt;modo&gt; [--output &lt;dir&gt;]
+  inspect   --case &lt;yaml|json&gt;
+  validate  --suite &lt;nome&gt; | --case &lt;yaml&gt; --baseline &lt;json&gt;
+  migrate   --from-json &lt;json&gt; --to-yaml &lt;yaml&gt;
+  list      --dir &lt;dir&gt;
+</code></pre>
+<h2 id="fluxo-de-execucao-modo-run-mode-lot-salt">Fluxo de execução (modo <code>run --mode lot-salt</code>)</h2>
+<pre><code>1. parse YAML → CaseData
+2. converter unidades → SI (CaseData em SI)
+3. inicializar geometria do poço
+4. inicializar campo térmico
+5. calcular tensão geostática inicial
+6. inicializar fluidos por anular
+7. loop temporal:
+   a. atualizar T(z, t)
+   b. calcular LOT: pressão de fratura, leakoff
+   c. chamar SaltCreepInterface: deformação → variação de volume
+   d. calcular APB: nova pressão dos anulares
+   e. verificar convergência
+   f. salvar saída se (passo % output_every == 0)
+8. pós-processamento: invocar script Python se configurado
+</code></pre>
+</section>
+
+<section id="issues" class="doc-section">
+<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<h1 id="08-problemas-conhecidos-e-riscos">08 — Problemas Conhecidos e Riscos</h1>
+<p><strong>Status:</strong> Ativo | <strong>Última atualização:</strong> 2026-06-01</p>
+<blockquote>
+<p>Este arquivo deve ser atualizado ANTES de qualquer mudança de formulação ou convenção.
+Toda refatoração deve ser comparada com esta lista antes de ser aprovada.</p>
+</blockquote>
+<h2 id="problemas-de-nomenclatura">Problemas de nomenclatura</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Problema</th>
+<th>Impacto</th>
+<th>Mitigação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N01</td>
+<td>Diretório físico é <code>legance/</code> mas docs dizem <code>legacy/</code></td>
+<td>Médio</td>
+<td>Criar <code>legacy/</code> organizacional; nunca renomear <code>legance/</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="parametros-hard-coded-identificados">Parâmetros hard-coded identificados</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Parâmetro</th>
+<th>Valor</th>
+<th>Arquivo legado</th>
+<th>Ação necessária</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H01</td>
+<td><code>dt</code> (passo temporal)</td>
+<td>1.0 h</td>
+<td><code>LOT_APB_v5/main/main.cpp</code></td>
+<td>Mover para YAML <code>time.dt_h</code></td>
+</tr>
+<tr>
+<td>H02</td>
+<td><code>ctoldP</code> (tolerância pressão)</td>
+<td>1.0 bar</td>
+<td><code>LOT_APB_v5/main/main.cpp</code></td>
+<td>Mover para YAML <code>time.solver.tol_pressure_bar</code></td>
+</tr>
+<tr>
+<td>H03</td>
+<td><code>tolEq</code> (tolerância equilíbrio)</td>
+<td>1E-8</td>
+<td><code>LOT_APB_v5/main/main.cpp</code></td>
+<td>Mover para YAML <code>time.solver.tol_eq</code></td>
+</tr>
+<tr>
+<td>H04</td>
+<td><code>tac</code> (tempo de estabilização)</td>
+<td>80 sem × 7d × 24h</td>
+<td><code>LOT_APB_v5/main/main.cpp</code></td>
+<td>Mover para YAML <code>time.solver.stabilization_h</code></td>
+</tr>
+<tr>
+<td>H05</td>
+<td><code>e0</code> da Halita</td>
+<td>1.8792e-6 /h (→ /min)</td>
+<td><code>LOTTeste.cpp</code></td>
+<td>Verificar unidades; mover para YAML <code>rocks[].creep.e0_per_h</code></td>
+</tr>
+<tr>
+<td>H06</td>
+<td><code>e0</code> da Carnalita</td>
+<td>1.581e-4 /h (→ /min)</td>
+<td><code>LOTTeste.cpp</code></td>
+<td>Idem acima</td>
+</tr>
+<tr>
+<td>H07</td>
+<td>Viscosidade fluido LOT</td>
+<td>3.0 cP</td>
+<td><code>8-BUZ-67D-*.cpp</code></td>
+<td>Converter para Pa·s no parser</td>
+</tr>
+<tr>
+<td>H08</td>
+<td>Geometria LOT</td>
+<td><code>"elliptical"</code></td>
+<td><code>8-BUZ-67D-*.cpp</code></td>
+<td>Mover para YAML <code>lot.fracture.geometry</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="riscos-de-formulacao">Riscos de formulação</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Risco</th>
+<th>Probabilidade</th>
+<th>Impacto</th>
+<th>Mitigação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R01</td>
+<td>Convenção de sinais não documentada (compressão +/-)</td>
+<td>Alta</td>
+<td>Crítico</td>
+<td>Auditar via <code>/formulation-audit</code> antes de implementar <code>lot/</code> e <code>salt/</code></td>
+</tr>
+<tr>
+<td>R02</td>
+<td>Unidades mistas nos main.cpp (PPG, pol, Pa, cP)</td>
+<td>Alta</td>
+<td>Alto</td>
+<td>Módulo <code>units/</code> centralizado; conversão obrigatória no parser</td>
+</tr>
+<tr>
+<td>R03</td>
+<td>SESTSAL possivelmente divergente entre LOT_Tese e LOT_APB_v5</td>
+<td>Média</td>
+<td>Alto</td>
+<td>Comparar diretamente os dois arquivos <code>sestsal/material.cpp</code></td>
+</tr>
+<tr>
+<td>R04</td>
+<td><code>APB1da</code> monolítica: impossível testar módulos isoladamente</td>
+<td>Alta</td>
+<td>Alto</td>
+<td>Fase 7 dedicada à decomposição</td>
+</tr>
+<tr>
+<td>R05</td>
+<td>Coeficientes de fluência em h⁻¹ convertidos para min⁻¹ inline no legado</td>
+<td>Média</td>
+<td>Alto</td>
+<td>Verificar em cada main; converter para SI (s⁻¹) no parser</td>
+</tr>
+<tr>
+<td>R06</td>
+<td>Acoplamento LOT-sal via tensão: convenção de tensão efetiva × total</td>
+<td>Alta</td>
+<td>Crítico</td>
+<td>Documentar em <code>docs/13_coupling_lot_apb_salt.md</code> antes de implementar</td>
+</tr>
+</tbody>
+</table>
+<h2 id="divergencias-identificadas-entre-legados">Divergências identificadas entre legados</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Divergência</th>
+<th>LOT_Tese</th>
+<th>LOT_APB_v5</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D01</td>
+<td>SESTSAL — versão/parâmetros</td>
+<td><code>include/sestsal/</code></td>
+<td><code>include/sestsal/</code></td>
+<td>Não verificado</td>
+</tr>
+<tr>
+<td>D02</td>
+<td>Solver parâmetros</td>
+<td>Hard-coded no main</td>
+<td>Maioria no JSON; alguns hard-coded</td>
+<td>H01-H04 acima</td>
+</tr>
+<tr>
+<td>D03</td>
+<td>Geometrias LOT</td>
+<td>4 variantes em arquivos separados</td>
+<td>Não identificado</td>
+<td>Verificar no JSON</td>
+</tr>
+</tbody>
+</table>
+<h2 id="itens-a-documentar-antes-de-implementar">Itens a documentar antes de implementar</h2>
+<p>Os seguintes pontos devem ser esclarecidos via skill <code>/formulation-audit</code>
+ANTES de iniciar a Fase 7 (refatoração C++):</p>
+<ul>
+<li>[ ] Convenção de sinais de tensão (compressão positiva ou negativa)</li>
+<li>[ ] Definição de tensão efetiva na interface sal-LOT</li>
+<li>[ ] Conversão de deformação viscosa para variação de volume anular</li>
+<li>[ ] Critério de convergência do loop LOT-sal (δP ou δε?)</li>
+<li>[ ] Tratamento de temperatura na lei de fluência (Kelvin ou Celsius no legado?)</li>
+</ul>
+</section>
+
+<section id="migration" class="doc-section">
+<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<h1 id="09-plano-de-migracao">09 — Plano de Migração</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="ordem-de-migracao-de-casos">Ordem de migração de casos</h2>
+<table>
+<thead>
+<tr>
+<th>Prioridade</th>
+<th>Caso</th>
+<th>Tipo</th>
+<th>Destino</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>SCORE-MRO-28_input.json</td>
+<td>APB completo</td>
+<td>cases/lot_apb_v5_migrated/</td>
+</tr>
+<tr>
+<td>2</td>
+<td>8-BUZ-67D-RJS-VISCO-elliptical.cpp</td>
+<td>LOT+APB+Sal</td>
+<td>cases/lot_tese_migrated/</td>
+</tr>
+<tr>
+<td>3</td>
+<td>LOTTeste.cpp</td>
+<td>LOT simples</td>
+<td>cases/lot_tese_migrated/</td>
+</tr>
+<tr>
+<td>4</td>
+<td>BUZ29-VISCO-DELL_PC_APTO.cpp</td>
+<td>APB validação</td>
+<td>cases/lot_tese_migrated/</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Demais BUZ29-*</td>
+<td>APB+Sal cenários</td>
+<td>cases/lot_tese_migrated/</td>
+</tr>
+</tbody>
+</table>
+<h2 id="mapeamento-json-yaml-lot_apb_v5">Mapeamento JSON → YAML (LOT_APB_v5)</h2>
+<table>
+<thead>
+<tr>
+<th>Campo JSON</th>
+<th>Campo YAML</th>
+<th>Transformação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>duration</code></td>
+<td><code>time.total_h</code></td>
+<td>Converter <code>duration_unit</code> → horas</td>
+</tr>
+<tr>
+<td><code>airgap</code></td>
+<td><code>wellbore.airgap_m</code></td>
+<td>Direto se metros</td>
+</tr>
+<tr>
+<td><code>temperature.data[].md[]</code></td>
+<td><code>temperature.data[].depth_m[]</code></td>
+<td>Renomear</td>
+</tr>
+<tr>
+<td><code>solids[]</code></td>
+<td><code>casings[]</code> + <code>cements[]</code></td>
+<td>Separar por tipo</td>
+</tr>
+<tr>
+<td><code>top_packer</code></td>
+<td><code>apb.top_packer_m</code></td>
+<td>Mover para seção APB</td>
+</tr>
+<tr>
+<td><code>salt_creep_enabled</code></td>
+<td><code>salt.enabled</code></td>
+<td>Renomear</td>
+</tr>
+<tr>
+<td><code>id_operation</code></td>
+<td><code>metadata.legacy_id</code></td>
+<td>Preservar como referência</td>
+</tr>
+</tbody>
+</table>
+<h2 id="parametros-hard-coded-a-adicionar-ao-yaml">Parâmetros hard-coded a adicionar ao YAML</h2>
+<p>Os seguintes parâmetros estão no <code>main.cpp</code> do LOT_APB_v5 e precisam ir para YAML:</p>
+<p><code>yaml
+time:
+  solver:
+    tol_pressure_bar: 1.0      # ctoldP
+    tol_eq: 1.0e-8             # tolEq
+    stabilization_days: 1.0    # dtac
+    dt_h: 1.0                  # dt
+  scheme: explicit             # adaptative = false</code></p>
+<h2 id="processo-de-validacao-de-migracao">Processo de validação de migração</h2>
+<ol>
+<li>Capturar baseline do legado</li>
+<li>Criar YAML com campos mapeados</li>
+<li>Executar novo código com YAML</li>
+<li>Comparar contra baseline (tolerância: L2 &lt; 1%)</li>
+<li>Documentar em docs/12_validation_results.md</li>
+</ol>
+</section>
+
+<section id="postprocess" class="doc-section">
+<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<h1 id="10-plano-de-pos-processamento">10 — Plano de Pós-Processamento</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="estrutura-do-pacote-lotsaltpost">Estrutura do pacote lotsaltpost</h2>
+<p><code>postprocess/lotsaltpost/
+├── io.py       # Leitura de resultados CSV/JSON
+├── compare.py  # Comparação novo × legado
+├── lot.py      # LOT: curva P×V, diagnóstico de fratura
+├── apb.py      # APB: pressão anular ×t
+├── salt.py     # Sal: deslocamento radial, fluência
+├── thermal.py  # Temperatura ×profundidade e ×tempo
+├── coupling.py # Painel acoplado LOT+APB+sal
+├── plots.py    # Primitivas matplotlib padronizadas
+├── report.py   # Gerador HTML de relatório
+├── export.py   # Exportação SVG/PDF para artigo
+├── units.py    # Conversão nos resultados
+├── style.py    # Paletas e marcadores
+└── cli.py      # lotsaltpost run &lt;estudo.yaml&gt;</code></p>
+<h2 id="scripts-disponiveis">Scripts disponíveis</h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Função</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>plot_lot_curve.py</code></td>
+<td>Curva LOT P×V e P×t</td>
+</tr>
+<tr>
+<td><code>plot_apb_pressure.py</code></td>
+<td>Pressão anular ×t</td>
+</tr>
+<tr>
+<td><code>compare_legado_novo.py</code></td>
+<td>Tabela de erro legado × novo</td>
+</tr>
+<tr>
+<td><code>plot_salt_closure.py</code></td>
+<td>Fechamento de poço ×t</td>
+</tr>
+<tr>
+<td><code>plot_coupled.py</code></td>
+<td>Painel completo</td>
+</tr>
+<tr>
+<td><code>generate_article_figures.py</code></td>
+<td>Figuras para publicação</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section id="cli" class="doc-section">
+<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<h1 id="11-uso-da-cli-lot-sim">11 — Uso da CLI lot-sim</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="subcomandos">Subcomandos</h2>
+<h3 id="run">run</h3>
+<p><code>ash
+lot-sim run --case &lt;arquivo.yaml&gt; --mode &lt;modo&gt; [--output &lt;dir&gt;] [--verbose]</code></p>
+<p>Modos disponíveis:</p>
+<table>
+<thead>
+<tr>
+<th>Modo</th>
+<th>Descrição</th>
+<th>Fase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lot</code></td>
+<td>LOT isolado</td>
+<td>5-6</td>
+</tr>
+<tr>
+<td><code>apb</code></td>
+<td>APB isolado</td>
+<td>5-6</td>
+</tr>
+<tr>
+<td><code>salt</code></td>
+<td>Sal isolado</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>lot-salt</code></td>
+<td>LOT acoplado ao sal</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>apb-salt</code></td>
+<td>APB acoplado ao sal</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>coupled</code></td>
+<td>Acoplamento completo</td>
+<td>8-10</td>
+</tr>
+</tbody>
+</table>
+<h3 id="inspect">inspect</h3>
+<p><code>ash
+lot-sim inspect --case &lt;arquivo.yaml&gt;
+lot-sim inspect --case &lt;arquivo.json&gt; --format json</code></p>
+<p>Valida o arquivo de caso contra o schema e imprime resumo.</p>
+<h3 id="validate">validate</h3>
+<p><code>ash
+lot-sim validate --suite regression
+lot-sim validate --case &lt;arquivo.yaml&gt; --baseline &lt;baseline.json&gt;</code></p>
+<h3 id="migrate">migrate</h3>
+<p><code>ash
+lot-sim migrate --from-json &lt;arquivo.json&gt; --to-yaml &lt;saida.yaml&gt;</code></p>
+<p>Converte JSON legado para YAML.</p>
+<h3 id="list">list</h3>
+<p><code>ash
+lot-sim list --dir cases/</code></p>
+<h2 id="exemplos">Exemplos</h2>
+<p>`ash</p>
+<h1 id="inspecionar-caso-migrado">Inspecionar caso migrado</h1>
+<p>lot-sim inspect --case cases/lot_apb_v5_migrated/score_mro_28.yaml</p>
+<h1 id="executar-apb-com-caso-migrado">Executar APB com caso migrado</h1>
+<p>lot-sim run --case cases/lot_apb_v5_migrated/score_mro_28.yaml --mode apb</p>
+<h1 id="migrar-json-legado">Migrar JSON legado</h1>
+<p>lot-sim migrate --from-json legance/LOT_APB_v5/SCORE-MRO-28_input.json \
+                --to-yaml cases/lot_apb_v5_migrated/score_mro_28.yaml</p>
+<h1 id="validar-regressao">Validar regressão</h1>
+<p>lot-sim validate --suite regression
+`
+"@</p>
+<p>System.Collections.Hashtable["12_validation_results.md"] = @"</p>
+<h1 id="12-resultados-de-validacao">12 — Resultados de Validação</h1>
+<p><strong>Status:</strong> NÃO INICIADO | <strong>Última atualização:</strong> 2026-06-01</p>
+<blockquote>
+<h2 id="aviso-critico">AVISO CRÍTICO</h2>
+<p>Este arquivo não contém nenhum resultado real de execução ainda.
+Nenhuma validação foi executada no código novo.
+Não alterar este arquivo sem rodar os testes documentados em docs/06_validation_plan.md.</p>
+</blockquote>
+<h2 id="status-da-suite-v0-v9">Status da suíte V0-V9</h2>
+<table>
+<thead>
+<tr>
+<th>Nível</th>
+<th>Status</th>
+<th>Data</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V0</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V1</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V2</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V3</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V4</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V5</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V6</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V7</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V8</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V9</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="como-atualizar-este-arquivo">Como atualizar este arquivo</h2>
+<p>Somente após executar os testes:</p>
+<p>`ash</p>
+<h1 id="exemplo-executar-v0-parser">Exemplo: executar V0 (parser)</h1>
+<p>./build/lot-sim inspect --case cases/validation/lot_simple.yaml</p>
+<h1 id="se-saiu-sem-erro-v0-passou">Se saiu sem erro: V0 = PASSOU</h1>
+<h1 id="atualizar-a-linha-correspondente-neste-arquivo-com">Atualizar a linha correspondente neste arquivo com:</h1>
+<h1 id="-status-passou-falhou">- Status: PASSOU / FALHOU</h1>
+<h1 id="-data-de-execucao">- Data de execução</h1>
+<h1 id="-erro-obtido-se-v2">- Erro obtido (se V2+)</h1>
+<h1 id="-tempo-de-execucao">- Tempo de execução</h1>
+<p>`
+"@</p>
+<p>System.Collections.Hashtable["13_coupling_lot_apb_salt.md"] = @"</p>
+<h1 id="13-acoplamento-lotapbsal">13 — Acoplamento LOT–APB–Sal</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="algoritmo-de-acoplamento-a-implementar-na-fase-8">Algoritmo de acoplamento (a implementar na Fase 8)</h2>
+<p>O módulo <code>include/coupling/</code> orquestra a sequência:</p>
+<p><code>Para cada passo de tempo dt:
+1. Atualizar campo térmico T(z, t)
+2. Calcular estado geostático atualizado σ₀(t)
+3. LOT: calcular pressão de fratura e leakoff
+4. Sal: calcular deformação viscosa da parede do poço
+5. APB: calcular pressurização do anular com novo volume
+6. Verificar convergência (δP &lt; tolP)
+7. Avançar t → t + dt</code></p>
+<h2 id="interface-de-acoplamento">Interface de acoplamento</h2>
+<p>O acoplamento entre LOT e sal ocorre via:
+- Tensão na parede do poço → <code>SaltCreepInterface::evaluate()</code>
+- Retorno: taxa de deformação → variação de volume anular
+- Variação de volume anular → correção de pressão APB</p>
+<h2 id="convencao-de-sinais-a-verificar">Convenção de sinais (a verificar)</h2>
+<blockquote>
+<p>PENDENTE — verificar com <code>/formulation-audit</code> antes de implementar.</p>
+<p>Questão crítica: tensão compressiva é positiva ou negativa na interface LOT-sal?</p>
+</blockquote>
+</section>
+
+<section id="results" class="doc-section">
+<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<h1 id="12-resultados-de-validacao">12 — Resultados de Validação</h1>
+<p><strong>Status:</strong> NÃO INICIADO | <strong>Última atualização:</strong> 2026-06-01</p>
+<hr />
+<blockquote>
+<h2 id="aviso-critico">AVISO CRÍTICO</h2>
+<p><strong>Este arquivo não contém nenhum resultado real de execução.</strong></p>
+<p>Nenhuma validação foi executada no código novo do <code>lot-salt-suite</code>.
+Nenhum baseline foi capturado dos legados ainda.</p>
+<p><strong>Não alterar</strong> este arquivo sem executar os testes descritos em
+<code>docs/06_validation_plan.md</code> e registrar os outputs reais aqui.</p>
+</blockquote>
+<hr />
+<h2 id="status-da-suite-v0-v9">Status da suíte V0-V9</h2>
+<table>
+<thead>
+<tr>
+<th>Nível</th>
+<th>Descrição</th>
+<th>Status</th>
+<th>Data</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V0</td>
+<td>Parser YAML</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V1</td>
+<td>Fluido isolado analítico</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V2</td>
+<td>Solução de Lamé (elástico)</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V3</td>
+<td>LOT simples sem sal</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V4</td>
+<td>APB simples sem sal</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V5</td>
+<td>Sal isolado (halita)</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V6</td>
+<td>LOT + sal</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V7</td>
+<td>APB + sal</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V8</td>
+<td>Caso acoplado completo</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>V9</td>
+<td>Regressão automática</td>
+<td>Não executado</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="baselines-capturados">Baselines capturados</h2>
+<table>
+<thead>
+<tr>
+<th>Baseline</th>
+<th>Arquivo</th>
+<th>Status</th>
+<th>Data</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LOT_Tese / LOTTeste</td>
+<td><code>tests/baselines/lot_tese_lotsimples.json</code></td>
+<td>Não capturado</td>
+<td>—</td>
+</tr>
+<tr>
+<td>LOT_Tese / 8-BUZ-67D elliptical</td>
+<td><code>tests/baselines/lot_tese_buz67d_ell.json</code></td>
+<td>Não capturado</td>
+<td>—</td>
+</tr>
+<tr>
+<td>LOT_APB_v5 / SCORE-MRO-28</td>
+<td><code>tests/baselines/apbv5_score_mro_28.json</code></td>
+<td>Não capturado</td>
+<td>—</td>
+</tr>
+<tr>
+<td>LOT_APB_v5 / SCORE-MRO-28 elastic</td>
+<td><code>tests/baselines/apbv5_score_mro_28_elastic.json</code></td>
+<td>Não capturado</td>
+<td>—</td>
+</tr>
+<tr>
+<td>saltcreep / halita DM</td>
+<td><code>tests/baselines/saltcreep_halita_dm.csv</code></td>
+<td>Não capturado</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="como-atualizar-este-arquivo">Como atualizar este arquivo</h2>
+<p>Somente após executar os testes:</p>
+<pre><code class="language-bash"># Exemplo: executar V0 (parser)
+./build/lot-sim inspect --case cases/validation/lot_simple.yaml
+# Se saiu sem erro → atualizar tabela V0 com status=PASSOU e data
+
+# Exemplo: executar V3 (LOT sem sal)
+./build/lot-sim run --case cases/lot_tese_migrated/lotsimples.yaml --mode lot
+# Comparar com baseline:
+python tools/compare_results.py \
+    results/lotsimples/lot_curve.csv \
+    tests/baselines/lot_tese_lotsimples.json \
+    --tolerance 0.01
+# Registrar: data, erro L2 obtido, erro L∞ obtido, tempo de execução
+</code></pre>
+</section>
+
+<section id="coupling" class="doc-section">
+<div class="section-header"><span style="background:#3b82f6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Planejado</span></div>
+<h1 id="13-acoplamento-lotapbsal">13 — Acoplamento LOT–APB–Sal</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<blockquote>
+<p>A formulação detalhada deve ser verificada via <code>/formulation-audit</code>
+comparando os legados antes de implementar o módulo <code>coupling/</code>.</p>
+</blockquote>
+<h2 id="conceito-de-acoplamento">Conceito de acoplamento</h2>
+<p>O LOT, APB e fluência de sal são fenômenos que se influenciam mutuamente:</p>
+<ol>
+<li><strong>LOT → Sal:</strong> pressão de fratura provoca campo de tensão na parede do poço →
+   inicia ou acelera fluência do sal</li>
+<li><strong>Sal → APB:</strong> fluência do sal deforma a parede → reduz volume anular →
+   aumenta pressão no anular (APB)</li>
+<li><strong>APB → Sal:</strong> pressão anular muda a tensão efetiva na rocha salina</li>
+</ol>
+<h2 id="algoritmo-proposto-a-verificar-com-formulacao-do-legado">Algoritmo proposto (a verificar com formulação do legado)</h2>
+<pre><code>Para cada passo de tempo dt:
+  1. Atualizar campo térmico T(z, t)
+  2. Calcular tensão geostática atualizada σ₀(t)
+  3. Resolver LOT:
+     - Calcular pressão de fratura P_frac
+     - Calcular leakoff: volume perdido Q_LOT(t)
+  4. Calcular tensão na parede do poço:
+     σ_wall = f(P_anular, P_poros, σ₀, geometria)
+  5. Chamar SaltCreepInterface::evaluate(σ_wall, T, dt):
+     - Retorna: taxa de deformação dε/dt e deformação acumulada ε
+  6. Calcular variação de volume anular:
+     δV_anular = f(ε, geometria do poço)
+  7. Atualizar pressão APB:
+     δP_APB = δV_anular / (compressibilidade_fluido × V_anular)
+  8. Verificar convergência (|δP_APB| &lt; tolP)
+  9. Atualizar estado e avançar tempo
+</code></pre>
+<h2 id="questoes-em-aberto-pendente-de-auditoria">Questões em aberto (PENDENTE de auditoria)</h2>
+<table>
+<thead>
+<tr>
+<th>Questão</th>
+<th>Impacto</th>
+<th>Arquivo de referência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Convenção de sinais de tensão</td>
+<td>Crítico</td>
+<td><code>legance/LOT_Tese/include/apb_code/Rock.h</code></td>
+</tr>
+<tr>
+<td>Definição de tensão efetiva no sal</td>
+<td>Crítico</td>
+<td><code>legance/LOT_Tese/include/sestsal/material.h</code></td>
+</tr>
+<tr>
+<td>Coordenadas: tensão radial × tangencial × axial</td>
+<td>Alto</td>
+<td><code>legance/LOT_Tese/src/apb_code/APB1da.cpp</code></td>
+</tr>
+<tr>
+<td>Critério de convergência do loop</td>
+<td>Médio</td>
+<td><code>legance/LOT_APB_v5/main/main.cpp</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
+<pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
+class LotApbSaltCoupling {
+public:
+    struct Config {
+        double tol_pressure_Pa;
+        int max_iterations;
+        bool salt_enabled;
+        bool lot_enabled;
+        bool apb_enabled;
+    };
+
+    // Executa um passo de tempo acoplado
+    void step(double dt_s, const Config&amp; cfg);
+
+private:
+    // Referências para módulos físicos
+    WellboreGeometry&amp; wellbore_;
+    FluidProperties&amp; fluids_;
+    ThermalField&amp; thermal_;
+    SaltCreepInterface&amp; salt_;
+    LotSolver&amp; lot_;
+    ApbSolver&amp; apb_;
+};
+</code></pre>
+</section>
+
+<section id="devguide" class="doc-section">
+<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<h1 id="14-guia-do-desenvolvedor">14 — Guia do Desenvolvedor</h1>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="fluxo-de-trabalho">Fluxo de trabalho</h2>
+<h3 id="adicionar-um-novo-modulo-c">Adicionar um novo módulo C++</h3>
+<ol>
+<li>Criar <code>include/&lt;modulo&gt;/&lt;Modulo&gt;.hpp</code> com interface pública</li>
+<li>Criar <code>src/&lt;modulo&gt;/&lt;Modulo&gt;.cpp</code> com implementação</li>
+<li>Criar <code>tests/cpp/test_&lt;modulo&gt;.cpp</code> com Catch2 (mínimo 3 testes)</li>
+<li>Adicionar ao <code>CMakeLists.txt</code></li>
+<li>Verificar com <code>cmake --build build -j &amp;&amp; ctest</code></li>
+<li>Atualizar <code>docs/07_target_architecture.md</code></li>
+<li>Executar <code>python tools/generate_docs_index.py</code></li>
+</ol>
+<h3 id="migrar-um-caso-legado">Migrar um caso legado</h3>
+<ol>
+<li>Ler o arquivo <code>.cpp</code> ou <code>.json</code> com <code>legacy-explorer</code></li>
+<li>Extrair parâmetros com <code>tools/migrate_*.py</code></li>
+<li>Criar YAML em <code>cases/</code></li>
+<li>Validar com <code>lot-sim inspect --case &lt;arquivo.yaml&gt;</code></li>
+<li>Executar com <code>lot-sim run</code></li>
+<li>Comparar com baseline (se existir)</li>
+<li>Documentar em <code>docs/09_migration_plan.md</code></li>
+</ol>
+<h3 id="atualizar-docsindexhtml">Atualizar docs/index.html</h3>
+<ol>
+<li>Editar o arquivo <code>.md</code> relevante em <code>docs/</code></li>
+<li>Atualizar <code>tools/docs_status.yaml</code> se o status mudou</li>
+<li>Executar <code>python tools/generate_docs_index.py</code></li>
+<li>Verificar que index.html abre sem erro no browser</li>
+</ol>
+<h3 id="antes-de-qualquer-prcommit">Antes de qualquer PR/commit</h3>
+<ol>
+<li><code>cmake --build build -j</code> — zero erros</li>
+<li><code>ctest --test-dir build --output-on-failure</code> — 100% verde</li>
+<li><code>pytest tests/python -q</code> — 100% verde</li>
+<li>Revisar <code>docs/08_known_issues.md</code> — nenhum risco novo sem documentação</li>
+</ol>
+<h2 id="skills-disponiveis">Skills disponíveis</h2>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>Quando usar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/formulation-audit</code></td>
+<td>Antes de implementar qualquer módulo físico</td>
+</tr>
+<tr>
+<td><code>/cpp-refactor</code></td>
+<td>Para refatoração C++</td>
+</tr>
+<tr>
+<td><code>/validation-benchmark</code></td>
+<td>Para criar/executar testes de regressão</td>
+</tr>
+<tr>
+<td><code>/postprocess-report</code></td>
+<td>Para pós-processamento Python</td>
+</tr>
+<tr>
+<td><code>/docs-html-report</code></td>
+<td>Para atualizar documentação</td>
+</tr>
+<tr>
+<td><code>/lot-salt-integration</code></td>
+<td>Para integração LOT+sal</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section id="changelog" class="doc-section">
+<div class="section-header"><span style="background:#f59e0b;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Em andamento</span></div>
+<h1 id="15-changelog">15 — Changelog</h1>
+<p><strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="unreleased">[Unreleased]</h2>
+<h3 id="fase-1-estrutura-do-repositorio-2026-06-01">Fase 1 — Estrutura do repositório (2026-06-01)</h3>
+<ul>
+<li>Criados diretórios: src/, include/, apps/, cases/, schemas/, tests/, postprocess/, tools/, docs/</li>
+<li>Criados: CLAUDE.md, AGENTS.md, README.md, .gitignore, CMakeLists.txt, pyproject.toml</li>
+<li>Criados: legacy/README.md, 11 × AGENTS.md por diretório</li>
+<li>Criados: 6 skills em .claude/skills/ e .agents/skills/</li>
+<li>Criados: 5 subagentes em .claude/agents/</li>
+<li>Criados: .claude/settings.json com permissões Allow/Deny</li>
+<li>Criados: 16 arquivos docs/*.md com estrutura inicial</li>
+</ul>
+<h3 id="fase-0-inventario-anterior">Fase 0 — Inventário (anterior)</h3>
+<ul>
+<li>Analisado: legance/LOT_Tese/ (17 arquivos main identificados)</li>
+<li>Analisado: legance/LOT_APB_v5/ (10 JSONs identificados)</li>
+<li>Analisado: external/saltcreep/ (120 testes C++ + 21 Python)</li>
+<li>Criados: ANALISE_INICIAL.md, NOVA_ESTRUTURA_REPOSITORIO.md (em versão anterior)</li>
+<li>Criados: target_repo/ com rascunhos de AGENTS.md, CLAUDE.md, docs/, skills/</li>
+</ul>
+</section>
+
+  <footer>lot-salt-suite v0.1.0 · Gerado em 2026-06-01 por generate_docs_index.py</footer>
+</main>
+</body>
+</html>
