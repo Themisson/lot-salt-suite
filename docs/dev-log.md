@@ -16,7 +16,7 @@ Repositório : https://github.com/Themisson/lot-salt-suite
 Testes C++  : 0 (módulos ainda não implementados)
 Testes Py   : 0
 Baselines   : 4 capturados (LOT_APB_v5)
-Saltcreep   : modificações em andamento por Themisson
+Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ```
 
 ### Próximas tarefas (Fase 5)
@@ -147,20 +147,54 @@ Saltcreep   : modificações em andamento por Themisson
 
 ---
 
-## Seção: Modificações em andamento no saltcreep
+## Seção: Modificações em external/saltcreep — histórico
 
-> Atualizar esta seção manualmente (ou via `/update-devlog`) quando houver
-> mudanças em `external/saltcreep/` que afetem o design do lot-salt-suite.
+### [2026-06-01] Sincronização 1 — WallPressureField + APB cases
+
+**Status:** Concluído e commitado (`13eb5c3`)
+
+**Novos arquivos adicionados:**
+
+| Arquivo | Relevância para lot-salt-suite |
+|---------|-------------------------------|
+| `include/solver/WallPressureField.hpp` | Interface-chave para pressão de lama → sal |
+| `src/solver/WallPressureField.cpp` | Confirma FC=119.826 (mesmo valor que APB1da) |
+| `cases/apb/mud_gradient_1d_8p5ppg.yaml` | Formato YAML para casos APB com gradiente de lama |
+| `cases/apb/mud_gradient_2d_Q8_8p5ppg.yaml` | Variante 2D Q8 do caso APB |
+| `post/saltpost/diameter.py` | Rastreamento de diâmetro — útil para APB |
+| `post/saltpost/layers.py` | Pós-processamento por camada |
+| `tests/cpp/test_wall_pressure_field.cpp` | Testes Catch2 para WallPressureField |
+
+**Arquivos modificados (impacto):**
+
+| Arquivo | O que mudou |
+|---------|------------|
+| `include/solver/Assembler.hpp` | Suporte a WallPressureField como BC |
+| `include/solver/TimeIntegrator.hpp` | Conexão com WallPressureField |
+| `include/io/CaseParser.hpp` | Novo modo `fluid.mode: hydrostatic_depth_profile` |
+| `src/io/CaseParser.cpp` | Parser para o novo modo de fluido APB |
+
+**Impacto direto no design da Fase 8 (SaltCreepInterface):**
 
 ```
-Status: Themisson está adaptando saltcreep para integrar funcionalidades
-        de LOT e APB presentes em legance/LOT_Tese e legance/LOT_APB_v5.
+WallPressureField é a ponte que faltava:
+  lot-salt-suite/include/salt/SaltCreepInterface.hpp
+    recebe WallPressureField* como parâmetro
+    ou como dependência injetada no SaltCreepSaltcreepAdapter
 
-Impacto esperado no lot-salt-suite:
-  - SaltCreepInterface (include/salt/) precisará expor campos adicionais
-  - Documenta aqui quando as modificações estiverem concluídas
+Fluxo confirmado:
+  APBSolver → WallPressureField → SaltCreepSaltcreepAdapter
+    → saltcreep::Assembler → deformação viscosa → δV anular → δP APB
+
+Constante confirmada: kLbPerGalToKgPerM3 = 119.826 (saltcreep)
+                      FC = 119.826427 (APB1da legado)  ← mesmo valor
 ```
 
-| Data | Modificação | Arquivos saltcreep | Status |
-|------|------------|-------------------|--------|
-| — | — | — | em andamento |
+**fluid.mode novo no YAML saltcreep:**
+```yaml
+fluid:
+  mode: hydrostatic_depth_profile  # novo
+  weight_lb_per_gal: 8.5
+  surface_pressure_Pa: 0.0
+```
+→ Este modo deve ser incorporado ao schema `schemas/lot_case.schema.yaml` na Fase 5.
