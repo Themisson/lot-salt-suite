@@ -30,8 +30,10 @@ vrock.push_back(new Rock(..., 1.8792e-06 / 60, 9.92e+06, 86., 3.36, 7.55));
 `material.h` declara `double e0; // [1/h]` — **INCORRETO**.
 O valor passado é `e0_literatura [1/h] ÷ 60` = `e0 [1/min]`.
 
-**Conclusão:** A unidade interna de tempo do modelo SESTSAL é **minutos [min]**, não horas.
-O `dt` passado para `solveThermalViscoStep(dt)` deve estar em [min] ou há conversão interna.
+**Conclusão:** No legado da tese, o valor passado para `e0` foi convertido para **[1/min]**.
+O incremento `dt` usado por qualquer backend deve ser coerente com a unidade temporal da
+taxa de fluência ativa; quando o backend usa `e0` em [1/min], o passo equivalente deve estar
+em minutos ou deve haver conversão explícita na fronteira.
 
 **Impacto para o código novo:**
 - Todo `e0` lido de YAML deve ser convertido: se o usuário informa `[1/h]`, o parser divide por 60 antes de passar ao modelo SESTSAL legado.
@@ -169,7 +171,7 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 | H07 | Viscosidade fluido LOT | 3.0 cP | `8-BUZ-67D-*.cpp` | Parser converte cP → Pa·s |
 | H08 | Geometria LOT | `"elliptical"` | `8-BUZ-67D-*.cpp` | YAML `lot.fracture.geometry` |
 
-## R08 — Unidade de `dt` no wrapper SESTSAL/APB: [h]
+## R08 — Unidade de `dt`: coerente com a taxa de fluência; LOT_APB_v5 usa [h]
 
 **Severidade:** Alta | **Status:** Confirmado em 2026-06-01
 
@@ -188,12 +190,17 @@ Arquivos auditados:
 - `Element::incrementalViscousForces(double _dt)` multiplica diretamente a taxa de fluência por `_dt`.
 - O APB principal usa `tac = 80 * 7 * 24` e escreve tempo como `t / 24 / 7`, consistente com `t` em horas.
 
-**Conclusão:** No `LOT_APB_v5`, o `dt` passado para `solveThermalViscoStep(dt)` está em **horas [h]**. O solver SESTSAL desse ramo espera taxa de fluência compatível com hora, e o passo interno adaptativo do wrapper (`dt = 1.e-6`, `dt_max = 0.001`) também está em horas.
+**Conclusão específica do `LOT_APB_v5`:** O `dt` passado para `solveThermalViscoStep(dt)` está em **horas [h]**. O solver SESTSAL desse ramo espera taxa de fluência compatível com hora, e o passo interno adaptativo do wrapper (`dt = 1.e-6`, `dt_max = 0.001`) também está em horas.
+
+**Regra geral:** `dt` é o incremento temporal numérico do modelo constitutivo e deve ser coerente com a unidade da taxa de deformação ativa. Se a taxa estiver em `[1/s]`, o `dt` correspondente deve estar em segundos; se estiver em `[1/h]`, em horas; se estiver em `[1/min]`, em minutos. Esse incremento pode ser definido pelo usuário, escolhido adaptativamente ou previamente inicializado pelo backend.
+
+**Tempo de simulação e acomodação:** O tempo total de simulação é definido pelo usuário. O tempo de acomodação (`tac`/`stabilization_h`) representa o intervalo inicial decorrido sem incrementos térmicos ou injeção/variação operacional de fluidos, permitindo a acomodação mecânica/viscosa antes do carregamento principal.
 
 **Impacto para o código novo:**
-- `time.dt_h` deve permanecer em horas no YAML e no `CaseData`.
-- Um futuro `SaltCreepSESTSALAdapter` deve passar `dt_h` ao wrapper legado, não minutos.
-- Se o adaptador usar uma implementação SESTSAL cujo `e0` foi normalizado para `[1/min]`, a fronteira deve converter explicitamente para manter consistência dimensional.
+- `time.dt_h` permanece em horas no YAML e no `CaseData` como escala de entrada do APB/LOT.
+- Um futuro `SaltCreepSESTSALAdapter` deve converter o passo de tempo para a unidade esperada pelo backend chamado.
+- Para o wrapper `LOT_APB_v5`, passar `dt_h` em horas.
+- Para uma implementação SESTSAL ou saltcreep que opere com taxa em segundos/minutos, converter explicitamente na fronteira para manter consistência dimensional.
 
 **Risco lateral observado:** A versão ativa de `APBSalt1D::solveThermalViscoStep` não atribui `this->dt_h = dt_h`; `storeResults()` usa o membro `dt_h`, que fica inicializado em `0`. Isto sugere que o armazenamento temporal interno do wrapper pode estar incorreto nessa versão, embora o incremento mecânico passado ao solver ainda use o `dt` interno em horas. Não corrigir no legado; tratar no futuro adapter.
 
@@ -210,7 +217,7 @@ Arquivos auditados:
 | R05 | e0 em h⁻¹ × min⁻¹ | Crítico | **CONFIRMADO** — e0 está em [1/min] (FA01) |
 | R06 | Temperatura: °C × K no SESTSAL | Crítico | **CONFIRMADO** — SESTSAL usa °C (FA02) |
 | R07 | Acoplamento sal-APB sequencial fraco | Médio | **CONFIRMADO** — staggered, uma iteração de sal/passo (FA04) |
-| R08 | `dt` passado a `solveThermalViscoStep` em horas ou minutos? | Alto | **CONFIRMADO** — `dt` em [h] no wrapper APB/SESTSAL do LOT_APB_v5 |
+| R08 | Unidade de `dt` em modelos de fluência | Alto | **CONFIRMADO** — `dt` deve ser coerente com a taxa de deformação; no wrapper APB/SESTSAL do LOT_APB_v5 é [h] |
 
 ## Itens pendentes após auditoria
 
@@ -218,7 +225,7 @@ Arquivos auditados:
 - [x] Temperatura no modelo: °C, não K → FA02
 - [x] Unidade de e0: [1/min] internamente → FA01
 - [x] Mecanismo de acoplamento sal→APB → FA04
-- [x] **R08:** `dt` em `solveThermalViscoStep` é [h] no wrapper APB/SESTSAL do LOT_APB_v5
+- [x] **R08:** `dt` deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]
 - [ ] Confirmar convenção de sinal de `u_wall` (positivo = inward ou outward?)
       — arquivo: `legance/LOT_APB_v5/include/apb/apb_salt_1d.h`
 - [ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)

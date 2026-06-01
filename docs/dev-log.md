@@ -43,6 +43,21 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 
 ---
 
+### [2026-06-01] Ajuste R08 — Codex + orientação do usuário
+**Status:** Documentação ajustada nesta sessão.
+**Testes:** não executados (mudança somente documental)
+
+**Correção conceitual:**
+- `dt` não é sempre horas ou minutos por natureza; ele deve ser coerente com a unidade temporal da taxa de deformação do backend ativo.
+- No `LOT_APB_v5`, a auditoria segue indicando `dt` em [h].
+- Se a taxa estiver em [1/s], [1/min] ou [1/h], o passo temporal correspondente deve estar em segundos, minutos ou horas, respectivamente, ou ser convertido explicitamente na fronteira.
+- `tac`/tempo de acomodação é o intervalo inicial sem incrementos térmicos ou injeção/variação operacional de fluidos.
+
+**Arquivos alterados:**
+- `docs/08_known_issues.md` — R08 reescrito como regra dimensional geral + conclusão específica para `LOT_APB_v5`
+
+---
+
 ### [2026-06-01] Fase 5-E — Codex
 **Status:** Implementado nesta sessão.
 **Testes C++:** 15 Catch2 | **Resultado ctest:** 15 passaram
