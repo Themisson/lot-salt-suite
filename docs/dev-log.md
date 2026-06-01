@@ -47,6 +47,19 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 
 ---
 
+### [2026-06-01] Template SaltCreep no manual gerado — Codex
+**Status:** Implementado nesta sessao.
+**Testes:** `python tools\generate_docs_index.py` e `python tools\generate_docs_index.py --dry-run` executados com sucesso. Verificacao estrutural confirmou sidebar, busca, fontes Fraunces/Hanken/IBM Plex Mono, hero, cards de metricas, links de navegacao agrupados, 21 secoes e script de destaque/copia.
+**Escopo:** `external/saltcreep/docs/index.html` foi usado apenas como referencia visual; nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/` ou `tests/baselines/` foi alterado.
+
+**Mudanca principal:**
+- `tools/generate_docs_index.py` agora gera `docs/index.html` no layout do manual SaltCreep: sidebar fixa escura, busca na navegacao, grupos de documentos, hero editorial, metricas em cards, conteudo em largura de leitura, blocos de codigo com botao de copia e responsividade mobile.
+- Como o manual SaltCreep vendorizado e mantido manualmente, o padrao visual foi adaptado no gerador local sem depender de arquivos de `external/saltcreep/`.
+
+**Observacao:** tentativa de abrir o HTML no navegador interno falhou por erro local do runtime da sandbox (`windows sandbox failed: spawn setup refresh`); a verificacao seguiu por geracao deterministica e inspeção estrutural do HTML.
+
+---
+
 ### [2026-06-01] Fase 6.5 — Execucao moderna LOT/PKN CSV/JSON — Codex
 **Status:** Implementado nesta sessao.
 **Testes:** `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`, `cmake --build build -j` e `ctest --test-dir build --output-on-failure` executados; 36/36 passaram.
