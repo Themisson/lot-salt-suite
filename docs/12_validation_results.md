@@ -6,9 +6,12 @@
 
 > ## AVISO
 >
-> Nenhuma validação foi executada no **código novo** do `lot-salt-suite`.
+> Nenhuma validação numérica de regressão contra legado foi executada no
+> **código novo** do `lot-salt-suite`.
 > Os baselines abaixo são saídas do **legado LOT_APB_v5** compilado e executado
-> em 2026-06-01 com g++ 16.1.0 + flags `-w -fpermissive`.
+> em 2026-06-01 com g++ 16.1.0 + flags `-w -fpermissive`. As validações de
+> contrato/sintéticas executadas no código novo ficam registradas por fase
+> neste documento e não substituem regressão legado × moderno.
 >
 > Compilação: `cmake -G "MinGW Makefiles" -DCMAKE_CXX_FLAGS="-w -fpermissive"`
 

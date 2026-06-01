@@ -1979,9 +1979,12 @@ Não alterar este arquivo sem rodar os testes documentados em docs/06_validation
 <hr />
 <blockquote>
 <h2 id="aviso">AVISO</h2>
-<p>Nenhuma validação foi executada no <strong>código novo</strong> do <code>lot-salt-suite</code>.
+<p>Nenhuma validação numérica de regressão contra legado foi executada no
+<strong>código novo</strong> do <code>lot-salt-suite</code>.
 Os baselines abaixo são saídas do <strong>legado LOT_APB_v5</strong> compilado e executado
-em 2026-06-01 com g++ 16.1.0 + flags <code>-w -fpermissive</code>.</p>
+em 2026-06-01 com g++ 16.1.0 + flags <code>-w -fpermissive</code>. As validações de
+contrato/sintéticas executadas no código novo ficam registradas por fase
+neste documento e não substituem regressão legado × moderno.</p>
 <p>Compilação: <code>cmake -G "MinGW Makefiles" -DCMAKE_CXX_FLAGS="-w -fpermissive"</code></p>
 </blockquote>
 <hr />

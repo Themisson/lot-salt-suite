@@ -49,6 +49,7 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 
 ### [2026-06-01] Fase 6.4 — PknModel fisico minimo em SI — Codex
 **Status:** Implementado nesta sessao.
+**Commit:** `537f4cc feat(lot): implement minimal SI PKN model`.
 **Testes:** `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`, `cmake --build build -j` e `ctest --test-dir build --output-on-failure` executados; 30/30 passaram.
 **Validacao CLI:** `lot-sim validate --case` retornou `OK` para `cases/validation/lot_pkn_minimal.yaml`, `cases/validation/lot_pkn_with_leakoff.yaml` e `cases/lot_tese_migrated/buz67d_pkn.yaml`.
 **Escopo:** nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/` ou `tests/baselines/` foi alterado.
