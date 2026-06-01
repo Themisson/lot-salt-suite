@@ -169,6 +169,36 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 | H07 | Viscosidade fluido LOT | 3.0 cP | `8-BUZ-67D-*.cpp` | Parser converte cP → Pa·s |
 | H08 | Geometria LOT | `"elliptical"` | `8-BUZ-67D-*.cpp` | YAML `lot.fracture.geometry` |
 
+## R08 — Unidade de `dt` no wrapper SESTSAL/APB: [h]
+
+**Severidade:** Alta | **Status:** Confirmado em 2026-06-01
+
+Arquivos auditados:
+- `legance/LOT_APB_v5/include/apb/apb_salt_1d.h`
+- `legance/LOT_APB_v5/src/apb/apb_salt_1d.cpp`
+- `legance/LOT_APB_v5/include/sestsal/solver.h`
+- `legance/LOT_APB_v5/src/sestsal/solver.cpp`
+- `legance/LOT_APB_v5/src/sestsal/element.cpp`
+- `legance/LOT_APB_v5/main/main.cpp`
+
+**Evidência direta:**
+- `APBSalt1D::solveThermalViscoStep(double dt_h)` recebe `dt_h` explicitamente nomeado em horas.
+- `APBSalt1D` armazena `time_h` e `dt_h` como membros.
+- `Solver::dt` é comentado como `last time increment, [h]`.
+- `Element::incrementalViscousForces(double _dt)` multiplica diretamente a taxa de fluência por `_dt`.
+- O APB principal usa `tac = 80 * 7 * 24` e escreve tempo como `t / 24 / 7`, consistente com `t` em horas.
+
+**Conclusão:** No `LOT_APB_v5`, o `dt` passado para `solveThermalViscoStep(dt)` está em **horas [h]**. O solver SESTSAL desse ramo espera taxa de fluência compatível com hora, e o passo interno adaptativo do wrapper (`dt = 1.e-6`, `dt_max = 0.001`) também está em horas.
+
+**Impacto para o código novo:**
+- `time.dt_h` deve permanecer em horas no YAML e no `CaseData`.
+- Um futuro `SaltCreepSESTSALAdapter` deve passar `dt_h` ao wrapper legado, não minutos.
+- Se o adaptador usar uma implementação SESTSAL cujo `e0` foi normalizado para `[1/min]`, a fronteira deve converter explicitamente para manter consistência dimensional.
+
+**Risco lateral observado:** A versão ativa de `APBSalt1D::solveThermalViscoStep` não atribui `this->dt_h = dt_h`; `storeResults()` usa o membro `dt_h`, que fica inicializado em `0`. Isto sugere que o armazenamento temporal interno do wrapper pode estar incorreto nessa versão, embora o incremento mecânico passado ao solver ainda use o `dt` interno em horas. Não corrigir no legado; tratar no futuro adapter.
+
+---
+
 ## Riscos de formulação (atualizados após auditoria)
 
 | ID | Risco | Impacto | Status após auditoria |
@@ -180,7 +210,7 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 | R05 | e0 em h⁻¹ × min⁻¹ | Crítico | **CONFIRMADO** — e0 está em [1/min] (FA01) |
 | R06 | Temperatura: °C × K no SESTSAL | Crítico | **CONFIRMADO** — SESTSAL usa °C (FA02) |
 | R07 | Acoplamento sal-APB sequencial fraco | Médio | **CONFIRMADO** — staggered, uma iteração de sal/passo (FA04) |
-| R08 | `dt` passado a `solveThermalViscoStep` em horas ou minutos? | Alto | Pendente — verificar implementação do solver SESTSAL |
+| R08 | `dt` passado a `solveThermalViscoStep` em horas ou minutos? | Alto | **CONFIRMADO** — `dt` em [h] no wrapper APB/SESTSAL do LOT_APB_v5 |
 
 ## Itens pendentes após auditoria
 
@@ -188,8 +218,7 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 - [x] Temperatura no modelo: °C, não K → FA02
 - [x] Unidade de e0: [1/min] internamente → FA01
 - [x] Mecanismo de acoplamento sal→APB → FA04
-- [ ] **R08 PENDENTE:** verificar se `dt` em `solveThermalViscoStep` é [h] ou [min]
-      — arquivo a verificar: `legance/LOT_APB_v5/src/apb/apb_salt_1d.cpp`
+- [x] **R08:** `dt` em `solveThermalViscoStep` é [h] no wrapper APB/SESTSAL do LOT_APB_v5
 - [ ] Confirmar convenção de sinal de `u_wall` (positivo = inward ou outward?)
       — arquivo: `legance/LOT_APB_v5/include/apb/apb_salt_1d.h`
 - [ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)

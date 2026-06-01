@@ -13,7 +13,7 @@ Fase ativa  : 5 em andamento (units + schema + CaseParser + CLI inspect)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
-Testes C++  : 12 Catch2 (12 passaram em 2026-06-01)
+Testes C++  : 15 Catch2 (15 passaram em 2026-06-01)
 Testes Py   : 0
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
@@ -21,7 +21,7 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 
 ### Próximas tarefas (Fase 5)
 
-- [ ] R08 pendente: verificar unidade de `dt` em `legance/LOT_APB_v5/src/apb/apb_salt_1d.cpp`
+- [x] R08 pendente: verificar unidade de `dt` em `legance/LOT_APB_v5/src/apb/apb_salt_1d.cpp`
 - [x] `schemas/lot_case.schema.yaml`
 - [x] `include/units/units.hpp` (conversões PPG→kg/m³, pol→m, etc.)
 - [x] `include/core/types.hpp` (CaseData struct)
@@ -40,6 +40,23 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 5-E — Codex
+**Status:** Implementado nesta sessão.
+**Testes C++:** 15 Catch2 | **Resultado ctest:** 15 passaram
+**Validação YAML:** `cases/validation/lot_minimal.yaml` e `cases/validation/lot_double_mechanism_reference.yaml` válidos contra `schemas/lot_case.schema.yaml`
+
+**Arquivos adicionados/alterados:**
+- `docs/08_known_issues.md` — R08 resolvido: `dt` do wrapper APB/SESTSAL em [h], com risco lateral documentado
+- `src/io/CaseParser.cpp` — valida listas mínimas e referências `annulars[].fluid`/`layers[].rock`
+- `tests/cpp/test_case_parser.cpp` — testes de referências inválidas e lista obrigatória vazia
+- `schemas/lot_case.schema.yaml` — `minItems` para listas semanticamente obrigatórias
+- `apps/lot-sim.cpp` — subcomando `validate --case`
+
+**Execução manual:**
+`lot-sim validate --case cases/validation/lot_minimal.yaml` imprime `OK: lot_minimal_validation`.
 
 ---
 

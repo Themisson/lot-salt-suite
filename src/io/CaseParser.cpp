@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <unordered_set>
 
 #include <yaml-cpp/yaml.h>
 
@@ -62,6 +63,38 @@ double parse_viscosity_Pa_s(const YAML::Node& node, const std::string& path) {
     return units::cP_to_Pa_s(node["viscosity_cP"].as<double>());
   }
   return require_as<double>(node["viscosity_Pa_s"], path + ".viscosity_Pa_s");
+}
+
+void validate_nonempty(bool condition, const std::string& field) {
+  if (!condition) {
+    throw std::runtime_error("Validacao falhou: " + field + " deve conter ao menos 1 item");
+  }
+}
+
+void validate_references(const lss::core::CaseData& data) {
+  std::unordered_set<std::string> fluid_ids;
+  for (const auto& fluid : data.fluids) {
+    fluid_ids.insert(fluid.id);
+  }
+
+  for (const auto& annular : data.annulars) {
+    if (!fluid_ids.contains(annular.fluid_id)) {
+      throw std::runtime_error("Validacao falhou: annulars[].fluid '" +
+                               annular.fluid_id + "' nao existe em fluids[].id");
+    }
+  }
+
+  std::unordered_set<std::string> rock_ids;
+  for (const auto& rock : data.rocks) {
+    rock_ids.insert(rock.id);
+  }
+
+  for (const auto& layer : data.layers) {
+    if (!rock_ids.contains(layer.rock_id)) {
+      throw std::runtime_error("Validacao falhou: layers[].rock '" +
+                               layer.rock_id + "' nao existe em rocks[].id");
+    }
+  }
 }
 
 }  // namespace
@@ -196,6 +229,11 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
   if (data.time.tol_eq <= 0.0) {
     throw std::runtime_error("Validacao falhou: time.solver.tol_eq deve ser > 0");
   }
+  validate_nonempty(!data.casings.empty(), "casings");
+  validate_nonempty(!data.fluids.empty(), "fluids");
+  validate_nonempty(!data.rocks.empty(), "rocks");
+  validate_nonempty(!data.layers.empty(), "layers");
+  validate_references(data);
 
   return data;
 }

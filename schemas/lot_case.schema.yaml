@@ -52,6 +52,7 @@ properties:
       shoe_depth_m: {type: number}
   casings:
     type: array
+    minItems: 1
     items:
       type: object
       required: [id, top_m, base_m, di_in, de_in, E_Pa, nu]
@@ -92,6 +93,7 @@ properties:
         base_m: {type: number}
   fluids:
     type: array
+    minItems: 1
     items:
       type: object
       required: [id, density_ppg, compressibility_per_Pa, mode]
@@ -127,6 +129,7 @@ properties:
             temp_C: {type: number}
   layers:
     type: array
+    minItems: 1
     items:
       type: object
       required: [id, top_m, base_m, rock]
@@ -138,6 +141,7 @@ properties:
         rock: {type: string}
   rocks:
     type: array
+    minItems: 1
     items:
       type: object
       required: [id, model, E_Pa, nu, density_kg_m3]

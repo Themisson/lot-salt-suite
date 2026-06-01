@@ -50,21 +50,34 @@ int inspect_case(const std::filesystem::path& case_path) {
   return EXIT_SUCCESS;
 }
 
+int validate_case(const std::filesystem::path& case_path) {
+  const auto data = lss::io::parse_yaml(case_path);
+  std::cout << "OK: " << data.name << '\n';
+  return EXIT_SUCCESS;
+}
+
 void print_usage() {
-  std::cerr << "Uso: lot-sim inspect --case <arquivo.yaml>\n";
+  std::cerr << "Uso: lot-sim <inspect|validate> --case <arquivo.yaml>\n";
 }
 
 }  // namespace
 
 int main(int argc, char* argv[]) {
-  if (argc != 4 || std::string(argv[1]) != "inspect" ||
-      std::string(argv[2]) != "--case") {
+  if (argc != 4 || std::string(argv[2]) != "--case") {
     print_usage();
     return EXIT_FAILURE;
   }
 
   try {
-    return inspect_case(argv[3]);
+    const std::string command = argv[1];
+    if (command == "inspect") {
+      return inspect_case(argv[3]);
+    }
+    if (command == "validate") {
+      return validate_case(argv[3]);
+    }
+    print_usage();
+    return EXIT_FAILURE;
   } catch (const std::exception& ex) {
     std::cerr << "Erro: " << ex.what() << '\n';
     return EXIT_FAILURE;
