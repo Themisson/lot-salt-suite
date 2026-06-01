@@ -1151,6 +1151,25 @@ cd legance/LOT_APB_v5 &amp;&amp; make main
                         ├── include/geomechanics/ (tensão geostática)
                         └── include/coupling/     (orquestrador)
 </code></pre>
+<h2 id="nucleo-de-simulacao">Núcleo de simulação</h2>
+<p>O núcleo de simulação do <code>lot-salt-suite</code> é C++.</p>
+<p>Devem permanecer em C++:</p>
+<ul>
+<li>parsing YAML/JSON e conversão para SI;</li>
+<li>modelos físicos de LOT, APB, sal, leakoff, breakdown e dano;</li>
+<li>integração com <code>external/saltcreep</code>;</li>
+<li>acoplamento LOT/APB/sal;</li>
+<li>runners e writers que produzem <code>CSV/JSON</code>.</li>
+</ul>
+<p>Python é uma camada externa. Ele pode consumir <code>CSV/JSON</code> já gravado pelo C++
+para gráficos, relatórios, auditorias auxiliares e migrações pontuais
+não-runtime, mas não deve ser necessário para executar a simulação.</p>
+<p>Fluxo principal:</p>
+<pre><code class="language-text">YAML/JSON → C++ parser → C++ model/runner → C++ writer → CSV/JSON
+</code></pre>
+<p>Fluxo de pós-processamento:</p>
+<pre><code class="language-text">CSV/JSON → Python plot/report → PNG/HTML
+</code></pre>
 <h2 id="regra-de-dependencia">Regra de dependência</h2>
 <ul>
 <li><code>core/</code> ← todos os módulos dependem</li>
@@ -1215,7 +1234,8 @@ Subcomandos:
    d. calcular APB: nova pressão dos anulares
    e. verificar convergência
    f. salvar saída se (passo % output_every == 0)
-8. pós-processamento: invocar script Python se configurado
+8. escrever CSV/JSON pelo writer C++
+9. pós-processamento externo opcional: script Python consome CSV/JSON já gerado
 </code></pre>
 <h2 id="prioridade-lotpkn">Prioridade LOT/PKN</h2>
 <p>A primeira entrega moderna do modulo <code>lot/</code> deve priorizar PKN, conforme a
@@ -1789,6 +1809,22 @@ report.html
 </code></pre>
 <p>O relatório HTML contém aviso explícito de que usa somente outputs modernos
 sintéticos e que nenhuma regressão numérica contra legado foi executada.</p>
+<h2 id="politica-c-first-python-postprocess-only">Política — C++ first, Python postprocess only</h2>
+<p>O pós-processamento começa <strong>depois</strong> que o C++ termina a simulação e grava
+<code>CSV/JSON</code>. O fluxo permitido é:</p>
+<pre><code class="language-text">CSV/JSON → Python plot/report → PNG/HTML
+</code></pre>
+<p>O fluxo runtime principal permanece:</p>
+<pre><code class="language-text">YAML/JSON → C++ parser → C++ model/runner → C++ writer → CSV/JSON
+</code></pre>
+<p><code>lot_pkn_report.py</code> não faz pré-processamento, não monta entradas do solver, não
+gera YAML de produção, não calcula <code>PknInput</code>, não calibra parâmetros e não
+substitui módulos C++. Ele apenas valida <code>timeseries.csv</code>/<code>result.json</code>, gera
+figuras e escreve <code>report.html</code>.</p>
+<p>Novos scripts Python devem ser avaliados contra esta política antes de serem
+criados. Se a tarefa envolver física, solver, parsing runtime, conversão de
+unidades, acoplamento LOT/APB/sal, dano, breakdown ou integração com
+<code>external/saltcreep</code>, a implementação deve ser C++.</p>
 <h3 id="robustez">Robustez</h3>
 <p>O script valida:</p>
 <ul>
@@ -2379,6 +2415,18 @@ comparando os legados antes de implementar o módulo <code>coupling/</code>.</p>
 <p>Na arquitetura atual, o caminho LOT inicial deve ser PKN. O acoplamento com sal
 deve passar pelo adapter para <code>external/saltcreep/</code>, que e uma dependencia
 vendorizada ativa com governanca descrita em <code>docs/16_saltcreep_governance.md</code>.</p>
+<h2 id="politica-de-implementacao">Política de implementação</h2>
+<p>O acoplamento LOT/APB/sal deve ser implementado em C++.</p>
+<p>Python não deve atuar como intermediário runtime entre LOT e sal, nem montar
+condições de contorno para <code>external/saltcreep</code> no fluxo principal. A integração
+deve ocorrer por interfaces C++, como <code>SaltCreepInterface</code>,
+<code>SaltCreepSaltcreepAdapter</code> e futuros adapters específicos para LOT/sal.</p>
+<p>Fluxo esperado:</p>
+<pre><code class="language-text">YAML/JSON → C++ parser → C++ LOT/APB/salt coupling → C++ writer → CSV/JSON
+</code></pre>
+<p>Python pode aparecer somente depois, para:</p>
+<pre><code class="language-text">CSV/JSON → Python plot/report/auditoria externa → PNG/HTML
+</code></pre>
 <h2 id="algoritmo-proposto-a-verificar-com-formulacao-do-legado">Algoritmo proposto (a verificar com formulação do legado)</h2>
 <pre><code>Para cada passo de tempo dt:
   1. Atualizar campo térmico T(z, t)
@@ -2486,6 +2534,24 @@ sal. O fluxo esperado e:</p>
 <div class="doc-body">
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="fluxo-de-trabalho">Fluxo de trabalho</h2>
+<h2 id="politica-operacional-c-first-python-postprocess-only">Política operacional — C++ first, Python postprocess only</h2>
+<p>Antes de criar qualquer arquivo Python, Codex/Claude deve responder:</p>
+<ol>
+<li>É pós-processamento de <code>CSV/JSON</code> já gerado pelo C++?</li>
+<li>É relatório/gráfico/auditoria auxiliar fora do runtime?</li>
+<li>É migração pontual em <code>tools/</code>, marcada como não-runtime e acompanhada de
+   relatório de mapeamento?</li>
+</ol>
+<p>Se a resposta for "não" para essas três perguntas, a tarefa deve ser C++.</p>
+<p>O fluxo normal do simulador é:</p>
+<pre><code class="language-text">YAML/JSON → C++ parser → C++ model/runner → C++ writer → CSV/JSON
+</code></pre>
+<p>O fluxo Python permitido é:</p>
+<pre><code class="language-text">CSV/JSON → Python plot/report → PNG/HTML
+</code></pre>
+<p>Agentes não devem propor Python como pré-processador padrão, gerador de YAML de
+produção, substituto de solver, executor de física runtime, calibrador
+automático sem fase dedicada ou caminho obrigatório para rodar LOT/APB/sal.</p>
 <h3 id="adicionar-um-novo-modulo-c">Adicionar um novo módulo C++</h3>
 <ol>
 <li>Criar <code>include/&lt;modulo&gt;/&lt;Modulo&gt;.hpp</code> com interface pública</li>
@@ -2694,6 +2760,12 @@ devem bloquear a primeira implementacao moderna.</p>
 <h2 id="escopo-da-primeira-entrega-lotpkn">Escopo da primeira entrega LOT/PKN</h2>
 <p>A primeira implementacao moderna deve criar contratos e testes, nao apenas
 transcrever equacoes do legado.</p>
+<p>O desenvolvimento tecnico do LOT/PKN segue a politica <strong>C++ first, Python
+postprocess only</strong>. Fisica, parser, conversao de unidades, runners, writers,
+leakoff, breakdown, dano, acoplamento com sal e integracao com
+<code>external/saltcreep</code> devem permanecer em C++. Python pode consumir CSV/JSON
+modernos para relatorios, graficos, auditorias auxiliares e migracoes pontuais
+nao-runtime.</p>
 <p>Componentes esperados:</p>
 <table>
 <thead>
@@ -2845,16 +2917,24 @@ entregar os dados ao solver.</p>
 </ul>
 <h2 id="proxima-fase-recomendada">Proxima fase recomendada</h2>
 <p>Com R09 mitigado para os dois PKN auditados, mas ainda aberto para <code>idQ == 4</code>,
-seguir um destes caminhos:</p>
+priorizar desenvolvimento C++ nesta ordem:</p>
 <ol>
-<li>Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
-   parsing com solver.</li>
-<li>Se for iniciar comparacao legado x moderno, primeiro confirmar o <code>idQ</code> de
-   geracao dos <code>.dat</code> e manter qualquer resultado como qualitativo ate resolver
-   os demais pontos PKN (<code>t</code> absoluto, <code>time</code> desde breakdown, <code>w0 * L1 * M_PI</code>).</li>
-<li>Para liberar regressao quantitativa envolvendo <code>idQ == 4</code>, obter justificativa
-   fisica/documental para <code>22</code> ou excluir esse ramo como referencia valida.</li>
+<li>Implementar <code>LeakoffModel</code> C++ calibravel, mantendo entradas SI e testes
+   Catch2.</li>
+<li>Tornar <code>PknModel</code> C++ mais rigoroso, documentando tempo desde breakdown,
+   volume, largura e comprimento.</li>
+<li>Consolidar <code>BreakdownCriterion</code> C++ e remover qualquer heuristica solta de
+   pos-processamento.</li>
+<li>Criar <code>SaltCreepLotAdapter</code>/<code>SaltCreepInterface</code> C++ para integrar
+   <code>external/saltcreep</code> sem script Python intermediario.</li>
+<li>Implementar acoplamento LOT/sal em C++ e só depois ampliar
+   pos-processamento ou comparacao externa.</li>
 </ol>
+<p>Antes de qualquer comparacao legado x moderno, confirmar o <code>idQ</code> de
+   geracao dos <code>.dat</code> e manter qualquer resultado como qualitativo ate resolver
+   os demais pontos PKN (<code>t</code> absoluto, <code>time</code> desde breakdown, <code>w0 * L1 * M_PI</code>).
+Para liberar regressao quantitativa envolvendo <code>idQ == 4</code>, obter justificativa
+fisica/documental para <code>22</code> ou excluir esse ramo como referencia valida.</p>
 <h2 id="riscos-tecnicos-a-resolver-antes-da-implementacao">Riscos tecnicos a resolver antes da implementacao</h2>
 <ul>
 <li>O legado usa conversoes de vazao com fatores geometricos embutidos e ao menos

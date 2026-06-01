@@ -19,6 +19,27 @@ Na arquitetura atual, o caminho LOT inicial deve ser PKN. O acoplamento com sal
 deve passar pelo adapter para `external/saltcreep/`, que e uma dependencia
 vendorizada ativa com governanca descrita em `docs/16_saltcreep_governance.md`.
 
+## Política de implementação
+
+O acoplamento LOT/APB/sal deve ser implementado em C++.
+
+Python não deve atuar como intermediário runtime entre LOT e sal, nem montar
+condições de contorno para `external/saltcreep` no fluxo principal. A integração
+deve ocorrer por interfaces C++, como `SaltCreepInterface`,
+`SaltCreepSaltcreepAdapter` e futuros adapters específicos para LOT/sal.
+
+Fluxo esperado:
+
+```text
+YAML/JSON → C++ parser → C++ LOT/APB/salt coupling → C++ writer → CSV/JSON
+```
+
+Python pode aparecer somente depois, para:
+
+```text
+CSV/JSON → Python plot/report/auditoria externa → PNG/HTML
+```
+
 ## Algoritmo proposto (a verificar com formulação do legado)
 
 ```

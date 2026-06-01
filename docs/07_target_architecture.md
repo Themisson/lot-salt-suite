@@ -21,6 +21,34 @@ apps/lot-sim.cpp
                         └── include/coupling/     (orquestrador)
 ```
 
+## Núcleo de simulação
+
+O núcleo de simulação do `lot-salt-suite` é C++.
+
+Devem permanecer em C++:
+
+- parsing YAML/JSON e conversão para SI;
+- modelos físicos de LOT, APB, sal, leakoff, breakdown e dano;
+- integração com `external/saltcreep`;
+- acoplamento LOT/APB/sal;
+- runners e writers que produzem `CSV/JSON`.
+
+Python é uma camada externa. Ele pode consumir `CSV/JSON` já gravado pelo C++
+para gráficos, relatórios, auditorias auxiliares e migrações pontuais
+não-runtime, mas não deve ser necessário para executar a simulação.
+
+Fluxo principal:
+
+```text
+YAML/JSON → C++ parser → C++ model/runner → C++ writer → CSV/JSON
+```
+
+Fluxo de pós-processamento:
+
+```text
+CSV/JSON → Python plot/report → PNG/HTML
+```
+
 ## Regra de dependência
 
 - `core/` ← todos os módulos dependem
@@ -101,7 +129,8 @@ Subcomandos:
    d. calcular APB: nova pressão dos anulares
    e. verificar convergência
    f. salvar saída se (passo % output_every == 0)
-8. pós-processamento: invocar script Python se configurado
+8. escrever CSV/JSON pelo writer C++
+9. pós-processamento externo opcional: script Python consome CSV/JSON já gerado
 ```
 
 ## Prioridade LOT/PKN

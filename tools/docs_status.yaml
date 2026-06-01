@@ -46,7 +46,7 @@ docs:
   cli_usage:              in_progress
   validation_results:     in_progress    # NUNCA mudar para validated sem execução real
   coupling:               planned
-  developer_guide:        planned
+  developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
   lot_pkn_roadmap:        implemented

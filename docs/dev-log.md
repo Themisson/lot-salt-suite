@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.7 implementada (pos-processamento moderno LOT/PKN)
+Fase ativa  : 6.8 implementada (politica C++ first / Python postprocess only)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
@@ -32,6 +32,7 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 - [x] Conectar LOT/PKN ao CLI moderno com saida CSV/JSON sem regressao legado
 - [x] Executar ensaio comparativo controlado R09 (`/(pi*22)` vs `/(pi*2)`) sem alterar legado
 - [x] Criar pos-processamento moderno minimo LOT/PKN para CSV/JSON sem regressao legado
+- [x] Registrar politica C++ first, Python postprocess only
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
 
@@ -45,6 +46,27 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.8 — Política C++ first, Python postprocess only — Codex
+**Status:** Implementado nesta sessao.
+**Testes/comandos:** `python tools\generate_docs_index.py`, `git diff --name-only` e `git status` executados. Fase documental; `ctest` nao foi executado porque nao houve alteracao em C++, CMake, schema ou testes.
+**Escopo:** somente documentos de governanca e manual gerado. Nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/`, `tests/baselines/`, `apps/`, `tests/` ou `postprocess/scripts/` foi alterado. Em `include/` e `src/`, apenas `AGENTS.md` de governanca foram atualizados.
+
+**Politica registrada:**
+- Motor de simulacao primario e C++.
+- Parser, conversao de unidades, modelos fisicos, runners, writers, leakoff, breakdown, dano, acoplamento LOT/APB/sal e integracao com `external/saltcreep` devem ser C++.
+- Python fica restrito a pos-processamento, graficos, relatorios, auditorias externas e migracoes pontuais nao-runtime em `tools/`.
+- Fluxo runtime: `YAML/JSON -> C++ parser -> C++ model/runner -> C++ writer -> CSV/JSON`.
+- Fluxo Python permitido: `CSV/JSON -> Python plot/report -> PNG/HTML`.
+
+**Arquivos alterados:**
+- `AGENTS.md`, `CLAUDE.md`, `postprocess/AGENTS.md`, `src/AGENTS.md`, `include/AGENTS.md`.
+- `docs/10_postprocessing_plan.md`, `docs/14_developer_workflow.md`, `docs/17_lot_pkn_roadmap.md`, `docs/07_target_architecture.md`, `docs/13_coupling_lot_apb_salt.md`.
+- `docs/dev-log.md`, `tools/docs_status.yaml`, `docs/index.html`.
+
+**Proxima etapa recomendada:** implementar `LeakoffModel` C++ com testes Catch2, depois evoluir `PknModel`, `BreakdownCriterion` e adapter LOT/saltcreep em C++.
 
 ---
 

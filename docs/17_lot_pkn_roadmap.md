@@ -15,6 +15,13 @@ devem bloquear a primeira implementacao moderna.
 A primeira implementacao moderna deve criar contratos e testes, nao apenas
 transcrever equacoes do legado.
 
+O desenvolvimento tecnico do LOT/PKN segue a politica **C++ first, Python
+postprocess only**. Fisica, parser, conversao de unidades, runners, writers,
+leakoff, breakdown, dano, acoplamento com sal e integracao com
+`external/saltcreep` devem permanecer em C++. Python pode consumir CSV/JSON
+modernos para relatorios, graficos, auditorias auxiliares e migracoes pontuais
+nao-runtime.
+
 Componentes esperados:
 
 | Componente | Responsabilidade |
@@ -157,15 +164,24 @@ entregar os dados ao solver.
 ## Proxima fase recomendada
 
 Com R09 mitigado para os dois PKN auditados, mas ainda aberto para `idQ == 4`,
-seguir um destes caminhos:
+priorizar desenvolvimento C++ nesta ordem:
 
-1. Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
-   parsing com solver.
-2. Se for iniciar comparacao legado x moderno, primeiro confirmar o `idQ` de
+1. Implementar `LeakoffModel` C++ calibravel, mantendo entradas SI e testes
+   Catch2.
+2. Tornar `PknModel` C++ mais rigoroso, documentando tempo desde breakdown,
+   volume, largura e comprimento.
+3. Consolidar `BreakdownCriterion` C++ e remover qualquer heuristica solta de
+   pos-processamento.
+4. Criar `SaltCreepLotAdapter`/`SaltCreepInterface` C++ para integrar
+   `external/saltcreep` sem script Python intermediario.
+5. Implementar acoplamento LOT/sal em C++ e só depois ampliar
+   pos-processamento ou comparacao externa.
+
+Antes de qualquer comparacao legado x moderno, confirmar o `idQ` de
    geracao dos `.dat` e manter qualquer resultado como qualitativo ate resolver
    os demais pontos PKN (`t` absoluto, `time` desde breakdown, `w0 * L1 * M_PI`).
-3. Para liberar regressao quantitativa envolvendo `idQ == 4`, obter justificativa
-   fisica/documental para `22` ou excluir esse ramo como referencia valida.
+Para liberar regressao quantitativa envolvendo `idQ == 4`, obter justificativa
+fisica/documental para `22` ou excluir esse ramo como referencia valida.
 
 ## Riscos tecnicos a resolver antes da implementacao
 

@@ -86,6 +86,31 @@ Modern synthetic LOT/PKN output - no legacy regression
 O relatório HTML contém aviso explícito de que usa somente outputs modernos
 sintéticos e que nenhuma regressão numérica contra legado foi executada.
 
+## Política — C++ first, Python postprocess only
+
+O pós-processamento começa **depois** que o C++ termina a simulação e grava
+`CSV/JSON`. O fluxo permitido é:
+
+```text
+CSV/JSON → Python plot/report → PNG/HTML
+```
+
+O fluxo runtime principal permanece:
+
+```text
+YAML/JSON → C++ parser → C++ model/runner → C++ writer → CSV/JSON
+```
+
+`lot_pkn_report.py` não faz pré-processamento, não monta entradas do solver, não
+gera YAML de produção, não calcula `PknInput`, não calibra parâmetros e não
+substitui módulos C++. Ele apenas valida `timeseries.csv`/`result.json`, gera
+figuras e escreve `report.html`.
+
+Novos scripts Python devem ser avaliados contra esta política antes de serem
+criados. Se a tarefa envolver física, solver, parsing runtime, conversão de
+unidades, acoplamento LOT/APB/sal, dano, breakdown ou integração com
+`external/saltcreep`, a implementação deve ser C++.
+
 ### Robustez
 
 O script valida:

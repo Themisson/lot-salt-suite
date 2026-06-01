@@ -43,6 +43,34 @@ Criar uma arquitetura modular C++ com:
 12. **`docs/12_validation_results.md`** nunca deve declarar validações como executadas sem rodá-las.
 13. **`docs/index.html`** status de seção = "validado" somente após CI verde documentado.
 
+## Política — C++ first, Python postprocess only
+
+O motor de simulação do projeto é C++. Modelos físicos, parsing, conversões de
+unidade, runners, writers, solvers, leakoff, breakdown, dano, acoplamento
+LOT/APB/sal e integração com `external/saltcreep` devem ser implementados
+primariamente em C++.
+
+Python deve servir ao simulador, não comandar o simulador. Use Python apenas
+para pós-processamento, gráficos, relatórios, auditorias auxiliares externas e
+migrações pontuais não-runtime em `tools/`.
+
+Não proponha pré-processadores Python como fluxo padrão. Não use Python para
+gerar entradas de produção, substituir módulos C++, implementar física do
+solver, escolher parâmetros físicos de produção, calibrar modelos
+automaticamente sem fase dedicada ou acessar legados no caminho runtime.
+
+Fluxo principal:
+
+```text
+YAML/JSON → C++ parser → C++ model/runner → C++ writer → CSV/JSON
+```
+
+Fluxo permitido de pós-processamento:
+
+```text
+CSV/JSON → Python plot/report → PNG/HTML
+```
+
 ## Antes de modificar código
 
 **Primeira leitura — sempre:** `docs/dev-log.md`

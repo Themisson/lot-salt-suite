@@ -28,6 +28,50 @@ documentação e registro em `docs/dev-log.md`.
 10. **OBRIGATÓRIO** converter todas as unidades de campo para SI no parser (não no solver).
 11. **OBRIGATÓRIO** informar arquivos alterados, testes executados e riscos ao final da tarefa.
 
+## Política — C++ first, Python postprocess only
+
+O motor primário de simulação do `lot-salt-suite` é C++.
+
+Devem ser implementados primariamente em C++:
+
+- modelos físicos;
+- parsing de entrada e conversão de unidades;
+- montagem de `CaseData`, runners e writers;
+- solvers numéricos;
+- modelos de LOT, APB, sal, leakoff, breakdown e dano;
+- acoplamento LOT/APB/sal;
+- integração com `external/saltcreep`.
+
+Python é permitido somente para:
+
+- pós-processamento;
+- gráficos;
+- geração de relatórios;
+- auditorias externas auxiliares;
+- utilitários pontuais de migração em `tools/`, claramente marcados como não-runtime.
+
+Python **não** deve:
+
+- gerar entradas de produção como parte do fluxo padrão;
+- substituir módulos de solver C++;
+- implementar modelos físicos usados pelo solver;
+- decidir parâmetros físicos para simulações de produção;
+- calibrar modelos automaticamente sem fase futura dedicada;
+- acessar outputs legados como parte do caminho runtime do solver;
+- tornar-se pré-processador obrigatório para simulações LOT/APB/sal normais.
+
+Fluxo principal:
+
+```text
+YAML/JSON → C++ parser → C++ model/runner → C++ writer → CSV/JSON
+```
+
+Fluxo permitido de pós-processamento:
+
+```text
+CSV/JSON → Python plot/report → PNG/HTML
+```
+
 ## Leitura obrigatória antes de qualquer tarefa
 
 ```

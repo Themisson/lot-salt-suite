@@ -29,6 +29,8 @@ src/
 3. Sem parâmetros físicos hard-coded: usar structs de caso carregadas do YAML
 4. Unidades sempre SI internamente
 5. Não incluir headers de `legance/` ou `external/saltcreep/include/apb_code/`
+6. Modelos físicos, solvers, runners, writers, leakoff, breakdown, dano e acoplamento devem permanecer em C++
+7. Não depender de Python como pré-processador runtime para montar entradas de simulação
 
 ## Subagente recomendado
 

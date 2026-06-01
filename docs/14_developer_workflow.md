@@ -4,6 +4,33 @@
 
 ## Fluxo de trabalho
 
+## Política operacional — C++ first, Python postprocess only
+
+Antes de criar qualquer arquivo Python, Codex/Claude deve responder:
+
+1. É pós-processamento de `CSV/JSON` já gerado pelo C++?
+2. É relatório/gráfico/auditoria auxiliar fora do runtime?
+3. É migração pontual em `tools/`, marcada como não-runtime e acompanhada de
+   relatório de mapeamento?
+
+Se a resposta for "não" para essas três perguntas, a tarefa deve ser C++.
+
+O fluxo normal do simulador é:
+
+```text
+YAML/JSON → C++ parser → C++ model/runner → C++ writer → CSV/JSON
+```
+
+O fluxo Python permitido é:
+
+```text
+CSV/JSON → Python plot/report → PNG/HTML
+```
+
+Agentes não devem propor Python como pré-processador padrão, gerador de YAML de
+produção, substituto de solver, executor de física runtime, calibrador
+automático sem fase dedicada ou caminho obrigatório para rodar LOT/APB/sal.
+
 ### Adicionar um novo módulo C++
 
 1. Criar `include/<modulo>/<Modulo>.hpp` com interface pública

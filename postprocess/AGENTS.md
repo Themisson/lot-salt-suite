@@ -27,6 +27,20 @@ postprocess/
 3. Separar leitura / métricas / gráficos / relatório
 4. Toda comparação deve produzir tabela de erro
 5. Nunca gerar gráfico com dados sintéticos apresentado como resultado real
+6. Python aqui é apenas pós-processamento, relatório, gráfico, auditoria ou migração pontual não-runtime
+7. Não gerar entradas YAML de produção, não montar `PknInput`/casos runtime e não substituir solver C++
+8. Não implementar modelos físicos usados pelo solver; novas físicas pertencem a `include/` + `src/`
+
+## Política C++ first
+
+O fluxo normal do projeto é:
+
+`YAML/JSON → C++ parser → C++ model/runner → C++ writer → CSV/JSON`.
+
+Scripts em `postprocess/` só podem consumir resultados já escritos pelo C++ ou
+artefatos de auditoria explicitamente fora do runtime. Relatórios como
+`lot_pkn_report.py` começam depois que o C++ já gerou `timeseries.csv` e
+`result.json`.
 
 ## Subagente recomendado
 
