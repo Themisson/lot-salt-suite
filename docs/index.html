@@ -83,7 +83,7 @@
     
     <div class="hero-stats">
       <div class="stat"><span class="stat-num">6/13</span><span class="stat-label">Fases ativas</span></div>
-      <div class="stat"><span class="stat-num">27</span><span class="stat-label">Testes C++</span></div>
+      <div class="stat"><span class="stat-num">30</span><span class="stat-label">Testes C++</span></div>
       <div class="stat"><span class="stat-num">0</span><span class="stat-label">Testes Python</span></div>
       <div class="stat"><span class="stat-num">0/10</span><span class="stat-label">Validações V0-V9</span></div>
     </div>
@@ -385,16 +385,45 @@ da fratura.</p>
 <h2 id="diagrama-de-estados">Diagrama de estados</h2>
 <p><code>Pressurização linear → Ponto de Leak-Off → Propagação de fratura → Fechamento
      (elástico)           (LOT_pressure)       (leakoff rate)       (closure)</code></p>
-<h2 id="formulacao-de-fratura-a-documentar-apos-auditoria">Formulação de fratura (a documentar após auditoria)</h2>
-<p><strong>Atenção:</strong> A formulação completa PKN ainda não está validada contra o legado
-porque R09 permanece blocker para regressão numérica. A Fase 6.2 cria apenas o
-contrato de entrada, os tipos C++ e testes sintéticos.</p>
-<p>Campos a documentar:
-- Relação pressão-volume antes da fratura (regime elástico)
-- Critério de iniciação de fratura
-- Geometrias suportadas: circular, elliptical, penny-shaped, PKN
-- Modelo de leakoff (filtração de fluido na parede)
-- Integração com deformação da rocha salina</p>
+<h2 id="formulacao-de-fratura-pkn-minima-em-si">Formulação de fratura PKN minima em SI</h2>
+<p><strong>Atenção:</strong> a formulação PKN moderna ainda não está validada contra o legado
+porque R09 permanece blocker para regressão numérica. A Fase 6.4 implementa uma
+base física mínima em SI para testes dimensionais e evolução incremental, sem
+usar <code>.dat</code> legado como baseline.</p>
+<p>O <code>lot::PknModel</code> recebe <code>PknInput</code> ja convertido para SI. O parser e o schema
+continuam responsaveis por unidades de campo; o solver nao le YAML/JSON.</p>
+<p>Para cada instante:</p>
+<pre><code class="language-text">t_ativo = max(0, t - t_acomodacao)
+V_inj = Q * t_ativo
+w = max(w0, 2.5 * (mu * Q^2 * t_ativo / (E' * h))^(1/5), 1e-9 m)
+V_frac = max(0, V_inj - V_leakoff)
+L = V_frac / (w * h)
+p_net = E' * w / h
+</code></pre>
+<p>onde <code>Q</code> e a taxa de injecao [m3/s], <code>mu</code> e a viscosidade [Pa.s], <code>E'</code> e o
+modulo plano [Pa], <code>h</code> e a altura PKN [m], <code>w0</code> e a abertura inicial [m] e
+<code>t_acomodacao</code> e o tempo sem incremento operacional.</p>
+<p>O leakoff atual e uma aproximacao acumulada opcional, usada apenas para manter
+conservacao dimensional basica:</p>
+<pre><code class="language-text">A_leakoff ~= 2 * h * L_anterior
+dV_leakoff = C_L * A_leakoff * sqrt(dt)
+V_leakoff = min(V_inj, V_leakoff_anterior + dV_leakoff)
+</code></pre>
+<p>Hipoteses desta fase:
+- Geometria PKN com altura constante imposta pelo usuario.
+- Propagacao ativada desde o inicio do tempo ativo; o acoplamento com
+  <code>BreakdownDetector</code> ainda nao esta conectado ao CLI.
+- Fluido newtoniano com viscosidade constante.
+- Sem acoplamento sal/APB e sem fechamento/descarga.
+- <code>dt</code>, tempo total e tempo de acomodacao sao definidos no contrato de entrada.
+- Todos os resultados expostos pelo modelo sao em SI e devem ser finitos e nao
+  negativos nos testes sinteticos.</p>
+<p>Campos ainda fora desta fase:
+- Relacao pressao-volume pre-fratura em regime elastico.
+- Criterio fisico completo de iniciacao de fratura.
+- Geometrias circular, elliptical e penny-shaped.
+- Leakoff Carter calibrado ou dependente de pressao.
+- Integracao com deformacao de sal.</p>
 <h2 id="contrato-lotpkn-sintetico-fase-62">Contrato LOT/PKN sintético (Fase 6.2)</h2>
 <p>O caminho moderno inicial usa <code>simulation.mode: lot-pkn</code>, <code>lot.model: pkn</code> e
 <code>lot.fracture.geometry: pkn</code>. O parser converte taxa de injecao, tempos,
@@ -2125,6 +2154,50 @@ nao baseline numerico.</p>
 auditados usam <code>idQ == 6</code>, que chama outra conversao. R09 permanece blocker para
 regressao PKN legado x moderno ate ensaio numerico comparativo ou documentacao
 fisica adicional.</p>
+<h2 id="fase-64-pknmodel-fisico-minimo-em-si">Fase 6.4 — PknModel fisico minimo em SI</h2>
+<p><strong>Data:</strong> 2026-06-01</p>
+<p><strong>Executado nesta fase:</strong></p>
+<ul>
+<li><code>cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug</code></li>
+<li><code>cmake --build build -j</code></li>
+<li><code>ctest --test-dir build --output-on-failure</code></li>
+<li><code>.\build\lot-sim.exe validate --case cases\validation\lot_pkn_minimal.yaml</code></li>
+<li><code>.\build\lot-sim.exe validate --case cases\validation\lot_pkn_with_leakoff.yaml</code></li>
+<li><code>.\build\lot-sim.exe validate --case cases\lot_tese_migrated\buz67d_pkn.yaml</code></li>
+</ul>
+<p><strong>Resultado CTest:</strong> 30 testes Catch2 executados, 30 passaram.</p>
+<p><strong>Resultado CLI:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Caso</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cases/validation/lot_pkn_minimal.yaml</code></td>
+<td><code>OK: lot_pkn_minimal_validation</code></td>
+</tr>
+<tr>
+<td><code>cases/validation/lot_pkn_with_leakoff.yaml</code></td>
+<td><code>OK: lot_pkn_with_leakoff_validation</code></td>
+</tr>
+<tr>
+<td><code>cases/lot_tese_migrated/buz67d_pkn.yaml</code></td>
+<td><code>OK: buz67d_pkn_migrated_contract</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Modelo coberto por teste:</strong> <code>lot::PknModel</code> gera resultados escalares e
+series temporais em SI com largura, comprimento, volume injetado, volume de
+fratura, volume de leakoff e pressao liquida finitos e nao negativos. Os testes
+cobrem monotonicidade basica, caso fechado sem leakoff, leakoff simplificado,
+determinismo e rejeicao de entradas invalidas.</p>
+<p><strong>Importante:</strong> esta fase nao executou regressao contra <code>legance/LOT_Tese</code> nem
+contra <code>legance/LOT_APB_v5</code>. O caso <code>buz67d_pkn.yaml</code> continua sendo contrato
+sintatico/migratorio. R09 continua bloqueando validacao numerica legado x
+moderno.</p>
 <h2 id="baselines-capturados">Baselines capturados</h2>
 <table>
 <thead>
@@ -2573,7 +2646,10 @@ entregar os dados ao solver.</p>
 4.7. Fase 6.3: auditar R09. Resultado: <code>/ M_PI / 22</code> existe em
    <code>Conv_bbmin_m3h(idQ == 4)</code>, mas os PKN auditados usam <code>idQ == 6</code>. R09 segue
    aberto para regressao numerica porque o fator nao tem justificativa
-   documental e o caminho PKN ainda exige ensaio comparativo controlado.</li>
+   documental e o caminho PKN ainda exige ensaio comparativo controlado.
+4.8. Fase 6.4: substituir o esqueleto sintetico por <code>PknModel</code> fisico minimo
+   em SI, com serie temporal, conservacao dimensional basica e testes Catch2,
+   sem regressao contra arquivos legados enquanto R09 permanecer aberto.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -2600,6 +2676,16 @@ entregar os dados ao solver.</p>
 - R09 continua aberto para regressao numerica legado x moderno; a proxima etapa
   deve ser ensaio comparativo controlado ou formulacao fisica minima em SI sem
   usar o legado como baseline.</p>
+<p><strong>Fase 6.4 (modelo fisico minimo em SI):</strong>
+- <code>lot::PknModel</code> agora calcula ponto e serie temporal em SI.
+- Entradas fisicas minimas: taxa, <code>dt</code>, tempo total, tempo de acomodacao,
+  altura, largura inicial, modulo plano, viscosidade e leakoff opcional.
+- Saidas: tempo, volume injetado, abertura, comprimento, volume de fratura,
+  volume de leakoff e pressao liquida.
+- Testes Catch2 cobrem finitude, nao negatividade, monotonicidade basica,
+  leakoff simplificado, determinismo e rejeicao de entradas invalidas.
+- A validacao CLI dos tres YAMLs <code>lot-pkn</code> continua sendo validacao de
+  contrato, nao regressao numerica contra legado.</p>
 <h2 id="fora-de-escopo-ate-r09-ser-resolvido">Fora de escopo até R09 ser resolvido</h2>
 <ul>
 <li>Comparação numérica com <code>legance/LOT_Tese</code> ou <code>legance/LOT_APB_v5</code>.</li>
@@ -2612,8 +2698,10 @@ entregar os dados ao solver.</p>
 <ol>
 <li>Ensaio comparativo controlado das variantes de conversao (<code>/(pi*22)</code> versus
    <code>/(pi*2)</code>) em ferramenta externa ao legado congelado.</li>
-<li>Implementacao fisica minima do <code>PknModel</code> em SI, com testes dimensionais e
-   sinteticos, sem regressao contra os <code>.dat</code> legados.</li>
+<li>Conectar <code>PknModel</code> ao subcomando <code>run</code> com saida CSV/JSON moderna e
+   documentar que <code>validate</code> segue restrito a schema/contrato.</li>
+<li>Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
+   parsing com solver.</li>
 </ol>
 <h2 id="riscos-tecnicos-a-resolver-antes-da-implementacao">Riscos tecnicos a resolver antes da implementacao</h2>
 <ul>

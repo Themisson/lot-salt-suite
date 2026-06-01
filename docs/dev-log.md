@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.3 em andamento (auditoria fisica/dimensional R09)
+Fase ativa  : 6.4 implementada (PknModel fisico minimo em SI)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
-Testes C++  : 27 Catch2 (27 passaram em 2026-06-01)
+Testes C++  : 30 Catch2 (30 passaram em 2026-06-01)
 Testes Py   : 0
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
@@ -28,6 +28,7 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 - [x] Implementar `lot::BreakdownDetector` sintetico com testes Catch2
 - [x] Criar esqueleto sintetico de `lot::PknModel` com testes Catch2
 - [x] Auditar R09 antes de regressao numerica PKN legado x moderno
+- [x] Implementar `lot::PknModel` fisico minimo em SI com series temporais sinteticas
 - [ ] Executar ensaio comparativo controlado R09 (`/(pi*22)` vs `/(pi*2)`) sem alterar legado
 - [ ] Conectar LOT/PKN ao CLI somente apos contrato numerico testado
 
@@ -43,6 +44,24 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.4 — PknModel fisico minimo em SI — Codex
+**Status:** Implementado nesta sessao.
+**Testes:** `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`, `cmake --build build -j` e `ctest --test-dir build --output-on-failure` executados; 30/30 passaram.
+**Validacao CLI:** `lot-sim validate --case` retornou `OK` para `cases/validation/lot_pkn_minimal.yaml`, `cases/validation/lot_pkn_with_leakoff.yaml` e `cases/lot_tese_migrated/buz67d_pkn.yaml`.
+**Escopo:** nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/` ou `tests/baselines/` foi alterado.
+
+**Modelo implementado:**
+- `lot::PknModel::simulate` gera serie temporal em SI usando `rate_m3_s`, `dt_s`, `total_time_s`, `accommodation_time_s`, altura de fratura, modulo plano e viscosidade.
+- A largura usa escala PKN minima proporcional a `(mu * Q^2 * t / (E' * h))^(1/5)`, com piso numerico e largura inicial.
+- O volume injetado e `Q * max(0, t - tac)`; o volume de fratura e o volume injetado menos leakoff acumulado simplificado.
+- A pressao liquida e estimada por `E' * width / h`; resultados escalares e series sao finitos e nao negativos.
+
+**R09:** permanece blocker para validacao numerica legado x moderno. Esta fase nao executou regressao contra `.dat` legado nem usou `buz67d_pkn.yaml` como baseline numerico.
+
+**Proxima etapa recomendada:** conectar o modelo ao subcomando `run` apenas depois de definir output numerico e manter R09 separado como ensaio comparativo controlado.
 
 ---
 

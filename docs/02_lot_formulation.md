@@ -19,18 +19,56 @@ Pressurização linear → Ponto de Leak-Off → Propagação de fratura → Fec
      (elástico)           (LOT_pressure)       (leakoff rate)       (closure)
 `
 
-## Formulação de fratura (a documentar após auditoria)
+## Formulação de fratura PKN minima em SI
 
-**Atenção:** A formulação completa PKN ainda não está validada contra o legado
-porque R09 permanece blocker para regressão numérica. A Fase 6.2 cria apenas o
-contrato de entrada, os tipos C++ e testes sintéticos.
+**Atenção:** a formulação PKN moderna ainda não está validada contra o legado
+porque R09 permanece blocker para regressão numérica. A Fase 6.4 implementa uma
+base física mínima em SI para testes dimensionais e evolução incremental, sem
+usar `.dat` legado como baseline.
 
-Campos a documentar:
-- Relação pressão-volume antes da fratura (regime elástico)
-- Critério de iniciação de fratura
-- Geometrias suportadas: circular, elliptical, penny-shaped, PKN
-- Modelo de leakoff (filtração de fluido na parede)
-- Integração com deformação da rocha salina
+O `lot::PknModel` recebe `PknInput` ja convertido para SI. O parser e o schema
+continuam responsaveis por unidades de campo; o solver nao le YAML/JSON.
+
+Para cada instante:
+
+```text
+t_ativo = max(0, t - t_acomodacao)
+V_inj = Q * t_ativo
+w = max(w0, 2.5 * (mu * Q^2 * t_ativo / (E' * h))^(1/5), 1e-9 m)
+V_frac = max(0, V_inj - V_leakoff)
+L = V_frac / (w * h)
+p_net = E' * w / h
+```
+
+onde `Q` e a taxa de injecao [m3/s], `mu` e a viscosidade [Pa.s], `E'` e o
+modulo plano [Pa], `h` e a altura PKN [m], `w0` e a abertura inicial [m] e
+`t_acomodacao` e o tempo sem incremento operacional.
+
+O leakoff atual e uma aproximacao acumulada opcional, usada apenas para manter
+conservacao dimensional basica:
+
+```text
+A_leakoff ~= 2 * h * L_anterior
+dV_leakoff = C_L * A_leakoff * sqrt(dt)
+V_leakoff = min(V_inj, V_leakoff_anterior + dV_leakoff)
+```
+
+Hipoteses desta fase:
+- Geometria PKN com altura constante imposta pelo usuario.
+- Propagacao ativada desde o inicio do tempo ativo; o acoplamento com
+  `BreakdownDetector` ainda nao esta conectado ao CLI.
+- Fluido newtoniano com viscosidade constante.
+- Sem acoplamento sal/APB e sem fechamento/descarga.
+- `dt`, tempo total e tempo de acomodacao sao definidos no contrato de entrada.
+- Todos os resultados expostos pelo modelo sao em SI e devem ser finitos e nao
+  negativos nos testes sinteticos.
+
+Campos ainda fora desta fase:
+- Relacao pressao-volume pre-fratura em regime elastico.
+- Criterio fisico completo de iniciacao de fratura.
+- Geometrias circular, elliptical e penny-shaped.
+- Leakoff Carter calibrado ou dependente de pressao.
+- Integracao com deformacao de sal.
 
 ## Contrato LOT/PKN sintético (Fase 6.2)
 

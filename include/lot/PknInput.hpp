@@ -18,6 +18,8 @@ struct PknInput {
   double initial_width_m = 0.0;
   double net_pressure_Pa = 0.0;
   double plane_strain_modulus_Pa = 0.0;
+  double fluid_viscosity_Pa_s = 0.0;
+  double leakoff_coefficient_m_sqrt_s = 0.0;
 };
 
 }  // namespace lss::lot

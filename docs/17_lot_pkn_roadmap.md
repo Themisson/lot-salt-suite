@@ -59,6 +59,9 @@ entregar os dados ao solver.
    `Conv_bbmin_m3h(idQ == 4)`, mas os PKN auditados usam `idQ == 6`. R09 segue
    aberto para regressao numerica porque o fator nao tem justificativa
    documental e o caminho PKN ainda exige ensaio comparativo controlado.
+4.8. Fase 6.4: substituir o esqueleto sintetico por `PknModel` fisico minimo
+   em SI, com serie temporal, conservacao dimensional basica e testes Catch2,
+   sem regressao contra arquivos legados enquanto R09 permanecer aberto.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -89,6 +92,17 @@ entregar os dados ao solver.
   deve ser ensaio comparativo controlado ou formulacao fisica minima em SI sem
   usar o legado como baseline.
 
+**Fase 6.4 (modelo fisico minimo em SI):**
+- `lot::PknModel` agora calcula ponto e serie temporal em SI.
+- Entradas fisicas minimas: taxa, `dt`, tempo total, tempo de acomodacao,
+  altura, largura inicial, modulo plano, viscosidade e leakoff opcional.
+- Saidas: tempo, volume injetado, abertura, comprimento, volume de fratura,
+  volume de leakoff e pressao liquida.
+- Testes Catch2 cobrem finitude, nao negatividade, monotonicidade basica,
+  leakoff simplificado, determinismo e rejeicao de entradas invalidas.
+- A validacao CLI dos tres YAMLs `lot-pkn` continua sendo validacao de
+  contrato, nao regressao numerica contra legado.
+
 ## Fora de escopo até R09 ser resolvido
 
 - Comparação numérica com `legance/LOT_Tese` ou `legance/LOT_APB_v5`.
@@ -102,8 +116,10 @@ Enquanto R09 permanecer aberto, seguir um destes caminhos:
 
 1. Ensaio comparativo controlado das variantes de conversao (`/(pi*22)` versus
    `/(pi*2)`) em ferramenta externa ao legado congelado.
-2. Implementacao fisica minima do `PknModel` em SI, com testes dimensionais e
-   sinteticos, sem regressao contra os `.dat` legados.
+2. Conectar `PknModel` ao subcomando `run` com saida CSV/JSON moderna e
+   documentar que `validate` segue restrito a schema/contrato.
+3. Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
+   parsing com solver.
 
 ## Riscos tecnicos a resolver antes da implementacao
 

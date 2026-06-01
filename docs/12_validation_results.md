@@ -91,6 +91,40 @@ auditados usam `idQ == 6`, que chama outra conversao. R09 permanece blocker para
 regressao PKN legado x moderno ate ensaio numerico comparativo ou documentacao
 fisica adicional.
 
+## Fase 6.4 — PknModel fisico minimo em SI
+
+**Data:** 2026-06-01
+
+**Executado nesta fase:**
+
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build -j`
+- `ctest --test-dir build --output-on-failure`
+- `.\build\lot-sim.exe validate --case cases\validation\lot_pkn_minimal.yaml`
+- `.\build\lot-sim.exe validate --case cases\validation\lot_pkn_with_leakoff.yaml`
+- `.\build\lot-sim.exe validate --case cases\lot_tese_migrated\buz67d_pkn.yaml`
+
+**Resultado CTest:** 30 testes Catch2 executados, 30 passaram.
+
+**Resultado CLI:**
+
+| Caso | Resultado |
+|------|-----------|
+| `cases/validation/lot_pkn_minimal.yaml` | `OK: lot_pkn_minimal_validation` |
+| `cases/validation/lot_pkn_with_leakoff.yaml` | `OK: lot_pkn_with_leakoff_validation` |
+| `cases/lot_tese_migrated/buz67d_pkn.yaml` | `OK: buz67d_pkn_migrated_contract` |
+
+**Modelo coberto por teste:** `lot::PknModel` gera resultados escalares e
+series temporais em SI com largura, comprimento, volume injetado, volume de
+fratura, volume de leakoff e pressao liquida finitos e nao negativos. Os testes
+cobrem monotonicidade basica, caso fechado sem leakoff, leakoff simplificado,
+determinismo e rejeicao de entradas invalidas.
+
+**Importante:** esta fase nao executou regressao contra `legance/LOT_Tese` nem
+contra `legance/LOT_APB_v5`. O caso `buz67d_pkn.yaml` continua sendo contrato
+sintatico/migratorio. R09 continua bloqueando validacao numerica legado x
+moderno.
+
 ## Baselines capturados
 
 | Baseline | Arquivo | Status | Data |
