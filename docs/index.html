@@ -1095,11 +1095,113 @@ Subcomandos:
 <section id="issues" class="doc-section">
 <div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
 <h1 id="08-problemas-conhecidos-e-riscos">08 — Problemas Conhecidos e Riscos</h1>
-<p><strong>Status:</strong> Ativo | <strong>Última atualização:</strong> 2026-06-01</p>
+<p><strong>Status:</strong> Ativo — Auditoria de formulação executada | <strong>Última atualização:</strong> 2026-06-01</p>
 <blockquote>
 <p>Este arquivo deve ser atualizado ANTES de qualquer mudança de formulação ou convenção.
 Toda refatoração deve ser comparada com esta lista antes de ser aprovada.</p>
 </blockquote>
+<hr />
+<h2 id="resultados-da-auditoria-de-formulacao-2026-06-01">RESULTADOS DA AUDITORIA DE FORMULAÇÃO (2026-06-01)</h2>
+<p>Arquivos auditados:
+- <code>legance/LOT_Tese/include/sestsal/material.h</code>
+- <code>legance/LOT_Tese/src/sestsal/material.cpp</code>
+- <code>legance/LOT_APB_v5/src/apb_code/APB1da.cpp</code>
+- <code>legance/LOT_Tese/LOTTeste.cpp</code> (linha 61–65)</p>
+<hr />
+<h2 id="fa01-unidade-de-tempo-do-e0-1min-nao-1h">FA01 — Unidade de tempo do e0: [1/min], NÃO [1/h]</h2>
+<p><strong>Severidade:</strong> Crítica | <strong>Status:</strong> Confirmado</p>
+<p><strong>Evidência direta</strong> (<code>LOTTeste.cpp</code>, linha 62–63):</p>
+<pre><code class="language-cpp">// a taxa de deformação está dividida por 60 para passar de horas para minuto
+vrock.push_back(new Rock(..., 1.8792e-06 / 60, 9.92e+06, 86., 3.36, 7.55));
+</code></pre>
+<p><code>material.h</code> declara <code>double e0; // [1/h]</code> — <strong>INCORRETO</strong>.
+O valor passado é <code>e0_literatura [1/h] ÷ 60</code> = <code>e0 [1/min]</code>.</p>
+<p><strong>Conclusão:</strong> A unidade interna de tempo do modelo SESTSAL é <strong>minutos [min]</strong>, não horas.
+O <code>dt</code> passado para <code>solveThermalViscoStep(dt)</code> deve estar em [min] ou há conversão interna.</p>
+<p><strong>Impacto para o código novo:</strong>
+- Todo <code>e0</code> lido de YAML deve ser convertido: se o usuário informa <code>[1/h]</code>, o parser divide por 60 antes de passar ao modelo SESTSAL legado.
+- Na nova arquitetura: armazenar <code>e0</code> em SI ([1/s]) internamente; converter na fronteira do SESTSAL adapter.
+- Schema YAML deve declarar campo <code>e0_unit: "1/h"</code> para deixar explícito.</p>
+<p><strong>Valores de referência confirmados:</strong>
+| Material | e0 literatura [1/h] | e0 passado ao modelo [1/min] |
+|----------|--------------------|-----------------------------|
+| Halita | 1.8792e-06 | 3.132e-08 |
+| Carnalita | 1.581e-04 | 2.635e-06 |</p>
+<hr />
+<h2 id="fa02-temperatura-no-modelo-de-fluencia-c-nao-k">FA02 — Temperatura no modelo de fluência: [°C], NÃO [K]</h2>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado</p>
+<p><strong>Evidência</strong> (<code>LOTTeste.cpp</code>, linha 61):</p>
+<pre><code class="language-cpp">// Rocha viscoelástica (..., e0 [1/h], sig0 [Pa], T0 [degC], n1, n2)
+vrock.push_back(new Rock(..., 86., 3.36, 7.55));  // T0 = 86 °C para halita
+</code></pre>
+<p><code>material.h</code> declara <code>double T0; // reference temperature, [K]</code> — <strong>INCORRETO</strong>.
+O valor passado é <code>T0 = 86</code> (°C), não <code>359.15</code> (K).</p>
+<p><strong>Fórmula Arrhenius no legado:</strong></p>
+<pre><code>ε̇ = e0 · exp(Q_R/T0 − Q_R/T) · (σ_eff/σ₀)ⁿ
+com Q_R = 12/0.0019858 = 6042.7  (unidade: °C, não K física)
+</code></pre>
+<p><strong>Consequência:</strong> A fórmula é <strong>auto-consistente em °C</strong>: se T0 e T são ambos em °C, <code>exp(Q_R/T0 − Q_R/T)</code> = 1 exatamente quando T=T0. O valor <code>Q_R=6042.7</code> é um <strong>parâmetro de ajuste empírico em °C</strong>, não a razão Q/R física em Kelvin.</p>
+<p><strong>Diferença em relação a usar Kelvin:</strong><br />
+A sensibilidade à temperatura muda drasticamente:
+- Na lei em °C, a variação entre 86°C e 96°C muda e0 por fator ≈ 4×
+- Na lei em K, a mesma variação (359→369 K) muda e0 por fator ≈ 1.05×</p>
+<p><strong>Impacto para o código novo:</strong>
+- O parser deve aceitar <code>T0</code> em °C (como está na prática), não em K.
+- Internamente, armazenar T0 em K (adicionar +273.15) e usar T em K para o modelo novo.
+- Para o <code>SaltCreepSESTSALAdapter</code>, manter a convenção original (°C) para reproduzir fielmente o legado.
+- <code>saltcreep</code> (referência moderna) usa temperatura em K — confirmar antes de integrar.</p>
+<p><strong>Valores confirmados:</strong>
+| Material | T0 (°C) | T0 (K) |
+|----------|---------|--------|
+| Halita | 86 | 359.15 |
+| Carnalita | 130 | 403.15 |</p>
+<hr />
+<h2 id="fa03-convencao-de-sinais-compressao-positiva">FA03 — Convenção de sinais: compressão POSITIVA</h2>
+<p><strong>Severidade:</strong> Crítica | <strong>Status:</strong> Confirmado</p>
+<p><strong>Evidência</strong> (<code>material.cpp</code>, linhas 58–73 — tensor desviador):</p>
+<pre><code class="language-cpp">sigd &lt;&lt; (+2*sig(0)-sig(1)-sig(2))/3.,
+      (-sig(0)+2*sig(1)-sig(2))/3.,
+      (-sig(0)-sig(1)+2*sig(2))/3.;
+</code></pre>
+<p><code>sig = {σ_rr, σ_θθ, σ_zz}</code> — notação de Voigt, axissimétrico.
+A pressão interna é passada como valor positivo (<code>pi + dP</code>, ambos positivos).</p>
+<p><strong>Matriz constitutiva</strong> (linhas 40–43):</p>
+<pre><code class="language-cpp">double fac = E/(1+nu)/(1-2*nu);  // positivo
+cm &lt;&lt; (1-nu)*fac, nu*fac, ...    // lei de Hooke com compressão &gt; 0
+</code></pre>
+<p><strong>Conclusão:</strong> Convenção de <strong>mecânica dos solos</strong>: tensão de compressão é positiva.
+- σ &gt; 0 → compressão (padrão geomecânico)
+- p_lama &gt; 0 → pressão compressiva na parede do poço
+- dP_APB &gt; 0 → aumento de pressão de compressão no anular</p>
+<p><strong>Impacto para o código novo:</strong>
+- Todo módulo <code>lot/</code>, <code>apb/</code>, <code>geomechanics/</code>, <code>salt/</code> deve usar a MESMA convenção.
+- Documentar em <code>include/core/types.hpp</code> com comentário explícito.
+- O <code>saltcreep</code> usa mesma convenção (verificar antes da integração).</p>
+<hr />
+<h2 id="fa04-acoplamento-sal-apb-mecanismo-confirmado">FA04 — Acoplamento sal → APB: mecanismo confirmado</h2>
+<p><strong>Severidade:</strong> Informativo | <strong>Status:</strong> Confirmado</p>
+<p><strong>Fluxo de acoplamento</strong> (<code>APB1da.cpp</code>, linhas 536–543):</p>
+<pre><code class="language-cpp">// 1. Impor pressão e temperatura do passo anterior no modelo de sal
+mdl-&gt;setInnerPressure(pi + dP);
+mdl-&gt;setInnerTemperature(Ti + dT);  // em °C
+
+// 2. Resolver um passo temporal de fluência viscosa
+mdl-&gt;solveThermalViscoStep(dt);
+
+// 3. Obter deslocamento da parede do poço (m)
+x(x.rows()-1) = mdl-&gt;getNodalDisplacement();  // linha 1197
+</code></pre>
+<p><strong>Fórmula de balanço de pressão APB</strong> (linhas 839–842):</p>
+<pre><code>dP = (α·dT − (dV + dV_leakage + dV_vented − dMl/(ρ·FC)) / Vi) / k
+</code></pre>
+<p>onde <code>dV</code> = variação de volume calculada a partir de <code>u_wall</code>.</p>
+<p><strong>Sentido físico:</strong> Se o sal flui para dentro (fechamento), <code>u_wall &gt; 0</code> →
+volume anular reduz (<code>dV &lt; 0</code>) → pressão de sal parcialmente alivia APB térmico.</p>
+<p><strong>Nota de acoplamento fraco:</strong> O deslocamento do sal é calculado fora do loop iterativo
+de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativo (linhas
+560–868) recalcula pressão sem iterar no sal. Isto é acoplamento <strong>sequencial fraco</strong>
+(staggered): sal e APB não são totalmente acoplados em cada passo de tempo.</p>
+<hr />
 <h2 id="problemas-de-nomenclatura">Problemas de nomenclatura</h2>
 <table>
 <thead>
@@ -1115,7 +1217,7 @@ Toda refatoração deve ser comparada com esta lista antes de ser aprovada.</p>
 <td>N01</td>
 <td>Diretório físico é <code>legance/</code> mas docs dizem <code>legacy/</code></td>
 <td>Médio</td>
-<td>Criar <code>legacy/</code> organizacional; nunca renomear <code>legance/</code></td>
+<td>Convivência deliberada — nunca renomear <code>legance/</code></td>
 </tr>
 </tbody>
 </table>
@@ -1126,7 +1228,7 @@ Toda refatoração deve ser comparada com esta lista antes de ser aprovada.</p>
 <th>ID</th>
 <th>Parâmetro</th>
 <th>Valor</th>
-<th>Arquivo legado</th>
+<th>Arquivo</th>
 <th>Ação necessária</th>
 </tr>
 </thead>
@@ -1136,159 +1238,131 @@ Toda refatoração deve ser comparada com esta lista antes de ser aprovada.</p>
 <td><code>dt</code> (passo temporal)</td>
 <td>1.0 h</td>
 <td><code>LOT_APB_v5/main/main.cpp</code></td>
-<td>Mover para YAML <code>time.dt_h</code></td>
+<td>YAML <code>time.dt_h</code></td>
 </tr>
 <tr>
 <td>H02</td>
 <td><code>ctoldP</code> (tolerância pressão)</td>
 <td>1.0 bar</td>
 <td><code>LOT_APB_v5/main/main.cpp</code></td>
-<td>Mover para YAML <code>time.solver.tol_pressure_bar</code></td>
+<td>YAML <code>time.solver.tol_pressure_bar</code></td>
 </tr>
 <tr>
 <td>H03</td>
 <td><code>tolEq</code> (tolerância equilíbrio)</td>
 <td>1E-8</td>
 <td><code>LOT_APB_v5/main/main.cpp</code></td>
-<td>Mover para YAML <code>time.solver.tol_eq</code></td>
+<td>YAML <code>time.solver.tol_eq</code></td>
 </tr>
 <tr>
 <td>H04</td>
-<td><code>tac</code> (tempo de estabilização)</td>
+<td><code>tac</code> (estabilização)</td>
 <td>80 sem × 7d × 24h</td>
 <td><code>LOT_APB_v5/main/main.cpp</code></td>
-<td>Mover para YAML <code>time.solver.stabilization_h</code></td>
+<td>YAML <code>time.solver.stabilization_h</code></td>
 </tr>
 <tr>
 <td>H05</td>
-<td><code>e0</code> da Halita</td>
-<td>1.8792e-6 /h (→ /min)</td>
+<td><code>e0</code> Halita</td>
+<td><code>1.8792e-06/60</code> [1/min]</td>
 <td><code>LOTTeste.cpp</code></td>
-<td>Verificar unidades; mover para YAML <code>rocks[].creep.e0_per_h</code></td>
+<td>YAML <code>rocks[].creep.e0_per_h: 1.8792e-6</code> com conversão no parser</td>
 </tr>
 <tr>
 <td>H06</td>
-<td><code>e0</code> da Carnalita</td>
-<td>1.581e-4 /h (→ /min)</td>
+<td><code>e0</code> Carnalita</td>
+<td><code>1.581e-04/60</code> [1/min]</td>
 <td><code>LOTTeste.cpp</code></td>
-<td>Idem acima</td>
+<td>Idem H05</td>
 </tr>
 <tr>
 <td>H07</td>
 <td>Viscosidade fluido LOT</td>
 <td>3.0 cP</td>
 <td><code>8-BUZ-67D-*.cpp</code></td>
-<td>Converter para Pa·s no parser</td>
+<td>Parser converte cP → Pa·s</td>
 </tr>
 <tr>
 <td>H08</td>
 <td>Geometria LOT</td>
 <td><code>"elliptical"</code></td>
 <td><code>8-BUZ-67D-*.cpp</code></td>
-<td>Mover para YAML <code>lot.fracture.geometry</code></td>
+<td>YAML <code>lot.fracture.geometry</code></td>
 </tr>
 </tbody>
 </table>
-<h2 id="riscos-de-formulacao">Riscos de formulação</h2>
+<h2 id="riscos-de-formulacao-atualizados-apos-auditoria">Riscos de formulação (atualizados após auditoria)</h2>
 <table>
 <thead>
 <tr>
 <th>ID</th>
 <th>Risco</th>
-<th>Probabilidade</th>
 <th>Impacto</th>
-<th>Mitigação</th>
+<th>Status após auditoria</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>R01</td>
-<td>Convenção de sinais não documentada (compressão +/-)</td>
-<td>Alta</td>
+<td>Convenção de sinais: compressão +/-</td>
 <td>Crítico</td>
-<td>Auditar via <code>/formulation-audit</code> antes de implementar <code>lot/</code> e <code>salt/</code></td>
+<td><strong>RESOLVIDO</strong> — compressão POSITIVA (FA03)</td>
 </tr>
 <tr>
 <td>R02</td>
-<td>Unidades mistas nos main.cpp (PPG, pol, Pa, cP)</td>
-<td>Alta</td>
+<td>Unidades mistas nos main.cpp</td>
 <td>Alto</td>
-<td>Módulo <code>units/</code> centralizado; conversão obrigatória no parser</td>
+<td>Confirmado — módulo <code>units/</code> obrigatório</td>
 </tr>
 <tr>
 <td>R03</td>
-<td>SESTSAL possivelmente divergente entre LOT_Tese e LOT_APB_v5</td>
-<td>Média</td>
+<td>SESTSAL divergente LOT_Tese × LOT_APB_v5</td>
 <td>Alto</td>
-<td>Comparar diretamente os dois arquivos <code>sestsal/material.cpp</code></td>
+<td>Pendente comparação direta</td>
 </tr>
 <tr>
 <td>R04</td>
-<td><code>APB1da</code> monolítica: impossível testar módulos isoladamente</td>
-<td>Alta</td>
+<td><code>APB1da</code> monolítica</td>
 <td>Alto</td>
-<td>Fase 7 dedicada à decomposição</td>
+<td>Confirmado — Fase 7 necessária</td>
 </tr>
 <tr>
 <td>R05</td>
-<td>Coeficientes de fluência em h⁻¹ convertidos para min⁻¹ inline no legado</td>
-<td>Média</td>
-<td>Alto</td>
-<td>Verificar em cada main; converter para SI (s⁻¹) no parser</td>
+<td>e0 em h⁻¹ × min⁻¹</td>
+<td>Crítico</td>
+<td><strong>CONFIRMADO</strong> — e0 está em [1/min] (FA01)</td>
 </tr>
 <tr>
 <td>R06</td>
-<td>Acoplamento LOT-sal via tensão: convenção de tensão efetiva × total</td>
-<td>Alta</td>
+<td>Temperatura: °C × K no SESTSAL</td>
 <td>Crítico</td>
-<td>Documentar em <code>docs/13_coupling_lot_apb_salt.md</code> antes de implementar</td>
+<td><strong>CONFIRMADO</strong> — SESTSAL usa °C (FA02)</td>
+</tr>
+<tr>
+<td>R07</td>
+<td>Acoplamento sal-APB sequencial fraco</td>
+<td>Médio</td>
+<td><strong>CONFIRMADO</strong> — staggered, uma iteração de sal/passo (FA04)</td>
+</tr>
+<tr>
+<td>R08</td>
+<td><code>dt</code> passado a <code>solveThermalViscoStep</code> em horas ou minutos?</td>
+<td>Alto</td>
+<td>Pendente — verificar implementação do solver SESTSAL</td>
 </tr>
 </tbody>
 </table>
-<h2 id="divergencias-identificadas-entre-legados">Divergências identificadas entre legados</h2>
-<table>
-<thead>
-<tr>
-<th>ID</th>
-<th>Divergência</th>
-<th>LOT_Tese</th>
-<th>LOT_APB_v5</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>D01</td>
-<td>SESTSAL — versão/parâmetros</td>
-<td><code>include/sestsal/</code></td>
-<td><code>include/sestsal/</code></td>
-<td>Não verificado</td>
-</tr>
-<tr>
-<td>D02</td>
-<td>Solver parâmetros</td>
-<td>Hard-coded no main</td>
-<td>Maioria no JSON; alguns hard-coded</td>
-<td>H01-H04 acima</td>
-</tr>
-<tr>
-<td>D03</td>
-<td>Geometrias LOT</td>
-<td>4 variantes em arquivos separados</td>
-<td>Não identificado</td>
-<td>Verificar no JSON</td>
-</tr>
-</tbody>
-</table>
-<h2 id="itens-a-documentar-antes-de-implementar">Itens a documentar antes de implementar</h2>
-<p>Os seguintes pontos devem ser esclarecidos via skill <code>/formulation-audit</code>
-ANTES de iniciar a Fase 7 (refatoração C++):</p>
+<h2 id="itens-pendentes-apos-auditoria">Itens pendentes após auditoria</h2>
 <ul>
-<li>[ ] Convenção de sinais de tensão (compressão positiva ou negativa)</li>
-<li>[ ] Definição de tensão efetiva na interface sal-LOT</li>
-<li>[ ] Conversão de deformação viscosa para variação de volume anular</li>
-<li>[ ] Critério de convergência do loop LOT-sal (δP ou δε?)</li>
-<li>[ ] Tratamento de temperatura na lei de fluência (Kelvin ou Celsius no legado?)</li>
+<li>[x] Convenção de sinais → FA03 (compressão positiva)</li>
+<li>[x] Temperatura no modelo: °C, não K → FA02</li>
+<li>[x] Unidade de e0: [1/min] internamente → FA01</li>
+<li>[x] Mecanismo de acoplamento sal→APB → FA04</li>
+<li>[ ] <strong>R08 PENDENTE:</strong> verificar se <code>dt</code> em <code>solveThermalViscoStep</code> é [h] ou [min]
+      — arquivo a verificar: <code>legance/LOT_APB_v5/src/apb/apb_salt_1d.cpp</code></li>
+<li>[ ] Confirmar convenção de sinal de <code>u_wall</code> (positivo = inward ou outward?)
+      — arquivo: <code>legance/LOT_APB_v5/include/apb/apb_salt_1d.h</code></li>
+<li>[ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)</li>
 </ul>
 </section>
 
@@ -1664,16 +1738,71 @@ Não alterar este arquivo sem rodar os testes documentados em docs/06_validation
 <section id="results" class="doc-section">
 <div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
 <h1 id="12-resultados-de-validacao">12 — Resultados de Validação</h1>
-<p><strong>Status:</strong> NÃO INICIADO | <strong>Última atualização:</strong> 2026-06-01</p>
+<p><strong>Status:</strong> BASELINES CAPTURADOS | <strong>Última atualização:</strong> 2026-06-01</p>
 <hr />
 <blockquote>
-<h2 id="aviso-critico">AVISO CRÍTICO</h2>
-<p><strong>Este arquivo não contém nenhum resultado real de execução.</strong></p>
-<p>Nenhuma validação foi executada no código novo do <code>lot-salt-suite</code>.
-Nenhum baseline foi capturado dos legados ainda.</p>
-<p><strong>Não alterar</strong> este arquivo sem executar os testes descritos em
-<code>docs/06_validation_plan.md</code> e registrar os outputs reais aqui.</p>
+<h2 id="aviso">AVISO</h2>
+<p>Nenhuma validação foi executada no <strong>código novo</strong> do <code>lot-salt-suite</code>.
+Os baselines abaixo são saídas do <strong>legado LOT_APB_v5</strong> compilado e executado
+em 2026-06-01 com g++ 16.1.0 + flags <code>-w -fpermissive</code>.</p>
+<p>Compilação: <code>cmake -G "MinGW Makefiles" -DCMAKE_CXX_FLAGS="-w -fpermissive"</code></p>
 </blockquote>
+<hr />
+<h2 id="baselines-lot_apb_v5-capturados-2026-06-01">Baselines LOT_APB_v5 capturados (2026-06-01)</h2>
+<table>
+<thead>
+<tr>
+<th>Baseline</th>
+<th>Arquivo</th>
+<th>Tamanho</th>
+<th>Execução</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SCORE-MRO-28 completo (output)</td>
+<td><code>apbv5_SCORE-MRO-28_output.json</code></td>
+<td>47 KB</td>
+<td>0.3 s</td>
+<td><strong>Capturado</strong></td>
+</tr>
+<tr>
+<td>SCORE-MRO-28 original (output)</td>
+<td><code>apbv5_SCORE-MRO-28_original_output.json</code></td>
+<td>27 KB</td>
+<td>pré-existente</td>
+<td><strong>Capturado</strong></td>
+</tr>
+<tr>
+<td>SCORE-MRO-28 Ev_temp (output)</td>
+<td><code>apbv5_SCORE-MRO-28_Ev_temp_output.json</code></td>
+<td>47 KB</td>
+<td>pré-existente</td>
+<td><strong>Capturado</strong></td>
+</tr>
+<tr>
+<td>MRO-28 reduzido (input ref)</td>
+<td><code>apbv5_MRO-28_min_times_input.json</code></td>
+<td>189 KB</td>
+<td>ref de entrada</td>
+<td><strong>Capturado</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Arquivos de entrada completos (57 MB) e output detalhado (29 MB) mantidos
+apenas localmente — excluídos do git por <code>.gitignore</code>.</p>
+</blockquote>
+<h2 id="nota-de-compilacao-do-legado">Nota de compilação do legado</h2>
+<pre><code>Compilador : g++ 16.1.0 (MSYS2/UCRT64)
+Flags      : -w -fpermissive (necessário por incompatibilidade Eigen antigo × GCC 16)
+Eigen      : versão bundled dentro de legance/LOT_APB_v5/include/Eigen/
+Data       : 2026-06-01
+Executável : legance/LOT_APB_v5/bin/apb.exe
+</code></pre>
+<p><strong>Risco registrado:</strong> o uso de <code>-fpermissive</code> pode ocultar divergências de comportamento
+em relação ao compilador original. Documentado em <code>docs/08_known_issues.md</code>.</p>
 <hr />
 <h2 id="status-da-suite-v0-v9">Status da suíte V0-V9</h2>
 <table>
