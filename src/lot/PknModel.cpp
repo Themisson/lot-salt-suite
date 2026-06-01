@@ -42,6 +42,9 @@ void validate_input(const PknInput& input) {
   if (input.leakoff.enabled && input.leakoff_coefficient_m_sqrt_s < 0.0) {
     throw std::invalid_argument("PknModel: leakoff coefficient must be non-negative");
   }
+  if (input.leakoff.enabled && input.leakoff_constant_rate_m3_s < 0.0) {
+    throw std::invalid_argument("PknModel: leakoff constant rate must be non-negative");
+  }
 }
 
 PknResult make_point(const PknInput& input, double elapsed_time_s,
@@ -73,11 +76,26 @@ PknResult make_point(const PknInput& input, double elapsed_time_s,
         (std::max(width_m, kMinimumWidthM) * input.fracture_height_m);
     const double leakoff_area_m2 = 2.0 * input.fracture_height_m *
                                    std::max(previous_length_m, kMinimumWidthM);
-    const double incremental_leakoff_m3 =
-        input.leakoff_coefficient_m_sqrt_s * leakoff_area_m2 *
-        std::sqrt(input.injection.dt_s);
-    leakoff_volume_m3 =
-        std::min(injected_volume_m3, previous_leakoff_m3 + incremental_leakoff_m3);
+    LeakoffInput leakoff_input;
+    leakoff_input.model = input.leakoff.model;
+    leakoff_input.coefficient_m_sqrt_s =
+        input.leakoff.coefficient_m_sqrt_s > 0.0
+            ? input.leakoff.coefficient_m_sqrt_s
+            : input.leakoff_coefficient_m_sqrt_s;
+    leakoff_input.constant_rate_m3_s =
+        input.leakoff.constant_rate_m3_s > 0.0 ? input.leakoff.constant_rate_m3_s
+                                               : input.leakoff_constant_rate_m3_s;
+    leakoff_input.area_m2 = leakoff_area_m2;
+
+    const LeakoffState leakoff_state{
+        std::max(0.0, active_time_s - input.injection.dt_s),
+        input.injection.dt_s,
+        previous_leakoff_m3,
+    };
+    const LeakoffStepResult leakoff_step =
+        compute_leakoff_step(leakoff_input, leakoff_state);
+    leakoff_volume_m3 = std::min(injected_volume_m3,
+                                 leakoff_step.cumulative_volume_m3);
   }
 
   const double fracture_volume_m3 =

@@ -303,6 +303,11 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
           require_as<double>(leakoff["coefficient_m_sqrt_s"],
                              "lot.leakoff.coefficient_m_sqrt_s");
     }
+    if (leakoff["constant_rate_m3_s"]) {
+      data.lot.leakoff_constant_rate_m3_s =
+          require_as<double>(leakoff["constant_rate_m3_s"],
+                             "lot.leakoff.constant_rate_m3_s");
+    }
   }
   if (lot["detection"]) {
     data.lot.detection_method =
@@ -352,6 +357,9 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
     }
     if (data.lot.leakoff_coefficient_m_sqrt_s < 0.0) {
       throw std::runtime_error("Validacao falhou: LOT/PKN exige coeficiente de leakoff >= 0");
+    }
+    if (data.lot.leakoff_constant_rate_m3_s < 0.0) {
+      throw std::runtime_error("Validacao falhou: LOT/PKN exige taxa constante de leakoff >= 0");
     }
   }
   validate_nonempty(!data.casings.empty(), "casings");

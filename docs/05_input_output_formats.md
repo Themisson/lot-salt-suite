@@ -75,6 +75,15 @@ lot:
     method: derivative_drop
 ```
 
+Modelos de `lot.leakoff.model` aceitos:
+
+| Modelo | Campos usados | Observacao |
+|--------|---------------|------------|
+| `none` | nenhum | Incremento zero; caso fechado sem leakoff. |
+| `constant_rate` | `constant_rate_m3_s` | Taxa volumetrica constante em SI [m3/s]. |
+| `carter` | `coefficient_m_sqrt_s` | Carter estrutural minimo, monotônico, sem calibracao por pressao. |
+| `synthetic_constant` | `coefficient_m_sqrt_s` | Compatibilidade com o leakoff simplificado das fases 6.4/6.5. |
+
 Unidades aceitas no contrato:
 
 | Quantidade | Unidades aceitas | Unidade interna |

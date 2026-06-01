@@ -43,11 +43,10 @@ if(LSS_BUILD_TESTS)
 endif()
 
 # ============================================================
-# Eigen (vendorizado do saltcreep — evitar duplicação)
+# Eigen header-only para cálculos do simulador
 # ============================================================
-# Eigen está em external/saltcreep/include/Eigen/
-# Uso como header-only sem target separado.
-set(EIGEN_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/external/saltcreep/include")
+# Eigen está em include/Eigen/ e é usado como header-only sem target separado.
+set(EIGEN_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 
 # ============================================================
 # OpenMP (opcional)
@@ -65,6 +64,7 @@ set(LSS_CORE_SOURCES
   src/io/CaseParser.cpp
   src/io/ResultWriter.cpp
   src/lot/BreakdownDetector.cpp
+  src/lot/LeakoffModel.cpp
   src/lot/PknModel.cpp
   src/lot/PknRunner.cpp
 )
@@ -92,6 +92,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_units.cpp
     tests/cpp/test_case_parser.cpp
     tests/cpp/test_breakdown_detector.cpp
+    tests/cpp/test_leakoff_model.cpp
     tests/cpp/test_pkn_model_synthetic.cpp
     tests/cpp/test_pkn_runner.cpp
     tests/cpp/test_result_writer.cpp
@@ -108,5 +109,5 @@ if(LSS_BUILD_TESTS)
   catch_discover_tests(lot_sim_tests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
 
-message(STATUS "lot-salt-suite configured. C++20, yaml-cpp, Eigen from saltcreep.")
+message(STATUS "lot-salt-suite configured. C++20, yaml-cpp, Eigen from include/Eigen.")
 message(STATUS "Modules will be populated from Fase 5 onwards.")

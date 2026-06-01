@@ -222,8 +222,9 @@ properties:
           enabled: {type: boolean}
           model:
             type: string
-            enum: [none, carter, synthetic_constant]
+            enum: [none, constant_rate, carter, synthetic_constant]
           coefficient_m_sqrt_s: {type: number, minimum: 0}
+          constant_rate_m3_s: {type: number, minimum: 0}
       detection:
         type: object
         required: [method]

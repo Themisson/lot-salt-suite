@@ -20,6 +20,7 @@ struct PknInput {
   double plane_strain_modulus_Pa = 0.0;
   double fluid_viscosity_Pa_s = 0.0;
   double leakoff_coefficient_m_sqrt_s = 0.0;
+  double leakoff_constant_rate_m3_s = 0.0;
 };
 
 }  // namespace lss::lot

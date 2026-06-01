@@ -44,14 +44,37 @@ onde `Q` e a taxa de injecao [m3/s], `mu` e a viscosidade [Pa.s], `E'` e o
 modulo plano [Pa], `h` e a altura PKN [m], `w0` e a abertura inicial [m] e
 `t_acomodacao` e o tempo sem incremento operacional.
 
-O leakoff atual e uma aproximacao acumulada opcional, usada apenas para manter
-conservacao dimensional basica:
+O leakoff fica encapsulado em `lot::LeakoffModel` e e acumulado em volume
+com entradas SI. O modelo fechado (`none`) preserva o volume acumulado anterior
+com incremento zero. A taxa constante (`constant_rate`) usa:
+
+```text
+dV_leakoff = q_L * dt
+V_leakoff = V_leakoff_anterior + dV_leakoff
+```
+
+onde `q_L` e `constant_rate_m3_s` [m3/s].
+
+O modelo Carter implementado nesta fase e uma forma estrutural minima,
+nao calibrada por pressao, usando coeficiente `C_L` [m/sqrt(s)] e area exposta
+[m2]:
+
+```text
+dV_leakoff = 2 * C_L * A_leakoff * (sqrt(t + dt) - sqrt(t))
+V_leakoff = V_leakoff_anterior + dV_leakoff
+```
+
+Para compatibilidade com os YAMLs e testes das fases anteriores,
+`synthetic_constant` continua aceito como aproximacao acumulada simplificada:
 
 ```text
 A_leakoff ~= 2 * h * L_anterior
 dV_leakoff = C_L * A_leakoff * sqrt(dt)
-V_leakoff = min(V_inj, V_leakoff_anterior + dV_leakoff)
 ```
+
+No acoplamento PKN, o volume acumulado de leakoff e limitado por `V_inj` para
+preservar volumes de fratura nao negativos. O modulo rejeita `dt <= 0`, tempo,
+area, coeficientes, taxas e acumulados negativos ou nao finitos.
 
 Hipoteses desta fase:
 - Geometria PKN com altura constante imposta pelo usuario.
@@ -67,7 +90,7 @@ Campos ainda fora desta fase:
 - Relacao pressao-volume pre-fratura em regime elastico.
 - Criterio fisico completo de iniciacao de fratura.
 - Geometrias circular, elliptical e penny-shaped.
-- Leakoff Carter calibrado ou dependente de pressao.
+- Leakoff Carter calibrado por pressao e historico fisico completo.
 - Integracao com deformacao de sal.
 
 ## Contrato LOT/PKN sintético (Fase 6.2)

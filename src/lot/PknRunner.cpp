@@ -35,8 +35,11 @@ LeakoffModel parse_leakoff_model(const std::string& model) {
   if (model == "synthetic_constant") {
     return LeakoffModel::SyntheticConstant;
   }
+  if (model == "constant_rate") {
+    return LeakoffModel::ConstantRate;
+  }
   if (model == "carter") {
-    throw std::runtime_error("PknRunner: carter leakoff is not implemented in Fase 6.5");
+    return LeakoffModel::Carter;
   }
   throw std::runtime_error("PknRunner: unsupported leakoff model: " + model);
 }
@@ -84,6 +87,8 @@ PknInput make_pkn_input(const lss::core::CaseData& data) {
   input.injection.accommodation_time_s = data.lot.injection_accommodation_time_s;
   input.leakoff.enabled = data.lot.leakoff_enabled;
   input.leakoff.model = parse_leakoff_model(data.lot.leakoff_model);
+  input.leakoff.coefficient_m_sqrt_s = data.lot.leakoff_coefficient_m_sqrt_s;
+  input.leakoff.constant_rate_m3_s = data.lot.leakoff_constant_rate_m3_s;
   input.breakdown.method = parse_breakdown_method(data.lot.breakdown_method);
   input.breakdown.pressure_Pa = data.lot.breakdown_pressure_Pa;
   input.fracture_height_m = data.lot.fracture_height_m;
@@ -92,6 +97,7 @@ PknInput make_pkn_input(const lss::core::CaseData& data) {
   input.plane_strain_modulus_Pa = plane_strain_modulus(rock);
   input.fluid_viscosity_Pa_s = data.lot.fracture_fluid_viscosity_Pa_s;
   input.leakoff_coefficient_m_sqrt_s = data.lot.leakoff_coefficient_m_sqrt_s;
+  input.leakoff_constant_rate_m3_s = data.lot.leakoff_constant_rate_m3_s;
   return input;
 }
 

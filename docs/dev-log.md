@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.8 implementada (politica C++ first / Python postprocess only)
+Fase ativa  : 6.9 implementada (LeakoffModel C++ estruturado)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
-Testes C++  : 37 Catch2 (37 passaram em 2026-06-01)
+Testes C++  : 46 Catch2 (46 passaram em 2026-06-01)
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
@@ -33,6 +33,7 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 - [x] Executar ensaio comparativo controlado R09 (`/(pi*22)` vs `/(pi*2)`) sem alterar legado
 - [x] Criar pos-processamento moderno minimo LOT/PKN para CSV/JSON sem regressao legado
 - [x] Registrar politica C++ first, Python postprocess only
+- [x] Implementar `LeakoffModel` C++ estruturado com testes Catch2
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
 
@@ -46,6 +47,30 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.9 — LeakoffModel C++ estruturado — Codex
+**Status:** Implementado nesta sessao.
+**Testes/comandos:** `cmake --build build --config Debug`, `ctest --test-dir build --output-on-failure` e `lot-sim validate --case` para `lot_pkn_minimal.yaml`, `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml` executados com sucesso.
+**Resultado:** 46/46 testes Catch2 passaram; os tres contratos YAML LOT/PKN retornaram `OK`.
+**Escopo:** nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/`, `tests/baselines/`, `postprocess/scripts/` ou `.dat` foi alterado/usado.
+
+**Mudanca principal:**
+- `lot::LeakoffModel` agora encapsula `none`, `constant_rate`, `carter` minimo e `synthetic_constant` de compatibilidade.
+- `PknModel` substituiu o calculo embutido de leakoff pela chamada ao modulo estruturado e continua limitando `V_leakoff <= V_inj`.
+- Parser/schema aceitam `constant_rate_m3_s` e o modelo `constant_rate`, mantendo `synthetic_constant`.
+- Carter permanece forma estrutural/monotonica minima, nao calibracao fisica dependente de pressao.
+
+**Arquivos criados/alterados:**
+- `src/lot/LeakoffModel.cpp`, `include/lot/LeakoffModel.hpp`, `include/lot/LotTypes.hpp`.
+- `src/lot/PknModel.cpp`, `include/lot/PknInput.hpp`, `src/lot/PknRunner.cpp`.
+- `include/core/types.hpp`, `src/io/CaseParser.cpp`, `schemas/lot_case.schema.yaml`.
+- `include/Eigen/` — Eigen header-only mantido em `include/` para calculos futuros do simulador.
+- `tests/cpp/test_leakoff_model.cpp`, `CMakeLists.txt`.
+- `docs/02_lot_formulation.md`, `docs/05_input_output_formats.md`, `docs/12_validation_results.md`, `docs/17_lot_pkn_roadmap.md`, `tools/docs_status.yaml`, `docs/index.html`.
+
+**Proxima etapa recomendada:** tornar o `PknModel` mais rigoroso quanto ao tempo desde breakdown e consolidar `BreakdownCriterion` C++ antes de iniciar adapters LOT/saltcreep.
 
 ---
 

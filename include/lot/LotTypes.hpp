@@ -5,7 +5,7 @@
 namespace lss::lot {
 
 enum class FractureGeometry { Circular, Elliptical, PennyShaped, Pkn };
-enum class LeakoffModel { None, Carter, SyntheticConstant };
+enum class LeakoffModel { None, ConstantRate, Carter, SyntheticConstant };
 enum class BreakdownMethod { PressureThreshold, DerivativeDrop };
 
 constexpr std::string_view to_string(FractureGeometry geometry) {
@@ -26,6 +26,8 @@ constexpr std::string_view to_string(LeakoffModel model) {
   switch (model) {
     case LeakoffModel::None:
       return "none";
+    case LeakoffModel::ConstantRate:
+      return "constant_rate";
     case LeakoffModel::Carter:
       return "carter";
     case LeakoffModel::SyntheticConstant:

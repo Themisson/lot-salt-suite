@@ -266,7 +266,7 @@
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
       <div class="stat"><div class="n coppc">6/13</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">37</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n tealc">46</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -596,12 +596,27 @@ p_net = E' * w / h
 <p>onde <code>Q</code> e a taxa de injecao [m3/s], <code>mu</code> e a viscosidade [Pa.s], <code>E'</code> e o
 modulo plano [Pa], <code>h</code> e a altura PKN [m], <code>w0</code> e a abertura inicial [m] e
 <code>t_acomodacao</code> e o tempo sem incremento operacional.</p>
-<p>O leakoff atual e uma aproximacao acumulada opcional, usada apenas para manter
-conservacao dimensional basica:</p>
+<p>O leakoff fica encapsulado em <code>lot::LeakoffModel</code> e e acumulado em volume
+com entradas SI. O modelo fechado (<code>none</code>) preserva o volume acumulado anterior
+com incremento zero. A taxa constante (<code>constant_rate</code>) usa:</p>
+<pre><code class="language-text">dV_leakoff = q_L * dt
+V_leakoff = V_leakoff_anterior + dV_leakoff
+</code></pre>
+<p>onde <code>q_L</code> e <code>constant_rate_m3_s</code> [m3/s].</p>
+<p>O modelo Carter implementado nesta fase e uma forma estrutural minima,
+nao calibrada por pressao, usando coeficiente <code>C_L</code> [m/sqrt(s)] e area exposta
+[m2]:</p>
+<pre><code class="language-text">dV_leakoff = 2 * C_L * A_leakoff * (sqrt(t + dt) - sqrt(t))
+V_leakoff = V_leakoff_anterior + dV_leakoff
+</code></pre>
+<p>Para compatibilidade com os YAMLs e testes das fases anteriores,
+<code>synthetic_constant</code> continua aceito como aproximacao acumulada simplificada:</p>
 <pre><code class="language-text">A_leakoff ~= 2 * h * L_anterior
 dV_leakoff = C_L * A_leakoff * sqrt(dt)
-V_leakoff = min(V_inj, V_leakoff_anterior + dV_leakoff)
 </code></pre>
+<p>No acoplamento PKN, o volume acumulado de leakoff e limitado por <code>V_inj</code> para
+preservar volumes de fratura nao negativos. O modulo rejeita <code>dt &lt;= 0</code>, tempo,
+area, coeficientes, taxas e acumulados negativos ou nao finitos.</p>
 <p>Hipoteses desta fase:
 - Geometria PKN com altura constante imposta pelo usuario.
 - Propagacao ativada desde o inicio do tempo ativo; o acoplamento com
@@ -615,7 +630,7 @@ V_leakoff = min(V_inj, V_leakoff_anterior + dV_leakoff)
 - Relacao pressao-volume pre-fratura em regime elastico.
 - Criterio fisico completo de iniciacao de fratura.
 - Geometrias circular, elliptical e penny-shaped.
-- Leakoff Carter calibrado ou dependente de pressao.
+- Leakoff Carter calibrado por pressao e historico fisico completo.
 - Integracao com deformacao de sal.</p>
 <h2 id="contrato-lotpkn-sintetico-fase-62">Contrato LOT/PKN sintético (Fase 6.2)</h2>
 <p>O caminho moderno inicial usa <code>simulation.mode: lot-pkn</code>, <code>lot.model: pkn</code> e
@@ -902,6 +917,38 @@ lot:
   detection:
     method: derivative_drop
 </code></pre>
+<p>Modelos de <code>lot.leakoff.model</code> aceitos:</p>
+<table>
+<thead>
+<tr>
+<th>Modelo</th>
+<th>Campos usados</th>
+<th>Observacao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>none</code></td>
+<td>nenhum</td>
+<td>Incremento zero; caso fechado sem leakoff.</td>
+</tr>
+<tr>
+<td><code>constant_rate</code></td>
+<td><code>constant_rate_m3_s</code></td>
+<td>Taxa volumetrica constante em SI [m3/s].</td>
+</tr>
+<tr>
+<td><code>carter</code></td>
+<td><code>coefficient_m_sqrt_s</code></td>
+<td>Carter estrutural minimo, monotônico, sem calibracao por pressao.</td>
+</tr>
+<tr>
+<td><code>synthetic_constant</code></td>
+<td><code>coefficient_m_sqrt_s</code></td>
+<td>Compatibilidade com o leakoff simplificado das fases 6.4/6.5.</td>
+</tr>
+</tbody>
+</table>
 <p>Unidades aceitas no contrato:</p>
 <table>
 <thead>
@@ -2333,6 +2380,48 @@ com <code>unittest</code>, usando apenas biblioteca padrão.</p>
 sintéticos. Não houve leitura de <code>.dat</code>, comparação com <code>legance/LOT_Tese</code>,
 comparação com <code>legance/LOT_APB_v5</code> nem alteração de baselines. R09 continua
 <code>MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION</code>.</p>
+<h2 id="fase-69-leakoffmodel-c-estruturado">Fase 6.9 — LeakoffModel C++ estruturado</h2>
+<p><strong>Data:</strong> 2026-06-01</p>
+<p><strong>Executado nesta fase:</strong></p>
+<ul>
+<li><code>cmake --build build --config Debug</code></li>
+<li><code>ctest --test-dir build --output-on-failure</code></li>
+<li><code>.\build\lot-sim.exe validate --case cases\validation\lot_pkn_minimal.yaml</code></li>
+<li><code>.\build\lot-sim.exe validate --case cases\validation\lot_pkn_with_leakoff.yaml</code></li>
+<li><code>.\build\lot-sim.exe validate --case cases\lot_tese_migrated\buz67d_pkn.yaml</code></li>
+</ul>
+<p><strong>Resultado CTest:</strong> 46 testes Catch2 executados, 46 passaram.</p>
+<p><strong>Resultado CLI validate:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Caso</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cases/validation/lot_pkn_minimal.yaml</code></td>
+<td><code>OK: lot_pkn_minimal_validation</code></td>
+</tr>
+<tr>
+<td><code>cases/validation/lot_pkn_with_leakoff.yaml</code></td>
+<td><code>OK: lot_pkn_with_leakoff_validation</code></td>
+</tr>
+<tr>
+<td><code>cases/lot_tese_migrated/buz67d_pkn.yaml</code></td>
+<td><code>OK: buz67d_pkn_migrated_contract</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Modelo coberto por teste:</strong> <code>lot::LeakoffModel</code> calcula incrementos e volumes
+acumulados para <code>none</code>, <code>constant_rate</code>, <code>carter</code> e <code>synthetic_constant</code>. Os
+testes cobrem incremento zero, taxa constante, rejeicao de taxa/coeficiente
+negativos, <code>dt &lt;= 0</code>, <code>NaN</code>/<code>Inf</code>, monotonicidade Carter e integracao com
+<code>PknModel</code>.</p>
+<p><strong>Importante:</strong> o Carter desta fase e estrutural/minimo e nao constitui
+calibracao fisica dependente de pressao. Nao houve regressao numerica contra
+legado, uso de <code>.dat</code>, APB, sal ou dano.</p>
 <h2 id="baselines-capturados">Baselines capturados</h2>
 <table>
 <thead>
@@ -2842,7 +2931,10 @@ entregar os dados ao solver.</p>
 4.11. Fase 6.7: criar pós-processamento moderno mínimo para <code>result.json</code> e
    <code>timeseries.csv</code>, gerando PNGs e <code>report.html</code> somente a partir dos outputs
    modernos sintéticos. Resultado: relatórios locais em <code>reports/</code>, sem
-   comparação com legado e com aviso explícito de ausência de regressão.</li>
+   comparação com legado e com aviso explícito de ausência de regressão.
+4.12. Fase 6.9: implementar <code>LeakoffModel</code> C++ estruturado com modelos
+   <code>none</code>, <code>constant_rate</code>, <code>carter</code> minimo e <code>synthetic_constant</code> de
+   compatibilidade, integrado ao <code>PknModel</code> e coberto por Catch2.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -2909,6 +3001,14 @@ entregar os dados ao solver.</p>
 - <code>reports/</code> permanece fora do versionamento.
 - Não houve regressão contra legado; R09 segue mitigado apenas para os PKN
   auditados e ainda bloqueia <code>idQ == 4</code>.</p>
+<p><strong>Fase 6.9 (LeakoffModel C++ estruturado):</strong>
+- <code>lot::LeakoffModel</code> separa o calculo de leakoff do <code>PknModel</code>.
+- Modelos suportados: <code>none</code>, <code>constant_rate</code>, <code>carter</code> minimo e
+  <code>synthetic_constant</code> para compatibilidade dos casos existentes.
+- O modulo rejeita <code>dt &lt;= 0</code>, entradas negativas, <code>NaN</code> e <code>Inf</code>.
+- <code>PknModel</code> passa a chamar o modulo e limita o acumulado por <code>V_inj</code>.
+- Testes Catch2 cobrem o modulo isolado e a integracao PKN; nao houve regressao
+  numerica contra legado.</p>
 <h2 id="fora-de-escopo-ate-r09-ser-totalmente-resolvido">Fora de escopo até R09 ser totalmente resolvido</h2>
 <ul>
 <li>Comparação numérica com <code>legance/LOT_Tese</code> ou <code>legance/LOT_APB_v5</code>.</li>
@@ -2919,8 +3019,6 @@ entregar os dados ao solver.</p>
 <p>Com R09 mitigado para os dois PKN auditados, mas ainda aberto para <code>idQ == 4</code>,
 priorizar desenvolvimento C++ nesta ordem:</p>
 <ol>
-<li>Implementar <code>LeakoffModel</code> C++ calibravel, mantendo entradas SI e testes
-   Catch2.</li>
 <li>Tornar <code>PknModel</code> C++ mais rigoroso, documentando tempo desde breakdown,
    volume, largura e comprimento.</li>
 <li>Consolidar <code>BreakdownCriterion</code> C++ e remover qualquer heuristica solta de

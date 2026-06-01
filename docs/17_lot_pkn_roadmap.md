@@ -81,6 +81,9 @@ entregar os dados ao solver.
    `timeseries.csv`, gerando PNGs e `report.html` somente a partir dos outputs
    modernos sintéticos. Resultado: relatórios locais em `reports/`, sem
    comparação com legado e com aviso explícito de ausência de regressão.
+4.12. Fase 6.9: implementar `LeakoffModel` C++ estruturado com modelos
+   `none`, `constant_rate`, `carter` minimo e `synthetic_constant` de
+   compatibilidade, integrado ao `PknModel` e coberto por Catch2.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -155,6 +158,15 @@ entregar os dados ao solver.
 - Não houve regressão contra legado; R09 segue mitigado apenas para os PKN
   auditados e ainda bloqueia `idQ == 4`.
 
+**Fase 6.9 (LeakoffModel C++ estruturado):**
+- `lot::LeakoffModel` separa o calculo de leakoff do `PknModel`.
+- Modelos suportados: `none`, `constant_rate`, `carter` minimo e
+  `synthetic_constant` para compatibilidade dos casos existentes.
+- O modulo rejeita `dt <= 0`, entradas negativas, `NaN` e `Inf`.
+- `PknModel` passa a chamar o modulo e limita o acumulado por `V_inj`.
+- Testes Catch2 cobrem o modulo isolado e a integracao PKN; nao houve regressao
+  numerica contra legado.
+
 ## Fora de escopo até R09 ser totalmente resolvido
 
 - Comparação numérica com `legance/LOT_Tese` ou `legance/LOT_APB_v5`.
@@ -166,15 +178,13 @@ entregar os dados ao solver.
 Com R09 mitigado para os dois PKN auditados, mas ainda aberto para `idQ == 4`,
 priorizar desenvolvimento C++ nesta ordem:
 
-1. Implementar `LeakoffModel` C++ calibravel, mantendo entradas SI e testes
-   Catch2.
-2. Tornar `PknModel` C++ mais rigoroso, documentando tempo desde breakdown,
+1. Tornar `PknModel` C++ mais rigoroso, documentando tempo desde breakdown,
    volume, largura e comprimento.
-3. Consolidar `BreakdownCriterion` C++ e remover qualquer heuristica solta de
+2. Consolidar `BreakdownCriterion` C++ e remover qualquer heuristica solta de
    pos-processamento.
-4. Criar `SaltCreepLotAdapter`/`SaltCreepInterface` C++ para integrar
+3. Criar `SaltCreepLotAdapter`/`SaltCreepInterface` C++ para integrar
    `external/saltcreep` sem script Python intermediario.
-5. Implementar acoplamento LOT/sal em C++ e só depois ampliar
+4. Implementar acoplamento LOT/sal em C++ e só depois ampliar
    pos-processamento ou comparacao externa.
 
 Antes de qualquer comparacao legado x moderno, confirmar o `idQ` de

@@ -238,6 +238,38 @@ sintéticos. Não houve leitura de `.dat`, comparação com `legance/LOT_Tese`,
 comparação com `legance/LOT_APB_v5` nem alteração de baselines. R09 continua
 `MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION`.
 
+## Fase 6.9 — LeakoffModel C++ estruturado
+
+**Data:** 2026-06-01
+
+**Executado nesta fase:**
+
+- `cmake --build build --config Debug`
+- `ctest --test-dir build --output-on-failure`
+- `.\build\lot-sim.exe validate --case cases\validation\lot_pkn_minimal.yaml`
+- `.\build\lot-sim.exe validate --case cases\validation\lot_pkn_with_leakoff.yaml`
+- `.\build\lot-sim.exe validate --case cases\lot_tese_migrated\buz67d_pkn.yaml`
+
+**Resultado CTest:** 46 testes Catch2 executados, 46 passaram.
+
+**Resultado CLI validate:**
+
+| Caso | Resultado |
+|------|-----------|
+| `cases/validation/lot_pkn_minimal.yaml` | `OK: lot_pkn_minimal_validation` |
+| `cases/validation/lot_pkn_with_leakoff.yaml` | `OK: lot_pkn_with_leakoff_validation` |
+| `cases/lot_tese_migrated/buz67d_pkn.yaml` | `OK: buz67d_pkn_migrated_contract` |
+
+**Modelo coberto por teste:** `lot::LeakoffModel` calcula incrementos e volumes
+acumulados para `none`, `constant_rate`, `carter` e `synthetic_constant`. Os
+testes cobrem incremento zero, taxa constante, rejeicao de taxa/coeficiente
+negativos, `dt <= 0`, `NaN`/`Inf`, monotonicidade Carter e integracao com
+`PknModel`.
+
+**Importante:** o Carter desta fase e estrutural/minimo e nao constitui
+calibracao fisica dependente de pressao. Nao houve regressao numerica contra
+legado, uso de `.dat`, APB, sal ou dano.
+
 ## Baselines capturados
 
 | Baseline | Arquivo | Status | Data |
