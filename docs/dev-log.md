@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.5 implementada (execucao moderna LOT/PKN CSV/JSON)
+Fase ativa  : 6.6 implementada (ensaio controlado R09 /22 vs /2)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
-Testes C++  : 36 Catch2 (36 passaram em 2026-06-01)
+Testes C++  : 37 Catch2 (37 passaram em 2026-06-01)
 Testes Py   : 0
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
@@ -30,7 +30,7 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 - [x] Auditar R09 antes de regressao numerica PKN legado x moderno
 - [x] Implementar `lot::PknModel` fisico minimo em SI com series temporais sinteticas
 - [x] Conectar LOT/PKN ao CLI moderno com saida CSV/JSON sem regressao legado
-- [ ] Executar ensaio comparativo controlado R09 (`/(pi*22)` vs `/(pi*2)`) sem alterar legado
+- [x] Executar ensaio comparativo controlado R09 (`/(pi*22)` vs `/(pi*2)`) sem alterar legado
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
 
@@ -44,6 +44,28 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.6 — Ensaio controlado R09 `/22` vs `/2` — Codex
+**Status:** Implementado nesta sessao.
+**Classificacao R09:** `MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION`.
+**Testes/comandos:** `python tools\audit_r09_pkn_conversion.py`, `python tools\generate_docs_index.py` e `python tools\generate_docs_index.py --dry-run` executados com sucesso. Nao houve alteracao C++, portanto `ctest` nao foi reexecutado nesta fase.
+**Escopo:** inspecao somente leitura de `legance/LOT_Tese/` e `legance/LOT_APB_v5/`; nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/` ou `tests/baselines/` foi alterado.
+
+**Resultado:**
+- `Conv_bbmin_m3h(Q) = Q * 9.53924 / M_PI / 22` pertence ao ramo `idQ == 4`.
+- `Conv_bbmin_m3min(Q) = Q * 0.158987 / M_PI / 2` pertence ao ramo `idQ == 6`.
+- Os casos PKN auditados `8-BUZ-67D-RJS-VISCO-pkn.cpp` e `9-BUZ-39DA-RJS-VISCO-2.cpp` usam `idQ == 6`; portanto, nao passam pelo literal `/22`.
+- Para a mesma base `Q * 9.53924`, `/22` produz `1/11` do valor de `/2`.
+
+**Arquivos criados/alterados:**
+- `docs/audits/R09_pkn_conversion_experiment.md` — relatorio da Fase 6.6.
+- `docs/audits/R09_pkn_conversion_table.csv` — tabela analitica gerada pelo script.
+- `tools/audit_r09_pkn_conversion.py` — script independente do legado.
+- `docs/08_known_issues.md`, `docs/12_validation_results.md`, `docs/17_lot_pkn_roadmap.md`, `tools/docs_status.yaml`, `tools/generate_docs_index.py`, `docs/index.html` — status e manual atualizados.
+
+**Proxima etapa recomendada:** criar pos-processamento moderno/compare qualitativo cuidadosamente rotulado para os dois PKN auditados, ou confirmar metadados de geracao dos `.dat` antes de qualquer regressao quantitativa.
 
 ---
 

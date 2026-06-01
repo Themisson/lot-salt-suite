@@ -254,7 +254,7 @@
 </div>
 <div class="nav-group">
   <div class="label">LOT/PKN e auditorias</div>
-  <a href="#saltcreep_governance" data-title="16. governanca do saltcreep"><span>16. Governanca do saltcreep</span><span class="nav-dot pill-impl"></span></a><a href="#lot_pkn_roadmap" data-title="17. roadmap lot/pkn"><span>17. Roadmap LOT/PKN</span><span class="nav-dot pill-impl"></span></a><a href="#lot_legacy_inventory" data-title="inventario lot nos legados"><span>Inventario LOT nos legados</span><span class="nav-dot pill-impl"></span></a><a href="#pkn_legacy_path" data-title="caminho pkn legado"><span>Caminho PKN legado</span><span class="nav-dot pill-impl"></span></a><a href="#non_pkn_models_status" data-title="status dos modelos nao pkn"><span>Status dos modelos nao PKN</span><span class="nav-dot pill-impl"></span></a>
+  <a href="#saltcreep_governance" data-title="16. governanca do saltcreep"><span>16. Governanca do saltcreep</span><span class="nav-dot pill-impl"></span></a><a href="#lot_pkn_roadmap" data-title="17. roadmap lot/pkn"><span>17. Roadmap LOT/PKN</span><span class="nav-dot pill-impl"></span></a><a href="#lot_legacy_inventory" data-title="inventario lot nos legados"><span>Inventario LOT nos legados</span><span class="nav-dot pill-impl"></span></a><a href="#pkn_legacy_path" data-title="caminho pkn legado"><span>Caminho PKN legado</span><span class="nav-dot pill-impl"></span></a><a href="#non_pkn_models_status" data-title="status dos modelos nao pkn"><span>Status dos modelos nao PKN</span><span class="nav-dot pill-impl"></span></a><a href="#r09_pkn_conversion_experiment" data-title="r09 — ensaio comparativo controlado das conversões pkn"><span>R09 — Ensaio comparativo controlado das conversões PKN</span><span class="nav-dot pill-impl"></span></a>
 </div>
   </nav>
 </aside>
@@ -266,7 +266,7 @@
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
       <div class="stat"><div class="n coppc">6/13</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">36</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n tealc">37</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">0</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -1522,40 +1522,45 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 <td>R09</td>
 <td>Expressão suspeita <code>/ M_PI / 22</code> na conversão de vazão</td>
 <td>Alto</td>
-<td><strong>BLOCKER para validação numérica PKN legado × moderno</strong> — auditoria Fase 6.3 reduziu o escopo, mas nao resolveu</td>
+<td><strong>MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION</strong> — Fase 6.6 quantificou o fator 11 e confirmou que os dois PKN auditados usam <code>idQ == 6</code>, nao o ramo <code>/22</code></td>
 </tr>
 </tbody>
 </table>
 <h2 id="r09-expressao-suspeita-m_pi-22-na-conversao-de-vazao-pkn">R09 — Expressão suspeita <code>/ M_PI / 22</code> na conversão de vazão PKN</h2>
-<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> BLOCKER para validação numérica PKN legado × moderno</p>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION</p>
 <p><strong>Localização:</strong> <code>legance/LOT_Tese/src/apb_code/APB1da.cpp</code>, linha aproximada 8,
 função <code>Conv_bbmin_m3h(double Q)</code>.</p>
 <p><strong>Evidência:</strong> A função <code>Conv_bbmin_m3h</code> contém:</p>
 <pre><code class="language-cpp">constexpr double Conv_bbmin_m3h(double Q) { return Q * 9.53924 / M_PI / 22; }
 </code></pre>
-<p>A auditoria Fase 6.3 (<code>docs/audits/R09_pkn_mpi22_audit.md</code>) mostrou que:
+<p>A auditoria Fase 6.3 (<code>docs/audits/R09_pkn_mpi22_audit.md</code>) e o ensaio
+controlado Fase 6.6 (<code>docs/audits/R09_pkn_conversion_experiment.md</code>) mostraram que:
 - <code>9.53924</code> é compatível com <code>bbl/min -&gt; m³/h</code>;
 - <code>/ M_PI / 22</code> é equivalente a <code>/ (M_PI * 22)</code> e preserva unidade, mas aplica
   fator adimensional não documentado;
 - as demais conversões equivalentes usam <code>/ M_PI / 2</code>;
 - os casos PKN auditados (<code>8-BUZ-67D-RJS-VISCO-pkn.cpp</code> e
   <code>9-BUZ-39DA-RJS-VISCO-2.cpp</code>) usam <code>idQ == 6</code>, portanto chamam
-  <code>Conv_bbmin_m3min(Q) = Q * 0.158987 / M_PI / 2</code>, não <code>Conv_bbmin_m3h</code>.</p>
+  <code>Conv_bbmin_m3min(Q) = Q * 0.158987 / M_PI / 2</code>, não <code>Conv_bbmin_m3h</code>.
+- para a mesma base <code>Q * 9.53924</code>, o ramo <code>/22</code> gera exatamente <code>1/11</code> do valor
+  do ramo <code>/2</code>.</p>
 <p><strong>Impacto:</strong>
 - Se um caso usar <code>idQ == 4</code>, <code>/ M_PI / 22</code> reduz <code>Qinj</code> por fator 11 em relação
   ao padrão <code>/ M_PI / 2</code>.
 - Para os PKN auditados com <code>idQ == 6</code>, o impacto direto dessa linha específica
-  é nulo, mas a família de conversões do legado continua misturando unidade e
-  fator geométrico.
-- A regressão PKN legado × moderno continua bloqueada porque ainda não há prova
-  documental/física para reproduzir ou substituir o fator, e o caminho PKN tem
-  outros pontos pendentes (<code>t</code> absoluto, <code>time</code> desde breakdown e volume
-  <code>w0 * L1 * M_PI</code>).</p>
+  é nulo. R09 fica mitigado para esses dois casos enquanto permanecer comprovado
+  que o caminho ativo é <code>idQ == 6</code>.
+- A regressão PKN legado × moderno continua bloqueada para <code>idQ == 4</code>, para
+  arquivos <code>.dat</code> cujo <code>idQ</code> de geração não esteja provado e para qualquer uso
+  geral da família de conversões do legado como referência física.
+- O caminho PKN ainda tem outros pontos pendentes (<code>t</code> absoluto, <code>time</code> desde
+  breakdown e volume <code>w0 * L1 * M_PI</code>), portanto a Fase 6.6 não libera validação
+  quantitativa legado × moderno.</p>
 <p><strong>Condição para desbloquear:</strong>
-1. Confirmar, por ensaio comparativo controlado ou metadado de geração, quais
-   <code>idQ</code> foram usados nos <code>.dat</code> PKN existentes.
-2. Comparar variantes isoladas <code>/ (M_PI * 22)</code> e <code>/ (M_PI * 2)</code> fora do legado
-   congelado, sem alterar <code>legance/</code>.
+1. Confirmar, por metadado de geração ou reexecução controlada, quais <code>idQ</code>
+   foram usados nos <code>.dat</code> PKN existentes.
+2. Para <code>idQ == 4</code>, obter justificativa física/documental para <code>22</code> ou tratar o
+   ramo como não confiável para regressão.
 3. Documentar a formulação física moderna de PKN em SI antes de usar qualquer
    baseline legado.</p>
 <p><strong>Não bloqueia:</strong> implementação de tipos de entrada, estrutura do <code>PknModel</code> e testes
@@ -1568,7 +1573,7 @@ unitários com entradas sintéticas. <strong>Bloqueia:</strong> comparação com
 <li>[x] Unidade de e0: [1/min] internamente → FA01</li>
 <li>[x] Mecanismo de acoplamento sal→APB → FA04</li>
 <li>[x] <strong>R08:</strong> <code>dt</code> deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]</li>
-<li>[ ] <strong>R09:</strong> Auditoria documental executada em Fase 6.3; requer ensaio numerico comparativo antes de usar baseline PKN legado</li>
+<li>[x] <strong>R09:</strong> Fase 6.6 executou ensaio analitico controlado; mitigado para os dois PKN auditados (<code>idQ == 6</code>), ainda blocker para <code>idQ == 4</code> e regressao quantitativa ampla</li>
 <li>[ ] Confirmar convenção de sinal de <code>u_wall</code> (positivo = inward ou outward?)
       — arquivo: <code>legance/LOT_APB_v5/include/apb/apb_salt_1d.h</code></li>
 <li>[ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)</li>
@@ -2121,6 +2126,28 @@ houve regressão numérica contra legado e de que R09 permanece blocker.</p>
 <p><strong>Importante:</strong> esta fase executou o fluxo moderno <code>YAML -&gt; CaseParser -&gt;
 PknInput -&gt; PknModel -&gt; PknResult -&gt; CSV/JSON</code>. Não houve comparação com
 arquivos <code>.dat</code>, <code>legance/LOT_Tese</code> ou <code>legance/LOT_APB_v5</code>.</p>
+<h2 id="fase-66-ensaio-comparativo-controlado-r09">Fase 6.6 — Ensaio comparativo controlado R09</h2>
+<p><strong>Data:</strong> 2026-06-01</p>
+<p><strong>Executado nesta fase:</strong></p>
+<ul>
+<li>Inspecao somente leitura de <code>legance/LOT_Tese/</code>.</li>
+<li>Inspecao somente leitura de <code>legance/LOT_APB_v5/</code>.</li>
+<li><code>python tools\audit_r09_pkn_conversion.py</code></li>
+<li><code>python tools\generate_docs_index.py</code></li>
+</ul>
+<p><strong>Resultado:</strong> ensaio analitico/documental concluido, sem validacao numerica
+legado x moderno. Nenhum baseline foi criado ou alterado, nenhum arquivo <code>.dat</code>
+foi usado como referencia e nenhum codigo legado foi modificado.</p>
+<p><strong>Conclusao R09:</strong> <code>MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION</code>.
+O ramo suspeito <code>Q * 9.53924 / M_PI / 22</code> pertence a <code>Conv_bbmin_m3h</code>, acionado
+por <code>idQ == 4</code>. Os dois casos PKN auditados (<code>8-BUZ-67D-RJS-VISCO-pkn.cpp</code> e
+<code>9-BUZ-39DA-RJS-VISCO-2.cpp</code>) usam <code>idQ == 6</code>, que chama
+<code>Conv_bbmin_m3min(Q) = Q * 0.158987 / M_PI / 2</code>.</p>
+<p><strong>Quantificacao:</strong> para a mesma base <code>Q * 9.53924</code>, a alternativa <code>/22</code> produz
+<code>1/11</code> do valor da alternativa <code>/2</code>. Assim, o literal <code>/22</code> nao afeta
+diretamente os dois PKN auditados, mas continua bloqueando regressao quantitativa
+para <code>idQ == 4</code>, para <code>.dat</code> sem metadado de <code>idQ</code> confirmado e para qualquer
+uso geral da familia <code>ConvflowRate()</code> como referencia fisica.</p>
 <h2 id="baselines-capturados">Baselines capturados</h2>
 <table>
 <thead>
@@ -2585,7 +2612,12 @@ entregar os dados ao solver.</p>
    sem regressao contra arquivos legados enquanto R09 permanecer aberto.
 4.9. Fase 6.5: conectar <code>PknModel</code> ao fluxo moderno de execucao
    <code>YAML -&gt; CaseParser -&gt; PknInput -&gt; PknModel -&gt; PknResult -&gt; CSV/JSON</code>, com
-   <code>lot-sim run --mode lot-pkn</code>, sem declarar regressao contra legado.</li>
+   <code>lot-sim run --mode lot-pkn</code>, sem declarar regressao contra legado.
+4.10. Fase 6.6: executar ensaio analitico controlado de R09. Resultado:
+   <code>/ M_PI / 22</code> pertence a <code>Conv_bbmin_m3h(idQ == 4)</code>, enquanto os dois PKN
+   auditados usam <code>idQ == 6</code> e <code>Conv_bbmin_m3min</code> com <code>/ M_PI / 2</code>. R09 fica
+   <code>MITIGATED_FOR_AUDITED_PKN_CASES</code>, mas segue <code>BLOCKER_FOR_IDQ4_REGRESSION</code>
+   e nao libera regressao quantitativa legado x moderno.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -2632,21 +2664,35 @@ entregar os dados ao solver.</p>
   diretório temporário.
 - O status de saída é <code>synthetic_modern_no_legacy_regression</code>: não há validação
   contra legado nesta fase.</p>
-<h2 id="fora-de-escopo-ate-r09-ser-resolvido">Fora de escopo até R09 ser resolvido</h2>
+<p><strong>Fase 6.6 (ensaio controlado R09):</strong>
+- <code>docs/audits/R09_pkn_conversion_experiment.md</code> documenta os ramos <code>idQ == 4</code>
+  e <code>idQ == 6</code> e quantifica <code>/22</code> versus <code>/2</code>.
+- <code>tools/audit_r09_pkn_conversion.py</code> calcula a tabela analitica sem depender
+  de legado e gera <code>docs/audits/R09_pkn_conversion_table.csv</code>.
+- Para a mesma base <code>Q * 9.53924</code>, <code>/22</code> produz <code>1/11</code> do valor de <code>/2</code>.
+- Os casos PKN auditados usam <code>idQ == 6</code>; portanto, o literal <code>/22</code> nao afeta
+  diretamente esses dois casos.
+- Nao houve validacao numerica legado x moderno e nenhum <code>.dat</code> foi usado como
+  baseline.</p>
+<h2 id="fora-de-escopo-ate-r09-ser-totalmente-resolvido">Fora de escopo até R09 ser totalmente resolvido</h2>
 <ul>
 <li>Comparação numérica com <code>legance/LOT_Tese</code> ou <code>legance/LOT_APB_v5</code>.</li>
 <li>Uso de <code>buz67d_pkn.yaml</code> como referência de resultado.</li>
 <li>Acoplamento com sal ou APB.</li>
 </ul>
 <h2 id="proxima-fase-recomendada">Proxima fase recomendada</h2>
-<p>Enquanto R09 permanecer aberto, seguir um destes caminhos:</p>
+<p>Com R09 mitigado para os dois PKN auditados, mas ainda aberto para <code>idQ == 4</code>,
+seguir um destes caminhos:</p>
 <ol>
-<li>Ensaio comparativo controlado das variantes de conversao (<code>/(pi*22)</code> versus
-   <code>/(pi*2)</code>) em ferramenta externa ao legado congelado.</li>
+<li>Criar pos-processamento moderno para os CSV/JSON LOT/PKN e comparacoes
+   qualitativas cuidadosamente rotuladas para os dois casos auditados.</li>
 <li>Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
    parsing com solver.</li>
-<li>Adicionar fixtures pequenas de golden output moderno, se necessário, sem
-   usar <code>.dat</code> legado como baseline.</li>
+<li>Se for iniciar comparacao legado x moderno, primeiro confirmar o <code>idQ</code> de
+   geracao dos <code>.dat</code> e manter qualquer resultado como qualitativo ate resolver
+   os demais pontos PKN (<code>t</code> absoluto, <code>time</code> desde breakdown, <code>w0 * L1 * M_PI</code>).</li>
+<li>Para liberar regressao quantitativa envolvendo <code>idQ == 4</code>, obter justificativa
+   fisica/documental para <code>22</code> ou excluir esse ramo como referencia valida.</li>
 </ol>
 <h2 id="riscos-tecnicos-a-resolver-antes-da-implementacao">Riscos tecnicos a resolver antes da implementacao</h2>
 <ul>
@@ -2948,6 +2994,313 @@ risco de misturar convencoes, unidades e erros historicos.</p>
 <li>A semantica de volume varia entre geometrias e precisa de auditoria dedicada
   antes de migracao.</li>
 </ul>
+</div>
+</section>
+
+<section id="r09_pkn_conversion_experiment">
+<div class="section-meta"><span>Documento</span><span class="pill pill-impl">Implementado</span></div>
+<h3>R09 — Ensaio comparativo controlado das conversões PKN</h3>
+<div class="doc-body">
+<p><strong>Data:</strong> 2026-06-01<br />
+<strong>Escopo:</strong> ensaio analítico/documental, sem executar legado, sem usar <code>.dat</code> como baseline e sem alterar <code>legance/</code>, <code>legacy/</code>, <code>external/saltcreep/</code> ou <code>tests/baselines/</code>.<br />
+<strong>Script:</strong> <code>tools/audit_r09_pkn_conversion.py</code><br />
+<strong>Tabela gerada:</strong> <code>docs/audits/R09_pkn_conversion_table.csv</code></p>
+<h2 id="1-resumo-executivo">1. Resumo executivo</h2>
+<p><strong>Classificação após o ensaio:</strong> <code>MITIGATED_FOR_AUDITED_PKN_CASES</code></p>
+<p>O ensaio confirma que:</p>
+<ul>
+<li>A expressão suspeita <code>Q * 9.53924 / M_PI / 22</code> existe no legado <code>LOT_Tese</code>.</li>
+<li>Ela pertence ao ramo <code>Conv_bbmin_m3h(double Q)</code>, selecionado quando <code>idQ == 4</code>.</li>
+<li>Os dois casos PKN auditados (<code>8-BUZ-67D-RJS-VISCO-pkn.cpp</code> e
+  <code>9-BUZ-39DA-RJS-VISCO-2.cpp</code>) usam <code>idQ == 6</code>, portanto chamam
+  <code>Conv_bbmin_m3min(double Q) = Q * 0.158987 / M_PI / 2</code>.</li>
+<li>O literal <code>/22</code> não afeta diretamente esses dois casos PKN auditados.</li>
+<li>O risco permanece para qualquer regressão ou caso que use <code>idQ == 4</code>.</li>
+</ul>
+<p>Conclusão operacional: <strong>Rota B</strong> — marcar R09 como mitigado para os casos PKN
+auditados, mas manter bloqueio para regressões envolvendo <code>idQ == 4</code> ou para
+qualquer uso geral da família de conversões do legado como referência física.</p>
+<h2 id="2-localizacao-dos-caminhos-de-conversao">2. Localização dos caminhos de conversão</h2>
+<p>Arquivo principal auditado:</p>
+<pre><code class="language-text">legance/LOT_Tese/src/apb_code/APB1da.cpp
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Linha aprox.</th>
+<th>Função</th>
+<th>Opção</th>
+<th>Expressão</th>
+<th>Entrada presumida</th>
+<th>Saída presumida</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4</td>
+<td><code>Conv_bbs_m3s</code></td>
+<td><code>idQ == 0</code></td>
+<td><code>Q * 0.158987 / M_PI / 2</code></td>
+<td>bbl/s</td>
+<td>m3/s normalizado por <code>2*pi</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>Conv_bbmin_m3s</code></td>
+<td><code>idQ == 1</code></td>
+<td><code>Q * 0.00264979 / M_PI / 2</code></td>
+<td>bbl/min</td>
+<td>m3/s normalizado por <code>2*pi</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>Conv_bbh_m3s</code></td>
+<td><code>idQ == 2</code></td>
+<td><code>Q * 4.41631E-5 / M_PI / 2</code></td>
+<td>bbl/h</td>
+<td>m3/s normalizado por <code>2*pi</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>Conv_bbs_m3h</code></td>
+<td><code>idQ == 3</code></td>
+<td><code>Q * 572.354 / M_PI / 2</code></td>
+<td>bbl/s</td>
+<td>m3/h normalizado por <code>2*pi</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>Conv_bbmin_m3h</code></td>
+<td><code>idQ == 4</code></td>
+<td><code>Q * 9.53924 / M_PI / 22</code></td>
+<td>bbl/min</td>
+<td>m3/h normalizado por <code>22*pi</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>Conv_bbh_m3h</code></td>
+<td><code>idQ == 5</code></td>
+<td><code>Q * 0.158987 / M_PI / 2</code></td>
+<td>bbl/h</td>
+<td>m3/h normalizado por <code>2*pi</code></td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>Conv_bbmin_m3min</code></td>
+<td><code>idQ == 6</code></td>
+<td><code>Q * 0.158987 / M_PI / 2</code></td>
+<td>bbl/min</td>
+<td>m3/min normalizado por <code>2*pi</code></td>
+</tr>
+</tbody>
+</table>
+<p>Seleção em <code>APB1da::ConvflowRate()</code> e <code>APB1da::ConvflowRate(double Q)</code>:</p>
+<pre><code class="language-text">idQ == 4 -&gt; Conv_bbmin_m3h(Q)
+idQ == 6 -&gt; Conv_bbmin_m3min(Q)
+</code></pre>
+<p><code>calculateLOTFracturedSaltRock(...)</code> obtém <code>Qinj</code> por <code>ConvflowRate()</code> e usa
+essa vazão no bloco de fratura, incluindo o ramo PKN.</p>
+<p>Na varredura de <code>legance/LOT_APB_v5/</code>, não foram encontrados
+<code>Conv_bbmin_m3h</code>, <code>Conv_bbmin_m3min</code>, <code>Q * 9.53924</code> nem <code>M_PI / 22</code>.</p>
+<h2 id="3-casos-pkn-auditados">3. Casos PKN auditados</h2>
+<table>
+<thead>
+<tr>
+<th>Caso</th>
+<th>Linha aprox.</th>
+<th>Configuração LOT</th>
+<th><code>idQ</code></th>
+<th>Conversão associada</th>
+<th>Passa por <code>/M_PI/22</code>?</th>
+<th>Conclusão</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp</code></td>
+<td>43, 137</td>
+<td><code>setLeakoffProps("pa_min", 3., "pkn")</code>; <code>APB1da(..., true, 6, 0.5, 9.5)</code></td>
+<td>6</td>
+<td><code>Q * 0.158987 / M_PI / 2</code></td>
+<td>Não</td>
+<td>R09 <code>/22</code> não está no caminho ativo deste caso.</td>
+</tr>
+<tr>
+<td><code>legance/LOT_Tese/9-BUZ-39DA-RJS-VISCO-2.cpp</code></td>
+<td>41, 140</td>
+<td><code>setLeakoffProps("pa_min", 1., "pkn")</code>; <code>APB1da(..., true, 6, 0.3)</code></td>
+<td>6</td>
+<td><code>Q * 0.158987 / M_PI / 2</code></td>
+<td>Não</td>
+<td>R09 <code>/22</code> não está no caminho ativo deste caso.</td>
+</tr>
+</tbody>
+</table>
+<p>Observação: o comentário do segundo caso diz "0.4 bpm", mas o argumento passado
+ao construtor é <code>0.3</code>. Este ensaio registra o valor de código, não corrige o
+legado.</p>
+<h2 id="4-tabela-comparativa-de-fatores">4. Tabela comparativa de fatores</h2>
+<p>A tabela abaixo usa o fator dimensional de <code>Conv_bbmin_m3h</code>, isto é,
+<code>Q * 9.53924</code>, para comparar apenas o efeito dos divisores angulares.</p>
+<table>
+<thead>
+<tr>
+<th>Q original</th>
+<th>Alternativa</th>
+<th>Valor convertido</th>
+<th>Razão vs <code>/M_PI/2</code></th>
+<th>Observação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.1</td>
+<td><code>Q * 9.53924 / (M_PI * 22)</code></td>
+<td>0.0138019745395</td>
+<td>0.0909090909091</td>
+<td>Mesmo valor de <code>/M_PI/22</code>.</td>
+</tr>
+<tr>
+<td>0.1</td>
+<td><code>Q * 9.53924 / (M_PI * 2)</code></td>
+<td>0.151821719934</td>
+<td>1.0</td>
+<td>Referência <code>/2</code>.</td>
+</tr>
+<tr>
+<td>0.1</td>
+<td><code>Q * 9.53924 / (2 * M_PI)</code></td>
+<td>0.151821719934</td>
+<td>1.0</td>
+<td>Idêntico a <code>/M_PI/2</code>.</td>
+</tr>
+<tr>
+<td>0.3</td>
+<td><code>Q * 9.53924 / (M_PI * 22)</code></td>
+<td>0.0414059236184</td>
+<td>0.0909090909091</td>
+<td>Mesmo valor de <code>/M_PI/22</code>.</td>
+</tr>
+<tr>
+<td>0.3</td>
+<td><code>Q * 9.53924 / (M_PI * 2)</code></td>
+<td>0.455465159802</td>
+<td>1.0</td>
+<td>Referência <code>/2</code>.</td>
+</tr>
+<tr>
+<td>0.3</td>
+<td><code>Q * 9.53924 / (2 * M_PI)</code></td>
+<td>0.455465159802</td>
+<td>1.0</td>
+<td>Idêntico a <code>/M_PI/2</code>.</td>
+</tr>
+<tr>
+<td>0.5</td>
+<td><code>Q * 9.53924 / (M_PI * 22)</code></td>
+<td>0.0690098726973</td>
+<td>0.0909090909091</td>
+<td>Mesmo valor de <code>/M_PI/22</code>.</td>
+</tr>
+<tr>
+<td>0.5</td>
+<td><code>Q * 9.53924 / (M_PI * 2)</code></td>
+<td>0.75910859967</td>
+<td>1.0</td>
+<td>Referência <code>/2</code>.</td>
+</tr>
+<tr>
+<td>0.5</td>
+<td><code>Q * 9.53924 / (2 * M_PI)</code></td>
+<td>0.75910859967</td>
+<td>1.0</td>
+<td>Idêntico a <code>/M_PI/2</code>.</td>
+</tr>
+<tr>
+<td>1.0</td>
+<td><code>Q * 9.53924 / (M_PI * 22)</code></td>
+<td>0.138019745395</td>
+<td>0.0909090909091</td>
+<td>Mesmo valor de <code>/M_PI/22</code>.</td>
+</tr>
+<tr>
+<td>1.0</td>
+<td><code>Q * 9.53924 / (M_PI * 2)</code></td>
+<td>1.51821719934</td>
+<td>1.0</td>
+<td>Referência <code>/2</code>.</td>
+</tr>
+<tr>
+<td>1.0</td>
+<td><code>Q * 9.53924 / (2 * M_PI)</code></td>
+<td>1.51821719934</td>
+<td>1.0</td>
+<td>Idêntico a <code>/M_PI/2</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Resumo numérico:</p>
+<pre><code class="language-text">(Q * 9.53924 / (pi * 22)) / (Q * 9.53924 / (pi * 2)) = 2 / 22 = 1/11
+</code></pre>
+<p>Logo, para o ramo <code>idQ == 4</code>, a expressão com <code>/22</code> gera uma vazão convertida
+onze vezes menor que a alternativa com <code>/2</code>.</p>
+<h2 id="5-interpretacao-fisicadimensional">5. Interpretação física/dimensional</h2>
+<p>O fator <code>9.53924</code> é compatível com a conversão dimensional pura:</p>
+<pre><code class="language-text">1 bbl/min * 0.158987 m3/bbl * 60 min/h ~= 9.53922 m3/h
+</code></pre>
+<p>Dividir por <code>M_PI</code>, <code>2</code> ou <code>22</code> não altera unidade, pois todos são fatores
+adimensionais. A unidade presumida de saída de <code>Conv_bbmin_m3h</code> continua sendo
+<code>m3/h</code>, mas a magnitude é modificada por uma normalização geométrica ou empírica
+não documentada.</p>
+<p>Em C++, os operadores de divisão são associativos à esquerda:</p>
+<pre><code class="language-text">Q * 9.53924 / M_PI / 2  == (Q * 9.53924 / M_PI) / 2  == Q * 9.53924 / (M_PI * 2)
+Q * 9.53924 / M_PI / 22 == (Q * 9.53924 / M_PI) / 22 == Q * 9.53924 / (M_PI * 22)
+</code></pre>
+<p>A diferença entre <code>/22</code> e <code>/2</code> é exatamente fator 11 porque:</p>
+<pre><code class="language-text">(1 / (pi * 2)) / (1 / (pi * 22)) = 22 / 2 = 11
+</code></pre>
+<h2 id="6-impacto-no-projeto-moderno">6. Impacto no projeto moderno</h2>
+<p><strong>O <code>PknModel</code> moderno deve copiar alguma dessas expressões?</strong><br />
+Não. O modelo moderno deve receber vazão em SI puro e deixar fatores
+geométricos dentro da formulação física documentada, não no parser nem em uma
+conversão de unidade herdada.</p>
+<p><strong>O <code>PknModel</code> moderno deve continuar usando apenas SI?</strong><br />
+Sim. A Fase 6.6 reforça que conversão de unidade e fator geométrico devem ficar
+separados. O parser moderno deve converter <code>bbl_min</code>, <code>m3_min</code>, <code>m3_h</code> etc. para
+<code>m3/s</code> sem embutir <code>pi</code>, <code>2</code> ou <code>22</code>.</p>
+<p><strong>A regressão legado x moderno pode ser liberada?</strong><br />
+Não de forma geral. A regressão quantitativa contra o legado continua bloqueada
+para qualquer caso que use <code>idQ == 4</code> e para qualquer comparação que dependa da
+família de conversões do legado sem separar unidade e fator geométrico.</p>
+<p><strong>Para quais casos o R09 ainda bloqueia comparação?</strong><br />
+Bloqueia casos com <code>idQ == 4</code>, casos cujo <code>idQ</code> de geração do <code>.dat</code> não esteja
+confirmado, e regressões que tentem tratar a família <code>ConvflowRate()</code> como uma
+referência física geral.</p>
+<p><strong>Para quais casos o R09 pode ser considerado mitigado?</strong><br />
+Para os dois casos PKN explicitamente auditados:</p>
+<ul>
+<li><code>8-BUZ-67D-RJS-VISCO-pkn.cpp</code>;</li>
+<li><code>9-BUZ-39DA-RJS-VISCO-2.cpp</code>.</li>
+</ul>
+<p>Neles, o ramo ativo é <code>idQ == 6</code>, não <code>idQ == 4</code>, portanto o literal <code>/22</code> não
+altera diretamente a vazão usada no bloco PKN.</p>
+<h2 id="7-conclusao-operacional">7. Conclusão operacional</h2>
+<p><strong>Rota escolhida:</strong> Rota B — marcar R09 como
+<code>MITIGATED_FOR_AUDITED_PKN_CASES</code>, mas manter <code>BLOCKER_FOR_IDQ4_REGRESSION</code>.</p>
+<p>Justificativa:</p>
+<ul>
+<li>Há prova direta de que os dois casos PKN auditados usam <code>idQ == 6</code>.</li>
+<li>Há prova direta de que <code>/M_PI/22</code> é usado por <code>idQ == 4</code>, não por <code>idQ == 6</code>.</li>
+<li>O ensaio analítico quantifica o impacto: <code>/22</code> produz <code>1/11</code> da conversão
+  correspondente com <code>/2</code>.</li>
+<li>Ainda não há justificativa documental para o <code>22</code>.</li>
+<li>Ainda não houve regressão numérica legado x moderno.</li>
+</ul>
+<p>Portanto, R09 fica mais preciso: não é bloqueio total para evoluir o pipeline
+moderno e para fazer comparações qualitativas cuidadosamente rotuladas nos dois
+casos PKN auditados, mas continua bloqueando regressão quantitativa legado x
+moderno quando <code>idQ == 4</code> ou o caminho de geração do dado legado não estiver
+provado.</p>
 </div>
 </section>
 

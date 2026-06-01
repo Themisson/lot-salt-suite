@@ -61,6 +61,7 @@ SECTION_MAP = {
     "lot_legacy_inventory": "audits/lot_legacy_inventory.md",
     "pkn_legacy_path": "audits/pkn_legacy_path.md",
     "non_pkn_models_status": "audits/non_pkn_models_status.md",
+    "r09_pkn_conversion_experiment": "audits/R09_pkn_conversion_experiment.md",
 }
 
 STATUS_LABELS = {
@@ -123,6 +124,7 @@ NAV_GROUPS = [
             "lot_legacy_inventory",
             "pkn_legacy_path",
             "non_pkn_models_status",
+            "r09_pkn_conversion_experiment",
         ],
     ),
 ]

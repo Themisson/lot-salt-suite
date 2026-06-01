@@ -174,6 +174,33 @@ houve regressão numérica contra legado e de que R09 permanece blocker.
 PknInput -> PknModel -> PknResult -> CSV/JSON`. Não houve comparação com
 arquivos `.dat`, `legance/LOT_Tese` ou `legance/LOT_APB_v5`.
 
+## Fase 6.6 — Ensaio comparativo controlado R09
+
+**Data:** 2026-06-01
+
+**Executado nesta fase:**
+
+- Inspecao somente leitura de `legance/LOT_Tese/`.
+- Inspecao somente leitura de `legance/LOT_APB_v5/`.
+- `python tools\audit_r09_pkn_conversion.py`
+- `python tools\generate_docs_index.py`
+
+**Resultado:** ensaio analitico/documental concluido, sem validacao numerica
+legado x moderno. Nenhum baseline foi criado ou alterado, nenhum arquivo `.dat`
+foi usado como referencia e nenhum codigo legado foi modificado.
+
+**Conclusao R09:** `MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION`.
+O ramo suspeito `Q * 9.53924 / M_PI / 22` pertence a `Conv_bbmin_m3h`, acionado
+por `idQ == 4`. Os dois casos PKN auditados (`8-BUZ-67D-RJS-VISCO-pkn.cpp` e
+`9-BUZ-39DA-RJS-VISCO-2.cpp`) usam `idQ == 6`, que chama
+`Conv_bbmin_m3min(Q) = Q * 0.158987 / M_PI / 2`.
+
+**Quantificacao:** para a mesma base `Q * 9.53924`, a alternativa `/22` produz
+`1/11` do valor da alternativa `/2`. Assim, o literal `/22` nao afeta
+diretamente os dois PKN auditados, mas continua bloqueando regressao quantitativa
+para `idQ == 4`, para `.dat` sem metadado de `idQ` confirmado e para qualquer
+uso geral da familia `ConvflowRate()` como referencia fisica.
+
 ## Baselines capturados
 
 | Baseline | Arquivo | Status | Data |

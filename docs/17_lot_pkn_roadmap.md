@@ -65,6 +65,11 @@ entregar os dados ao solver.
 4.9. Fase 6.5: conectar `PknModel` ao fluxo moderno de execucao
    `YAML -> CaseParser -> PknInput -> PknModel -> PknResult -> CSV/JSON`, com
    `lot-sim run --mode lot-pkn`, sem declarar regressao contra legado.
+4.10. Fase 6.6: executar ensaio analitico controlado de R09. Resultado:
+   `/ M_PI / 22` pertence a `Conv_bbmin_m3h(idQ == 4)`, enquanto os dois PKN
+   auditados usam `idQ == 6` e `Conv_bbmin_m3min` com `/ M_PI / 2`. R09 fica
+   `MITIGATED_FOR_AUDITED_PKN_CASES`, mas segue `BLOCKER_FOR_IDQ4_REGRESSION`
+   e nao libera regressao quantitativa legado x moderno.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -117,7 +122,18 @@ entregar os dados ao solver.
 - O status de saída é `synthetic_modern_no_legacy_regression`: não há validação
   contra legado nesta fase.
 
-## Fora de escopo até R09 ser resolvido
+**Fase 6.6 (ensaio controlado R09):**
+- `docs/audits/R09_pkn_conversion_experiment.md` documenta os ramos `idQ == 4`
+  e `idQ == 6` e quantifica `/22` versus `/2`.
+- `tools/audit_r09_pkn_conversion.py` calcula a tabela analitica sem depender
+  de legado e gera `docs/audits/R09_pkn_conversion_table.csv`.
+- Para a mesma base `Q * 9.53924`, `/22` produz `1/11` do valor de `/2`.
+- Os casos PKN auditados usam `idQ == 6`; portanto, o literal `/22` nao afeta
+  diretamente esses dois casos.
+- Nao houve validacao numerica legado x moderno e nenhum `.dat` foi usado como
+  baseline.
+
+## Fora de escopo até R09 ser totalmente resolvido
 
 - Comparação numérica com `legance/LOT_Tese` ou `legance/LOT_APB_v5`.
 - Uso de `buz67d_pkn.yaml` como referência de resultado.
@@ -125,14 +141,18 @@ entregar os dados ao solver.
 
 ## Proxima fase recomendada
 
-Enquanto R09 permanecer aberto, seguir um destes caminhos:
+Com R09 mitigado para os dois PKN auditados, mas ainda aberto para `idQ == 4`,
+seguir um destes caminhos:
 
-1. Ensaio comparativo controlado das variantes de conversao (`/(pi*22)` versus
-   `/(pi*2)`) em ferramenta externa ao legado congelado.
+1. Criar pos-processamento moderno para os CSV/JSON LOT/PKN e comparacoes
+   qualitativas cuidadosamente rotuladas para os dois casos auditados.
 2. Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
    parsing com solver.
-3. Adicionar fixtures pequenas de golden output moderno, se necessário, sem
-   usar `.dat` legado como baseline.
+3. Se for iniciar comparacao legado x moderno, primeiro confirmar o `idQ` de
+   geracao dos `.dat` e manter qualquer resultado como qualitativo ate resolver
+   os demais pontos PKN (`t` absoluto, `time` desde breakdown, `w0 * L1 * M_PI`).
+4. Para liberar regressao quantitativa envolvendo `idQ == 4`, obter justificativa
+   fisica/documental para `22` ou excluir esse ramo como referencia valida.
 
 ## Riscos tecnicos a resolver antes da implementacao
 

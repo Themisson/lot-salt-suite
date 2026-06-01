@@ -218,11 +218,11 @@ Arquivos auditados:
 | R06 | Temperatura: °C × K no SESTSAL | Crítico | **CONFIRMADO** — SESTSAL usa °C (FA02) |
 | R07 | Acoplamento sal-APB sequencial fraco | Médio | **CONFIRMADO** — staggered, uma iteração de sal/passo (FA04) |
 | R08 | Unidade de `dt` em modelos de fluência | Alto | **CONFIRMADO** — `dt` deve ser coerente com a taxa de deformação; no wrapper APB/SESTSAL do LOT_APB_v5 é [h] |
-| R09 | Expressão suspeita `/ M_PI / 22` na conversão de vazão | Alto | **BLOCKER para validação numérica PKN legado × moderno** — auditoria Fase 6.3 reduziu o escopo, mas nao resolveu |
+| R09 | Expressão suspeita `/ M_PI / 22` na conversão de vazão | Alto | **MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION** — Fase 6.6 quantificou o fator 11 e confirmou que os dois PKN auditados usam `idQ == 6`, nao o ramo `/22` |
 
 ## R09 — Expressão suspeita `/ M_PI / 22` na conversão de vazão PKN
 
-**Severidade:** Alta | **Status:** BLOCKER para validação numérica PKN legado × moderno
+**Severidade:** Alta | **Status:** MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION
 
 **Localização:** `legance/LOT_Tese/src/apb_code/APB1da.cpp`, linha aproximada 8,
 função `Conv_bbmin_m3h(double Q)`.
@@ -233,7 +233,8 @@ função `Conv_bbmin_m3h(double Q)`.
 constexpr double Conv_bbmin_m3h(double Q) { return Q * 9.53924 / M_PI / 22; }
 ```
 
-A auditoria Fase 6.3 (`docs/audits/R09_pkn_mpi22_audit.md`) mostrou que:
+A auditoria Fase 6.3 (`docs/audits/R09_pkn_mpi22_audit.md`) e o ensaio
+controlado Fase 6.6 (`docs/audits/R09_pkn_conversion_experiment.md`) mostraram que:
 - `9.53924` é compatível com `bbl/min -> m³/h`;
 - `/ M_PI / 22` é equivalente a `/ (M_PI * 22)` e preserva unidade, mas aplica
   fator adimensional não documentado;
@@ -241,23 +242,27 @@ A auditoria Fase 6.3 (`docs/audits/R09_pkn_mpi22_audit.md`) mostrou que:
 - os casos PKN auditados (`8-BUZ-67D-RJS-VISCO-pkn.cpp` e
   `9-BUZ-39DA-RJS-VISCO-2.cpp`) usam `idQ == 6`, portanto chamam
   `Conv_bbmin_m3min(Q) = Q * 0.158987 / M_PI / 2`, não `Conv_bbmin_m3h`.
+- para a mesma base `Q * 9.53924`, o ramo `/22` gera exatamente `1/11` do valor
+  do ramo `/2`.
 
 **Impacto:**
 - Se um caso usar `idQ == 4`, `/ M_PI / 22` reduz `Qinj` por fator 11 em relação
   ao padrão `/ M_PI / 2`.
 - Para os PKN auditados com `idQ == 6`, o impacto direto dessa linha específica
-  é nulo, mas a família de conversões do legado continua misturando unidade e
-  fator geométrico.
-- A regressão PKN legado × moderno continua bloqueada porque ainda não há prova
-  documental/física para reproduzir ou substituir o fator, e o caminho PKN tem
-  outros pontos pendentes (`t` absoluto, `time` desde breakdown e volume
-  `w0 * L1 * M_PI`).
+  é nulo. R09 fica mitigado para esses dois casos enquanto permanecer comprovado
+  que o caminho ativo é `idQ == 6`.
+- A regressão PKN legado × moderno continua bloqueada para `idQ == 4`, para
+  arquivos `.dat` cujo `idQ` de geração não esteja provado e para qualquer uso
+  geral da família de conversões do legado como referência física.
+- O caminho PKN ainda tem outros pontos pendentes (`t` absoluto, `time` desde
+  breakdown e volume `w0 * L1 * M_PI`), portanto a Fase 6.6 não libera validação
+  quantitativa legado × moderno.
 
 **Condição para desbloquear:**
-1. Confirmar, por ensaio comparativo controlado ou metadado de geração, quais
-   `idQ` foram usados nos `.dat` PKN existentes.
-2. Comparar variantes isoladas `/ (M_PI * 22)` e `/ (M_PI * 2)` fora do legado
-   congelado, sem alterar `legance/`.
+1. Confirmar, por metadado de geração ou reexecução controlada, quais `idQ`
+   foram usados nos `.dat` PKN existentes.
+2. Para `idQ == 4`, obter justificativa física/documental para `22` ou tratar o
+   ramo como não confiável para regressão.
 3. Documentar a formulação física moderna de PKN em SI antes de usar qualquer
    baseline legado.
 
@@ -273,7 +278,7 @@ unitários com entradas sintéticas. **Bloqueia:** comparação com baseline leg
 - [x] Unidade de e0: [1/min] internamente → FA01
 - [x] Mecanismo de acoplamento sal→APB → FA04
 - [x] **R08:** `dt` deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]
-- [ ] **R09:** Auditoria documental executada em Fase 6.3; requer ensaio numerico comparativo antes de usar baseline PKN legado
+- [x] **R09:** Fase 6.6 executou ensaio analitico controlado; mitigado para os dois PKN auditados (`idQ == 6`), ainda blocker para `idQ == 4` e regressao quantitativa ampla
 - [ ] Confirmar convenção de sinal de `u_wall` (positivo = inward ou outward?)
       — arquivo: `legance/LOT_APB_v5/include/apb/apb_salt_1d.h`
 - [ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)

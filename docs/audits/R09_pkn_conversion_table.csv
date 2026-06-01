@@ -1,0 +1,21 @@
+Q_original,alternative,converted_value,ratio_to_M_PI_2,observation
+0.1,Q * 9.53924 / (M_PI * 22),0.0138019745395,0.0909090909091,idQ == 4 suspect branch; same as /M_PI/22
+0.1,Q * 9.53924 / M_PI / 22,0.0138019745395,0.0909090909091,C++ left-associative form used by Conv_bbmin_m3h
+0.1,Q * 9.53924 / (M_PI * 2),0.151821719934,1,canonical parenthesized form of /M_PI/2
+0.1,Q * 9.53924 / M_PI / 2,0.151821719934,1,pattern used by neighboring conversion functions
+0.1,Q * 9.53924 / (2 * M_PI),0.151821719934,1,identical to /M_PI/2
+0.3,Q * 9.53924 / (M_PI * 22),0.0414059236184,0.0909090909091,idQ == 4 suspect branch; same as /M_PI/22
+0.3,Q * 9.53924 / M_PI / 22,0.0414059236184,0.0909090909091,C++ left-associative form used by Conv_bbmin_m3h
+0.3,Q * 9.53924 / (M_PI * 2),0.455465159802,1,canonical parenthesized form of /M_PI/2
+0.3,Q * 9.53924 / M_PI / 2,0.455465159802,1,pattern used by neighboring conversion functions
+0.3,Q * 9.53924 / (2 * M_PI),0.455465159802,1,identical to /M_PI/2
+0.5,Q * 9.53924 / (M_PI * 22),0.0690098726973,0.0909090909091,idQ == 4 suspect branch; same as /M_PI/22
+0.5,Q * 9.53924 / M_PI / 22,0.0690098726973,0.0909090909091,C++ left-associative form used by Conv_bbmin_m3h
+0.5,Q * 9.53924 / (M_PI * 2),0.75910859967,1,canonical parenthesized form of /M_PI/2
+0.5,Q * 9.53924 / M_PI / 2,0.75910859967,1,pattern used by neighboring conversion functions
+0.5,Q * 9.53924 / (2 * M_PI),0.75910859967,1,identical to /M_PI/2
+1,Q * 9.53924 / (M_PI * 22),0.138019745395,0.0909090909091,idQ == 4 suspect branch; same as /M_PI/22
+1,Q * 9.53924 / M_PI / 22,0.138019745395,0.0909090909091,C++ left-associative form used by Conv_bbmin_m3h
+1,Q * 9.53924 / (M_PI * 2),1.51821719934,1,canonical parenthesized form of /M_PI/2
+1,Q * 9.53924 / M_PI / 2,1.51821719934,1,pattern used by neighboring conversion functions
+1,Q * 9.53924 / (2 * M_PI),1.51821719934,1,identical to /M_PI/2
