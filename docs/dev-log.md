@@ -43,6 +43,25 @@ Saltcreep   : modificações em andamento por Themisson
 
 ---
 
+### [2026-06-01 12:17] `13eb5c3` — Themisson
+**Commit:** `feat(saltcreep): sync saltcreep with LOT/APB integration updates`
+**Testes C++:** 0 arquivos | **Testes Python:** 0 arquivos
+**Último resultado ctest:** nenhum (módulos ainda não implementados)
+
+**⚠ Modificações em external/saltcreep/:**
+- `external/saltcreep/.gitignore`
+- `external/saltcreep/AGENTS.md`
+- `external/saltcreep/CLAUDE.md`
+- `external/saltcreep/CMakeLists.txt`
+- `external/saltcreep/cases/apb/mud_gradient_1d_8p5ppg.yaml`
+- `external/saltcreep/cases/apb/mud_gradient_2d_Q8_8p5ppg.yaml`
+- `external/saltcreep/cases/sestsal/base_model.yaml`
+- `external/saltcreep/cases/sestsal/base_model2D.yaml`
+- … e mais 38 arquivos
+> Atualizar a seção 'Modificações em andamento no saltcreep' abaixo.
+
+---
+
 ### [2026-06-01 11:47] `3b45136` — Themisson
 **Commit:** `feat: add dev-log system with auto-update hook`
 **Testes C++:** 0 arquivos | **Testes Python:** 0 arquivos
