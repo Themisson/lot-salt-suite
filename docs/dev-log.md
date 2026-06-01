@@ -47,6 +47,24 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 
 ---
 
+### [2026-06-01] Revisao Fase 6.5 — LOT/PKN CSV/JSON — Codex
+**Status:** Aprovado com ressalvas corrigidas nesta sessao.
+**Commit revisado:** `f18bca1 feat(lot): run pkn cases to csv json`.
+**Testes:** `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`, `cmake --build build -j` e `ctest --test-dir build --output-on-failure` executados; 37/37 passaram apos inclusao de teste negativo do `ResultWriter`.
+**Validacao CLI:** `lot-sim validate --case` retornou `OK` para `cases/validation/lot_pkn_minimal.yaml`, `cases/validation/lot_pkn_with_leakoff.yaml` e `cases/lot_tese_migrated/buz67d_pkn.yaml`.
+**Validacao schema:** os tres YAMLs LOT/PKN foram validados contra `schemas/lot_case.schema.yaml`.
+**Execucao CLI:** `lot-sim run --mode lot-pkn` executou `lot_pkn_minimal.yaml` e `lot_pkn_with_leakoff.yaml`, gerando `result.json` e `timeseries.csv` em `results\lot_pkn_minimal_review` e `results\lot_pkn_with_leakoff_review`.
+**Escopo:** `legance/`, `legacy/`, `external/saltcreep/` e `tests/baselines/` permaneceram intocados; `results/` permanece ignorado pelo git.
+
+**Patches aplicados na revisao:**
+- `docs/05_input_output_formats.md` — removido trecho PowerShell/hashtable colado indevidamente no Markdown e mantida documentacao limpa de saida CSV futura.
+- `src/io/ResultWriter.cpp` e `tests/cpp/test_result_writer.cpp` — writer agora rejeita valores nao finitos antes de gravar CSV/JSON, com teste Catch2 dedicado.
+- `docs/index.html` — regenerado a partir dos Markdown corrigidos.
+
+**Conclusao:** fluxo moderno `YAML -> CaseParser -> PknInput -> PknModel -> PknResult -> CSV/JSON` aprovado para a Fase 6.5. Nao houve regressao contra legado; R09 permanece blocker para comparacao legado x moderno.
+
+---
+
 ### [2026-06-01] Template SaltCreep no manual gerado — Codex
 **Status:** Implementado nesta sessao.
 **Testes:** `python tools\generate_docs_index.py` e `python tools\generate_docs_index.py --dry-run` executados com sucesso. Verificacao estrutural confirmou sidebar, busca, fontes Fraunces/Hanken/IBM Plex Mono, hero, cards de metricas, links de navegacao agrupados, 21 secoes e script de destaque/copia.

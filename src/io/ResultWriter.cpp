@@ -1,6 +1,7 @@
 #include "io/ResultWriter.hpp"
 
 #include <cstddef>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -56,9 +57,36 @@ void ensure_series_sizes(const lss::lot::PknResult& result) {
   }
 }
 
+void require_finite(double value, const std::string& field) {
+  if (!std::isfinite(value)) {
+    throw std::runtime_error("ResultWriter: non-finite value in " + field);
+  }
+}
+
+void ensure_finite_values(const lss::lot::PknResult& result) {
+  require_finite(result.time_s, "summary.time_s");
+  require_finite(result.injected_volume_m3, "summary.injected_volume_m3");
+  require_finite(result.length_m, "summary.fracture_length_m");
+  require_finite(result.width_m, "summary.fracture_width_m");
+  require_finite(result.fracture_volume_m3, "summary.fracture_volume_m3");
+  require_finite(result.leakoff_volume_m3, "summary.leakoff_volume_m3");
+  require_finite(result.net_pressure_Pa, "summary.net_pressure_Pa");
+
+  for (std::size_t i = 0; i < result.time_series_s.size(); ++i) {
+    require_finite(result.time_series_s[i], "series.time_s");
+    require_finite(result.injected_volume_series_m3[i], "series.injected_volume_m3");
+    require_finite(result.fracture_length_series_m[i], "series.fracture_length_m");
+    require_finite(result.fracture_width_series_m[i], "series.fracture_width_m");
+    require_finite(result.fracture_volume_series_m3[i], "series.fracture_volume_m3");
+    require_finite(result.leakoff_volume_series_m3[i], "series.leakoff_volume_m3");
+    require_finite(result.net_pressure_series_Pa[i], "series.net_pressure_Pa");
+  }
+}
+
 void write_timeseries_csv(const std::filesystem::path& path,
                           const lss::lot::PknResult& result) {
   ensure_series_sizes(result);
+  ensure_finite_values(result);
 
   std::ofstream out(path);
   if (!out) {
@@ -79,6 +107,9 @@ void write_timeseries_csv(const std::filesystem::path& path,
 
 void write_summary_json(const std::filesystem::path& path, const std::string& case_id,
                         const lss::lot::PknResult& result) {
+  ensure_series_sizes(result);
+  ensure_finite_values(result);
+
   std::ofstream out(path);
   if (!out) {
     throw std::runtime_error("ResultWriter: cannot open JSON output: " + path.string());

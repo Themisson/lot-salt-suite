@@ -1,6 +1,8 @@
 #include <filesystem>
 #include <fstream>
+#include <limits>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include <catch2/catch_test_macros.hpp>
@@ -42,6 +44,21 @@ TEST_CASE("ResultWriter creates PKN CSV and JSON outputs") {
   CHECK(json.find("No numerical regression against legacy was performed.") !=
         std::string::npos);
   CHECK(json.find("R09 remains blocker for legacy comparison.") != std::string::npos);
+
+  std::filesystem::remove_all(output_dir);
+}
+
+TEST_CASE("ResultWriter rejects non-finite PKN values") {
+  const auto data = lss::io::parse_yaml("cases/validation/lot_pkn_minimal.yaml");
+  auto run = lss::lot::run_pkn_case(data);
+  run.result.net_pressure_series_Pa.front() =
+      std::numeric_limits<double>::quiet_NaN();
+  const auto output_dir =
+      std::filesystem::temp_directory_path() / "lss_result_writer_nonfinite";
+  std::filesystem::remove_all(output_dir);
+
+  CHECK_THROWS_AS(lss::io::write_pkn_result(output_dir, data.name, run.result),
+                  std::runtime_error);
 
   std::filesystem::remove_all(output_dir);
 }
