@@ -1,0 +1,23 @@
+# Halita — parâmetros do mecanismo duplo (DM)
+# Fonte: SESTSAL legacy/sestsal/examples/base_model.inp + H50.nf
+# Unidades SI (conversões: e0 [1/h]÷3600=[1/s]; Q [kcal/mol]×4184=[J/mol]; T0 [°C]+273.15=[K])
+
+dm:
+  e0_1_s:  5.5556e-10    # 2.000e-6 [1/h] ÷ 3600
+  sig0_Pa: 9.762e6        # 9.762 MPa
+  T0_K:    359.15         # 86 °C + 273.15
+  n1:      3.223          # expoente para σ_ef ≤ σ₀ (dislocation glide)
+  n2:      7.562          # expoente para σ_ef > σ₀ (dislocation climb)
+  Q_J_mol: 50208.0        # 12 kcal/mol × 4184 J/kcal
+
+elastic:
+  E_Pa:    20.4e9         # 20.4 GPa
+  nu:      0.36
+
+# EDMT — fluência primária (transiente)
+# K1: fator de amplificação transiente (taxa_inicial = (1+K1)×DM, K1=0 desabilita)
+# K2: taxa de decaimento com deformação viscosa acumulada [1/strain]
+# Valores de referência — calibrar com ensaios triaxiais em data/ensaios/
+edmt:
+  K1: 2.0    # taxa inicial ≈ 3× DM; Costa & Poiate (2009) reportam 1.5–3.0
+  K2: 5.0    # decai a 1% do transiente em εv ≈ 1 (deformação de ~1%)

@@ -1,0 +1,58 @@
+name: modelo_A_Q8
+# TCC caso A com elemento Q8 axisimetrico 2D (Etapa 3b)
+
+geometry:
+  well_radius_m: 0.155575
+  outer_radius_factor: 321.5
+
+depths:
+  water_depth_m: 1600
+  burial_m: 4100
+  salt_above_m: 0
+
+lithology:
+  primary: halita
+
+fluid:
+  weight_lb_per_gal: 9.6
+
+stress:
+  k0: 1.0
+  overburden_grad_Pa_per_m: 21000
+
+thermal:
+  mode: profile
+  seabed_temp_C: 4.0
+  grad_C_per_m: 0.01442
+
+element:
+  type: axisym_2d_Q8
+
+mesh:
+  n_elements_radial: 100
+  ratio: 1000
+  n_elements_axial: 1
+
+creep:
+  elastic_only: false
+  secondary: true
+
+time:
+  total_h: 360
+  scheme: explicit
+  steps:
+    - until_h: 0.01
+      dt_h: 5.0e-5
+    - until_h: 5.0
+      dt_h: 1.0e-3
+    - until_h: 20.0
+      dt_h: 1.0e-2
+    - until_h: 100.0
+      dt_h: 5.0e-2
+    - until_h: 360.0
+      dt_h: 1.0e-1
+
+output:
+  every_n_steps: 100
+  fields: [displacement, stress]
+  series: [wall_closure_pct, closure_rate]

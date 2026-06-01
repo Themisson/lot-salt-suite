@@ -1,0 +1,19 @@
+# Taquidrita — parâmetros do mecanismo duplo (DM)
+# Fonte: SESTSAL H50.nf (material 2) — taxa ~80x maior que halita
+# Taxa de creep taquidrita ≈ 10^7 × halita em condições de poço profundo
+
+dm:
+  e0_1_s:  4.3889e-8     # 1.58e-4 [1/h] ÷ 3600
+  sig0_Pa: 5.743e6        # 5.743 MPa (menor σ₀ → ativa fluência mais cedo)
+  T0_K:    403.15         # 130 °C + 273.15 (T₀ maior → mais sensível a T)
+  n1:      2.868
+  n2:      7.090
+  Q_J_mol: 50208.0        # 12 kcal/mol × 4184 J/kcal
+
+elastic:
+  E_Pa:    20.4e9
+  nu:      0.36
+
+edmt:
+  K1: 2.0
+  K2: 5.0

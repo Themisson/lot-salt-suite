@@ -1,0 +1,18 @@
+# Carnalita — parâmetros do mecanismo duplo (DM)
+# Fonte: SESTSAL H50.nf (material 3)
+
+dm:
+  e0_1_s:  5.1111e-8     # 1.84e-4 [1/h] ÷ 3600
+  sig0_Pa: 7.865e6        # 7.865 MPa
+  T0_K:    359.15         # 86 °C + 273.15
+  n1:      2.608
+  n2:      7.786
+  Q_J_mol: 50208.0        # 12 kcal/mol × 4184 J/kcal
+
+elastic:
+  E_Pa:    20.4e9
+  nu:      0.36
+
+edmt:
+  K1: 2.0
+  K2: 5.0

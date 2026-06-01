@@ -1,0 +1,36 @@
+name: lame_test
+
+geometry:
+  well_radius_m: 0.1556          # Ri = 6.125" converted to m
+  outer_radius_factor: 100       # Re = 100 * Ri (large domain for Lamé accuracy)
+
+depths:
+  burial_m: 0                    # not used for elastic-only Lamé test
+
+lithology:
+  primary: halita
+
+fluid:
+  pressure_Pa: 10.0e6            # prescribed pressure (bypasses lb/gal conversion)
+
+stress:
+  k0: 1.0
+
+material:
+  E_Pa: 25.0e9                   # Young's modulus (Pa)  — halite representative
+  nu: 0.30                       # Poisson's ratio
+
+element:
+  type: axisym_1d_L3
+
+mesh:
+  n_elements_radial: 30
+  ratio: 1000                    # last/first element length ratio (refinement at wall)
+  n_elements_axial: 1
+
+creep:
+  elastic_only: true
+
+output:
+  every_n_steps: 1
+  fields: [displacement, stress]

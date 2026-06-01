@@ -1,0 +1,34 @@
+{
+  "$comment": "Configuração de projeto do Claude Code para o SaltCreep. Commitar. Segredos/preferências pessoais vão em settings.local.json (gitignored).",
+  "permissions": {
+    "allow": [
+      "Bash(cmake:*)",
+      "Bash(ctest:*)",
+      "Bash(pytest:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(./build/saltcreep:*)",
+      "Read(./**)",
+      "Edit(main/**)",
+      "Edit(src/**)",
+      "Edit(post/**)",
+      "Edit(bindings/**)",
+      "Edit(tests/**)",
+      "Edit(cases/**)",
+      "Edit(docs/**)",
+      "Edit(CMakeLists.txt)",
+      "Edit(.gitignore)"
+    ],
+    "deny": [
+      "Edit(legacy/**)",
+      "Edit(docs/references/**)",
+      "Read(./**/*.key)",
+      "Read(./**/.env)",
+      "Bash(rm -rf:*)",
+      "Bash(git push:*)"
+    ]
+  },
+  "$model_comment": "Sonnet 4.6 como padrão (melhor custo/qualidade para implementação rotineira). Use /model opus pontualmente para arquitetura/raciocínio difícil. Subagentes definem seu próprio modelo no front-matter. Ver docs/model-selection.md.",
+  "model": "sonnet"
+}

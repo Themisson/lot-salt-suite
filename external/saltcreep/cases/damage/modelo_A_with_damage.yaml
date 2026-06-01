@@ -1,0 +1,65 @@
+name: modelo_A_with_damage
+
+geometry:
+  well_radius_m: 0.155575
+  outer_radius_factor: 321.5
+
+depths:
+  water_depth_m: 1600
+  burial_m: 4100
+  salt_above_m: 0
+
+lithology:
+  primary: halita
+
+fluid:
+  weight_lb_per_gal: 9.6
+
+stress:
+  k0: 1.25
+  overburden_grad_Pa_per_m: 21000
+
+thermal:
+  mode: profile
+  seabed_temp_C: 4.0
+  grad_C_per_m: 0.01442
+
+element:
+  type: axisym_1d_L3
+
+mesh:
+  n_elements_radial: 6
+  ratio: 50
+  n_elements_axial: 1
+
+creep:
+  elastic_only: false
+  secondary: true
+  primary: true
+  tertiary: true
+  damage: true
+  tertiary_model: MottaV1
+  dilatancy_envelope: Spier
+  motta_v1:
+    n_d: 2.0
+    A_d: 1.0e-11
+    m_d: 1.0
+    p_d: 0.0
+    D_max: 0.99
+  spier:
+    a: 0.0
+    b_Pa: 0.0
+
+time:
+  total_h: 1.0
+  scheme: implicit_adaptive
+  dt_h: 0.001
+  dt_max_h: 0.005
+  dt_min_h: 1.0e-12
+  tol_global: 1.0e-4
+
+output:
+  every_n_steps: 10
+  damage_tracking: true
+  damage_thresholds: [0.1, 0.3, 0.5, 0.8]
+  failure_D_critical: 0.5

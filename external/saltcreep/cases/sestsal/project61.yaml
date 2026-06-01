@@ -1,0 +1,47 @@
+name: project61
+
+geometry:
+  well_radius_m: 0.155575
+  outer_radius_factor: 320
+
+mesh:
+  n_radial: 8
+  ratio: 1.05
+
+depths:
+  burial_m: 5060
+  water_depth_m: 0
+  salt_above_m: 0
+
+lithology: halita
+
+fluid:
+  weight_lb_per_gal: 5030.0
+
+stress:
+  k0: 1.0
+
+material:
+  E_Pa: 2.0e+10
+  nu: 0.36
+
+thermal:
+  enabled: false
+  mode: constant
+  T_K: 326.15
+
+time:
+  total_s: 3600
+  dt_s: 180
+  scheme: explicit
+
+creep:
+  elastic_only: false
+  secondary: true
+  primary: false
+  tertiary: false
+  damage: false
+
+output:
+  every_n_steps: 10
+  vtu: false

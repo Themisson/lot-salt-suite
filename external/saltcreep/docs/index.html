@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaltCreep — Documentação Técnica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#211b14;
+    --ink-soft:#4a4239;
+    --paper:#f7f3ec;
+    --paper-2:#efe8dc;
+    --sidebar:#191f23;
+    --sidebar-2:#222a2f;
+    --sidebar-ink:#c7cdcf;
+    --sidebar-ink-dim:#7d878c;
+    --copper:#b4632c;
+    --copper-bright:#d07a3c;
+    --teal:#1f6f6b;
+    --teal-bright:#2c8f89;
+    --rule:#ddd3c4;
+    --rule-soft:#e8e0d2;
+    --code-bg:#20262a;
+    --code-ink:#dfe4e3;
+    --warn:#9a5b1f;
+    --ok:#2c7a4b;
+    --shadow:0 1px 2px rgba(33,27,20,.06),0 8px 28px rgba(33,27,20,.08);
+    --maxw:820px;
+    --sbw:300px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Hanken Grotesk',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.65;
+    font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    position:fixed;top:0;left:0;bottom:0;width:var(--sbw);
+    background:var(--sidebar);
+    color:var(--sidebar-ink);
+    display:flex;flex-direction:column;
+    border-right:1px solid #0e1316;
+    z-index:50;
+  }
+  .brand{
+    padding:26px 26px 18px;
+    border-bottom:1px solid #0e1316;
+  }
+  .brand h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:25px;
+    letter-spacing:-.01em;
+    color:#f2ede4;
+    line-height:1.05;
+    display:flex;align-items:baseline;gap:8px;
+  }
+  .brand h1 .dot{color:var(--copper-bright)}
+  .brand .sub{
+    font-size:12px;color:var(--sidebar-ink-dim);
+    margin-top:7px;letter-spacing:.02em;
+    font-weight:500;
+  }
+  .brand .ver{
+    display:inline-block;margin-top:12px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;letter-spacing:.04em;
+    color:var(--teal-bright);
+    border:1px solid #2c3a3a;
+    background:#16201f;
+    padding:3px 8px;border-radius:5px;
+  }
+  .search-wrap{padding:16px 20px 8px}
+  .search-wrap input{
+    width:100%;
+    background:var(--sidebar-2);
+    border:1px solid #2e373c;
+    color:#e7ebec;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    padding:9px 12px;border-radius:7px;
+    outline:none;transition:border-color .15s;
+  }
+  .search-wrap input:focus{border-color:var(--teal)}
+  .search-wrap input::placeholder{color:#69737a}
+  nav{
+    flex:1;overflow-y:auto;padding:8px 12px 40px;
+  }
+  nav::-webkit-scrollbar{width:9px}
+  nav::-webkit-scrollbar-thumb{background:#2b3338;border-radius:5px}
+  .nav-group{margin-top:18px}
+  .nav-group > .label{
+    font-size:10.5px;font-weight:700;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--sidebar-ink-dim);
+    padding:0 14px 7px;
+  }
+  nav a{
+    display:block;
+    color:var(--sidebar-ink);
+    text-decoration:none;
+    font-size:13.5px;
+    padding:6.5px 14px;
+    border-radius:7px;
+    transition:background .13s,color .13s;
+    position:relative;
+  }
+  nav a:hover{background:#232c31;color:#fff}
+  nav a.active{
+    background:#243230;color:#fff;
+    box-shadow:inset 2px 0 0 var(--copper-bright);
+  }
+  nav a.sub{padding-left:26px;font-size:12.5px;color:var(--sidebar-ink-dim)}
+  nav a.sub:hover,nav a.sub.active{color:#fff}
+  .nav-hidden{display:none!important}
+
+  /* ---------- MAIN ---------- */
+  main{margin-left:var(--sbw);padding:0}
+  .hero{
+    background:
+      radial-gradient(900px 380px at 88% -10%, rgba(180,99,44,.12), transparent 60%),
+      radial-gradient(700px 340px at 0% 0%, rgba(31,111,107,.10), transparent 55%),
+      var(--paper);
+    border-bottom:1px solid var(--rule);
+    padding:62px 60px 46px;
+  }
+  .hero .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--copper);font-weight:600;
+  }
+  .hero h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:46px;line-height:1.04;letter-spacing:-.02em;
+    margin:14px 0 0;max-width:760px;
+  }
+  .hero p{
+    margin-top:18px;max-width:640px;
+    font-size:17px;color:var(--ink-soft);
+  }
+  .stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+  .stat{
+    background:#fff;border:1px solid var(--rule);
+    border-radius:11px;padding:14px 18px;min-width:118px;
+    box-shadow:var(--shadow);
+  }
+  .stat .n{font-family:'Fraunces',serif;font-weight:600;font-size:27px;line-height:1}
+  .stat .n.tealc{color:var(--teal)}
+  .stat .n.coppc{color:var(--copper)}
+  .stat .l{font-size:11.5px;color:var(--ink-soft);margin-top:5px;letter-spacing:.02em}
+
+  .content{padding:18px 60px 120px;max-width:calc(var(--maxw) + 120px)}
+  section{padding-top:40px;scroll-margin-top:20px}
+  section > h3{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:30px;letter-spacing:-.015em;
+    padding-bottom:12px;margin-bottom:8px;
+    border-bottom:2px solid var(--ink);
+    display:inline-block;
+  }
+  section > h4{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:21px;margin:30px 0 10px;letter-spacing:-.01em;
+  }
+  section p{margin:13px 0;color:var(--ink-soft)}
+  section p strong{color:var(--ink);font-weight:600}
+  .lead{font-size:17.5px;color:var(--ink)!important;max-width:680px}
+  a.inline{color:var(--teal);text-decoration:none;border-bottom:1px solid var(--teal-bright)}
+  a.inline:hover{background:#e7efee}
+
+  ul.clean,ol.clean{margin:14px 0 14px 4px;padding-left:22px;color:var(--ink-soft)}
+  ul.clean li,ol.clean li{margin:7px 0}
+  ul.clean li strong,ol.clean li strong{color:var(--ink)}
+
+  /* code */
+  pre{
+    background:var(--code-bg);
+    color:var(--code-ink);
+    border-radius:11px;
+    padding:18px 20px;
+    overflow-x:auto;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;line-height:1.6;
+    margin:16px 0;
+    position:relative;
+    border:1px solid #2c343a;
+  }
+  pre code{font-family:inherit;white-space:pre}
+  .code-head{
+    display:flex;align-items:center;justify-content:space-between;
+    background:#1a2024;border:1px solid #2c343a;border-bottom:none;
+    border-radius:11px 11px 0 0;
+    padding:8px 16px;margin-top:16px;
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;
+    color:#8b9499;letter-spacing:.03em;
+  }
+  .code-head + pre{margin-top:0;border-radius:0 0 11px 11px}
+  .copy-btn{
+    background:#2a333a;color:#bcc4c6;border:1px solid #39444b;
+    border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;transition:all .13s;
+  }
+  .copy-btn:hover{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .copy-btn.done{background:var(--ok);color:#fff;border-color:var(--ok)}
+  code.ic{
+    font-family:'IBM Plex Mono',monospace;font-size:.88em;
+    background:var(--paper-2);color:#7a4420;
+    padding:1.5px 6px;border-radius:5px;border:1px solid var(--rule-soft);
+  }
+  .tok-k{color:#e0925e}/* keyword */
+  .tok-t{color:#5fb3ac}/* type */
+  .tok-c{color:#7a858b;font-style:italic}/* comment */
+  .tok-s{color:#cdae6d}/* string */
+  .tok-n{color:#c98a8a}/* number */
+  .tok-f{color:#9db6d6}/* func */
+
+  /* class card */
+  .card{
+    background:#fff;border:1px solid var(--rule);
+    border-radius:13px;margin:18px 0;overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .card-head{
+    display:flex;align-items:center;gap:12px;cursor:pointer;
+    padding:15px 20px;
+    background:linear-gradient(0deg,#fcfaf6,#fff);
+    border-bottom:1px solid transparent;
+    transition:border-color .15s;
+    user-select:none;
+  }
+  .card.open .card-head{border-bottom-color:var(--rule-soft)}
+  .card-head .cname{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;
+    color:var(--ink);
+  }
+  .card-head .ctag{
+    font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:3px 9px;border-radius:20px;
+  }
+  .ctag.iface{background:#e6efee;color:var(--teal)}
+  .ctag.elem{background:#f6e8dd;color:var(--copper)}
+  .ctag.const{background:#ece6f0;color:#6b4a86}
+  .ctag.therm{background:#fbe7d8;color:#a85a22}
+  .ctag.solver{background:#e2ece6;color:#2c7a4b}
+  .ctag.io{background:#eae6df;color:#5a5043}
+  .card-head .file{
+    margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11.5px;
+    color:#a59a88;
+  }
+  .card-head .chev{transition:transform .2s;color:#b3a892;font-size:13px;margin-left:10px}
+  .card.open .chev{transform:rotate(90deg)}
+  .card-body{display:none;padding:4px 22px 20px}
+  .card.open .card-body{display:block}
+  .card-body p{margin:11px 0}
+  .field-tag{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;
+    font-size:11px;color:var(--ink-soft);margin:2px 6px 2px 0;
+  }
+  .role{
+    font-size:13px;color:var(--teal);font-weight:600;
+    margin:6px 0 2px;letter-spacing:.02em;
+  }
+
+  /* callouts */
+  .note{
+    border-left:3px solid var(--teal);
+    background:#edf4f3;
+    padding:13px 18px;border-radius:0 9px 9px 0;margin:16px 0;
+    font-size:14.5px;color:#234b48;
+  }
+  .note.warn{border-left-color:var(--warn);background:#f8efe2;color:#6e4a1e}
+  .note .nt{font-weight:700;display:block;margin-bottom:3px;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+
+  /* tables */
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:13.5px}
+  th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--rule-soft)}
+  th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);border-bottom:2px solid var(--rule)}
+  td{color:var(--ink-soft)}
+  td code,th code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--copper)}
+  tr:hover td{background:#fbf8f2}
+
+  /* tabs */
+  .tabs{display:flex;gap:4px;margin:18px 0 0;border-bottom:1px solid var(--rule)}
+  .tab{
+    padding:9px 16px;cursor:pointer;font-size:13.5px;font-weight:600;
+    color:var(--ink-soft);border-bottom:2px solid transparent;margin-bottom:-1px;
+    transition:all .13s;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--copper);border-bottom-color:var(--copper)}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+
+  /* pipeline diagram */
+  .pipe{
+    display:flex;align-items:stretch;gap:0;margin:24px 0;flex-wrap:wrap;
+    background:#fff;border:1px solid var(--rule);border-radius:13px;
+    padding:22px;box-shadow:var(--shadow);
+  }
+  .pipe-step{
+    flex:1;min-width:120px;text-align:center;position:relative;padding:0 8px;
+  }
+  .pipe-step:not(:last-child)::after{
+    content:"→";position:absolute;right:-7px;top:18px;color:var(--copper);font-size:18px;
+  }
+  .pipe-step .ps-ic{
+    width:44px;height:44px;margin:0 auto 9px;border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:600;font-size:19px;color:#fff;
+  }
+  .pipe-step .ps-t{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .pipe-step .ps-d{font-size:11px;color:var(--ink-soft);margin-top:3px;line-height:1.4}
+
+  /* interactive case builder */
+  .builder{
+    background:#fff;border:1px solid var(--rule);border-radius:13px;
+    overflow:hidden;margin:20px 0;box-shadow:var(--shadow);
+  }
+  .builder-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .builder-form{padding:22px;border-right:1px solid var(--rule-soft)}
+  .builder-out{background:var(--code-bg);padding:0}
+  .builder-out .code-head{margin:0;border-radius:0;border-top:none;border-right:none}
+  .builder-out pre{margin:0;border-radius:0;border:none;min-height:100%}
+  .fg{margin-bottom:15px}
+  .fg label{display:block;font-size:12px;font-weight:600;color:var(--ink);margin-bottom:5px;letter-spacing:.01em}
+  .fg .hint{font-size:11px;color:#9a9080;font-weight:400}
+  .fg input,.fg select{
+    width:100%;padding:8px 11px;border:1px solid var(--rule);border-radius:7px;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink);
+    background:var(--paper);outline:none;transition:border-color .13s;
+  }
+  .fg input:focus,.fg select:focus{border-color:var(--teal)}
+  .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .chk{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:13px;color:var(--ink-soft)}
+  .chk input{width:auto}
+
+  footer{
+    margin-left:var(--sbw);
+    background:var(--sidebar);color:var(--sidebar-ink-dim);
+    padding:30px 60px;font-size:13px;
+    border-top:1px solid #0e1316;
+  }
+  footer strong{color:var(--sidebar-ink)}
+  .mono{font-family:'IBM Plex Mono',monospace}
+
+  @media(max-width:1080px){
+    :root{--sbw:0px}
+    .sidebar{transform:translateX(-100%);transition:transform .25s}
+    .sidebar.show{transform:translateX(0)}
+    main,footer{margin-left:0}
+    .hero,.content,footer{padding-left:26px;padding-right:26px}
+    .builder-grid{grid-template-columns:1fr}
+    .builder-form{border-right:none;border-bottom:1px solid var(--rule-soft)}
+    .menu-btn{display:flex!important}
+  }
+  .menu-btn{
+    display:none;position:fixed;top:16px;right:16px;z-index:60;
+    background:var(--sidebar);color:#fff;border:none;border-radius:9px;
+    width:44px;height:44px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;
+    box-shadow:var(--shadow);
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-btn" id="menuBtn">☰</button>
+
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <h1>SaltCreep<span class="dot">.</span></h1>
+    <div class="sub">Solver FEM de fluência em rocha salina</div>
+    <span class="ver">v1.0 · 120 testes C++ · 21 testes Py</span>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="navSearch" placeholder="buscar na navegação…" autocomplete="off">
+  </div>
+  <nav id="nav">
+    <div class="nav-group">
+      <div class="label">Início</div>
+      <a href="#overview">Visão geral</a>
+      <a href="#architecture">Arquitetura</a>
+      <a href="#physics">Física e invariantes</a>
+      <a href="#developer-guide">Developer Guide</a>
+    </div>
+    <div class="nav-group">
+      <div class="label">Referência de classes</div>
+      <a href="#interfaces">Interfaces</a>
+      <a href="#interfaces" class="sub">Element</a>
+      <a href="#interfaces" class="sub">ConstitutiveModel</a>
+      <a href="#interfaces" class="sub">ThermalField</a>
+      <a href="#elements">Elementos</a>
+      <a href="#elements" class="sub">AxisymL3 · Q4 · T3</a>
+      <a href="#elements" class="sub">Q8 · Q9 · T6</a>
+      <a href="#constitutive">Modelos constitutivos</a>
+      <a href="#constitutive" class="sub">DoubleMechanism</a>
+      <a href="#constitutive" class="sub">EDMT · ISV · Motta/Wang/Aubertin</a>
+      <a href="#thermal">Campos térmicos</a>
+      <a href="#mesh-adaptation">Refinamento adaptativo</a>
+      <a href="#solver">Motor / Solver</a>
+      <a href="#io">Entrada e saída</a>
+    </div>
+    <div class="nav-group">
+      <div class="label">Guia prático</div>
+      <a href="#input">Criar um arquivo de caso</a>
+      <a href="#builder">Construtor interativo</a>
+      <a href="#build">Compilação e executável</a>
+      <a href="#run">Rodar um caso</a>
+      <a href="#post">Pós-processamento</a>
+      <a href="#visualization">Visualização</a>
+      <a href="#final-report">Final Report</a>
+      <a href="#verify">Verificação</a>
+    </div>
+  </nav>
+</aside>
+
+<main>
+  <div class="hero">
+    <div class="eyebrow">Documentação técnica · C++20 / Python</div>
+    <h2>Solver de fechamento de poços em rocha salina por fluência</h2>
+    <p class="lead">Motor FEM axissimétrico com fluência primária, secundária e terciária com dano, acoplamento termomecânico fraco e seis tipos de elemento finito. Verificador independente do SESTSAL e plataforma para extensões de pesquisa.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="n coppc">3</div><div class="l">interfaces plugáveis</div></div>
+      <div class="stat"><div class="n tealc">7</div><div class="l">tipos de elemento</div></div>
+      <div class="stat"><div class="n coppc">6</div><div class="l">leis de fluência</div></div>
+      <div class="stat"><div class="n tealc">2</div><div class="l">integradores temporais</div></div>
+      <div class="stat"><div class="n coppc">141</div><div class="l">testes verdes</div></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+  <!-- ============ OVERVIEW ============ -->
+  <section id="overview">
+    <h3>Visão geral</h3>
+    <p class="lead">O SaltCreep resolve o problema de fechamento de poços verticais perfurados em formações de rocha salina, onde a fluência (creep) do sal fecha lentamente o furo ao longo do tempo.</p>
+    <p>O projeto persegue <strong>dois objetivos simultâneos</strong>:</p>
+    <ul class="clean">
+      <li><strong>Verificador independente</strong> do SESTSAL — o motor de produção legado (sucessor do ANVEC) usado em engenharia de poços. Reproduzir seus resultados com um código independente dá confiança nas previsões de fechamento.</li>
+      <li><strong>Motor modernizado</strong> que incorpora estágios de fluência que o legado não cobre por completo: primária + secundária + terciária + dano, acoplamento termomecânico, e múltiplos tipos de elemento finito para estudo de convergência.</li>
+    </ul>
+    <p>O método numérico é <strong>FEM contínuo</strong> (Método dos Elementos Finitos). A decisão de não usar BEM, FVM ou MPM foi deliberada: a fluência é uma integral de domínio (a deformação viscosa age como força de corpo), o que anula a vantagem de fronteira do BEM; as variáveis de dano são volumétricas; e o regime físico (pequenas deformações, condições de contorno precisas na parede do poço) favorece o FEM.</p>
+    <div class="note">
+      <span class="nt">Princípio de construção</span>
+      O solver foi construído de forma <strong>incremental e verificável</strong>: cada camada nova precisa passar em toda a bateria de testes antes da próxima entrar. Nenhuma etapa avança com regressão vermelha.
+    </div>
+  </section>
+
+  <!-- ============ DEVELOPER GUIDE ============ -->
+  <section id="developer-guide">
+    <h3>Developer Guide</h3>
+    <p class="lead">O guia de desenvolvimento explica como estender o solver sem violar os contratos de física e verificação.</p>
+    <div class="note">
+      <span class="nt">Extensões seguras</span>
+      Consulte <a href="developer-guide.md"><code class="ic">docs/developer-guide.md</code></a> antes de adicionar um novo <code class="ic">Element</code>, <code class="ic">ConstitutiveModel</code> ou <code class="ic">ThermalField</code>. O guia cobre fluxo do solver, factories, testes mínimos, YAML, documentação e checklist de validação.
+    </div>
+    <div class="code-head"><span>abrir guia de desenvolvimento</span><button class="copy-btn">copiar</button></div>
+    <pre><code>docs/developer-guide.md</code></pre>
+  </section>
+
+  <!-- ============ ARCHITECTURE ============ -->
+  <section id="architecture">
+    <h3>Arquitetura</h3>
+    <p class="lead">O coração do projeto são <strong>três interfaces plugáveis</strong>. O motor conhece apenas os contratos abstratos; as implementações concretas se registram em factories e são escolhidas pelo arquivo de caso, sem recompilação.</p>
+
+    <div class="pipe">
+      <div class="pipe-step">
+        <div class="ps-ic" style="background:var(--teal)">Y</div>
+        <div class="ps-t">CaseParser</div>
+        <div class="ps-d">Lê o YAML, valida e monta a configuração</div>
+      </div>
+      <div class="pipe-step">
+        <div class="ps-ic" style="background:var(--copper)">F</div>
+        <div class="ps-t">Factories</div>
+        <div class="ps-d">Instanciam Element, ConstitutiveModel, ThermalField</div>
+      </div>
+      <div class="pipe-step">
+        <div class="ps-ic" style="background:#6b4a86">A</div>
+        <div class="ps-t">Assembler</div>
+        <div class="ps-d">Monta K, f_geo, pseudo-forças</div>
+      </div>
+      <div class="pipe-step">
+        <div class="ps-ic" style="background:#2c7a4b">∫</div>
+        <div class="ps-t">Integrator</div>
+        <div class="ps-d">Avança no tempo (explícito ou implícito)</div>
+      </div>
+      <div class="pipe-step">
+        <div class="ps-ic" style="background:var(--copper-bright)">↘</div>
+        <div class="ps-t">Output</div>
+        <div class="ps-d">CSV + metadata.json + VTU/PVD → saltpost</div>
+      </div>
+    </div>
+
+    <h4>As três interfaces</h4>
+    <table>
+      <tr><th>Interface</th><th>Responsabilidade</th><th>Implementações</th></tr>
+      <tr><td><code>Element</code></td><td>Geometria do elemento finito: funções de forma, matriz B, Jacobiano</td><td>L3, Q4, T3, Q8, Q9, T6</td></tr>
+      <tr><td><code>ConstitutiveModel</code></td><td>Lei de fluência: taxa viscosa, tangente, dano</td><td>DoubleMechanism, EDMT, ISVSHDMunson, MottaV1, Wang2004, AubertinISVSHD</td></tr>
+      <tr><td><code>ThermalField</code></td><td>Campo de temperatura T(r,z,t) consumido pelo Arrhenius e pela deformação térmica</td><td>ProfileField, Conduction1DField, Conduction2DField</td></tr>
+    </table>
+
+    <h4>Otimização central: K constante</h4>
+    <p>A matriz de rigidez elástica <code class="ic">K</code> é <strong>constante</strong> durante toda a simulação (o acoplamento térmico é fraco e não a altera). Por isso ela é fatorada <strong>uma única vez</strong> (Cholesky/LDLᵀ via <code class="ic">SimplicialLDLT</code> do Eigen), e cada passo no tempo é apenas uma back-substitution barata. Toda a não linearidade (fluência, dano, expansão térmica) vive no <strong>lado direito</strong> como pseudo-forças.</p>
+
+    <h4>Layout do repositório</h4>
+    <div class="code-head"><span>estrutura de pastas</span><button class="copy-btn">copiar</button></div>
+    <pre><code>saltcreep/
+├── CLAUDE.md / AGENTS.md      <span class="tok-c"># instruções para agentes de IA</span>
+├── CMakeLists.txt             <span class="tok-c"># C++20, Ninja, FetchContent</span>
+├── include/                   <span class="tok-c"># TODOS os .hpp + Eigen vendored</span>
+│   ├── Eigen/                 <span class="tok-c"># Eigen 5.x (header-only)</span>
+│   ├── elements/              <span class="tok-c"># Element.hpp + 7 elementos</span>
+│   ├── constitutive/          <span class="tok-c"># ConstitutiveModel + DM/EDMT/ISV/Motta/Wang/Aubertin</span>
+│   ├── thermal/               <span class="tok-c"># ThermalField + Profile/Conduction</span>
+│   ├── solver/                <span class="tok-c"># Mesh, Factory, Assembler, Integrators</span>
+│   ├── io/                    <span class="tok-c"># CaseParser + VtuWriter</span>
+│   └── types.hpp              <span class="tok-c"># Voigt, GaussPoint, Stress, InternalState</span>
+├── src/                       <span class="tok-c"># TODOS os .cpp (espelha include/)</span>
+├── main/main.cpp              <span class="tok-c"># ponto de entrada</span>
+├── cases/                     <span class="tok-c"># YAML por simulação (tcc/ = oráculos)</span>
+├── data/litologias/           <span class="tok-c"># propriedades de halita, taquidrita…</span>
+├── post/saltpost/             <span class="tok-c"># pacote Python de pós-processamento</span>
+├── tests/cpp + tests/python   <span class="tok-c"># Catch2 + pytest/unittest</span>
+└── results/                   <span class="tok-c"># saída (gitignored)</span></code></pre>
+  </section>
+
+  <!-- ============ PHYSICS ============ -->
+  <section id="physics">
+    <h3>Física e invariantes</h3>
+    <p class="lead">Erros nos invariantes físicos são silenciosos e fatais — o código compila, roda, e produz números errados. Eles são testados explicitamente.</p>
+
+    <h4>Decomposição aditiva da deformação</h4>
+    <p>A deformação total em cada ponto material é a soma de três contribuições:</p>
+    <div class="code-head"><span>decomposição</span></div>
+    <pre><code>ε_total = ε_elástica + ε_viscosa + ε_térmica
+          (ε^e)        (ε^v)        (ε^th)</code></pre>
+    <p>A tensão é recuperada de <code class="ic">σ = D · (B·u − ε^v − ε^th) + σ_geo</code>, onde <code class="ic">D</code> é a matriz constitutiva elástica e <code class="ic">σ_geo</code> é o estado geostático inicial.</p>
+
+    <h4>Invariantes invioláveis</h4>
+    <ul class="clean">
+      <li><strong>Configuração de referência:</strong> a deformação é medida a partir do estado geostático, no instante logo após o furo. O estado geostático em si não gera deformação.</li>
+      <li><strong>Taxa volumétrica viscosa = 0:</strong> a fluência é puramente desviadora (material isotrópico). O sal não muda de volume ao fluir.</li>
+      <li><strong>K constante:</strong> fatorada uma vez; a temperatura entra só via Arrhenius e ε^th, nunca alterando K.</li>
+      <li><strong>Saturação primária → secundária:</strong> primária + secundária deve convergir para o mecanismo duplo puro no regime permanente. Testado com tolerância &lt; 1%.</li>
+      <li><strong>Convenção de sinal:</strong> compressão é <strong>negativa</strong> internamente (verificado: σ_geo ≈ −119,7 MPa no modelo A). A envoltória de Spier foi ajustada para essa convenção.</li>
+      <li><strong>Ordem de Voigt:</strong> <code class="ic">[ε_rr, ε_θθ, ε_zz, γ_rz]</code> em todo o código.</li>
+      <li><strong>Taquidrita:</strong> taxa de fluência ~10⁷× a da halita → exige passo de tempo pequeno ou integrador implícito.</li>
+    </ul>
+
+    <h4>Acoplamento termomecânico FRACO</h4>
+    <p>O acoplamento é <strong>unidirecional</strong>: o campo térmico afeta a mecânica, mas a mecânica não retroalimenta o térmico. A temperatura entra de duas formas: (i) na deformação térmica <code class="ic">ε^th = α(T − T_ref)</code>, e (ii) no termo de Arrhenius da lei de fluência (temperatura mais alta acelera a fluência). O algoritmo segue Vasconcelos (2019).</p>
+    <div class="note">
+      <span class="nt">Por que fraco e não forte</span>
+      O acoplamento forte (monolítico) exigiria refatorar K a cada passo, destruindo a otimização de fatoração única. O acoplamento fraco preserva K constante e é fisicamente adequado para o regime do problema, conforme validado na dissertação de referência.
+    </div>
+
+    <h4>Fluência terciária e detecção de falha</h4>
+    <p>A variável interna de dano <code class="ic">D</code> representa a progressão acumulada de microfissuração e perda de integridade mecânica. Ela é limitada ao intervalo operacional <code class="ic">0 ≤ D ≤ D_max</code>, com <code class="ic">D_max = 0.99</code> para impedir singularidade numérica.</p>
+    <ul class="clean">
+      <li><strong>D = 0:</strong> material íntegro; a taxa de fluência terciária reduz exatamente ao mecanismo duplo quando a envoltória de dilatância não é ativada.</li>
+      <li><strong>D intermediário:</strong> dano em evolução; a taxa é amplificada por <code class="ic">(1 − D)^{-n_d}</code>, acelerando o fechamento em relação ao regime secundário.</li>
+      <li><strong>D → D_max:</strong> regime próximo da ruptura; a taxa cresce rapidamente e o problema temporal se torna rígido.</li>
+    </ul>
+    <p>O início da terciária pode ser identificado pelo <strong>ponto de inflexão</strong> na curva deformação × tempo: a taxa deixa de estabilizar/desacelerar e passa a crescer. No modelo Motta v1, o dano só evolui quando a envoltória de dilatância indica regime dilatante: <code class="ic">f_dil &gt; 0</code>. Para <code class="ic">f_dil ≤ 0</code>, o confinamento é considerado seguro e <code class="ic">dD/dt = 0</code>.</p>
+    <div class="note warn">
+      <span class="nt">Atenção numérica</span>
+      Para detectar falha, rode com <code class="ic">creep.tertiary: true</code>, <code class="ic">creep.damage: true</code> e <code class="ic">time.scheme: implicit_adaptive</code>. O integrador explícito tende a divergir no regime terciário acelerado.
+    </div>
+    <div class="note">
+      <span class="nt">Calibração</span>
+      Sem dados experimentais que incluam o estágio terciário até ruptura, a previsão de falha por dano é qualitativa. Para uso quantitativo, os parâmetros de Motta v1 e da envoltória de Spier devem ser calibrados com ensaios triaxiais apropriados.
+    </div>
+  </section>
+
+  <!-- ============ INTERFACES ============ -->
+  <section id="interfaces">
+    <h3>Interfaces (contratos abstratos)</h3>
+    <p class="lead">As três classes base que definem os contratos. O motor depende apenas delas — nunca de implementações concretas.</p>
+
+    <div class="card open" data-name="Element ConstitutiveModel ThermalField interface contrato">
+      <div class="card-head">
+        <span class="ctag iface">interface</span>
+        <span class="cname">Element</span>
+        <span class="file">include/elements/Element.hpp</span>
+        <span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">O que faz</p>
+        <p>Define o contrato de um elemento finito axissimétrico. Qualquer elemento (1D ou 2D) implementa estes métodos; o Assembler trabalha apenas com a interface.</p>
+        <p class="role">Métodos principais</p>
+        <pre><code><span class="tok-k">class</span> <span class="tok-t">Element</span> {
+<span class="tok-k">public</span>:
+  <span class="tok-k">virtual</span> std::span&lt;<span class="tok-k">const</span> GaussPoint&gt; <span class="tok-f">gauss_points</span>() <span class="tok-k">const</span> = <span class="tok-n">0</span>;
+  <span class="tok-k">virtual</span> <span class="tok-k">void</span> <span class="tok-f">shape_functions</span>(<span class="tok-k">const</span> GaussPoint&, std::span&lt;<span class="tok-k">double</span>&gt; N) <span class="tok-k">const</span> = <span class="tok-n">0</span>;
+  <span class="tok-k">virtual</span> Eigen::MatrixXd <span class="tok-f">B_matrix</span>(<span class="tok-k">const</span> GaussPoint&,
+                                  std::span&lt;<span class="tok-k">const</span> Node&gt;) <span class="tok-k">const</span> = <span class="tok-n">0</span>;
+  <span class="tok-k">virtual</span> <span class="tok-k">double</span> <span class="tok-f">jacobian_weight</span>(<span class="tok-k">const</span> GaussPoint&,
+                                  std::span&lt;<span class="tok-k">const</span> Node&gt;) <span class="tok-k">const</span> = <span class="tok-n">0</span>;
+  <span class="tok-k">virtual</span> <span class="tok-k">int</span> <span class="tok-f">n_nodes</span>() <span class="tok-k">const</span> = <span class="tok-n">0</span>;
+  <span class="tok-k">virtual</span> <span class="tok-k">int</span> <span class="tok-f">n_dofs_per_node</span>() <span class="tok-k">const</span> = <span class="tok-n">0</span>;
+};</code></pre>
+        <p class="role">Detalhe crítico — matriz B axissimétrica</p>
+        <p>A matriz B inclui o termo <code class="ic">ε_θθ = u_r / r</code> (deformação circunferencial), avaliado com o raio interpolado no ponto de Gauss. É o erro mais comum em elementos axissimétricos — o teste de Lamé detecta exatamente sua ausência. O peso de integração inclui o fator <code class="ic">2πr</code>.</p>
+      </div>
+    </div>
+
+    <div class="card" data-name="ConstitutiveModel interface fluência creep tangente">
+      <div class="card-head">
+        <span class="ctag iface">interface</span>
+        <span class="cname">ConstitutiveModel</span>
+        <span class="file">include/constitutive/ConstitutiveModel.hpp</span>
+        <span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">O que faz</p>
+        <p>Define o contrato de uma lei de fluência. Dada a tensão, o estado interno, a temperatura e o passo de tempo, retorna a taxa de deformação viscosa e atualiza o estado.</p>
+        <p class="role">Métodos principais</p>
+        <pre><code><span class="tok-k">class</span> <span class="tok-t">ConstitutiveModel</span> {
+<span class="tok-k">public</span>:
+  <span class="tok-c">// taxa viscosa + atualização de estado + dano</span>
+  <span class="tok-k">virtual</span> ViscousResult <span class="tok-f">evaluate</span>(<span class="tok-k">const</span> Stress&, <span class="tok-k">const</span> InternalState&,
+                                  <span class="tok-k">double</span> T, <span class="tok-k">double</span> dt) <span class="tok-k">const</span> = <span class="tok-n">0</span>;
+  <span class="tok-c">// matriz constitutiva elástica D (constante)</span>
+  <span class="tok-k">virtual</span> Eigen::MatrixXd <span class="tok-f">D_elastic</span>() <span class="tok-k">const</span> = <span class="tok-n">0</span>;
+  <span class="tok-c">// tangente d(ε̇_v)/d(σ) para o Newton local do implícito</span>
+  <span class="tok-c">// default: diferenças finitas; modelos sobrescrevem com analítico</span>
+  <span class="tok-k">virtual</span> Eigen::MatrixXd <span class="tok-f">tangent</span>(<span class="tok-k">const</span> Stress&, <span class="tok-k">const</span> InternalState&,
+                                 <span class="tok-k">double</span> T) <span class="tok-k">const</span>;
+};</code></pre>
+        <p>A <code class="ic">tangent()</code> tem um default numérico (diferenças finitas centrais) que funciona para qualquer lei; DM, EDMT, ISVSHDMunson, MottaV1, Wang2004 e AubertinISVSHD a sobrescrevem com derivadas analíticas ou tangentes simplificadas aprovadas para acelerar o Newton local.</p>
+      </div>
+    </div>
+
+    <div class="card" data-name="ThermalField interface temperatura térmico Arrhenius">
+      <div class="card-head">
+        <span class="ctag iface">interface</span>
+        <span class="cname">ThermalField</span>
+        <span class="file">include/thermal/ThermalField.hpp</span>
+        <span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">O que faz</p>
+        <p>Define o contrato de uma fonte de temperatura. Fornece T(x,t) em qualquer ponto físico e instante, mais os parâmetros de expansão térmica.</p>
+        <pre><code><span class="tok-k">class</span> <span class="tok-t">ThermalField</span> {
+<span class="tok-k">public</span>:
+  <span class="tok-k">virtual</span> <span class="tok-k">double</span> <span class="tok-f">temperature_at</span>(<span class="tok-k">const</span> Eigen::Vector2d& x,
+                                 <span class="tok-k">double</span> t) <span class="tok-k">const</span> = <span class="tok-n">0</span>;
+  <span class="tok-k">virtual</span> <span class="tok-k">double</span> <span class="tok-f">alpha_thermal</span>() <span class="tok-k">const</span> = <span class="tok-n">0</span>;  <span class="tok-c">// coef. expansão</span>
+  <span class="tok-k">virtual</span> <span class="tok-k">double</span> <span class="tok-f">T_reference</span>() <span class="tok-k">const</span> = <span class="tok-n">0</span>;    <span class="tok-c">// T de referência</span>
+};</code></pre>
+        <p>Implementações: <code class="ic">ProfileField</code> (perfil T(z) analítico, estacionário), <code class="ic">Conduction1DField</code> (calor radial transiente) e <code class="ic">Conduction2DField</code> (calor em r,z com camadas).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ELEMENTS ============ -->
+  <section id="elements">
+    <h3>Elementos finitos</h3>
+    <p class="lead">Seis tipos de elemento, todos axissimétricos, todos com o termo <code class="ic">u/r</code> e integração com peso <code class="ic">2πr</code>. O tipo é uma flag no arquivo de caso — permite estudo de convergência com o mesmo caso físico.</p>
+
+    <table>
+      <tr><th>Elemento</th><th>Nós</th><th>Ordem</th><th>Integração</th><th>Taxa de convergência</th></tr>
+      <tr><td><code>axisym_1d_L3</code></td><td>3</td><td>Quadrático</td><td>Gauss (radial)</td><td>~h³ (3.81 medido)</td></tr>
+      <tr><td><code>axisym_2d_Q4</code></td><td>4</td><td>Bilinear</td><td>2×2 Gauss</td><td>~h² (1.91)</td></tr>
+      <tr><td><code>axisym_2d_T3</code></td><td>3</td><td>Linear</td><td>3 pontos triangular</td><td>~h² (1.88)</td></tr>
+      <tr><td><code>axisym_2d_Q8</code></td><td>8</td><td>Quadrático (serendipity)</td><td>3×3 Gauss</td><td>~h³ (3.58)</td></tr>
+      <tr><td><code>axisym_2d_Q9</code></td><td>9</td><td>Quadrático (Lagrange)</td><td>3×3 Gauss</td><td>~h³ (3.58)</td></tr>
+      <tr><td><code>axisym_2d_AQ9</code></td><td>9</td><td>Enriquecido Lamé</td><td>4×3 especial</td><td>exato p/ Lamé</td></tr>
+      <tr><td><code>axisym_2d_T6</code></td><td>6</td><td>Quadrático</td><td>Dunavant 6 pontos</td><td>~h³ (2.67)</td></tr>
+    </table>
+
+    <div class="card" data-name="AxisymL3 elemento 1D radial L3 TCC quadrático">
+      <div class="card-head">
+        <span class="ctag elem">elemento</span><span class="cname">AxisymL3</span>
+        <span class="file">elements/axisym_1d_L3</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Elemento radial 1D de 3 nós, quadrático — o elemento do TCC, usado como MVP e baseline de convergência. Espessura unitária. A matriz B é 3×3 (ε_rr, ε_θθ, ε_zz) com 1 DOF por nó (u_r). O termo ε_θθ = N_i/r é o crítico. É o elemento mais eficiente por GDL para o problema de Lamé puro radial.</p>
+      </div>
+    </div>
+    <div class="card" data-name="AxisymQ4 quadrilátero bilinear 4 nós 2D">
+      <div class="card-head">
+        <span class="ctag elem">elemento</span><span class="cname">AxisymQ4</span>
+        <span class="file">elements/axisym_2d_q4</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Quadrilátero bilinear (r,z), 4 nós, 2 DOFs/nó (u_r, u_z). Funções de forma <code class="ic">N_i = ¼(1±ξ)(1±η)</code>, integração Gauss 2×2 nos pontos (±1/√3). Matriz B 4×8 em Voigt. Jacobiano 2×2 completo. Primeiro elemento 2D, barato, baixa ordem.</p>
+      </div>
+    </div>
+    <div class="card" data-name="AxisymT3 triângulo linear 3 nós não estruturada">
+      <div class="card-head">
+        <span class="ctag elem">elemento</span><span class="cname">AxisymT3</span>
+        <span class="file">elements/axisym_2d_t3</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Triângulo linear, 3 nós, para malhas não estruturadas. Funções <code class="ic">N0=1−ξ−η, N1=ξ, N2=η</code>, derivadas constantes. Usa regra triangular de <strong>3 pontos</strong> (não centróide): o centróide de 1 ponto subintegra o termo axissimétrico N/r e perde a taxa h² — lição aprendida na validação.</p>
+      </div>
+    </div>
+    <div class="card" data-name="AxisymQ8 serendipity quadrático 8 nós">
+      <div class="card-head">
+        <span class="ctag elem">elemento</span><span class="cname">AxisymQ8</span>
+        <span class="file">elements/axisym_2d_q8</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Quadrilátero serendipity, 8 nós (cantos + meios de aresta), quadrático. Integração Gauss 3×3. Melhor precisão por GDL entre os 2D — recomendado para produção. Não tem nó central, então usa menos GDLs que o Q9 para a mesma ordem.</p>
+      </div>
+    </div>
+    <div class="card" data-name="AxisymQ9 Lagrangiano 9 nós quadrático">
+      <div class="card-head">
+        <span class="ctag elem">elemento</span><span class="cname">AxisymQ9</span>
+        <span class="file">elements/axisym_2d_q9</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Quadrilátero Lagrangiano, 9 nós (3×3, inclui centro). Funções de forma por produto tensorial dos polinômios de Lagrange 1D. Integração Gauss 3×3. Comparável ao Q8 em precisão; o nó central adiciona GDLs.</p>
+      </div>
+    </div>
+    <div class="card" data-name="AxisymAQ9 enriquecido Lame 9 nós base racional">
+      <div class="card-head">
+        <span class="ctag elem">elemento</span><span class="cname">AxisymAQ9</span>
+        <span class="file">elements/axisym_2d_aq9</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Quadrilátero de 9 nós enriquecido pela base radial <code class="ic">{1, r, 1/r}</code>. Mantém 2 DOFs por nó, usa quadratura radial especial com pesos positivos e resolve o Lamé com erro de machine epsilon em 1 elemento.</p>
+      </div>
+    </div>
+    <div class="card" data-name="AxisymT6 triângulo quadrático 6 nós baricêntrica Dunavant">
+      <div class="card-head">
+        <span class="ctag elem">elemento</span><span class="cname">AxisymT6</span>
+        <span class="file">elements/axisym_2d_t6</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Triângulo quadrático, 6 nós (cantos + meios). Funções de forma em coordenadas baricêntricas <code class="ic">L_i(2L_i−1)</code> e <code class="ic">4L_iL_j</code>. Integração Dunavant de 6 pontos (grau 4) — mais rica que 3 pontos, necessária para o termo N/r.</p>
+      </div>
+    </div>
+    <div class="note">
+      <span class="nt">AQ9 enriquecido</span>
+      O elemento da dissertação (Araújo 2012; Vasconcelos 2019) está implementado como <code class="ic">axisym_2d_AQ9</code>. A base radial inclui <code class="ic">1/r</code>, então o campo de Lamé é representado em erro de arredondamento com 1 elemento radial.
+    </div>
+  </section>
+
+  <!-- ============ CONSTITUTIVE ============ -->
+  <section id="constitutive">
+    <h3>Modelos constitutivos</h3>
+    <p class="lead">As leis de fluência. Cada estágio (secundária, primária, terciária) é ativado por flag no arquivo de caso e pode ser isolado ou combinado.</p>
+
+    <div class="card open" data-name="DoubleMechanism DM mecanismo duplo secundária Arrhenius">
+      <div class="card-head">
+        <span class="ctag const">constitutiva</span><span class="cname">DoubleMechanism</span>
+        <span class="file">constitutive/double_mechanism</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Física — fluência secundária (regime permanente)</p>
+        <p>O mecanismo duplo de Costa &amp; Poiate. A taxa de fluência depende da tensão efetiva via lei de potência, com expoente que muda conforme o mecanismo de deformação dominante:</p>
+        <pre><code>ε̇_v = ε̇₀ · (σ_ef/σ₀)ⁿ · exp[(Q/R)(1/T₀ − 1/T)]
+
+  n = 3   se σ_ef ≤ σ₀   (dislocation glide)
+  n = 5   se σ_ef &gt; σ₀   (dislocation climb)</code></pre>
+        <p class="role">Implementação</p>
+        <p>Direção da taxa pelo tensor desviador (<code class="ic">ε̇_ij = √(3/2)·ε̇·s_ij/σ_ef</code>), componente volumétrica zero. O termo de Arrhenius recebe T do ThermalField. As constantes (ε̇₀, σ₀, Q, T₀) vêm de <code class="ic">data/litologias/*.yaml</code> — nunca hard-coded. Tangente analítica implementada para o Newton local. Caso degenerado σ_ef → 0 retorna taxa zero (evita divisão por zero).</p>
+      </div>
+    </div>
+
+    <div class="card" data-name="EDMT primária endurecimento saturação transiente">
+      <div class="card-head">
+        <span class="ctag const">constitutiva</span><span class="cname">EDMT</span>
+        <span class="file">constitutive/edmt</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Física — fluência primária (transiente)</p>
+        <pre><code>ε̇_total = ε̇_DM · (1 + K₁·exp(−K₂·εᵥ))
+dεᵥ/dt  = |ε̇_total|        (variável de endurecimento)</code></pre>
+        <p class="role">Implementação</p>
+        <p>Acrescenta um transiente rápido inicial que decai para a taxa do mecanismo duplo. A variável de endurecimento <code class="ic">εᵥ</code> cresce monotonicamente; quando εᵥ→∞, o fator transiente → 1 e a taxa <strong>satura exatamente no DM</strong> (testado com tolerância &lt;1%). Flag <code class="ic">creep.primary</code>. Pode rodar isolada (só transiente) com aviso, ou combinada com a secundária.</p>
+      </div>
+    </div>
+
+    <div class="card" data-name="MottaV1 terciária dano Kachanov Spier Ratigan DeVries Hunsche dilatância">
+      <div class="card-head">
+        <span class="ctag const">constitutiva</span><span class="cname">MottaV1</span>
+        <span class="file">constitutive/motta_v1</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Física — fluência terciária com dano</p>
+        <pre><code>ε̇_total = ε̇_DM / (1 − D)^n_d                  (amplificação por dano)
+dD/dt   = A_d · max(f_dil,0)^m_d / (1−D)^p_d  (Kachanov)
+f_dil   = DilatancyEnvelope(I₁,J₂)</code></pre>
+        <p class="role">Implementação</p>
+        <p>O dano <code class="ic">D ∈ [0, 0.99]</code> amplifica a taxa de fluência. Com D=0 e abaixo da envoltória, reduz exatamente ao DM. A terciária só inicia em regime dilatante (<code class="ic">f_dil &gt; 0</code>); em confinamento compressivo, dD/dt = 0. A envoltória é escolhida em tempo de execução por <code class="ic">creep.dilatancy_envelope</code>: <code class="ic">Spier</code>, <code class="ic">Ratigan</code>, <code class="ic">DeVries</code> ou <code class="ic">Hunsche</code>. D é limitado a 0.99 para evitar singularidade.</p>
+        <p class="role">Diagnóstico de falha</p>
+        <p>Quando <code class="ic">output.damage_tracking: true</code> e <code class="ic">creep.damage: true</code>, o solver grava <code class="ic">damage_wall.csv</code> com D(t), taxa de fluência e tensão efetiva no ponto de Gauss mais próximo da parede, e <code class="ic">damage_events.csv</code> com cruzamentos de limiares, aceleração de taxa e inflexão estimada por diferenças finitas. O critério operacional de falha é <code class="ic">failure_D_critical</code>; por padrão D=0.5.</p>
+        <div class="note warn">
+          <span class="nt">Requer integrador implícito</span>
+          Casos com terciária + dano em litologias móveis (taquidrita) ou k0 alto exigem o <code class="ic">implicit_adaptive</code> — o explícito diverge no regime acelerado.
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-name="DilatancyEnvelope Spier Ratigan DeVries Hunsche envoltórias dilatância">
+      <div class="card-head">
+        <span class="ctag const">constitutiva</span><span class="cname">DilatancyEnvelope</span>
+        <span class="file">constitutive/dilatancy_envelope</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Física — início de dano por dilatância</p>
+        <pre><code>Spier:   f = √J₂ − a·I₁_comp − b
+Ratigan: f = √J₂ − c·(I₁_comp + d)^m
+DeVries: f = √J₂ − e·sinh(f_coeff·I₁_comp/σ₀)
+Hunsche: f = √J₂ − g·(I₁_comp/I₁_ref)^h</code></pre>
+        <p>As quatro envoltórias compartilham o contrato <code class="ic">dilatancy_function(I1,J2)</code>. Como as tensões internas usam compressão negativa, os termos de confinamento são avaliados com <code class="ic">I₁_comp = −I₁</code>. Se <code class="ic">f_dil ≤ 0</code>, o confinamento é seguro; se <code class="ic">f_dil &gt; 0</code>, o Motta v1 deixa o dano evoluir.</p>
+        <p class="role">Uso no YAML</p>
+        <p>Selecionar com <code class="ic">creep.dilatancy_envelope: Spier|Ratigan|DeVries|Hunsche</code>. Os blocos <code class="ic">spier</code>, <code class="ic">ratigan</code>, <code class="ic">devries</code> e <code class="ic">hunsche</code> permitem calibrar cada critério por litologia/ensaio.</p>
+      </div>
+    </div>
+
+    <div class="card" data-name="ISVSHDMunson ISV_SH_DM primária seno hiperbólico Munson Dawson Chan">
+      <div class="card-head">
+        <span class="ctag const">constitutiva</span><span class="cname">ISVSHDMunson</span>
+        <span class="file">constitutive/isv_sh_dm</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Física — primária Munson-Dawson/Chan</p>
+        <pre><code>ε̇_primary = ε̇0 · sinh(σ_ef/σ_ref)^n · exp[(Q/R)(1/T0 − 1/T)] · h(ε_v^p)
+h(ε_v^p) = 1/sinh(asinh(1) + K_h·ε_v^p)
+dε_v^p/dt = |ε̇_primary|</code></pre>
+        <p>Alternativa à EDMT para a fase primária. Com <code class="ic">secondary:true</code>, a taxa total é <code class="ic">ε̇_DM + ε̇_primary</code>; à medida que <code class="ic">ε_v^p</code> cresce, o hardening seno-hiperbólico decai e o modelo satura para DM. O deslocamento <code class="ic">asinh(1)</code> regulariza a singularidade inicial de <code class="ic">1/sinh(K_h ε_v^p)</code>, mantendo <code class="ic">h(0)=1</code>.</p>
+      </div>
+    </div>
+
+    <div class="card" data-name="Wang2004 CDM terciária dano von Mises">
+      <div class="card-head">
+        <span class="ctag const">constitutiva</span><span class="cname">Wang2004</span>
+        <span class="file">constitutive/wang_2004</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Física — dano contínuo acoplado à fluência</p>
+        <pre><code>ε̇_total = ε̇_DM / (1 − D)^n_d
+dD/dt   = A_d · σ_ef^m_d / (1 − D)^p_d
+σ_ef    = √(3/2 · s:s)</code></pre>
+        <p>É uma alternativa CDM ao Motta v1: o dano evolui diretamente com a tensão equivalente de von Mises, sem envoltória de dilatância. O parser carrega parâmetros padrão por litologia para halita e taquidrita, com override opcional em <code class="ic">creep.wang_2004</code>. O estado interno usa o mesmo campo <code class="ic">damage_D</code>, limitado a <code class="ic">D_max=0.99</code>.</p>
+        <p class="role">Uso recomendado</p>
+        <p>Ativar com <code class="ic">creep.tertiary: true</code>, <code class="ic">creep.damage: true</code> e <code class="ic">tertiary_model: wang_2004</code>. Como os parâmetros publicados são agressivos em unidades SI, use <code class="ic">implicit_adaptive</code> e trate previsões de falha como qualitativas até calibrar com ensaios.</p>
+      </div>
+    </div>
+
+    <div class="card" data-name="AubertinISVSHD ISV_SH_D unificado primária secundária dano">
+      <div class="card-head">
+        <span class="ctag const">constitutiva</span><span class="cname">AubertinISVSHD</span>
+        <span class="file">constitutive/aubertin_isv_sh_d</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Física — lei unificada ISV_SH_D</p>
+        <pre><code>ε̇_v = ε̇0 · (σ_ef/σ0)^n · exp[(Q/R)(1/T0 − 1/T)]
+     · (1 + K1·exp(−K2·ε_v^p)) · 1/(1−D)^n_d
+
+dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
+        <p>Acopla primária, secundária, terciária e dano em uma única formulação de variáveis internas. O estado armazena <code class="ic">eps_v_primary</code>, <code class="ic">eps_v_secondary</code> e <code class="ic">damage_D</code>. Com <code class="ic">A_d=0</code> e <code class="ic">D=0</code>, reduz à EDMT exponencial; com dano ativo, a terciária aparece pela amplificação <code class="ic">(1-D)^(-n_d)</code>.</p>
+        <p class="role">Uso recomendado</p>
+        <p>Ativar com <code class="ic">creep.tertiary: true</code> e <code class="ic">tertiary_model: aubertin_isv_sh_d</code>. O flag <code class="ic">creep.damage</code> não é obrigatório porque o dano é intrínseco ao modelo, embora o rastreamento de dano continue disponível por <code class="ic">output.damage_tracking</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THERMAL ============ -->
+  <section id="thermal">
+    <h3>Campos térmicos</h3>
+    <p class="lead">Implementações do ThermalField. A temperatura entra na mecânica via deformação térmica e via Arrhenius (acoplamento fraco).</p>
+
+    <div class="card" data-name="ProfileField perfil geotérmico T(z) estacionário">
+      <div class="card-head">
+        <span class="ctag therm">térmico</span><span class="cname">ProfileField</span>
+        <span class="file">thermal/profile_field</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Perfil geotérmico analítico, estacionário (independente de t):</p>
+        <pre><code>T(z) = T_seabed + gradiente_geotérmico · (profundidade + z)</code></pre>
+        <p>Para o caso 1D radial (z fixo), T é constante em todos os nós. Para 2D (r,z), T varia com a profundidade z mas não com o raio r. Fornece também α e T_ref do YAML.</p>
+      </div>
+    </div>
+
+    <div class="card" data-name="Conduction1DField condução Fourier Crank-Nicolson transiente">
+      <div class="card-head">
+        <span class="ctag therm">térmico</span><span class="cname">Conduction1DField</span>
+        <span class="file">thermal/conduction_1d_field</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Física — equação de calor 1D radial</p>
+        <pre><code>(1/r) ∂/∂r (k·r·∂T/∂r) = ρ·cP·∂T/∂t</code></pre>
+        <p class="role">Implementação</p>
+        <p>Resolve a equação de Fourier transiente por FEM com os mesmos elementos L3 quadráticos. Monta as matrizes de capacitância <code class="ic">C</code> e condutividade <code class="ic">H</code>. Integração temporal por <strong>Crank-Nicolson (β=½)</strong>, incondicionalmente estável e de 2ª ordem. A matriz <code class="ic">[C₂₂ + Δt·β·H₂₂]</code> é constante para Δt fixo → fatorada uma vez.</p>
+        <p>Condições de contorno: parede interna a T prescrita (fluido); borda externa <code class="ic">prescribed</code> (T geotérmica fixa, default) ou <code class="ic">flux_zero</code> (isolada). Aceita consultas temporais fora de ordem — necessário para o step-doubling do integrador implícito.</p>
+      </div>
+    </div>
+
+    <div class="card" data-name="Conduction2DField condução Fourier 2D camadas Crank-Nicolson">
+      <div class="card-head">
+        <span class="ctag therm">térmico</span><span class="cname">Conduction2DField</span>
+        <span class="file">thermal/conduction_2d_field</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Física — equação de calor 2D axissimétrica</p>
+        <pre><code>(1/r) ∂/∂r (k·r·∂T/∂r) + ∂/∂z(k·∂T/∂z) = ρ·cP·∂T/∂t</code></pre>
+        <p class="role">Implementação</p>
+        <p>Usa a mesma malha 2D e o mesmo <code class="ic">Element</code> do problema mecânico. Monta <code class="ic">Cij = ∫ρcP NiNj 2πr dA</code> e <code class="ic">Hij = ∫k ∇Ni·∇Nj 2πr dA</code>, com integração nos pontos de Gauss do elemento. Em cada ponto de Gauss, as propriedades térmicas vêm da camada <code class="ic">thermal.layers</code> correspondente à profundidade local z.</p>
+        <p>Contornos: parede interna com T prescrita; borda externa, topo e base aceitam <code class="ic">prescribed</code> ou <code class="ic">flux_zero</code>. A marcha temporal segue Crank-Nicolson e reusa a fatoração de <code class="ic">[C₂₂ + Δt·β·H₂₂]</code> para Δt fixo.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ SOLVER ============ -->
+  <section id="solver">
+    <h3>Motor / Solver</h3>
+    <p class="lead">As classes de infraestrutura que orquestram a montagem e a marcha no tempo.</p>
+
+    <div class="card" data-name="Mesh Mesh1D Mesh2D malha nós conectividade DOF">
+      <div class="card-head">
+        <span class="ctag solver">solver</span><span class="cname">Mesh / Mesh1D / Mesh2D</span>
+        <span class="file">solver/Mesh</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>A malha genérica armazena nós em coordenadas físicas <code class="ic">Node{r, z}</code>, conectividade achatada, e o número de DOFs por nó. O índice global de DOF é sempre <code class="ic">node_id · dofs_per_node + local_dof</code>. Para o L3 (1 DOF/nó) reduz ao indexamento 1D antigo; para 2D (2 DOFs/nó) endereça (u_r, u_z). Builders: <code class="ic">build_mesh_L3</code> (progressão geométrica radial) e <code class="ic">build_mesh_structured_2d</code>.</p>
+      </div>
+    </div>
+    <div class="card" data-name="ElementFactory factory registro despacho tipo">
+      <div class="card-head">
+        <span class="ctag solver">solver</span><span class="cname">ElementFactory</span>
+        <span class="file">elements/ElementFactory</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Mapeia a string <code class="ic">element.type</code> do YAML para a subclasse concreta de Element. <code class="ic">make_element("axisym_2d_Q8")</code> retorna um <code class="ic">unique_ptr&lt;Element&gt;</code>. Tipo desconhecido falha cedo com erro claro. Adicionar um novo elemento é registrar uma linha aqui.</p>
+      </div>
+    </div>
+    <div class="card" data-name="Assembler montagem rigidez K pseudo-força geostática viscosa térmica">
+      <div class="card-head">
+        <span class="ctag solver">solver</span><span class="cname">Assembler</span>
+        <span class="file">solver/Assembler</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Monta a matriz de rigidez global <code class="ic">K_e += Bᵀ·D·B·jw</code> (esparsa) e os vetores de força. Quatro montagens: rigidez K, força geostática <code class="ic">f_geo = ∫Bᵀσ_geo·jw</code>, pseudo-força viscosa <code class="ic">f_v = ∫Bᵀ·D·Δε_v</code>, e pseudo-força térmica <code class="ic">f_th = ∫Bᵀ·D·Δε_th</code>. O espalhamento usa <code class="ic">mesh.dof_index()</code>, genérico para 1D e 2D.</p>
+      </div>
+    </div>
+    <div class="card" data-name="ExplicitIntegrator TimeIntegrator Euler explícito marcha tempo">
+      <div class="card-head">
+        <span class="ctag solver">solver</span><span class="cname">TimeIntegrator (explícito)</span>
+        <span class="file">solver/TimeIntegrator</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Integrador de Euler explícito. No construtor: monta f_geo, aplica Dirichlet (u=0 na borda externa), e <strong>fatora K uma vez</strong>. Cada passo: avalia a lei constitutiva em cada ponto de Gauss, monta as pseudo-forças, resolve <code class="ic">K·Δu = f_v + f_th</code> por back-substitution, atualiza tensões e estado. Adequado para halita e tensões moderadas. Schedule de Δt configurável com transições graduais.</p>
+      </div>
+    </div>
+    <div class="card" data-name="ImplicitAdaptiveIntegrator implícito backward Euler Newton local step doubling">
+      <div class="card-head">
+        <span class="ctag solver">solver</span><span class="cname">ImplicitAdaptiveIntegrator</span>
+        <span class="file">solver/ImplicitAdaptiveIntegrator</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Backward Euler com Newton local por ponto de Gauss e controle adaptativo de passo. Para cada passo: resolve localmente <code class="ic">R = Δε_v − Δt·ε̇_v(σ_trial) = 0</code> com jacobiana <code class="ic">J = I + Δt·tangent·D</code>; monta pseudo-força com a taxa convergida; resolve com a K já fatorada. O erro do passo é estimado por step-doubling (um passo Δt vs. dois passos Δt/2); aceita/rejeita e ajusta Δt. Necessário para taquidrita, k0 alto e terciária — onde o explícito diverge.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ IO ============ -->
+  <section id="io">
+    <h3>Entrada e saída</h3>
+    <div class="card" data-name="CaseParser parser YAML validação configuração entrada">
+      <div class="card-head">
+        <span class="ctag io">i/o</span><span class="cname">CaseParser</span>
+        <span class="file">io/CaseParser</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Lê o arquivo YAML de caso (via yaml-cpp), valida os campos e monta a struct de configuração. Resolve paths relativos para absolutos antes de carregar dados de litologia. Aplica defaults (ex.: <code class="ic">element.type</code> ausente → axisym_1d_L3; <code class="ic">thermal.beta</code> → 0.5). Emite avisos para combinações fisicamente questionáveis (explícito + taquidrita; primária sem secundária). <strong>Toda conversão de unidades acontece aqui</strong> — internamente o solver é 100% SI.</p>
+      </div>
+    </div>
+    <div class="card" data-name="saltpost pós-processamento Python comparação plots métricas">
+      <div class="card-head">
+        <span class="ctag io">python</span><span class="cname">saltpost (pacote Python)</span>
+        <span class="file">post/saltpost/</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Pacote de pós-processamento profissional com módulos: <code class="ic">io</code> (lê closure.csv, perfis de deslocamento, metadata.json e CSVs de dano), <code class="ic">registry</code> (descobre results/*), <code class="ic">compare</code> (alinha séries, calcula erro relativo), <code class="ic">studies</code> (descobre estudos por <code class="ic">--study/--vary</code>), <code class="ic">plots</code> (gráficos padronizados), <code class="ic">export</code> (pacote paper PNG/PDF/CSV/MD/LaTeX), <code class="ic">report</code> (dashboard HTML), <code class="ic">animations</code> (GIF/MP4) e <code class="ic">vtk</code> (carrega VTU via PyVista). Cores fixas por tipo de elemento para gráficos consistentes. Detalhado na seção de pós-processamento.</p>
+      </div>
+    </div>
+    <div class="card" data-name="VtuWriter VTU PVD ParaView PyVista visualização campos">
+      <div class="card-head">
+        <span class="ctag io">i/o</span><span class="cname">VtuWriter</span>
+        <span class="file">io/VtuWriter</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Exporta malha e campos em formato VTK XML Unstructured Grid (<code class="ic">.vtu</code>) para ParaView/PyVista. Campos nodais: <code class="ic">u</code>, <code class="ic">u_r</code>, <code class="ic">u_z</code>, <code class="ic">sigma</code>, <code class="ic">eps_v</code>, <code class="ic">damage_D</code> e <code class="ic">temperature_K</code>. Também grava médias por célula e um índice <code class="ic">.pvd</code> para abrir a série temporal como animação.</p>
+        <p>Ativado por YAML com <code class="ic">output.vtu: true</code> e frequência controlada por <code class="ic">output.vtu_every_n_steps</code>. O passo final é sempre escrito. A exportação atual escreve o setor axissimétrico (r,z); <code class="ic">output.revolve_3d</code> fica reservado para extrusão/revolução futura.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INPUT FILE ============ -->
+  <section id="input">
+    <h3>Criar um arquivo de caso (do zero)</h3>
+    <p class="lead">Um caso é definido por um único arquivo YAML. Ele descreve a geometria, a litologia, os estágios de fluência ativos, a malha, o esquema temporal e a saída. O executável recebe esse arquivo e produz os resultados.</p>
+
+    <h4>Anatomia completa de um arquivo de caso</h4>
+    <div class="code-head"><span>cases/meu_poco.yaml — exemplo anotado completo</span><button class="copy-btn">copiar</button></div>
+    <pre><code><span class="tok-k">name</span>: <span class="tok-s">meu_poco</span>                  <span class="tok-c"># nome → vira results/meu_poco/</span>
+
+<span class="tok-k">geometry</span>:
+  <span class="tok-k">inner_radius_m</span>: <span class="tok-n">0.1079</span>        <span class="tok-c"># raio do poço (parede interna)</span>
+  <span class="tok-k">outer_radius_m</span>: <span class="tok-n">10.79</span>         <span class="tok-c"># raio externo do domínio</span>
+
+<span class="tok-k">depths</span>:
+  <span class="tok-k">water_depth_m</span>: <span class="tok-n">1000</span>          <span class="tok-c"># lâmina d'água</span>
+  <span class="tok-k">burial_m</span>: <span class="tok-n">2000</span>               <span class="tok-c"># profundidade de soterramento até o topo do sal</span>
+
+<span class="tok-k">lithology</span>:
+  <span class="tok-k">primary</span>: <span class="tok-s">halita</span>             <span class="tok-c"># lê data/litologias/halita.yaml</span>
+
+<span class="tok-k">fluid</span>:
+  <span class="tok-k">mud_weight_kg_per_m3</span>: <span class="tok-n">1180</span>   <span class="tok-c"># peso do fluido de perfuração</span>
+
+<span class="tok-k">stress</span>:
+  <span class="tok-k">k0</span>: <span class="tok-n">1.0</span>                     <span class="tok-c"># razão de tensão horizontal/vertical</span>
+
+<span class="tok-k">element</span>:
+  <span class="tok-k">type</span>: <span class="tok-s">axisym_1d_L3</span>           <span class="tok-c"># L3 | Q4 | T3 | Q8 | Q9 | AQ9 | T6</span>
+
+<span class="tok-k">mesh</span>:
+  <span class="tok-k">n_elements_radial</span>: <span class="tok-n">100</span>       <span class="tok-c"># nº de elementos na direção radial</span>
+  <span class="tok-k">ratio</span>: <span class="tok-n">1000</span>                <span class="tok-c"># razão de progressão (refina na parede)</span>
+  <span class="tok-k">adaptive</span>: <span class="tok-k">false</span>           <span class="tok-c"># refinamento h Zienkiewicz-Zhu</span>
+  <span class="tok-k">error_threshold</span>: <span class="tok-n">0.10</span>       <span class="tok-c"># marca elementos com eta_rel maior</span>
+  <span class="tok-k">max_refinement_levels</span>: <span class="tok-n">3</span>
+  <span class="tok-k">damage_refinement_threshold</span>: <span class="tok-n">-1.0</span> <span class="tok-c"># opcional; negativo desliga</span>
+
+<span class="tok-k">creep</span>:
+  <span class="tok-k">elastic_only</span>: <span class="tok-k">false</span>        <span class="tok-c"># só elástico (sem fluência)?</span>
+  <span class="tok-k">secondary</span>: <span class="tok-k">true</span>            <span class="tok-c"># mecanismo duplo (DM)</span>
+  <span class="tok-k">primary</span>: <span class="tok-k">false</span>             <span class="tok-c"># transiente primário (EDMT ou ISV_SH_DM)</span>
+  <span class="tok-k">tertiary</span>: <span class="tok-k">false</span>            <span class="tok-c"># terciária com dano (Motta ou Wang)</span>
+  <span class="tok-k">damage</span>: <span class="tok-k">false</span>
+  <span class="tok-k">primary_model</span>: <span class="tok-s">EDMT</span>          <span class="tok-c"># EDMT | isv_sh_dm</span>
+  <span class="tok-k">tertiary_model</span>: <span class="tok-s">MottaV1</span>       <span class="tok-c"># MottaV1 | wang_2004 | aubertin_isv_sh_d</span>
+  <span class="tok-k">dilatancy_envelope</span>: <span class="tok-s">Spier</span>     <span class="tok-c"># Spier | Ratigan | DeVries | Hunsche</span>
+  <span class="tok-k">spier</span>:
+    <span class="tok-k">a</span>: <span class="tok-n">0.25</span>
+    <span class="tok-k">b_Pa</span>: <span class="tok-n">0.0</span>
+  <span class="tok-k">ratigan</span>:
+    <span class="tok-k">c</span>: <span class="tok-n">0.81</span>
+    <span class="tok-k">d_Pa</span>: <span class="tok-n">0.0</span>
+    <span class="tok-k">m</span>: <span class="tok-n">1.0</span>
+  <span class="tok-k">devries</span>:
+    <span class="tok-k">e_Pa</span>: <span class="tok-n">10.0e6</span>
+    <span class="tok-k">f</span>: <span class="tok-n">1.0</span>
+    <span class="tok-k">sigma0_Pa</span>: <span class="tok-n">30.0e6</span>
+  <span class="tok-k">hunsche</span>:
+    <span class="tok-k">g_Pa</span>: <span class="tok-n">10.0e6</span>
+    <span class="tok-k">I1_ref_Pa</span>: <span class="tok-n">30.0e6</span>
+    <span class="tok-k">h</span>: <span class="tok-n">1.0</span>
+  <span class="tok-k">isv_sh_dm</span>:
+    <span class="tok-k">e0_s</span>: <span class="tok-n">5.0e-7</span>
+    <span class="tok-k">sig_ref</span>: <span class="tok-n">1.0e6</span>
+    <span class="tok-k">n</span>: <span class="tok-n">1.5</span>
+    <span class="tok-k">Q_J_mol</span>: <span class="tok-n">51.6e3</span>
+    <span class="tok-k">T0</span>: <span class="tok-n">359.15</span>
+    <span class="tok-k">K_h</span>: <span class="tok-n">1.2</span>
+  <span class="tok-k">wang_2004</span>:
+    <span class="tok-k">A_d</span>: <span class="tok-n">1.2e-8</span>
+    <span class="tok-k">m_d</span>: <span class="tok-n">2.5</span>
+    <span class="tok-k">p_d</span>: <span class="tok-n">1.0</span>
+    <span class="tok-k">n_d</span>: <span class="tok-n">2.0</span>
+    <span class="tok-k">D_max</span>: <span class="tok-n">0.99</span>
+  <span class="tok-k">aubertin_isv_sh_d</span>:
+    <span class="tok-k">e0_s</span>: <span class="tok-n">5.0e-7</span>
+    <span class="tok-k">sig0</span>: <span class="tok-n">1.0e6</span>
+    <span class="tok-k">n</span>: <span class="tok-n">3.0</span>
+    <span class="tok-k">Q_J_mol</span>: <span class="tok-n">51.6e3</span>
+    <span class="tok-k">T0</span>: <span class="tok-n">359.15</span>
+    <span class="tok-k">K1</span>: <span class="tok-n">0.8</span>
+    <span class="tok-k">K2</span>: <span class="tok-n">2.5</span>
+    <span class="tok-k">A_d</span>: <span class="tok-n">1.5e-8</span>
+    <span class="tok-k">m_d</span>: <span class="tok-n">2.5</span>
+    <span class="tok-k">n_d</span>: <span class="tok-n">2.0</span>
+    <span class="tok-k">p_d</span>: <span class="tok-n">1.0</span>
+    <span class="tok-k">D_max</span>: <span class="tok-n">0.99</span>
+
+<span class="tok-k">thermal</span>:
+  <span class="tok-k">enabled</span>: <span class="tok-k">false</span>             <span class="tok-c"># acoplamento térmico ligado?</span>
+  <span class="tok-k">mode</span>: <span class="tok-s">profile</span>              <span class="tok-c"># profile | conduction_1d | conduction_2d</span>
+  <span class="tok-k">seabed_temp_C</span>: <span class="tok-n">4.0</span>
+  <span class="tok-k">geothermal_gradient_C_per_m</span>: <span class="tok-n">0.03</span>
+  <span class="tok-k">alpha_thermal</span>: <span class="tok-n">3.5e-5</span>        <span class="tok-c"># coef. expansão térmica</span>
+  <span class="tok-k">T_reference_C</span>: <span class="tok-n">25.0</span>
+  <span class="tok-k">outer_bc</span>: <span class="tok-s">prescribed</span>        <span class="tok-c"># conduction_*: prescribed | flux_zero</span>
+  <span class="tok-k">top_bc</span>: <span class="tok-s">flux_zero</span>           <span class="tok-c"># conduction_2d</span>
+  <span class="tok-k">bottom_bc</span>: <span class="tok-s">flux_zero</span>        <span class="tok-c"># conduction_2d</span>
+  <span class="tok-k">layers</span>:                       <span class="tok-c"># conduction_2d: k, rho, cP por camada</span>
+    - <span class="tok-k">z_top_m</span>: <span class="tok-n">0</span>
+      <span class="tok-k">z_bottom_m</span>: <span class="tok-n">500</span>
+      <span class="tok-k">k_W_per_mK</span>: <span class="tok-n">5.4</span>
+      <span class="tok-k">rho_kg_per_m3</span>: <span class="tok-n">2160</span>
+      <span class="tok-k">cp_J_per_kgK</span>: <span class="tok-n">860</span>
+
+<span class="tok-k">time</span>:
+  <span class="tok-k">scheme</span>: <span class="tok-s">explicit</span>           <span class="tok-c"># explicit | implicit_adaptive</span>
+  <span class="tok-k">total_h</span>: <span class="tok-n">480</span>                <span class="tok-c"># tempo total simulado (horas)</span>
+  <span class="tok-k">dt_h</span>: <span class="tok-n">0.01</span>                  <span class="tok-c"># passo inicial</span>
+
+<span class="tok-k">output</span>:
+  <span class="tok-k">fields</span>: [<span class="tok-s">closure_pct</span>, <span class="tok-s">u_r</span>, <span class="tok-s">sigma</span>]
+  <span class="tok-k">series</span>: [<span class="tok-s">closure_pct</span>]
+  <span class="tok-k">vtu</span>: <span class="tok-k">true</span>                 <span class="tok-c"># escreve .vtu para ParaView/PyVista</span>
+  <span class="tok-k">vtu_every_n_steps</span>: <span class="tok-n">10</span>    <span class="tok-c"># frequência; passo final sempre é escrito</span>
+  <span class="tok-k">revolve_3d</span>: <span class="tok-k">false</span>          <span class="tok-c"># reservado; hoje exporta setor (r,z)</span>
+  <span class="tok-k">damage_tracking</span>: <span class="tok-k">false</span>     <span class="tok-c"># CSVs de dano se creep.damage também estiver ligado</span>
+  <span class="tok-k">damage_thresholds</span>: [<span class="tok-n">0.1</span>, <span class="tok-n">0.3</span>, <span class="tok-n">0.5</span>, <span class="tok-n">0.8</span>]
+  <span class="tok-k">failure_D_critical</span>: <span class="tok-n">0.5</span>
+  <span class="tok-k">creep_rate_multiplier_threshold</span>: <span class="tok-n">10.0</span></code></pre>
+
+    <h4>Passo a passo para um caso novo</h4>
+    <ol class="clean">
+      <li><strong>Copie um caso existente</strong> como ponto de partida: <code class="ic">cp cases/tcc/modelo_A.yaml cases/meu_poco.yaml</code></li>
+      <li><strong>Ajuste a geometria</strong> (raios) e as <strong>profundidades</strong> (lâmina d'água + soterramento) — elas definem a tensão geostática.</li>
+      <li><strong>Escolha a litologia</strong>. Deve existir um arquivo correspondente em <code class="ic">data/litologias/</code>. Para uma litologia nova, crie o YAML com as constantes (ε̇₀, σ₀, Q, T₀, E, ν).</li>
+      <li><strong>Defina o fluido</strong> (peso da lama) e <strong>k0</strong> — controlam a tensão desviadora na parede.</li>
+      <li><strong>Escolha o elemento e a malha</strong>. Para 1D radial use L3; para estudo 2D use Q8. Mais elementos + ratio maior = mais refino na parede.</li>
+      <li><strong>Ligue os estágios de fluência</strong> desejados. Comece com só <code class="ic">secondary: true</code>; adicione primária/terciária conforme a análise.</li>
+      <li><strong>Escolha o esquema temporal</strong>. <code class="ic">explicit</code> para halita; <code class="ic">implicit_adaptive</code> para taquidrita, k0 alto ou terciária.</li>
+      <li><strong>Rode</strong> (ver seção seguinte) e inspecione com o saltpost.</li>
+    </ol>
+    <div class="note">
+      <span class="nt">Dica de validação</span>
+      Comece sempre com <code class="ic">creep.elastic_only: true</code> para confirmar que a geometria e as tensões estão corretas (deve bater com Lamé), depois ligue a fluência. Erros de geometria/tensão são mais fáceis de pegar no caso elástico.
+    </div>
+  </section>
+
+  <!-- ============ INTERACTIVE BUILDER ============ -->
+  <section id="builder">
+    <h3>Construtor interativo de caso</h3>
+    <p class="lead">Ajuste os campos e copie o YAML gerado. Útil para montar um caso novo sem partir de um arquivo em branco.</p>
+    <div class="builder">
+      <div class="builder-grid">
+        <div class="builder-form">
+          <div class="fg">
+            <label>Nome do caso</label>
+            <input type="text" id="b_name" value="meu_poco">
+          </div>
+          <div class="fg-row">
+            <div class="fg"><label>Raio interno (m)</label><input type="text" id="b_ri" value="0.1079"></div>
+            <div class="fg"><label>Raio externo (m)</label><input type="text" id="b_re" value="10.79"></div>
+          </div>
+          <div class="fg-row">
+            <div class="fg"><label>Lâmina d'água (m)</label><input type="text" id="b_wd" value="1000"></div>
+            <div class="fg"><label>Soterramento (m)</label><input type="text" id="b_bur" value="2000"></div>
+          </div>
+          <div class="fg-row">
+            <div class="fg">
+              <label>Litologia</label>
+              <select id="b_lith"><option>halita</option><option>taquidrita</option><option>carnalita</option></select>
+            </div>
+            <div class="fg"><label>Peso do fluido (kg/m³)</label><input type="text" id="b_mud" value="1180"></div>
+          </div>
+          <div class="fg-row">
+            <div class="fg"><label>k0 <span class="hint">(tensão H/V)</span></label><input type="text" id="b_k0" value="1.0"></div>
+            <div class="fg">
+              <label>Elemento</label>
+              <select id="b_elem"><option>axisym_1d_L3</option><option>axisym_2d_Q4</option><option>axisym_2d_T3</option><option>axisym_2d_Q8</option><option>axisym_2d_Q9</option><option>axisym_2d_AQ9</option><option>axisym_2d_T6</option></select>
+            </div>
+          </div>
+          <div class="fg-row">
+            <div class="fg"><label>Elementos radiais</label><input type="text" id="b_nr" value="100"></div>
+            <div class="fg"><label>Razão de malha</label><input type="text" id="b_ratio" value="1000"></div>
+          </div>
+          <div class="fg"><label>Refinamento adaptativo</label>
+            <div class="chk"><input type="checkbox" id="b_adapt"><label for="b_adapt" style="margin:0">Ativar estimador Zienkiewicz-Zhu</label></div>
+          </div>
+          <div class="fg-row">
+            <div class="fg"><label>Limiar de erro</label><input type="text" id="b_adapt_thr" value="0.10"></div>
+            <div class="fg"><label>Níveis máximos</label><input type="text" id="b_adapt_levels" value="3"></div>
+          </div>
+          <div class="fg"><label>Estágios de fluência</label>
+            <div class="chk"><input type="checkbox" id="b_sec" checked><label for="b_sec" style="margin:0">Secundária (DM)</label></div>
+            <div class="chk"><input type="checkbox" id="b_pri"><label for="b_pri" style="margin:0">Primária (EDMT)</label></div>
+            <div class="chk"><input type="checkbox" id="b_ter"><label for="b_ter" style="margin:0">Terciária + dano (Motta)</label></div>
+            <div class="fg" style="margin-top:8px">
+              <label>Envoltória de dilatância</label>
+              <select id="b_env"><option>Spier</option><option>Ratigan</option><option>DeVries</option><option>Hunsche</option></select>
+            </div>
+          </div>
+          <div class="fg"><label>Térmico</label>
+            <div class="chk"><input type="checkbox" id="b_therm"><label for="b_therm" style="margin:0">Acoplamento térmico ligado</label></div>
+          </div>
+          <div class="fg"><label>Visualização</label>
+            <div class="chk"><input type="checkbox" id="b_vtu" checked><label for="b_vtu" style="margin:0">Exportar VTU/PVD</label></div>
+            <div class="chk"><input type="checkbox" id="b_damage_tracking"><label for="b_damage_tracking" style="margin:0">Rastrear dano/falha</label></div>
+          </div>
+          <div class="fg-row">
+            <div class="fg">
+              <label>Esquema temporal</label>
+              <select id="b_scheme"><option>explicit</option><option>implicit_adaptive</option></select>
+            </div>
+            <div class="fg"><label>Tempo total (h)</label><input type="text" id="b_time" value="480"></div>
+          </div>
+        </div>
+        <div class="builder-out">
+          <div class="code-head"><span id="b_fname">cases/meu_poco.yaml</span><button class="copy-btn" id="b_copy">copiar</button></div>
+          <pre><code id="b_output"></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BUILD ============ -->
+  <section id="build">
+    <h3>Compilação e geração do executável</h3>
+    <p class="lead">O projeto usa CMake com C++20. Eigen está embutido (vendored em include/); yaml-cpp e Catch2 são baixados automaticamente via FetchContent na primeira configuração.</p>
+
+    <h4>Pré-requisitos</h4>
+    <table>
+      <tr><th>Ferramenta</th><th>Versão</th><th>Observação</th></tr>
+      <tr><td>Compilador C++</td><td>C++20</td><td>MSVC (Visual Studio 2022), GCC 11+, ou Clang 14+</td></tr>
+      <tr><td>CMake</td><td>3.20+</td><td>sistema de build</td></tr>
+      <tr><td>Ninja</td><td>qualquer</td><td>gerador recomendado (mais rápido)</td></tr>
+      <tr><td>Eigen</td><td>5.x</td><td>já incluído em include/Eigen/</td></tr>
+      <tr><td>yaml-cpp</td><td>0.8</td><td>baixado por FetchContent</td></tr>
+      <tr><td>Catch2</td><td>v3.5</td><td>baixado por FetchContent</td></tr>
+      <tr><td>OpenMP</td><td>opcional</td><td>detectado automaticamente pelo CMake; se ausente, o solver roda sequencialmente</td></tr>
+      <tr><td>Python</td><td>3.9+</td><td>para pós-processamento (numpy, matplotlib, pandas, pyyaml)</td></tr>
+    </table>
+
+    <h4>Comandos de compilação</h4>
+    <div class="tabs">
+      <div class="tab active" data-tab="win">Windows (MSVC)</div>
+      <div class="tab" data-tab="nix">Linux / macOS</div>
+    </div>
+    <div class="tab-panel active" id="tab-win">
+      <div class="code-head"><span>PowerShell — na raiz do projeto</span><button class="copy-btn">copiar</button></div>
+      <pre><code><span class="tok-c"># Configurar (Ninja recomendado; primeira vez baixa yaml-cpp + Catch2)</span>
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+<span class="tok-c"># Alternativa sem Ninja (usa o gerador do Visual Studio)</span>
+cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+<span class="tok-c"># Compilar (-j = paralelo)</span>
+cmake --build build -j
+
+<span class="tok-c"># O executável fica em build/saltcreep.exe</span></code></pre>
+    </div>
+    <div class="tab-panel" id="tab-nix">
+      <div class="code-head"><span>bash — na raiz do projeto</span><button class="copy-btn">copiar</button></div>
+      <pre><code><span class="tok-c"># Configurar</span>
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+<span class="tok-c"># Compilar</span>
+cmake --build build -j
+
+<span class="tok-c"># O executável fica em build/saltcreep</span></code></pre>
+    </div>
+
+    <div class="note">
+      <span class="nt">Tipos de build</span>
+      Use <code class="ic">RelWithDebInfo</code> para desenvolvimento (otimizado + símbolos de debug). Para perfilamento/produção use <code class="ic">-DCMAKE_BUILD_TYPE=Release</code>. Para debugar com gdb/lldb use <code class="ic">Debug</code>.
+    </div>
+    <div class="note">
+      <span class="nt">Builds de diagnóstico</span>
+      Para limpeza e testes de borda, o CMake aceita <code class="ic">-DENABLE_WERROR=ON</code> para tratar warnings do projeto como erro e <code class="ic">-DENABLE_SANITIZERS=ON</code> para ativar Address/Undefined Sanitizer quando o compilador e o linker oferecem o runtime necessário. Se o runtime sanitizado não existir na máquina, o CMake emite aviso e mantém o build funcional sem instrumentação.
+    </div>
+    <div class="note">
+      <span class="nt">OpenMP</span>
+      O CMake tenta localizar OpenMP com <code class="ic">find_package(OpenMP)</code>. Quando disponível, os loops externos de elementos na montagem e na avaliação constitutiva são paralelizados; quando não disponível, o mesmo código compila e executa em modo sequencial. Para controlar uma execução, use <code class="ic">OMP_NUM_THREADS=1</code>, <code class="ic">2</code>, <code class="ic">4</code>, etc.
+    </div>
+  </section>
+
+  <!-- ============ RUN ============ -->
+  <section id="run">
+    <h3>Rodar um caso</h3>
+    <p class="lead">Com o executável compilado, rodar um caso é passar o arquivo YAML como argumento. A saída vai para results/&lt;nome&gt;/.</p>
+
+    <div class="code-head"><span>fluxo completo de execução</span><button class="copy-btn">copiar</button></div>
+    <pre><code><span class="tok-c"># 1. Rodar uma simulação</span>
+./build/saltcreep cases/meu_poco.yaml
+<span class="tok-c">#    → gera results/meu_poco/closure.csv, displacements.csv, metadata.json
+#      e, se output.vtu=true, meu_poco_0000.vtu + meu_poco.pvd</span>
+
+<span class="tok-c"># 2. Plotar o resultado de um caso</span>
+python post/plot_case.py results/meu_poco
+
+<span class="tok-c"># 3. Rodar o mesmo caso físico com vários elementos (estudo)</span>
+./build/saltcreep cases/tcc/modelo_A_L3.yaml
+./build/saltcreep cases/tcc/modelo_A_Q8.yaml
+./build/saltcreep cases/tcc/modelo_A_T6.yaml</code></pre>
+
+    <h4>O que é produzido</h4>
+    <table>
+      <tr><th>Arquivo</th><th>Conteúdo</th></tr>
+      <tr><td><code>closure.csv</code></td><td>série temporal: tempo [h], fechamento [%], deslocamento radial assinado <code>wall_disp_m</code> e magnitude física <code>u_wall_m</code></td></tr>
+      <tr><td><code>displacements.csv</code></td><td>campo de deslocamento radial nodal para o caminho elástico</td></tr>
+      <tr><td><code>displacements_profile.csv</code></td><td>perfil temporal nodal: <code>t_h</code>, <code>r_m</code>, <code>z_m</code>, <code>u_r_m</code>, <code>u_z_m</code></td></tr>
+      <tr><td><code>wall_profile.csv</code></td><td>perfil temporal na parede interna: <code>u_r(z)</code> para elementos 2D (e ponto único no L3)</td></tr>
+      <tr><td><code>damage_wall.csv</code></td><td>quando habilitado: evolução de <code>D</code>, <code>eps_dot</code> e <code>sigma_ef</code> no ponto mais danificado da parede</td></tr>
+      <tr><td><code>damage_events.csv</code></td><td>quando habilitado: eventos de limiar de dano, taxa acelerada e inflexão da fluência</td></tr>
+      <tr><td><code>metadata.json</code></td><td>elemento, malha, GDLs, esquema, flags, <code>omp_threads</code>, tempo total e timers granulares de montagem, solução e constitutivo</td></tr>
+      <tr><td><code>*.vtu</code></td><td>malha + campos para ParaView/PyVista: deslocamento, tensão, εv, dano, temperatura</td></tr>
+      <tr><td><code>*.pvd</code></td><td>índice de série temporal VTU para abrir animação no ParaView</td></tr>
+    </table>
+    <p>O <code class="ic">metadata.json</code> é o que permite ao saltpost agrupar e comparar resultados automaticamente.</p>
+  </section>
+
+  <!-- ============ POST ============ -->
+  <section id="post">
+    <h3>Pós-processamento (saltpost)</h3>
+    <p class="lead">O pacote saltpost compara resultados entre elementos diferentes e discretizações diferentes, gerando gráficos estilo publicação e tabelas de métricas.</p>
+
+    <div class="code-head"><span>comparação de casos — modos de uso</span><button class="copy-btn">copiar</button></div>
+    <pre><code><span class="tok-c"># Comparar dois casos específicos</span>
+python post/compare_cases.py results/modelo_A_L3 results/modelo_A_Q8
+
+<span class="tok-c"># Comparar TODOS os elementos no mesmo caso físico</span>
+python post/compare_cases.py --glob <span class="tok-s">"results/modelo_A_*"</span> --group-by element
+
+<span class="tok-c"># Comparar discretizações (refinamento de malha)</span>
+python post/compare_cases.py --glob <span class="tok-s">"results/modelo_A_Q8_*"</span> --group-by n_dofs
+
+<span class="tok-c"># Tabela-resumo de todos os resultados</span>
+python post/compare_cases.py --summary --glob <span class="tok-s">"results/*"</span>
+
+<span class="tok-c"># Estudo declarativo: mesmo caso físico, variando elemento/modelo/térmico</span>
+python post/compare_cases.py --study modelo_A --vary element
+python post/compare_cases.py --study modelo_A --vary constitutive
+python post/compare_cases.py --study modelo_A --vary thermal
+
+<span class="tok-c"># Pacote científico: nomes padronizados + PNG/PDF + CSV/MD/LaTeX</span>
+python post/compare_cases.py --study modelo_A --vary element --format paper
+
+<span class="tok-c"># Dashboard HTML estático com figuras, metadados e links VTU/PVD</span>
+python post/compare_cases.py --study modelo_A --vary element --report
+
+<span class="tok-c"># Animações GIF/MP4</span>
+python post/compare_cases.py results/modelo_A_Q8 --animate closure
+python post/compare_cases.py results/modelo_A_Q8 --animate all --animation-format mp4</code></pre>
+
+    <h4>Saídas geradas</h4>
+    <ul class="clean">
+      <li><strong>closure_vs_tempo.png/pdf</strong> — curvas de fechamento × tempo sobrepostas, uma por caso, cores fixas por elemento.</li>
+      <li><strong>error_vs_time</strong> — erro relativo de cada variante contra uma referência (ex.: L3).</li>
+      <li><strong>closure_vs_dofs</strong> — fechamento final × número de GDLs, para decidir o melhor custo/precisão.</li>
+      <li><strong>comparison_table.csv/md</strong> — tabela com elemento, GDLs, fechamento final, erro vs. referência, tempo de execução.</li>
+      <li><strong>paper/</strong> — quando <code class="ic">--format paper</code> é usado, contém figuras renomeadas, tabelas em CSV/Markdown/LaTeX e <code class="ic">paper_manifest.csv</code>.</li>
+      <li><strong>results/report/index.html</strong> — dashboard HTML estático criado por <code class="ic">--report</code>.</li>
+      <li><strong>*_anim_*.gif/mp4</strong> — animações de fechamento, deslocamento radial, dano e temperatura.</li>
+    </ul>
+    <p>Para campos espaciais, use <code class="ic">output.vtu: true</code>. O módulo <code class="ic">post/saltpost/vtk.py</code> fornece <code class="ic">load_vtu()</code> quando PyVista estiver instalado, permitindo inspecionar tensões, dano e temperatura em 2D. O guia completo está em <a href="post-processing.md"><code class="ic">docs/post-processing.md</code></a>.</p>
+
+    <h4>Estudo de convergência</h4>
+    <p>O script <code class="ic">post/convergence.py</code> monta o problema de Lamé para todos os 7 elementos e gera <code class="ic">lame_error_vs_dofs.png</code> e <code class="ic">lame_error_vs_time.png</code>, confirmando as taxas de convergência teóricas e destacando o AQ9 no regime de machine epsilon com poucos GDLs.</p>
+  </section>
+
+  <!-- ============ VISUALIZATION ============ -->
+  <section id="visualization">
+    <h3>Visualização de resultados</h3>
+    <p class="lead">A visualização combina três camadas: curvas e tabelas automáticas com saltpost, estudo de convergência reproduzível e inspeção espacial em ParaView/PyVista a partir dos arquivos VTU/PVD.</p>
+
+    <h4>Gráficos automáticos (saltpost)</h4>
+    <p>Use <code class="ic">post/compare_cases.py</code> para alinhar séries temporais, calcular erro relativo e gerar figuras padronizadas de fechamento × tempo, erro × tempo, fechamento final × GDLs e tabela-resumo.</p>
+    <div class="code-head"><span>saltpost — comparações usuais</span><button class="copy-btn">copiar</button></div>
+    <pre><code><span class="tok-c"># Closure × tempo para dois resultados específicos</span>
+python post/compare_cases.py results/modelo_A_L3 results/modelo_A_Q8
+
+<span class="tok-c"># Comparação entre elementos no mesmo caso físico</span>
+python post/compare_cases.py --glob <span class="tok-s">"results/modelo_A_*"</span> --group-by element
+
+<span class="tok-c"># Comparação entre estágios de fluência</span>
+python post/compare_cases.py results/modelo_A_secondary_only results/modelo_A_primary_secondary results/modelo_A_tertiary_damage
+
+<span class="tok-c"># Tabela-resumo de todos os resultados disponíveis</span>
+python post/compare_cases.py --summary --glob <span class="tok-s">"results/*"</span>
+
+<span class="tok-c"># Estudos declarativos por família</span>
+python post/compare_cases.py --study modelo_A --vary element
+python post/compare_cases.py --study modelo_A --vary constitutive
+python post/compare_cases.py --study modelo_A --vary thermal
+
+<span class="tok-c"># Dashboard HTML estático e exportação científica</span>
+python post/compare_cases.py --study modelo_A --vary element --report --format paper
+
+<span class="tok-c"># Deslocamento radial físico na parede vs tempo</span>
+python post/compare_cases.py results/modelo_A --plot displacement
+
+<span class="tok-c"># Comparação de deslocamento entre variantes/elementos</span>
+python post/compare_cases.py --glob <span class="tok-s">"results/modelo_A_*"</span> --plot displacement --group-by element
+
+<span class="tok-c"># Perfil radial u_r(r) em tempos selecionados</span>
+python post/compare_cases.py results/modelo_A --plot radial_profile
+
+<span class="tok-c"># Perfil vertical u_r(z) na parede interna (2D)</span>
+python post/compare_cases.py results/modelo_A_Q8 --plot wall_profile
+
+<span class="tok-c"># Mapa 2D u_r(r,z) no tempo mais próximo de 240 h</span>
+python post/compare_cases.py results/modelo_A_Q8 --plot field_map --time <span class="tok-n">240</span>
+
+<span class="tok-c"># D(t) na parede com limiares de falha</span>
+python post/compare_cases.py results/modelo_A_with_damage --plot damage
+
+<span class="tok-c"># Taxa de fluência na parede e ponto de inflexão</span>
+python post/compare_cases.py results/modelo_A_with_damage --plot creep_rate
+
+<span class="tok-c"># Comparação com e sem terciária/dano</span>
+python post/compare_cases.py results/modelo_A_no_damage results/modelo_A_with_damage --plot damage_comparison
+
+<span class="tok-c"># Trajetória tensão efetiva × dano</span>
+python post/compare_cases.py results/modelo_A_with_damage --plot phase_space
+
+<span class="tok-c"># Animações: fechamento, u_r(r,z,t), dano e temperatura</span>
+python post/compare_cases.py results/modelo_A_Q8 --animate closure
+python post/compare_cases.py results/modelo_A_Q8 --animate ur
+python post/compare_cases.py results/modelo_A_Q8 --animate damage
+python post/compare_cases.py results/modelo_A_Q8 --animate temperature</code></pre>
+    <p>Os gráficos usam cores fixas por elemento quando os elementos diferem. Quando vários casos usam o mesmo elemento, as cores e marcadores passam a distinguir o nome do caso, preservando legendas inequívocas com caso + elemento. Os plots de deslocamento escolhem automaticamente a unidade do eixo: μm, mm, cm ou m.</p>
+
+    <h4>Dashboard e exportação científica</h4>
+    <p>O modo <code class="ic">--report</code> monta um dashboard HTML estático em <code class="ic">results/report/index.html</code>, copiando figuras para <code class="ic">assets/</code>, resumindo metadados e criando links diretos para <code class="ic">metadata.json</code>, CSVs, <code class="ic">.pvd</code> e <code class="ic">.vtu</code>. O modo <code class="ic">--format paper</code> cria um pacote reprodutível em <code class="ic">paper/</code> com nomes determinísticos, figuras PNG/PDF e tabelas CSV/Markdown/LaTeX.</p>
+    <div class="code-head"><span>dashboard + pacote paper</span><button class="copy-btn">copiar</button></div>
+    <pre><code>python post/compare_cases.py --study modelo_A --vary element --report --format paper</code></pre>
+
+    <h4>Animações</h4>
+    <p>As animações são geradas pelo módulo <code class="ic">saltpost.animations</code>. <code class="ic">closure</code> usa <code class="ic">closure.csv</code>; <code class="ic">ur</code> usa <code class="ic">displacements_profile.csv</code>; <code class="ic">damage</code> e <code class="ic">temperature</code> usam os campos <code class="ic">damage_D</code> e <code class="ic">temperature_K</code> dos VTUs quando PyVista está disponível. GIF é o padrão; MP4 é usado quando <code class="ic">ffmpeg</code> existe.</p>
+    <div class="code-head"><span>animações de campos e fechamento</span><button class="copy-btn">copiar</button></div>
+    <pre><code>python post/compare_cases.py results/modelo_A_Q8 --animate all
+python post/compare_cases.py results/modelo_A_Q8 --animate all --animation-format mp4</code></pre>
+
+    <h4>Viewer interativo de deslocamento</h4>
+    <p>Para explorar o perfil <code class="ic">u_r(z)</code> na parede interna com controle de tempo, use o viewer interativo baseado em <code class="ic">wall_profile.csv</code>. Ele funciona em casos 2D e também em casos 1D, onde a parede tem um único ponto em profundidade.</p>
+    <div class="code-head"><span>viewer u_r(z) com slider temporal</span><button class="copy-btn">copiar</button></div>
+    <pre><code><span class="tok-c"># Janela matplotlib com slider e Play/Pause</span>
+python post/displacement_viewer.py results/modelo_A_Q8
+
+<span class="tok-c"># HTML standalone para compartilhar ou abrir no navegador</span>
+python post/displacement_viewer.py results/modelo_A_Q8 --html</code></pre>
+    <p>O HTML gerado em <code class="ic">results/&lt;caso&gt;/displacement_viewer.html</code> embute os dados do CSV, inverte o eixo de profundidade na convenção geológica, mostra tooltip com <code class="ic">z</code> e <code class="ic">u_r</code>, e inclui botão para exportar PNG do instante selecionado.</p>
+
+    <h4>Estudo de convergência</h4>
+    <p>Para reproduzir o estudo de Lamé com todos os elementos implementados, rode:</p>
+    <div class="code-head"><span>convergência Lamé</span><button class="copy-btn">copiar</button></div>
+    <pre><code>python post/convergence.py</code></pre>
+    <table>
+      <tr><th>Elemento</th><th>Malhas radiais</th><th>GDL final</th><th>Erro final</th><th>Taxa mínima observada</th><th>Tempo final local</th></tr>
+      <tr><td><code>axisym_1d_L3</code></td><td>5, 10, 20, 40</td><td>81</td><td>9.771e-08</td><td>3.81</td><td>0.002 s</td></tr>
+      <tr><td><code>axisym_2d_Q4</code></td><td>5, 10, 20, 40</td><td>1722</td><td>2.694e-04</td><td>1.91</td><td>0.089 s</td></tr>
+      <tr><td><code>axisym_2d_T3</code></td><td>5, 10, 20, 40</td><td>3362</td><td>2.690e-04</td><td>1.88</td><td>0.193 s</td></tr>
+      <tr><td><code>axisym_2d_Q8</code></td><td>3, 6, 12, 24</td><td>1874</td><td>5.214e-07</td><td>3.58</td><td>0.106 s</td></tr>
+      <tr><td><code>axisym_2d_Q9</code></td><td>3, 6, 12, 24</td><td>2450</td><td>5.214e-07</td><td>3.58</td><td>0.121 s</td></tr>
+      <tr><td><code>axisym_2d_AQ9</code></td><td>1, 2, 4</td><td>54</td><td>4.436e-16</td><td>exato</td><td>0.044 s</td></tr>
+      <tr><td><code>axisym_2d_T6</code></td><td>3, 6, 12, 24</td><td>2450</td><td>4.614e-06</td><td>2.67</td><td>0.110 s</td></tr>
+    </table>
+    <p>O script gera <code class="ic">results/convergence/lame_convergence.csv</code>, <code class="ic">lame_error_vs_dofs.png</code> e <code class="ic">lame_error_vs_time.png</code>.</p>
+
+    <h4>ParaView (3D interativo)</h4>
+    <p>Quando o YAML usa <code class="ic">output.vtu: true</code>, o solver grava uma série <code class="ic">*.vtu</code> e um índice <code class="ic">*.pvd</code>. Abra o arquivo <code class="ic">results/&lt;caso&gt;/&lt;caso&gt;.pvd</code> no ParaView para carregar a série temporal inteira.</p>
+    <ul class="clean">
+      <li><strong>Warp by Vector:</strong> use o vetor <code class="ic">u</code> para amplificar visualmente os deslocamentos. Ajuste o fator de escala sem alterar os valores físicos.</li>
+      <li><strong>Clip:</strong> corte a geometria para enxergar a região próxima à parede do poço e gradientes internos.</li>
+      <li><strong>Plot Over Line:</strong> extraia perfis radiais ou verticais de <code class="ic">u_r</code>, <code class="ic">sigma</code>, <code class="ic">damage_D</code> ou <code class="ic">temperature_K</code>. Em <code class="ic">conduction_2d</code>, o campo <code class="ic">temperature_K</code> revela a frente térmica atravessando camadas com k diferentes.</li>
+      <li><strong>Animação temporal:</strong> use o botão Play para percorrer os frames do <code class="ic">.pvd</code> e observar a evolução do fechamento.</li>
+    </ul>
+
+    <h4>PyVista (3D programático)</h4>
+    <p>PyVista permite transformar a saída VTU em scripts reprodutíveis para figuras, perfis e animações.</p>
+    <div class="code-head"><span>PyVista — leitura e plot básico</span><button class="copy-btn">copiar</button></div>
+    <pre><code><span class="tok-k">import</span> pyvista <span class="tok-k">as</span> pv
+
+mesh = pv.read(<span class="tok-s">"results/modelo_A_Q8/modelo_A_Q8_0000.vtu"</span>)
+mesh.plot(scalars=<span class="tok-s">"u_r"</span>, cmap=<span class="tok-s">"coolwarm"</span>)
+
+<span class="tok-c"># Perfil radial</span>
+profile = mesh.sample_over_line((0.155575, 0.0, 0.0), (50.0, 0.0, 0.0), resolution=<span class="tok-n">400</span>)
+
+<span class="tok-c"># Série temporal</span>
+reader = pv.PVDReader(<span class="tok-s">"results/modelo_A_Q8/modelo_A_Q8.pvd"</span>)
+times = reader.time_values
+reader.set_active_time_value(times[-1])
+last = reader.read()</code></pre>
+    <p>O helper <code class="ic">post/saltpost/vtk.py</code> oferece <code class="ic">load_vtu()</code> e <code class="ic">discover_vtu()</code> para usar a mesma convenção de arquivos do saltpost.</p>
+
+    <h4>Benchmark OpenMP</h4>
+    <p>O script <code class="ic">post/benchmark.py</code> roda o caso <code class="ic">modelo_A_Q8</code> com 1, 2 e 4 threads, coleta <code class="ic">wall_time_s</code>, <code class="ic">time_assembly_s</code>, <code class="ic">time_solve_s</code> e <code class="ic">time_constitutive_s</code> do <code class="ic">metadata.json</code>, e gera gráficos de speedup e composição de tempo.</p>
+    <div class="code-head"><span>benchmark OpenMP</span><button class="copy-btn">copiar</button></div>
+    <pre><code>python post/benchmark.py</code></pre>
+    <p>As saídas ficam em <code class="ic">results/benchmark/</code>: <code class="ic">benchmark_openmp.csv</code>, <code class="ic">speedup_vs_threads.png/pdf</code> e <code class="ic">time_breakdown.png/pdf</code>.</p>
+
+    <h4>Benchmark suite</h4>
+    <p>A suite integral <code class="ic">post/benchmark_suite.py</code> gera YAMLs temporários, roda o solver para combinações de elemento, modelo constitutivo, envoltória, modo térmico, caso padrão e threads OpenMP, e consolida os metadados em um relatório de desempenho e precisão.</p>
+    <div class="code-head"><span>benchmark suite — presets</span><button class="copy-btn">copiar</button></div>
+    <pre><code><span class="tok-c"># Execução representativa cobrindo todas as dimensões sem explodir o tempo</span>
+python post/benchmark_suite.py --preset standard
+
+<span class="tok-c"># Matriz cartesiana completa: elementos × modelos × thermal × threads × casos</span>
+python post/benchmark_suite.py --preset full
+
+<span class="tok-c"># Conferir a matriz planejada sem rodar o solver</span>
+python post/benchmark_suite.py --preset full --dry-run
+
+<span class="tok-c"># Limitar uma campanha exploratória</span>
+python post/benchmark_suite.py --preset full --max-runs <span class="tok-n">50</span></code></pre>
+    <p>As saídas principais são <code class="ic">results/benchmark/benchmark_suite.json</code>, <code class="ic">benchmark_report.md</code> e <code class="ic">benchmark_time_vs_dofs.png/pdf</code>. O relatório inclui tempo total por elemento, tempo por modelo, breakdown montagem/solve/constitutivo, speedup OpenMP e GDLs finais por elemento.</p>
+
+    <h4>Comparação de estágios de fluência</h4>
+    <p>Para isolar a contribuição física de cada estágio, rode o mesmo caso mudando apenas as flags de <code class="ic">creep</code> e o nome do caso. Uma sequência típica é:</p>
+    <ul class="clean">
+      <li><strong>Secundária:</strong> <code class="ic">secondary: true</code>, <code class="ic">primary: false</code>, <code class="ic">tertiary: false</code>.</li>
+      <li><strong>Primária + secundária:</strong> <code class="ic">secondary: true</code>, <code class="ic">primary: true</code>, <code class="ic">primary_model: EDMT</code> ou <code class="ic">primary_model: isv_sh_dm</code>.</li>
+      <li><strong>Terciária + dano:</strong> <code class="ic">tertiary: true</code>, <code class="ic">damage: true</code>, <code class="ic">tertiary_model: MottaV1</code> com <code class="ic">dilatancy_envelope: Spier|Ratigan|DeVries|Hunsche</code>, <code class="ic">tertiary_model: wang_2004</code> para CDM acoplado, ou <code class="ic">tertiary_model: aubertin_isv_sh_d</code> para a lei ISV unificada; preferencialmente com <code class="ic">time.scheme: implicit_adaptive</code>.</li>
+    </ul>
+    <p>Depois, sobreponha as curvas com <code class="ic">post/compare_cases.py</code>. A separação entre as curvas mostra o efeito incremental da primária e, quando houver dano, o momento em que a terciária acelera o fechamento.</p>
+  </section>
+
+  <!-- ============ FINAL REPORT ============ -->
+  <section id="final-report">
+    <h3>Final Report</h3>
+    <p class="lead">O relatório final de validação consolida a credencial técnica e as advertências de uso do solver: comparação SESTSAL, convergência Lamé, regimes de fluência, acoplamento térmico, dano/falha, OpenMP, adaptação de malha e tabela de decisão.</p>
+    <div class="note">
+      <span class="nt">Documento de referência</span>
+      Leia <a href="final-validation-report.md"><code class="ic">docs/final-validation-report.md</code></a> antes de usar o SaltCreep como evidência externa. O documento resume onde o solver está validado, onde a previsão ainda depende de calibração experimental e quais combinações de elemento/modelo são recomendadas por aplicação.
+    </div>
+    <div class="code-head"><span>abrir relatório consolidado</span><button class="copy-btn">copiar</button></div>
+    <pre><code>docs/final-validation-report.md</code></pre>
+  </section>
+
+  <!-- ============ MESH ADAPTATION ============ -->
+  <section id="mesh-adaptation">
+    <h3>Refinamento adaptativo h</h3>
+    <p class="lead">O refinamento adaptativo concentra elementos onde a tensão recuperada indica erro alto. A implementação usa o estimador Zienkiewicz-Zhu em norma de energia e refinadores h para Q4 e T3.</p>
+
+    <h4>Como funciona</h4>
+    <ol class="clean">
+      <li><strong>Estado elástico inicial:</strong> o solver monta a malha do YAML, resolve o equilíbrio elástico e calcula <code class="ic">sigma_gp</code>.</li>
+      <li><strong>Recuperação ZZ:</strong> o <code class="ic">ErrorEstimator</code> suaviza tensões nos nós, reconstrói <code class="ic">sigma*</code> nos pontos de Gauss e integra <code class="ic">(sigma_h - sigma*)^T D^{-1} (sigma_h - sigma*)</code>.</li>
+      <li><strong>Marcação:</strong> elementos com <code class="ic">eta_rel &gt; error_threshold</code> são refinados; opcionalmente, elementos com <code class="ic">damage_D</code> alto também entram na marcação.</li>
+      <li><strong>Refino e transferência:</strong> <code class="ic">MeshRefiner</code> subdivide Q4 em 4 Q4 ou T3 em 3 T3, transfere <code class="ic">u</code>, tensões, deformações viscosas/térmicas e variáveis internas.</li>
+    </ol>
+
+    <div class="code-head"><span>YAML — adaptação de malha</span><button class="copy-btn">copiar</button></div>
+    <pre><code><span class="tok-k">mesh</span>:
+  <span class="tok-k">n_elements_radial</span>: <span class="tok-n">20</span>
+  <span class="tok-k">n_elements_axial</span>: <span class="tok-n">2</span>
+  <span class="tok-k">ratio</span>: <span class="tok-n">1000</span>
+  <span class="tok-k">adaptive</span>: <span class="tok-k">true</span>
+  <span class="tok-k">error_threshold</span>: <span class="tok-n">0.10</span>
+  <span class="tok-k">max_refinement_levels</span>: <span class="tok-n">3</span>
+  <span class="tok-k">damage_refinement_threshold</span>: <span class="tok-n">0.30</span></code></pre>
+
+    <div class="note">
+      <span class="nt">Escopo atual</span>
+      A adaptação é um pre-refinamento baseado no estado elástico inicial, antes da marcha temporal. O estimador calcula erro para qualquer elemento 2D, inclusive AQ9; a subdivisão conformante está implementada para <code class="ic">axisym_2d_Q4</code> e <code class="ic">axisym_2d_T3</code>. Se outro elemento for marcado para subdivisão, o solver aborta com mensagem explícita.
+    </div>
+
+    <p>Detalhes de algoritmo, transferência de campos e limitações estão em <code class="ic">docs/mesh-adaptation.md</code>. O plano arquitetural aprovado antes da implementação permanece registrado em <code class="ic">docs/etapa-12-plan.md</code>.</p>
+  </section>
+
+  <!-- ============ VERIFY ============ -->
+  <section id="verify">
+    <h3>Verificação</h3>
+    <p class="lead">O protocolo de verificação roda em ordem; a construção para no primeiro teste que regredir. Tolerâncias nunca são relaxadas para um teste passar.</p>
+
+    <div class="code-head"><span>rodar a bateria de testes</span><button class="copy-btn">copiar</button></div>
+    <pre><code><span class="tok-c"># Testes C++ (Catch2) — 120 testes</span>
+ctest --test-dir build --output-on-failure
+
+<span class="tok-c"># Testes Python (saltpost/VTU/deslocamento/dano/viewer/benchmark/edge/dashboard) — 21 testes</span>
+python -m unittest discover tests/python -v</code></pre>
+
+    <h4>Protocolo (ordem de verificação)</h4>
+    <ol class="clean">
+      <li><strong>Lamé analítico</strong> — cilindro vazado elástico, erro &lt; tolerância. O oráculo fundamental.</li>
+      <li><strong>Patch test</strong> de cada elemento — campos lineares/quadráticos reproduzidos exatamente.</li>
+      <li><strong>Regressão TCC A–F</strong> — reproduz os modelos do TCC com tolerâncias publicadas.</li>
+      <li><strong>Convergência</strong> entre elementos — taxa ~h² (linear) ou ~h³ (quadrático).</li>
+      <li><strong>Consistência térmica</strong> — profile, conduction_1d e conduction_2d nos limites uniformes; balanço de energia no problema térmico isolado.</li>
+      <li><strong>Equivalência explícito↔implícito</strong> — mesmo resultado no caso suave; implícito converge onde explícito diverge.</li>
+      <li><strong>Saturação e dano</strong> — primária satura no DM; dano monotônico, limitado a 0.99.</li>
+    </ol>
+    <div class="note">
+      <span class="nt">Estado atual</span>
+      <strong>120 testes C++ + 21 testes Python — todos verdes.</strong> Todas as etapas do roadmap original (0 a 5) concluídas e a Fase 2 inclui saída VTU/PVD, visualização espacial, gráficos físicos de deslocamento, viewer interativo de parede, dashboard HTML, exportação paper, estudos declarativos, animações, diagnóstico de falha por dano, condução térmica 2D com camadas, paralelismo OpenMP opcional, benchmark de desempenho, benchmark suite integral, refinamento adaptativo h e testes de edge case: elástico, secundária, primária EDMT/ISV, terciária com dano Motta/Wang/Aubertin, envoltórias Spier/Ratigan/DeVries/Hunsche, 7 elementos, integrador implícito, acoplamento térmico fraco e pós-processamento.
+    </div>
+  </section>
+
+  </div>
+</main>
+
+<footer>
+  <p><strong>SaltCreep</strong> — solver FEM de fluência em rocha salina · C++20 / Python · Documentação técnica v1.0</p>
+  <p style="margin-top:6px">Verificador independente do SESTSAL · Construído incrementalmente com verificação em cada etapa · <span class="mono">120 testes C++ · 21 testes Python</span></p>
+</footer>
+
+<script>
+  // ---------- mobile menu ----------
+  const menuBtn=document.getElementById('menuBtn');
+  const sidebar=document.getElementById('sidebar');
+  menuBtn.addEventListener('click',()=>sidebar.classList.toggle('show'));
+
+  // ---------- collapsible cards ----------
+  document.querySelectorAll('.card-head').forEach(h=>{
+    h.addEventListener('click',()=>h.parentElement.classList.toggle('open'));
+  });
+
+  // ---------- copy buttons (static) ----------
+  function wireCopy(btn,getText){
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const txt=getText();
+      navigator.clipboard.writeText(txt).then(()=>{
+        const old=btn.textContent;btn.textContent='copiado ✓';btn.classList.add('done');
+        setTimeout(()=>{btn.textContent=old;btn.classList.remove('done')},1400);
+      });
+    });
+  }
+  document.querySelectorAll('.code-head .copy-btn').forEach(btn=>{
+    if(btn.id==='b_copy')return;
+    wireCopy(btn,()=>{
+      const pre=btn.closest('.code-head').nextElementSibling;
+      return pre?pre.innerText:'';
+    });
+  });
+
+  // ---------- scrollspy ----------
+  const navLinks=[...document.querySelectorAll('#nav a:not(.sub)')];
+  const sections=navLinks.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  function onScroll(){
+    let cur=sections[0];
+    const y=window.scrollY+120;
+    for(const s of sections){if(s.offsetTop<=y)cur=s;}
+    navLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur.id));
+  }
+  window.addEventListener('scroll',onScroll);onScroll();
+
+  // close mobile sidebar on link click
+  document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click',()=>{
+    if(window.innerWidth<=1080)sidebar.classList.remove('show');
+  }));
+
+  // ---------- nav search ----------
+  const search=document.getElementById('navSearch');
+  search.addEventListener('input',()=>{
+    const q=search.value.toLowerCase().trim();
+    document.querySelectorAll('#nav a').forEach(a=>{
+      const match=a.textContent.toLowerCase().includes(q);
+      a.classList.toggle('nav-hidden',q&&!match);
+    });
+    document.querySelectorAll('.nav-group').forEach(g=>{
+      const anyVisible=[...g.querySelectorAll('a')].some(a=>!a.classList.contains('nav-hidden'));
+      g.style.display=anyVisible?'':'none';
+    });
+  });
+
+  // ---------- tabs ----------
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      const panel=t.getAttribute('data-tab');
+      const group=t.parentElement;
+      group.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      let sib=group.nextElementSibling;
+      while(sib&&sib.classList.contains('tab-panel')){
+        sib.classList.toggle('active',sib.id==='tab-'+panel);
+        sib=sib.nextElementSibling;
+      }
+    });
+  });
+
+  // ---------- interactive YAML builder ----------
+  const ids=['b_name','b_ri','b_re','b_wd','b_bur','b_lith','b_mud','b_k0','b_elem','b_nr','b_ratio','b_adapt','b_adapt_thr','b_adapt_levels','b_sec','b_pri','b_ter','b_env','b_therm','b_vtu','b_damage_tracking','b_scheme','b_time'];
+  function v(id){const el=document.getElementById(id);return el.type==='checkbox'?el.checked:el.value;}
+  function genYAML(){
+    const name=v('b_name')||'caso';
+    const therm=v('b_therm');
+    const ter=v('b_ter');
+    const y=
+`name: ${name}
+
+geometry:
+  inner_radius_m: ${v('b_ri')}
+  outer_radius_m: ${v('b_re')}
+
+depths:
+  water_depth_m: ${v('b_wd')}
+  burial_m: ${v('b_bur')}
+
+lithology:
+  primary: ${v('b_lith')}
+
+fluid:
+  mud_weight_kg_per_m3: ${v('b_mud')}
+
+stress:
+  k0: ${v('b_k0')}
+
+element:
+  type: ${v('b_elem')}
+
+mesh:
+  n_elements_radial: ${v('b_nr')}
+  ratio: ${v('b_ratio')}
+  adaptive: ${v('b_adapt')}
+  error_threshold: ${v('b_adapt_thr')}
+  max_refinement_levels: ${v('b_adapt_levels')}
+  damage_refinement_threshold: -1.0
+
+creep:
+  elastic_only: false
+  secondary: ${v('b_sec')}
+  primary: ${v('b_pri')}
+  tertiary: ${ter}
+  damage: ${ter}
+  primary_model: EDMT
+  tertiary_model: MottaV1
+  dilatancy_envelope: ${v('b_env')}
+  spier:
+    a: 0.25
+    b_Pa: 0.0
+  ratigan:
+    c: 0.81
+    d_Pa: 0.0
+    m: 1.0
+  devries:
+    e_Pa: 10.0e6
+    f: 1.0
+    sigma0_Pa: 30.0e6
+  hunsche:
+    g_Pa: 10.0e6
+    I1_ref_Pa: 30.0e6
+    h: 1.0
+
+thermal:
+  enabled: ${therm}${therm?`
+  mode: profile
+  seabed_temp_C: 4.0
+  geothermal_gradient_C_per_m: 0.03
+  alpha_thermal: 3.5e-5
+  T_reference_C: 25.0`:''}
+
+time:
+  scheme: ${v('b_scheme')}
+  total_h: ${v('b_time')}
+  dt_h: 0.01
+
+output:
+  fields: [closure_pct, u_r, sigma]
+  series: [closure_pct]
+  vtu: ${v('b_vtu')}
+  vtu_every_n_steps: 10
+  revolve_3d: false
+  damage_tracking: ${v('b_damage_tracking')}
+  damage_thresholds: [0.1, 0.3, 0.5, 0.8]
+  failure_D_critical: 0.5
+  creep_rate_multiplier_threshold: 10.0`;
+    return y;
+  }
+  function syntaxColor(yaml){
+    return yaml
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/(#.*)$/gm,'<span class="tok-c">$1</span>')
+      .replace(/^(\s*)([a-zA-Z0-9_]+):/gm,'$1<span class="tok-k">$2</span>:')
+      .replace(/: (true|false)\b/g,': <span class="tok-k">$1</span>')
+      .replace(/: (-?\d+\.?\d*([eE]-?\d+)?)\b/g,': <span class="tok-n">$1</span>');
+  }
+  function updateBuilder(){
+    document.getElementById('b_output').innerHTML=syntaxColor(genYAML());
+    document.getElementById('b_fname').textContent='cases/'+(v('b_name')||'caso')+'.yaml';
+  }
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    el.addEventListener('input',updateBuilder);
+    el.addEventListener('change',updateBuilder);
+  });
+  updateBuilder();
+  wireCopy(document.getElementById('b_copy'),genYAML);
+</script>
+</body>
+</html>

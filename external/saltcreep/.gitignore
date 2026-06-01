@@ -1,0 +1,16 @@
+﻿build/
+out/
+build_*/
+*.o *.so *.a *.exe
+results/
+docs/references/*.pdf
+docs/references/*.pptx
+docs/references/*.docx
+.claude/settings.local.json
+.vscode/ .idea/ .DS_Store Thumbs.db *.swp *~
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+CMakeFiles/ CMakeCache.txt cmake_install.cmake Makefile compile_commands.json

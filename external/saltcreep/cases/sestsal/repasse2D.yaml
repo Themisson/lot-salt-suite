@@ -1,0 +1,56 @@
+name: repasse2D
+
+geometry:
+  well_radius_m: 0.155575
+  outer_radius_factor: 320
+
+mesh:
+  n_radial: 25
+  ratio: 1.05
+
+depths:
+  burial_m: 4565
+  water_depth_m: 0
+  salt_above_m: 0
+
+lithology: halita
+
+fluid:
+  weight_lb_per_gal: 4586.0
+
+stress:
+  k0: 1.0
+
+material:
+  E_Pa: 2.0e+10
+  nu: 0.36
+
+thermal:
+  enabled: false
+  mode: constant
+  T_K: 373.9
+
+time:
+  total_s: 3600
+  dt_s: 180
+  scheme: explicit
+
+creep:
+  elastic_only: false
+  secondary: true
+  primary: false
+  tertiary: false
+  damage: false
+
+output:
+  every_n_steps: 10
+  vtu: false
+  steps:
+    - until_s: 36
+      dt_s: 0.036000000000000004
+    - until_s: 18000
+      dt_s: 3.6
+    - until_s: 36000
+      dt_s: 36.0
+    - until_s: 1296000
+      dt_s: 1800.0

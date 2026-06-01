@@ -1,0 +1,53 @@
+name: caso_wang
+
+geometry:
+  well_radius_m: 0.155575
+  outer_radius_factor: 1000
+
+mesh:
+  n_elements_radial: 6
+  ratio: 50
+
+depths:
+  water_depth_m: 1000
+  burial_m: 2000
+  salt_above_m: 0
+
+lithology:
+  primary: halita
+
+fluid:
+  pressure_Pa: 35.0e6
+
+stress:
+  k0: 1.0
+
+thermal:
+  enabled: false
+  mode: constant
+  T_K: 359.15
+
+time:
+  total_h: 0.05
+  dt_h: 0.005
+  scheme: implicit_adaptive
+  dt_max_h: 0.005
+  tol_global: 1.0e-5
+
+creep:
+  elastic_only: false
+  secondary: true
+  primary: false
+  tertiary: true
+  damage: true
+  tertiary_model: wang_2004
+  wang_2004:
+    A_d: 1.0e-40
+    m_d: 2.5
+    p_d: 1.0
+    n_d: 2.0
+    D_max: 0.99
+
+output:
+  every_n_steps: 10
+  vtu: false

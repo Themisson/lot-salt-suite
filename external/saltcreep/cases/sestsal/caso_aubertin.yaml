@@ -1,0 +1,61 @@
+name: caso_aubertin
+
+geometry:
+  well_radius_m: 0.155575
+  outer_radius_factor: 1000
+
+mesh:
+  n_elements_radial: 6
+  ratio: 50
+
+depths:
+  water_depth_m: 1000
+  burial_m: 2000
+  salt_above_m: 0
+
+lithology:
+  primary: halita
+
+fluid:
+  pressure_Pa: 35.0e6
+
+stress:
+  k0: 1.0
+
+thermal:
+  enabled: false
+  mode: constant
+  T_K: 359.15
+
+time:
+  total_h: 0.05
+  dt_h: 0.005
+  scheme: implicit_adaptive
+  dt_max_h: 0.005
+  tol_global: 1.0e-5
+
+creep:
+  elastic_only: false
+  secondary: true
+  primary: true
+  tertiary: true
+  damage: false
+  primary_model: EDMT
+  tertiary_model: aubertin_isv_sh_d
+  aubertin_isv_sh_d:
+    e0_s: 5.5556e-10
+    sig0: 9.762e6
+    n: 3.223
+    Q_J_mol: 50208.0
+    T0: 359.15
+    K1: 0.8
+    K2: 2.5
+    A_d: 0.0
+    m_d: 2.5
+    n_d: 2.0
+    p_d: 1.0
+    D_max: 0.99
+
+output:
+  every_n_steps: 10
+  vtu: false
