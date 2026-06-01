@@ -1,0 +1,45 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmake:*)",
+      "Bash(ctest:*)",
+      "Bash(pytest:*)",
+      "Bash(python tools/*:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(./build/lot-sim:*)",
+      "Read(./**)",
+      "Edit(apps/**)",
+      "Edit(src/**)",
+      "Edit(include/**)",
+      "Edit(postprocess/**)",
+      "Edit(tests/**)",
+      "Edit(cases/**)",
+      "Edit(schemas/**)",
+      "Edit(docs/**)",
+      "Edit(tools/**)",
+      "Edit(CMakeLists.txt)",
+      "Edit(pyproject.toml)",
+      "Edit(CLAUDE.md)",
+      "Edit(AGENTS.md)",
+      "Edit(README.md)",
+      "Edit(.gitignore)",
+      "Edit(.claude/settings.json)",
+      "Edit(.agents/**)"
+    ],
+    "deny": [
+      "Edit(legance/**)",
+      "Edit(external/**)",
+      "Edit(legacy/LOT_Tese/**)",
+      "Edit(legacy/LOT_APB_v5/**)",
+      "Bash(rm -rf:*)",
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git push --force:*)"
+    ]
+  },
+  "model": "sonnet"
+}
