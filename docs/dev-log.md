@@ -43,6 +43,20 @@ Saltcreep   : modificações em andamento por Themisson
 
 ---
 
+### [2026-06-01 11:47] `3b45136` — Themisson
+**Commit:** `feat: add dev-log system with auto-update hook`
+**Testes C++:** 0 arquivos | **Testes Python:** 0 arquivos
+**Último resultado ctest:** nenhum (módulos ainda não implementados)
+**Arquivos alterados:**
+- `.agents/skills/update-devlog/SKILL.md`
+- `.claude/settings.json`
+- `.claude/skills/update-devlog/SKILL.md`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `tools/update_devlog.py`
+
+---
+
 ### [2026-06-01 10:36] `4739d4b` — Themisson
 **Commit:** `docs: formulation audit results (Fase 3 /formulation-audit)`
 **Fase:** 3 — Auditoria de formulação
