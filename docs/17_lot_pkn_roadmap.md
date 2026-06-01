@@ -61,11 +61,27 @@ entregar os dados ao solver.
 7. Comparar com arquivos legados somente quando o pipeline moderno produzir
    series equivalentes e documentar em `docs/12_validation_results.md`.
 
-## Fora de escopo nesta fase
+## O que foi entregue por fase
 
-Nesta Fase 6.1 nao foram implementados `PknModel`, `BreakdownDetector`,
-executavel novo ou comparacao numerica. A fase e de auditoria, governanca e
-roadmap para reduzir risco antes da codificacao.
+**Fase 6.1 (auditoria e governança):**
+- Mapeamento do caminho PKN legado em `docs/audits/pkn_legacy_path.md`.
+- Catálogo de modelos não PKN em `docs/audits/non_pkn_models_status.md`.
+- Política de saltcreep vendorizado ativo em `docs/16_saltcreep_governance.md`.
+- Nenhum código C++ novo.
+
+**Fase 6.2 (contrato sintético):**
+- `lot::BreakdownDetector` com 5 testes Catch2 sintéticos (vetor SI, erros controlados).
+- Esqueleto sintético de `lot::PknModel` com 4 testes (não usa formulação física validada).
+- Três casos YAML validados pelo parser: `lot_pkn_minimal.yaml`, `lot_pkn_with_leakoff.yaml`, `buz67d_pkn.yaml`.
+- `buz67d_pkn.yaml` é contrato sintático/migratório — NÃO é baseline numérico.
+- R09 (`/ M_PI / 22`) permanece blocker para qualquer regressão PKN legado × moderno.
+
+## Fora de escopo até R09 ser resolvido
+
+- Comparação numérica com `legance/LOT_Tese` ou `legance/LOT_APB_v5`.
+- Uso de `buz67d_pkn.yaml` como referência de resultado.
+- Conexão do subcomando `run` ao `PknModel`.
+- Acoplamento com sal ou APB.
 
 ## Riscos tecnicos a resolver antes da implementacao
 

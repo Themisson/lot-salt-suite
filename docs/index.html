@@ -2552,10 +2552,25 @@ entregar os dados ao solver.</p>
 <li>Comparar com arquivos legados somente quando o pipeline moderno produzir
    series equivalentes e documentar em <code>docs/12_validation_results.md</code>.</li>
 </ol>
-<h2 id="fora-de-escopo-nesta-fase">Fora de escopo nesta fase</h2>
-<p>Nesta Fase 6.1 nao foram implementados <code>PknModel</code>, <code>BreakdownDetector</code>,
-executavel novo ou comparacao numerica. A fase e de auditoria, governanca e
-roadmap para reduzir risco antes da codificacao.</p>
+<h2 id="o-que-foi-entregue-por-fase">O que foi entregue por fase</h2>
+<p><strong>Fase 6.1 (auditoria e governança):</strong>
+- Mapeamento do caminho PKN legado em <code>docs/audits/pkn_legacy_path.md</code>.
+- Catálogo de modelos não PKN em <code>docs/audits/non_pkn_models_status.md</code>.
+- Política de saltcreep vendorizado ativo em <code>docs/16_saltcreep_governance.md</code>.
+- Nenhum código C++ novo.</p>
+<p><strong>Fase 6.2 (contrato sintético):</strong>
+- <code>lot::BreakdownDetector</code> com 5 testes Catch2 sintéticos (vetor SI, erros controlados).
+- Esqueleto sintético de <code>lot::PknModel</code> com 4 testes (não usa formulação física validada).
+- Três casos YAML validados pelo parser: <code>lot_pkn_minimal.yaml</code>, <code>lot_pkn_with_leakoff.yaml</code>, <code>buz67d_pkn.yaml</code>.
+- <code>buz67d_pkn.yaml</code> é contrato sintático/migratório — NÃO é baseline numérico.
+- R09 (<code>/ M_PI / 22</code>) permanece blocker para qualquer regressão PKN legado × moderno.</p>
+<h2 id="fora-de-escopo-ate-r09-ser-resolvido">Fora de escopo até R09 ser resolvido</h2>
+<ul>
+<li>Comparação numérica com <code>legance/LOT_Tese</code> ou <code>legance/LOT_APB_v5</code>.</li>
+<li>Uso de <code>buz67d_pkn.yaml</code> como referência de resultado.</li>
+<li>Conexão do subcomando <code>run</code> ao <code>PknModel</code>.</li>
+<li>Acoplamento com sal ou APB.</li>
+</ul>
 <h2 id="riscos-tecnicos-a-resolver-antes-da-implementacao">Riscos tecnicos a resolver antes da implementacao</h2>
 <ul>
 <li>O legado usa conversoes de vazao com fatores geometricos embutidos e ao menos

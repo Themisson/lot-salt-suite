@@ -30,7 +30,7 @@ lot-salt-suite/
 ├── tools/              # Scripts utilitários e migração
 ├── docs/               # Documentação técnica + index.html
 ├── legance/            # Legado congelado (LOT_Tese, LOT_APB_v5)
-└── external/saltcreep/ # Referência de sal/fluência (não modificar)
+└── external/saltcreep/ # Dependência vendorizada ativa — edição controlada por tarefa explícita, testes e dev-log
 ```
 
 ## Início rápido
