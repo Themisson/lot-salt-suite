@@ -5,92 +5,265 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>lot-salt-suite — Documentação Técnica</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }
-  #sidebar { width: 260px; min-width: 260px; background: #1e293b; padding: 24px 16px; overflow-y: auto; position: sticky; top: 0; height: 100vh; }
-  #sidebar h1 { font-size: 1rem; font-weight: 700; color: #38bdf8; margin-bottom: 4px; }
-  #sidebar .version { font-size: 0.7rem; color: #64748b; margin-bottom: 20px; }
-  #sidebar ul { list-style: none; }
-  #sidebar li { margin: 4px 0; }
-  #sidebar a { text-decoration: none; font-size: 0.85rem; padding: 4px 8px; display: block; border-radius: 4px; transition: background 0.15s; }
-  #sidebar a:hover { background: #334155; }
-  #main { flex: 1; padding: 32px 40px; overflow-y: auto; max-width: 900px; }
-  .hero { background: linear-gradient(135deg, #1e3a5f, #0f172a); padding: 32px; border-radius: 12px; margin-bottom: 32px; }
-  .hero h2 { font-size: 1.8rem; color: #38bdf8; margin-bottom: 8px; }
-  .hero p { color: #94a3b8; margin-bottom: 16px; }
-  .hero-stats { display: flex; gap: 24px; flex-wrap: wrap; }
-  .stat { text-align: center; }
-  .stat-num { display: block; font-size: 1.6rem; font-weight: 700; color: #38bdf8; }
-  .stat-label { font-size: 0.75rem; color: #64748b; }
-  .doc-section { background: #1e293b; border-radius: 8px; padding: 24px; margin-bottom: 24px; }
-  .section-header { margin-bottom: 12px; }
-  h1, h2, h3, h4 { color: #f1f5f9; margin: 1rem 0 0.5rem; }
-  h1 { font-size: 1.5rem; border-bottom: 1px solid #334155; padding-bottom: 8px; }
-  h2 { font-size: 1.2rem; color: #38bdf8; }
-  p { line-height: 1.7; color: #cbd5e1; margin: 0.5rem 0; }
-  a { color: #38bdf8; }
-  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.85rem; }
-  th { background: #334155; padding: 8px 12px; text-align: left; color: #94a3b8; }
-  td { padding: 6px 12px; border-bottom: 1px solid #1e293b; }
-  tr:hover td { background: #334155; }
-  code { background: #0f172a; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', monospace; font-size: 0.85em; color: #7dd3fc; }
-  pre { background: #0f172a; padding: 16px; border-radius: 6px; overflow-x: auto; margin: 1rem 0; }
-  pre code { padding: 0; background: none; }
-  ul, ol { padding-left: 1.5rem; color: #cbd5e1; }
+  :root {
+    --dark:#172033;
+    --accent:#0f766e;
+    --accent2:#14b8a6;
+    --bg:#f4f6f8;
+    --paper:#ffffff;
+    --text:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --soft:#f9fafb;
+    --code:#111827;
+    --ok:#15803d;
+    --warn:#a16207;
+    --bad:#b91c1c;
+    --info:#1d4ed8;
+    --impl:#6d28d9;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.58;
+  }
+  header {
+    background: linear-gradient(135deg, var(--dark), var(--accent));
+    color: white;
+    padding: 42px 56px;
+  }
+  header h1 { margin: 0 0 8px; font-size: 34px; letter-spacing: 0; }
+  header p { margin: 6px 0; color: #eef2f7; max-width: 980px; }
+  header .small { color: #d1d5db; }
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    background: var(--paper);
+    padding: 34px 52px 64px;
+  }
+  .toc {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(255,255,255,.96);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: -10px 0 26px;
+    box-shadow: 0 8px 20px rgba(15,23,42,.08);
+    backdrop-filter: blur(8px);
+  }
+  .toc strong { display: block; margin-bottom: 8px; }
+  .toc a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 4px 8px 4px 0;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: #f3f4f6;
+    color: #1f2937;
+    text-decoration: none;
+    font-size: 13px;
+  }
+  .toc a:hover { background: #ccfbf1; color: #134e4a; }
+  .toc-dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; }
+  .hero { margin: 4px 0 28px; }
+  .hero h2 {
+    margin: 0 0 8px;
+    padding: 0;
+    border: 0;
+    color: var(--dark);
+    font-size: 28px;
+  }
+  .hero p { color: var(--muted); max-width: 880px; }
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+  }
+  .status-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #ffffff;
+  }
+  .status-card h3 { margin: 0 0 8px; color: #1f2937; font-size: 16px; }
+  .status-card p { color: var(--muted); font-size: 13px; margin: 10px 0 0; }
+  .pill {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: .02em;
+  }
+  .pill-ok { background: #dcfce7; color: #166534; }
+  .pill-warn { background: #fef3c7; color: #92400e; }
+  .pill-bad { background: #fee2e2; color: #991b1b; }
+  .pill-info { background: #dbeafe; color: #1e40af; }
+  .pill-impl { background: #ede9fe; color: #5b21b6; }
+  .pill-muted { background: #f3f4f6; color: #4b5563; }
+  .notice {
+    border-left: 5px solid var(--info);
+    background: #eff6ff;
+    padding: 16px 20px;
+    margin: 18px 0;
+  }
+  .notice-warn { border-left-color: #f59e0b; background: #fffbeb; }
+  .doc-section {
+    border-top: 1px solid var(--line);
+    padding: 26px 0 18px;
+    margin: 0 0 12px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .section-kicker {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .section-source { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  h1, h2, h3, h4 { color: #1f2937; letter-spacing: 0; }
+  h1 { font-size: 28px; margin: 18px 0 10px; }
+  h2 {
+    margin-top: 42px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent2);
+    font-size: 22px;
+  }
+  h3 { margin-top: 28px; color: #0f766e; }
+  h4 { margin-top: 20px; }
+  p { line-height: 1.7; margin: 0.55rem 0; }
+  a { color: #0f766e; }
+  table { border-collapse: collapse; width: 100%; margin: 18px 0; font-size: 14px; }
+  th {
+    background: #f3f4f6;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: .06em;
+  }
+  td, th { border: 1px solid var(--line); padding: 9px 11px; vertical-align: top; }
+  tr:hover td { background: #f9fafb; }
+  code {
+    font-family: Consolas, 'Courier New', monospace;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #0f766e;
+    font-size: .9em;
+  }
+  pre {
+    background: var(--code);
+    color: #e5e7eb;
+    padding: 16px;
+    border-radius: 8px;
+    overflow: auto;
+    white-space: pre-wrap;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 13px;
+  }
+  pre code { color: inherit; background: none; padding: 0; }
+  ul, ol { padding-left: 1.5rem; }
   li { margin: 4px 0; line-height: 1.6; }
-  blockquote { border-left: 3px solid #38bdf8; padding: 8px 16px; background: #0f172a; margin: 1rem 0; color: #94a3b8; }
-  footer { color: #475569; font-size: 0.75rem; text-align: center; margin-top: 32px; padding: 16px; }
+  blockquote {
+    background: #f9fafb;
+    border-left: 5px solid #6b7280;
+    padding: 14px 18px;
+    margin: 16px 0;
+    color: #374151;
+  }
+  footer { color: var(--muted); font-size: 13px; text-align: center; margin-top: 32px; padding: 16px; }
+  @media (max-width: 760px) {
+    header { padding: 30px 22px; }
+    header h1 { font-size: 27px; }
+    main { padding: 22px 18px 42px; }
+    .toc { position: static; }
+    .toc a { display: flex; }
+    table { display: block; overflow-x: auto; }
+  }
 </style>
 </head>
 <body>
-<nav id="sidebar">
-  <h1>lot-salt-suite</h1>
-  <div class="version">v0.1.0 · 2026-06-01</div>
-  <ul>
-<li><a href="#overview" style="color:#3b82f6">00 Project Overview</a></li>
-<li><a href="#inventory" style="color:#3b82f6">01 Repository Inventory</a></li>
-<li><a href="#lot" style="color:#6b7280">02 Lot Formulation</a></li>
-<li><a href="#apb" style="color:#6b7280">03 Apb Formulation</a></li>
-<li><a href="#salt" style="color:#6b7280">04 Salt Creep Models</a></li>
-<li><a href="#input" style="color:#6b7280">05 Input Output Formats</a></li>
-<li><a href="#validation_plan" style="color:#3b82f6">06 Validation Plan</a></li>
-<li><a href="#architecture" style="color:#3b82f6">07 Target Architecture</a></li>
-<li><a href="#issues" style="color:#6b7280">08 Known Issues</a></li>
-<li><a href="#migration" style="color:#6b7280">09 Migration Plan</a></li>
-<li><a href="#postprocess" style="color:#6b7280">10 Postprocessing Plan</a></li>
-<li><a href="#cli" style="color:#6b7280">11 Cli Usage</a></li>
-<li><a href="#results" style="color:#6b7280">12 Validation Results</a></li>
-<li><a href="#coupling" style="color:#3b82f6">13 Coupling Lot Apb Salt</a></li>
-<li><a href="#devguide" style="color:#6b7280">14 Developer Workflow</a></li>
-<li><a href="#changelog" style="color:#f59e0b">15 Changelog</a></li>
-<li><a href="#saltcreep_governance" style="color:#8b5cf6">16 Saltcreep Governance</a></li>
-<li><a href="#lot_pkn_roadmap" style="color:#8b5cf6">17 Lot Pkn Roadmap</a></li>
-<li><a href="#lot_legacy_inventory" style="color:#8b5cf6">Audits/Lot Legacy Inventory</a></li>
-<li><a href="#pkn_legacy_path" style="color:#8b5cf6">Audits/Pkn Legacy Path</a></li>
-<li><a href="#non_pkn_models_status" style="color:#8b5cf6">Audits/Non Pkn Models Status</a></li>
-</ul>
-</nav>
-<main id="main">
-  
-    <div style="background:#fef3c7;border:1px solid #f59e0b;padding:12px 16px;margin:16px 0;border-radius:6px;">
-      <strong>Aviso:</strong> Nenhuma validação foi executada ainda no código novo.
-      Os resultados em <a href="#results">Resultados de Validação</a> refletem planos,
-      não execuções reais.
-    </div>
+<header>
+  <h1>Manual Técnico — lot-salt-suite</h1>
+  <p>Documentação navegável do simulador integrado de Leak-Off Test, APB e fluência de sal para poços em formações salinas.</p>
+  <p class="small">Versão 0.1.0 · Atualizado em 2026-06-01 · Gerado em 2026-06-01</p>
+</header>
+<main>
+  <nav class="toc">
+    <strong>Navegação rápida</strong>
+    <a href="#overview"><span>00 — Visão Geral do Projeto</span><span class="toc-dot pill-info"></span></a>
+<a href="#inventory"><span>01 — Inventário do Repositório</span><span class="toc-dot pill-info"></span></a>
+<a href="#lot"><span>02 — Formulação do Leak-Off Test (LOT)</span><span class="toc-dot pill-muted"></span></a>
+<a href="#apb"><span>03 — Formulação do Annular Pressure Buildup (APB)</span><span class="toc-dot pill-muted"></span></a>
+<a href="#salt"><span>04 — Modelos de Fluência de Sal</span><span class="toc-dot pill-muted"></span></a>
+<a href="#input"><span>05 — Formatos de Entrada e Saída</span><span class="toc-dot pill-muted"></span></a>
+<a href="#validation_plan"><span>06 — Plano de Validação</span><span class="toc-dot pill-info"></span></a>
+<a href="#architecture"><span>07 — Arquitetura-Alvo</span><span class="toc-dot pill-info"></span></a>
+<a href="#issues"><span>08 — Problemas Conhecidos e Riscos</span><span class="toc-dot pill-muted"></span></a>
+<a href="#migration"><span>09 — Plano de Migração</span><span class="toc-dot pill-muted"></span></a>
+<a href="#postprocess"><span>10 — Plano de Pós-Processamento</span><span class="toc-dot pill-muted"></span></a>
+<a href="#cli"><span>11 — Uso da CLI lot-sim</span><span class="toc-dot pill-muted"></span></a>
+<a href="#results"><span>12 — Resultados de Validação</span><span class="toc-dot pill-muted"></span></a>
+<a href="#coupling"><span>13 — Acoplamento LOT–APB–Sal</span><span class="toc-dot pill-info"></span></a>
+<a href="#devguide"><span>14 — Guia do Desenvolvedor</span><span class="toc-dot pill-muted"></span></a>
+<a href="#changelog"><span>15 — Changelog</span><span class="toc-dot pill-warn"></span></a>
+<a href="#saltcreep_governance"><span>16. Governanca do saltcreep</span><span class="toc-dot pill-impl"></span></a>
+<a href="#lot_pkn_roadmap"><span>17. Roadmap LOT/PKN</span><span class="toc-dot pill-impl"></span></a>
+<a href="#lot_legacy_inventory"><span>Inventario LOT nos legados</span><span class="toc-dot pill-impl"></span></a>
+<a href="#pkn_legacy_path"><span>Caminho PKN legado</span><span class="toc-dot pill-impl"></span></a>
+<a href="#non_pkn_models_status"><span>Status dos modelos nao PKN</span><span class="toc-dot pill-impl"></span></a>
+  </nav>
   <div class="hero">
     <h2>lot-salt-suite</h2>
-    <p>Simulador integrado de LOT, APB e fluência de sal para poços em formações salinas.</p>
+    <p>Painel consolidado de estado do projeto, formulações, contratos de entrada, validação, arquitetura e riscos conhecidos.</p>
     
-    <div class="hero-stats">
-      <div class="stat"><span class="stat-num">6/13</span><span class="stat-label">Fases ativas</span></div>
-      <div class="stat"><span class="stat-num">30</span><span class="stat-label">Testes C++</span></div>
-      <div class="stat"><span class="stat-num">0</span><span class="stat-label">Testes Python</span></div>
-      <div class="stat"><span class="stat-num">0/10</span><span class="stat-label">Validações V0-V9</span></div>
+    <div class="status-grid">
+      <article class="status-card">
+        <h3>Fases</h3>
+        <span class="pill pill-ok">6/13</span>
+        <p>Fases concluídas ou em andamento no plano técnico do projeto.</p>
+      </article>
+      <article class="status-card">
+        <h3>Testes C++</h3>
+        <span class="pill pill-info">30</span>
+        <p>Testes Catch2 registrados como verdes na última execução documentada.</p>
+      </article>
+      <article class="status-card">
+        <h3>Testes Python</h3>
+        <span class="pill pill-muted">0</span>
+        <p>Testes pytest registrados no pacote de pós-processamento.</p>
+      </article>
+      <article class="status-card">
+        <h3>Validações</h3>
+        <span class="pill pill-warn">0/10</span>
+        <p>Status da suíte V0-V9; validação numérica só conta quando registrada.</p>
+      </article>
     </div>
     
   </div>
+  
+    <div class="notice notice-warn">
+      <strong>Aviso:</strong> nenhuma validação numérica de regressão contra legado
+      foi marcada como validada. Testes sintéticos e validações de contrato aparecem
+      em <a href="#results">Resultados de Validação</a>.
+    </div>
   <section id="overview" class="doc-section">
-<div class="section-header"><span style="background:#3b82f6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Planejado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-info">Planejado</span></div>
+<div class="section-source">00 — Visão Geral do Projeto</div>
 <h1 id="00-visao-geral-do-projeto">00 — Visão Geral do Projeto</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="objetivo">Objetivo</h2>
@@ -149,7 +322,8 @@ mistura múltiplas responsabilidades em uma única classe (<code>APB1da</code>).
 </section>
 
 <section id="inventory" class="doc-section">
-<div class="section-header"><span style="background:#3b82f6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Planejado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-info">Planejado</span></div>
+<div class="section-source">01 — Inventário do Repositório</div>
 <h1 id="01-inventario-do-repositorio">01 — Inventário do Repositório</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="nota-sobre-nomenclatura">Nota sobre nomenclatura</h2>
@@ -370,7 +544,8 @@ contém apenas <code>README.md</code> organizacional.</p>
 </section>
 
 <section id="lot" class="doc-section">
-<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-muted">Não iniciado</span></div>
+<div class="section-source">02 — Formulação do Leak-Off Test (LOT)</div>
 <h1 id="02-formulacao-do-leak-off-test-lot">02 — Formulação do Leak-Off Test (LOT)</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <blockquote>
@@ -507,7 +682,8 @@ comprimentos e pressao de breakdown para SI antes de preencher <code>CaseData</c
 </section>
 
 <section id="apb" class="doc-section">
-<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-muted">Não iniciado</span></div>
+<div class="section-source">03 — Formulação do Annular Pressure Buildup (APB)</div>
 <h1 id="03-formulacao-do-annular-pressure-buildup-apb">03 — Formulação do Annular Pressure Buildup (APB)</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <blockquote>
@@ -559,7 +735,8 @@ temperatura. A pressão aumenta porque o anular tem volume constante.</p>
 </section>
 
 <section id="salt" class="doc-section">
-<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-muted">Não iniciado</span></div>
+<div class="section-source">04 — Modelos de Fluência de Sal</div>
 <h1 id="04-modelos-de-fluencia-de-sal">04 — Modelos de Fluência de Sal</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="modelos-no-legado-sestsal">Modelos no legado (SESTSAL)</h2>
@@ -640,7 +817,8 @@ o modelo de mecanismo duplo (double mechanism):</p>
 </section>
 
 <section id="input" class="doc-section">
-<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-muted">Não iniciado</span></div>
+<div class="section-source">05 — Formatos de Entrada e Saída</div>
 <h1 id="05-formatos-de-entrada-e-saida">05 — Formatos de Entrada e Saída</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="formato-principal-yaml">Formato principal: YAML</h2>
@@ -1017,7 +1195,8 @@ em docs/12_validation_results.md.</p>
 </section>
 
 <section id="validation_plan" class="doc-section">
-<div class="section-header"><span style="background:#3b82f6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Planejado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-info">Planejado</span></div>
+<div class="section-source">06 — Plano de Validação</div>
 <h1 id="06-plano-de-validacao">06 — Plano de Validação</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="sequencia-v0-v9">Sequência V0-V9</h2>
@@ -1162,7 +1341,8 @@ cd legance/LOT_APB_v5 &amp;&amp; make main
 </section>
 
 <section id="architecture" class="doc-section">
-<div class="section-header"><span style="background:#3b82f6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Planejado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-info">Planejado</span></div>
+<div class="section-source">07 — Arquitetura-Alvo</div>
 <h1 id="07-arquitetura-alvo">07 — Arquitetura-Alvo</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="diagrama-de-modulos">Diagrama de módulos</h2>
@@ -1262,7 +1442,8 @@ penny-shaped permanecem catalogados, mas fora do primeiro caminho critico.</p>
 </section>
 
 <section id="issues" class="doc-section">
-<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-muted">Não iniciado</span></div>
+<div class="section-source">08 — Problemas Conhecidos e Riscos</div>
 <h1 id="08-problemas-conhecidos-e-riscos">08 — Problemas Conhecidos e Riscos</h1>
 <p><strong>Status:</strong> Ativo — Auditoria de formulação executada | <strong>Última atualização:</strong> 2026-06-01</p>
 <blockquote>
@@ -1604,7 +1785,8 @@ unitários com entradas sintéticas. <strong>Bloqueia:</strong> comparação com
 </section>
 
 <section id="migration" class="doc-section">
-<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-muted">Não iniciado</span></div>
+<div class="section-source">09 — Plano de Migração</div>
 <h1 id="09-plano-de-migracao">09 — Plano de Migração</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="ordem-de-migracao-de-casos">Ordem de migração de casos</h2>
@@ -1718,7 +1900,8 @@ time:
 </section>
 
 <section id="postprocess" class="doc-section">
-<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-muted">Não iniciado</span></div>
+<div class="section-source">10 — Plano de Pós-Processamento</div>
 <h1 id="10-plano-de-pos-processamento">10 — Plano de Pós-Processamento</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="estrutura-do-pacote-lotsaltpost">Estrutura do pacote lotsaltpost</h2>
@@ -1774,7 +1957,8 @@ time:
 </section>
 
 <section id="cli" class="doc-section">
-<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-muted">Não iniciado</span></div>
+<div class="section-source">11 — Uso da CLI lot-sim</div>
 <h1 id="11-uso-da-cli-lot-sim">11 — Uso da CLI lot-sim</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="subcomandos">Subcomandos</h2>
@@ -1973,7 +2157,8 @@ Não alterar este arquivo sem rodar os testes documentados em docs/06_validation
 </section>
 
 <section id="results" class="doc-section">
-<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-muted">Não iniciado</span></div>
+<div class="section-source">12 — Resultados de Validação</div>
 <h1 id="12-resultados-de-validacao">12 — Resultados de Validação</h1>
 <p><strong>Status:</strong> BASELINES CAPTURADOS | <strong>Última atualização:</strong> 2026-06-01</p>
 <hr />
@@ -2262,7 +2447,8 @@ python tools/compare_results.py \
 </section>
 
 <section id="coupling" class="doc-section">
-<div class="section-header"><span style="background:#3b82f6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Planejado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-info">Planejado</span></div>
+<div class="section-source">13 — Acoplamento LOT–APB–Sal</div>
 <h1 id="13-acoplamento-lotapbsal">13 — Acoplamento LOT–APB–Sal</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <blockquote>
@@ -2382,7 +2568,8 @@ sal. O fluxo esperado e:</p>
 </section>
 
 <section id="devguide" class="doc-section">
-<div class="section-header"><span style="background:#6b7280;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Não iniciado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-muted">Não iniciado</span></div>
+<div class="section-source">14 — Guia do Desenvolvedor</div>
 <h1 id="14-guia-do-desenvolvedor">14 — Guia do Desenvolvedor</h1>
 <p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="fluxo-de-trabalho">Fluxo de trabalho</h2>
@@ -2458,7 +2645,8 @@ sal. O fluxo esperado e:</p>
 </section>
 
 <section id="changelog" class="doc-section">
-<div class="section-header"><span style="background:#f59e0b;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Em andamento</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-warn">Em andamento</span></div>
+<div class="section-source">15 — Changelog</div>
 <h1 id="15-changelog">15 — Changelog</h1>
 <p><strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="unreleased">[Unreleased]</h2>
@@ -2483,7 +2671,8 @@ sal. O fluxo esperado e:</p>
 </section>
 
 <section id="saltcreep_governance" class="doc-section">
-<div class="section-header"><span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Implementado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-impl">Implementado</span></div>
+<div class="section-source">16. Governanca do saltcreep</div>
 <h1 id="16-governanca-do-saltcreep">16. Governanca do saltcreep</h1>
 <h2 id="decisao-de-governanca">Decisao de governanca</h2>
 <p><code>external/saltcreep/</code> passa a ser tratado como dependencia vendorizada ativa do
@@ -2576,7 +2765,8 @@ arquivo do saltcreep foi alterado.</p>
 </section>
 
 <section id="lot_pkn_roadmap" class="doc-section">
-<div class="section-header"><span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Implementado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-impl">Implementado</span></div>
+<div class="section-source">17. Roadmap LOT/PKN</div>
 <h1 id="17-roadmap-lotpkn">17. Roadmap LOT/PKN</h1>
 <h2 id="decisao-de-prioridade">Decisao de prioridade</h2>
 <p>A migracao de LOT deve priorizar o caminho PKN observado nos legados antes de
@@ -2721,7 +2911,8 @@ entregar os dados ao solver.</p>
 </section>
 
 <section id="lot_legacy_inventory" class="doc-section">
-<div class="section-header"><span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Implementado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-impl">Implementado</span></div>
+<div class="section-source">Inventario LOT nos legados</div>
 <h1 id="inventario-lot-nos-legados">Inventario LOT nos legados</h1>
 <h2 id="escopo">Escopo</h2>
 <p>Auditoria somente leitura dos caminhos LOT nos legados, com foco em arquivos
@@ -2843,7 +3034,8 @@ ser usado como fonte principal da formulacao PKN.</p>
 </section>
 
 <section id="pkn_legacy_path" class="doc-section">
-<div class="section-header"><span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Implementado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-impl">Implementado</span></div>
+<div class="section-source">Caminho PKN legado</div>
 <h1 id="caminho-pkn-legado">Caminho PKN legado</h1>
 <h2 id="entrada-do-caso">Entrada do caso</h2>
 <p>O caso PKN mais direto auditado e <code>legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp</code>.
@@ -2944,7 +3136,8 @@ viscosidade <code>1 cP</code> convertida para <code>pa_min</code> e escreve resu
 </section>
 
 <section id="non_pkn_models_status" class="doc-section">
-<div class="section-header"><span style="background:#8b5cf6;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">Implementado</span></div>
+<div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-impl">Implementado</span></div>
+<div class="section-source">Status dos modelos nao PKN</div>
 <h1 id="status-dos-modelos-nao-pkn">Status dos modelos nao PKN</h1>
 <h2 id="objetivo">Objetivo</h2>
 <p>Catalogar modelos de fratura encontrados nos legados que nao devem entrar na

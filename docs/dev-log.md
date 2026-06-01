@@ -47,6 +47,20 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 
 ---
 
+### [2026-06-01] Template visual do manual tecnico — Codex
+**Status:** Implementado nesta sessao.
+**Testes:** `python tools\generate_docs_index.py` e `python tools\generate_docs_index.py --dry-run` executados com sucesso. Verificacao estrutural do HTML confirmou 21 secoes documentais, 4 cards de status e sumario com links ancorados.
+**Escopo:** apenas gerador do manual e HTML gerado foram alterados; nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/` ou `tests/baselines/` foi alterado.
+
+**Mudanca principal:**
+- `tools/generate_docs_index.py` passa a gerar o `docs/index.html` com layout claro inspirado no resumo executivo anexado: header em gradiente, sumario sticky em chips, cards de status, secoes amplas, tabelas legiveis, blocos de codigo contrastados e responsividade mobile.
+- O sumario usa o primeiro titulo real de cada Markdown em vez de nomes tecnicos de arquivo.
+- O aviso de validacao foi alinhado ao estado atual: sem regressao numerica legado x moderno validada, mas com testes sinteticos/contratuais registrados.
+
+**Observacao:** tentativa de abrir o HTML no navegador interno falhou por erro local do runtime da sandbox; a verificacao seguiu por geracao deterministica e inspeção estrutural do HTML.
+
+---
+
 ### [2026-06-01] Fase 6.4 — PknModel fisico minimo em SI — Codex
 **Status:** Implementado nesta sessao.
 **Commit:** `537f4cc feat(lot): implement minimal SI PKN model`.

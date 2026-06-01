@@ -10,7 +10,7 @@ O script:
 1. Lê tools/docs_status.yaml para status de cada seção
 2. Converte docs/*.md para HTML usando python-markdown
 3. Injeta nas seções do template HTML
-4. Atualiza hero stats (fases, testes, módulos)
+4. Atualiza painel de status, sumário e métricas do projeto
 5. Salva docs/index.html
 """
 from __future__ import annotations
@@ -73,6 +73,16 @@ STATUS_LABELS = {
     "completed":     ("Concluído",    "#10b981"),
 }
 
+STATUS_CLASSES = {
+    "not_started":   "pill-muted",
+    "planned":       "pill-info",
+    "in_progress":   "pill-warn",
+    "implemented":   "pill-impl",
+    "validated":     "pill-ok",
+    "risk":          "pill-bad",
+    "completed":     "pill-ok",
+}
+
 
 def load_status() -> dict:
     if not STATUS_FILE.exists():
@@ -93,24 +103,32 @@ def md_to_html(md_file: Path) -> str:
 
 
 def status_badge(status: str) -> str:
-    label, color = STATUS_LABELS.get(status, ("Desconhecido", "#9ca3af"))
-    return (
-        f'<span style="background:{color};color:white;padding:2px 8px;'
-        f'border-radius:4px;font-size:0.75rem;font-weight:600;">{label}</span>'
-    )
+    label, _ = STATUS_LABELS.get(status, ("Desconhecido", "#9ca3af"))
+    css_class = STATUS_CLASSES.get(status, "pill-muted")
+    return f'<span class="pill {css_class}">{label}</span>'
 
 
-def build_sidebar(status: dict) -> str:
+def section_title(md_name: str) -> str:
+    md_file = DOCS_DIR / md_name
+    if md_file.exists():
+        for line in md_file.read_text(encoding="utf-8").splitlines():
+            if line.startswith("# "):
+                return line[2:].strip()
+    return md_name.replace(".md", "").replace("_", " ").replace("/", " / ").title()
+
+
+def build_toc(status: dict) -> str:
     docs_status = status.get("docs", {})
     items = []
     for sec_id, md_name in SECTION_MAP.items():
-        title = md_name.replace(".md", "").replace("_", " ").title()
+        title = section_title(md_name)
         sec_status = docs_status.get(sec_id, "not_started")
-        _, color = STATUS_LABELS.get(sec_status, ("", "#6b7280"))
+        css_class = STATUS_CLASSES.get(sec_status, "pill-muted")
         items.append(
-            f'<li><a href="#{sec_id}" style="color:{color}">{title}</a></li>'
+            f'<a href="#{sec_id}"><span>{title}</span>'
+            f'<span class="toc-dot {css_class}"></span></a>'
         )
-    return "<ul>\n" + "\n".join(items) + "\n</ul>"
+    return "\n".join(items)
 
 
 def build_sections(status: dict) -> str:
@@ -120,9 +138,14 @@ def build_sections(status: dict) -> str:
         sec_status = docs_status.get(sec_id, "not_started")
         html_content = md_to_html(DOCS_DIR / md_name)
         badge = status_badge(sec_status)
+        title = section_title(md_name)
         parts.append(
             f'<section id="{sec_id}" class="doc-section">\n'
-            f'<div class="section-header">{badge}</div>\n'
+            f'<div class="section-header">'
+            f'<span class="section-kicker">Documento</span>'
+            f'{badge}'
+            f'</div>\n'
+            f'<div class="section-source">{title}</div>\n'
             f'{html_content}\n'
             f'</section>\n'
         )
@@ -141,11 +164,27 @@ def build_hero_stats(status: dict) -> str:
     v_done = sum(1 for v in validation.values() if v not in ("not_started",))
 
     return f"""
-    <div class="hero-stats">
-      <div class="stat"><span class="stat-num">{completed_phases}/{total_phases}</span><span class="stat-label">Fases ativas</span></div>
-      <div class="stat"><span class="stat-num">{cpp_tests}</span><span class="stat-label">Testes C++</span></div>
-      <div class="stat"><span class="stat-num">{py_tests}</span><span class="stat-label">Testes Python</span></div>
-      <div class="stat"><span class="stat-num">{v_done}/10</span><span class="stat-label">Validações V0-V9</span></div>
+    <div class="status-grid">
+      <article class="status-card">
+        <h3>Fases</h3>
+        <span class="pill pill-ok">{completed_phases}/{total_phases}</span>
+        <p>Fases concluídas ou em andamento no plano técnico do projeto.</p>
+      </article>
+      <article class="status-card">
+        <h3>Testes C++</h3>
+        <span class="pill pill-info">{cpp_tests}</span>
+        <p>Testes Catch2 registrados como verdes na última execução documentada.</p>
+      </article>
+      <article class="status-card">
+        <h3>Testes Python</h3>
+        <span class="pill pill-muted">{py_tests}</span>
+        <p>Testes pytest registrados no pacote de pós-processamento.</p>
+      </article>
+      <article class="status-card">
+        <h3>Validações</h3>
+        <span class="pill pill-warn">{v_done}/10</span>
+        <p>Status da suíte V0-V9; validação numérica só conta quando registrada.</p>
+      </article>
     </div>
     """
 
@@ -155,20 +194,20 @@ def generate_html(status: dict, dry_run: bool = False) -> str:
     last_updated = status.get("last_updated", today)
     version = status.get("project_version", "0.1.0")
 
-    sidebar = build_sidebar(status)
+    toc = build_toc(status)
     sections = build_sections(status)
     hero = build_hero_stats(status)
 
-    # Aviso se nenhuma validação foi executada
+    # Aviso se nenhuma validação numérica foi executada
     validation = status.get("validation", {})
     any_validated = any(v == "validated" for v in validation.values())
     warning_html = ""
     if not any_validated:
         warning_html = """
-    <div style="background:#fef3c7;border:1px solid #f59e0b;padding:12px 16px;margin:16px 0;border-radius:6px;">
-      <strong>Aviso:</strong> Nenhuma validação foi executada ainda no código novo.
-      Os resultados em <a href="#results">Resultados de Validação</a> refletem planos,
-      não execuções reais.
+    <div class="notice notice-warn">
+      <strong>Aviso:</strong> nenhuma validação numérica de regressão contra legado
+      foi marcada como validada. Testes sintéticos e validações de contrato aparecem
+      em <a href="#results">Resultados de Validação</a>.
     </div>"""
 
     html = f"""<!DOCTYPE html>
@@ -178,56 +217,214 @@ def generate_html(status: dict, dry_run: bool = False) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>lot-salt-suite — Documentação Técnica</title>
 <style>
-  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{ font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }}
-  #sidebar {{ width: 260px; min-width: 260px; background: #1e293b; padding: 24px 16px; overflow-y: auto; position: sticky; top: 0; height: 100vh; }}
-  #sidebar h1 {{ font-size: 1rem; font-weight: 700; color: #38bdf8; margin-bottom: 4px; }}
-  #sidebar .version {{ font-size: 0.7rem; color: #64748b; margin-bottom: 20px; }}
-  #sidebar ul {{ list-style: none; }}
-  #sidebar li {{ margin: 4px 0; }}
-  #sidebar a {{ text-decoration: none; font-size: 0.85rem; padding: 4px 8px; display: block; border-radius: 4px; transition: background 0.15s; }}
-  #sidebar a:hover {{ background: #334155; }}
-  #main {{ flex: 1; padding: 32px 40px; overflow-y: auto; max-width: 900px; }}
-  .hero {{ background: linear-gradient(135deg, #1e3a5f, #0f172a); padding: 32px; border-radius: 12px; margin-bottom: 32px; }}
-  .hero h2 {{ font-size: 1.8rem; color: #38bdf8; margin-bottom: 8px; }}
-  .hero p {{ color: #94a3b8; margin-bottom: 16px; }}
-  .hero-stats {{ display: flex; gap: 24px; flex-wrap: wrap; }}
-  .stat {{ text-align: center; }}
-  .stat-num {{ display: block; font-size: 1.6rem; font-weight: 700; color: #38bdf8; }}
-  .stat-label {{ font-size: 0.75rem; color: #64748b; }}
-  .doc-section {{ background: #1e293b; border-radius: 8px; padding: 24px; margin-bottom: 24px; }}
-  .section-header {{ margin-bottom: 12px; }}
-  h1, h2, h3, h4 {{ color: #f1f5f9; margin: 1rem 0 0.5rem; }}
-  h1 {{ font-size: 1.5rem; border-bottom: 1px solid #334155; padding-bottom: 8px; }}
-  h2 {{ font-size: 1.2rem; color: #38bdf8; }}
-  p {{ line-height: 1.7; color: #cbd5e1; margin: 0.5rem 0; }}
-  a {{ color: #38bdf8; }}
-  table {{ border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.85rem; }}
-  th {{ background: #334155; padding: 8px 12px; text-align: left; color: #94a3b8; }}
-  td {{ padding: 6px 12px; border-bottom: 1px solid #1e293b; }}
-  tr:hover td {{ background: #334155; }}
-  code {{ background: #0f172a; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', monospace; font-size: 0.85em; color: #7dd3fc; }}
-  pre {{ background: #0f172a; padding: 16px; border-radius: 6px; overflow-x: auto; margin: 1rem 0; }}
-  pre code {{ padding: 0; background: none; }}
-  ul, ol {{ padding-left: 1.5rem; color: #cbd5e1; }}
+  :root {{
+    --dark:#172033;
+    --accent:#0f766e;
+    --accent2:#14b8a6;
+    --bg:#f4f6f8;
+    --paper:#ffffff;
+    --text:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --soft:#f9fafb;
+    --code:#111827;
+    --ok:#15803d;
+    --warn:#a16207;
+    --bad:#b91c1c;
+    --info:#1d4ed8;
+    --impl:#6d28d9;
+  }}
+  * {{ box-sizing: border-box; }}
+  html {{ scroll-behavior: smooth; }}
+  body {{
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.58;
+  }}
+  header {{
+    background: linear-gradient(135deg, var(--dark), var(--accent));
+    color: white;
+    padding: 42px 56px;
+  }}
+  header h1 {{ margin: 0 0 8px; font-size: 34px; letter-spacing: 0; }}
+  header p {{ margin: 6px 0; color: #eef2f7; max-width: 980px; }}
+  header .small {{ color: #d1d5db; }}
+  main {{
+    max-width: 1280px;
+    margin: 0 auto;
+    background: var(--paper);
+    padding: 34px 52px 64px;
+  }}
+  .toc {{
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(255,255,255,.96);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: -10px 0 26px;
+    box-shadow: 0 8px 20px rgba(15,23,42,.08);
+    backdrop-filter: blur(8px);
+  }}
+  .toc strong {{ display: block; margin-bottom: 8px; }}
+  .toc a {{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 4px 8px 4px 0;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: #f3f4f6;
+    color: #1f2937;
+    text-decoration: none;
+    font-size: 13px;
+  }}
+  .toc a:hover {{ background: #ccfbf1; color: #134e4a; }}
+  .toc-dot {{ width: 8px; height: 8px; border-radius: 999px; display: inline-block; }}
+  .hero {{ margin: 4px 0 28px; }}
+  .hero h2 {{
+    margin: 0 0 8px;
+    padding: 0;
+    border: 0;
+    color: var(--dark);
+    font-size: 28px;
+  }}
+  .hero p {{ color: var(--muted); max-width: 880px; }}
+  .status-grid {{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+  }}
+  .status-card {{
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #ffffff;
+  }}
+  .status-card h3 {{ margin: 0 0 8px; color: #1f2937; font-size: 16px; }}
+  .status-card p {{ color: var(--muted); font-size: 13px; margin: 10px 0 0; }}
+  .pill {{
+    display: inline-block;
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: .02em;
+  }}
+  .pill-ok {{ background: #dcfce7; color: #166534; }}
+  .pill-warn {{ background: #fef3c7; color: #92400e; }}
+  .pill-bad {{ background: #fee2e2; color: #991b1b; }}
+  .pill-info {{ background: #dbeafe; color: #1e40af; }}
+  .pill-impl {{ background: #ede9fe; color: #5b21b6; }}
+  .pill-muted {{ background: #f3f4f6; color: #4b5563; }}
+  .notice {{
+    border-left: 5px solid var(--info);
+    background: #eff6ff;
+    padding: 16px 20px;
+    margin: 18px 0;
+  }}
+  .notice-warn {{ border-left-color: #f59e0b; background: #fffbeb; }}
+  .doc-section {{
+    border-top: 1px solid var(--line);
+    padding: 26px 0 18px;
+    margin: 0 0 12px;
+  }}
+  .section-header {{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }}
+  .section-kicker {{
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }}
+  .section-source {{ color: var(--muted); font-size: 13px; margin-bottom: 12px; }}
+  h1, h2, h3, h4 {{ color: #1f2937; letter-spacing: 0; }}
+  h1 {{ font-size: 28px; margin: 18px 0 10px; }}
+  h2 {{
+    margin-top: 42px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent2);
+    font-size: 22px;
+  }}
+  h3 {{ margin-top: 28px; color: #0f766e; }}
+  h4 {{ margin-top: 20px; }}
+  p {{ line-height: 1.7; margin: 0.55rem 0; }}
+  a {{ color: #0f766e; }}
+  table {{ border-collapse: collapse; width: 100%; margin: 18px 0; font-size: 14px; }}
+  th {{
+    background: #f3f4f6;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: .06em;
+  }}
+  td, th {{ border: 1px solid var(--line); padding: 9px 11px; vertical-align: top; }}
+  tr:hover td {{ background: #f9fafb; }}
+  code {{
+    font-family: Consolas, 'Courier New', monospace;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #0f766e;
+    font-size: .9em;
+  }}
+  pre {{
+    background: var(--code);
+    color: #e5e7eb;
+    padding: 16px;
+    border-radius: 8px;
+    overflow: auto;
+    white-space: pre-wrap;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 13px;
+  }}
+  pre code {{ color: inherit; background: none; padding: 0; }}
+  ul, ol {{ padding-left: 1.5rem; }}
   li {{ margin: 4px 0; line-height: 1.6; }}
-  blockquote {{ border-left: 3px solid #38bdf8; padding: 8px 16px; background: #0f172a; margin: 1rem 0; color: #94a3b8; }}
-  footer {{ color: #475569; font-size: 0.75rem; text-align: center; margin-top: 32px; padding: 16px; }}
+  blockquote {{
+    background: #f9fafb;
+    border-left: 5px solid #6b7280;
+    padding: 14px 18px;
+    margin: 16px 0;
+    color: #374151;
+  }}
+  footer {{ color: var(--muted); font-size: 13px; text-align: center; margin-top: 32px; padding: 16px; }}
+  @media (max-width: 760px) {{
+    header {{ padding: 30px 22px; }}
+    header h1 {{ font-size: 27px; }}
+    main {{ padding: 22px 18px 42px; }}
+    .toc {{ position: static; }}
+    .toc a {{ display: flex; }}
+    table {{ display: block; overflow-x: auto; }}
+  }}
 </style>
 </head>
 <body>
-<nav id="sidebar">
-  <h1>lot-salt-suite</h1>
-  <div class="version">v{version} · {last_updated}</div>
-  {sidebar}
-</nav>
-<main id="main">
-  {warning_html}
+<header>
+  <h1>Manual Técnico — lot-salt-suite</h1>
+  <p>Documentação navegável do simulador integrado de Leak-Off Test, APB e fluência de sal para poços em formações salinas.</p>
+  <p class="small">Versão {version} · Atualizado em {last_updated} · Gerado em {today}</p>
+</header>
+<main>
+  <nav class="toc">
+    <strong>Navegação rápida</strong>
+    {toc}
+  </nav>
   <div class="hero">
     <h2>lot-salt-suite</h2>
-    <p>Simulador integrado de LOT, APB e fluência de sal para poços em formações salinas.</p>
+    <p>Painel consolidado de estado do projeto, formulações, contratos de entrada, validação, arquitetura e riscos conhecidos.</p>
     {hero}
   </div>
+  {warning_html}
   {sections}
   <footer>lot-salt-suite v{version} · Gerado em {today} por generate_docs_index.py</footer>
 </main>
