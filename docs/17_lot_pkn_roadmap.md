@@ -70,6 +70,10 @@ entregar os dados ao solver.
    auditados usam `idQ == 6` e `Conv_bbmin_m3min` com `/ M_PI / 2`. R09 fica
    `MITIGATED_FOR_AUDITED_PKN_CASES`, mas segue `BLOCKER_FOR_IDQ4_REGRESSION`
    e nao libera regressao quantitativa legado x moderno.
+4.11. Fase 6.7: criar pós-processamento moderno mínimo para `result.json` e
+   `timeseries.csv`, gerando PNGs e `report.html` somente a partir dos outputs
+   modernos sintéticos. Resultado: relatórios locais em `reports/`, sem
+   comparação com legado e com aviso explícito de ausência de regressão.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -133,6 +137,17 @@ entregar os dados ao solver.
 - Nao houve validacao numerica legado x moderno e nenhum `.dat` foi usado como
   baseline.
 
+**Fase 6.7 (pós-processamento moderno LOT/PKN):**
+- `postprocess/scripts/lot_pkn_report.py` lê `timeseries.csv` e `result.json`.
+- São gerados `pressure_vs_time.png`, `pressure_vs_volume.png`,
+  `length_vs_time.png`, `width_vs_time.png`, `leakoff_vs_time.png` e
+  `report.html`.
+- Os relatórios são rotulados como `Modern synthetic LOT/PKN output - no legacy regression`.
+- O script valida colunas obrigatórias, arquivos ausentes e valores `NaN`/`Inf`.
+- `reports/` permanece fora do versionamento.
+- Não houve regressão contra legado; R09 segue mitigado apenas para os PKN
+  auditados e ainda bloqueia `idQ == 4`.
+
 ## Fora de escopo até R09 ser totalmente resolvido
 
 - Comparação numérica com `legance/LOT_Tese` ou `legance/LOT_APB_v5`.
@@ -144,14 +159,12 @@ entregar os dados ao solver.
 Com R09 mitigado para os dois PKN auditados, mas ainda aberto para `idQ == 4`,
 seguir um destes caminhos:
 
-1. Criar pos-processamento moderno para os CSV/JSON LOT/PKN e comparacoes
-   qualitativas cuidadosamente rotuladas para os dois casos auditados.
-2. Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
+1. Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
    parsing com solver.
-3. Se for iniciar comparacao legado x moderno, primeiro confirmar o `idQ` de
+2. Se for iniciar comparacao legado x moderno, primeiro confirmar o `idQ` de
    geracao dos `.dat` e manter qualquer resultado como qualitativo ate resolver
    os demais pontos PKN (`t` absoluto, `time` desde breakdown, `w0 * L1 * M_PI`).
-4. Para liberar regressao quantitativa envolvendo `idQ == 4`, obter justificativa
+3. Para liberar regressao quantitativa envolvendo `idQ == 4`, obter justificativa
    fisica/documental para `22` ou excluir esse ramo como referencia valida.
 
 ## Riscos tecnicos a resolver antes da implementacao

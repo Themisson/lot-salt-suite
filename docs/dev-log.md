@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.6 implementada (ensaio controlado R09 /22 vs /2)
+Fase ativa  : 6.7 implementada (pos-processamento moderno LOT/PKN)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
 Testes C++  : 37 Catch2 (37 passaram em 2026-06-01)
-Testes Py   : 0
+Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ```
@@ -31,6 +31,7 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 - [x] Implementar `lot::PknModel` fisico minimo em SI com series temporais sinteticas
 - [x] Conectar LOT/PKN ao CLI moderno com saida CSV/JSON sem regressao legado
 - [x] Executar ensaio comparativo controlado R09 (`/(pi*22)` vs `/(pi*2)`) sem alterar legado
+- [x] Criar pos-processamento moderno minimo LOT/PKN para CSV/JSON sem regressao legado
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
 
@@ -44,6 +45,29 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.7 — Pós-processamento moderno LOT/PKN — Codex
+**Status:** Implementado nesta sessao.
+**Testes:** `python -m unittest discover tests\python` executado; 3/3 passaram. `python -m pytest tests\python` foi tentado, mas o ambiente local nao possui `pytest` instalado.
+**Execucao CLI moderna:** `.\build\lot-sim.exe run --case cases\validation\lot_pkn_minimal.yaml --mode lot-pkn --output results\lot_pkn_minimal` e `.\build\lot-sim.exe run --case cases\validation\lot_pkn_with_leakoff.yaml --mode lot-pkn --output results\lot_pkn_with_leakoff` executados com sucesso.
+**Pós-processamento:** `python postprocess\scripts\lot_pkn_report.py --run-dir results\lot_pkn_minimal --output reports\lot_pkn_minimal` e `python postprocess\scripts\lot_pkn_report.py --run-dir results\lot_pkn_with_leakoff --output reports\lot_pkn_with_leakoff` geraram 5 PNGs e `report.html` para cada caso.
+**Escopo:** nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/`, `tests/baselines/`, `include/`, `src/` ou `apps/` foi alterado. `results/` e `reports/` permanecem fora do versionamento.
+
+**Resultado:**
+- `postprocess/scripts/lot_pkn_report.py` valida arquivos de entrada, colunas obrigatorias, `NaN`/`Inf` e gera relatorio HTML.
+- Relatorios sao rotulados como `Modern synthetic LOT/PKN output - no legacy regression`.
+- Nao houve leitura de `.dat`, comparacao com legado ou declaracao de validacao legado x moderno.
+- R09 continua `MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION`.
+
+**Arquivos criados/alterados:**
+- `postprocess/scripts/lot_pkn_report.py` — script de graficos/relatorio.
+- `tests/python/test_lot_pkn_postprocess.py` e `tests/fixtures/lot_pkn_modern/` — testes e fixture minima.
+- `.gitignore` — inclui `reports/`.
+- `docs/10_postprocessing_plan.md`, `docs/11_cli_usage.md`, `docs/12_validation_results.md`, `docs/17_lot_pkn_roadmap.md`, `tools/docs_status.yaml`, `docs/index.html` — documentacao/status atualizados.
+
+**Proxima etapa recomendada:** evoluir leakoff/breakdown moderno ou confirmar metadados de `idQ` antes de qualquer comparacao legado x moderno.
 
 ---
 

@@ -267,7 +267,7 @@
     <div class="stat-row">
       <div class="stat"><div class="n coppc">6/13</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">37</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">0</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -1701,7 +1701,7 @@ time:
 <div class="section-meta"><span>Documento</span><span class="pill pill-muted">Não iniciado</span></div>
 <h3>10 — Plano de Pós-Processamento</h3>
 <div class="doc-body">
-<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<p><strong>Status:</strong> Implementado parcialmente | <strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="estrutura-do-pacote-lotsaltpost">Estrutura do pacote lotsaltpost</h2>
 <p><code>postprocess/lotsaltpost/
 ├── io.py       # Leitura de resultados CSV/JSON
@@ -1726,6 +1726,10 @@ time:
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><code>lot_pkn_report.py</code></td>
+<td>Fase 6.7: gráficos e relatório HTML para saídas modernas LOT/PKN (<code>result.json</code> + <code>timeseries.csv</code>), sem regressão contra legado</td>
+</tr>
 <tr>
 <td><code>plot_lot_curve.py</code></td>
 <td>Curva LOT P×V e P×t</td>
@@ -1752,6 +1756,56 @@ time:
 </tr>
 </tbody>
 </table>
+<h2 id="fase-67-pos-processamento-moderno-lotpkn">Fase 6.7 — Pós-processamento moderno LOT/PKN</h2>
+<p>O script <code>postprocess/scripts/lot_pkn_report.py</code> lê apenas as saídas modernas
+geradas por:</p>
+<pre><code class="language-bash">lot-sim run --mode lot-pkn
+</code></pre>
+<p>Entradas esperadas:</p>
+<pre><code class="language-text">result.json
+timeseries.csv
+</code></pre>
+<p>Saídas geradas no diretório <code>--output</code>:</p>
+<pre><code class="language-text">pressure_vs_time.png
+pressure_vs_volume.png
+length_vs_time.png
+width_vs_time.png
+leakoff_vs_time.png
+report.html
+</code></pre>
+<p>Uso:</p>
+<pre><code class="language-bash">python postprocess/scripts/lot_pkn_report.py \
+  --run-dir results/lot_pkn_minimal \
+  --output reports/lot_pkn_minimal
+</code></pre>
+<p>Também é possível informar os arquivos diretamente:</p>
+<pre><code class="language-bash">python postprocess/scripts/lot_pkn_report.py \
+  --input results/lot_pkn_minimal/timeseries.csv \
+  --summary results/lot_pkn_minimal/result.json \
+  --output reports/lot_pkn_minimal
+</code></pre>
+<p>Todos os relatórios são rotulados como:</p>
+<pre><code class="language-text">Modern synthetic LOT/PKN output - no legacy regression
+</code></pre>
+<p>O relatório HTML contém aviso explícito de que usa somente outputs modernos
+sintéticos e que nenhuma regressão numérica contra legado foi executada.</p>
+<h3 id="robustez">Robustez</h3>
+<p>O script valida:</p>
+<ul>
+<li>existência dos arquivos de entrada;</li>
+<li>colunas obrigatórias do CSV;</li>
+<li>ausência de <code>NaN</code>/<code>Inf</code>;</li>
+<li>presença de <code>summary</code> em <code>result.json</code>;</li>
+<li>criação do diretório de saída.</li>
+</ul>
+<h3 id="escopo-deliberadamente-fora">Escopo deliberadamente fora</h3>
+<ul>
+<li>Não lê <code>legance/</code>, <code>legacy/</code>, <code>external/saltcreep/</code> ou <code>tests/baselines/</code>.</li>
+<li>Não compara com <code>.dat</code>.</li>
+<li>Não declara validação contra legado.</li>
+<li>Não resolve R09; R09 permanece mitigado apenas para os casos PKN auditados e
+  ainda bloqueia regressões envolvendo <code>idQ == 4</code>.</li>
+</ul>
 </div>
 </section>
 
@@ -1818,6 +1872,57 @@ lot-sim run --case cases/validation/lot_pkn_with_leakoff.yaml \
             --mode lot-pkn \
             --output results/lot_pkn_with_leakoff
 </code></pre>
+<h2 id="pos-processamento-lotpkn-moderno">Pós-processamento LOT/PKN moderno</h2>
+<p>Após gerar <code>result.json</code> e <code>timeseries.csv</code>, o relatório moderno pode ser
+criado com:</p>
+<pre><code class="language-bash">python postprocess/scripts/lot_pkn_report.py \
+  --run-dir results/lot_pkn_minimal \
+  --output reports/lot_pkn_minimal
+</code></pre>
+<p>ou:</p>
+<pre><code class="language-bash">python postprocess/scripts/lot_pkn_report.py \
+  --input results/lot_pkn_minimal/timeseries.csv \
+  --summary results/lot_pkn_minimal/result.json \
+  --output reports/lot_pkn_minimal
+</code></pre>
+<p>Arquivos gerados:</p>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Conteúdo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pressure_vs_time.png</code></td>
+<td>Pressão líquida × tempo</td>
+</tr>
+<tr>
+<td><code>pressure_vs_volume.png</code></td>
+<td>Pressão líquida × volume injetado</td>
+</tr>
+<tr>
+<td><code>length_vs_time.png</code></td>
+<td>Comprimento de fratura × tempo</td>
+</tr>
+<tr>
+<td><code>width_vs_time.png</code></td>
+<td>Abertura de fratura × tempo</td>
+</tr>
+<tr>
+<td><code>leakoff_vs_time.png</code></td>
+<td>Volume de leakoff × tempo</td>
+</tr>
+<tr>
+<td><code>report.html</code></td>
+<td>Relatório HTML com resumo, tabela final, figuras e limitações</td>
+</tr>
+</tbody>
+</table>
+<p>Os relatórios são outputs de pós-processamento moderno sintético:
+<code>Modern synthetic LOT/PKN output - no legacy regression</code>. Eles não comparam com
+<code>legance/</code>, <code>.dat</code> ou baselines.</p>
 <h2 id="fora-de-escopo-atual">Fora de escopo atual</h2>
 <ul>
 <li><code>run --mode apb</code>, <code>salt</code>, <code>lot-salt</code>, <code>apb-salt</code> e <code>coupled</code>.</li>
@@ -2148,6 +2253,50 @@ por <code>idQ == 4</code>. Os dois casos PKN auditados (<code>8-BUZ-67D-RJS-VISC
 diretamente os dois PKN auditados, mas continua bloqueando regressao quantitativa
 para <code>idQ == 4</code>, para <code>.dat</code> sem metadado de <code>idQ</code> confirmado e para qualquer
 uso geral da familia <code>ConvflowRate()</code> como referencia fisica.</p>
+<h2 id="fase-67-pos-processamento-moderno-lotpkn">Fase 6.7 — Pós-processamento moderno LOT/PKN</h2>
+<p><strong>Data:</strong> 2026-06-01</p>
+<p><strong>Executado nesta fase:</strong></p>
+<ul>
+<li><code>python -m unittest discover tests\python</code></li>
+<li><code>.\build\lot-sim.exe run --case cases\validation\lot_pkn_minimal.yaml --mode lot-pkn --output results\lot_pkn_minimal</code></li>
+<li><code>.\build\lot-sim.exe run --case cases\validation\lot_pkn_with_leakoff.yaml --mode lot-pkn --output results\lot_pkn_with_leakoff</code></li>
+<li><code>python postprocess\scripts\lot_pkn_report.py --run-dir results\lot_pkn_minimal --output reports\lot_pkn_minimal</code></li>
+<li><code>python postprocess\scripts\lot_pkn_report.py --run-dir results\lot_pkn_with_leakoff --output reports\lot_pkn_with_leakoff</code></li>
+</ul>
+<p><strong>Resultado Python:</strong> 3 testes <code>unittest</code> executados, 3 passaram.</p>
+<p><strong>Observação sobre pytest:</strong> <code>python -m pytest tests\python</code> foi tentado, mas o
+ambiente Python local não tinha <code>pytest</code> instalado. Os testes foram mantidos em
+formato compatível com descoberta futura por pytest, mas executados nesta fase
+com <code>unittest</code>, usando apenas biblioteca padrão.</p>
+<p><strong>Relatórios gerados localmente:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Caso</th>
+<th>Relatório</th>
+<th>Figuras</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lot_pkn_minimal</code></td>
+<td><code>reports\lot_pkn_minimal\report.html</code></td>
+<td>5 PNGs</td>
+</tr>
+<tr>
+<td><code>lot_pkn_with_leakoff</code></td>
+<td><code>reports\lot_pkn_with_leakoff\report.html</code></td>
+<td>5 PNGs</td>
+</tr>
+</tbody>
+</table>
+<p>Os relatórios contêm o aviso:</p>
+<pre><code class="language-text">This report uses modern synthetic LOT/PKN outputs only. No numerical regression against legacy was performed.
+</code></pre>
+<p><strong>Importante:</strong> esta fase é apenas pós-processamento de outputs modernos
+sintéticos. Não houve leitura de <code>.dat</code>, comparação com <code>legance/LOT_Tese</code>,
+comparação com <code>legance/LOT_APB_v5</code> nem alteração de baselines. R09 continua
+<code>MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION</code>.</p>
 <h2 id="baselines-capturados">Baselines capturados</h2>
 <table>
 <thead>
@@ -2617,7 +2766,11 @@ entregar os dados ao solver.</p>
    <code>/ M_PI / 22</code> pertence a <code>Conv_bbmin_m3h(idQ == 4)</code>, enquanto os dois PKN
    auditados usam <code>idQ == 6</code> e <code>Conv_bbmin_m3min</code> com <code>/ M_PI / 2</code>. R09 fica
    <code>MITIGATED_FOR_AUDITED_PKN_CASES</code>, mas segue <code>BLOCKER_FOR_IDQ4_REGRESSION</code>
-   e nao libera regressao quantitativa legado x moderno.</li>
+   e nao libera regressao quantitativa legado x moderno.
+4.11. Fase 6.7: criar pós-processamento moderno mínimo para <code>result.json</code> e
+   <code>timeseries.csv</code>, gerando PNGs e <code>report.html</code> somente a partir dos outputs
+   modernos sintéticos. Resultado: relatórios locais em <code>reports/</code>, sem
+   comparação com legado e com aviso explícito de ausência de regressão.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -2674,6 +2827,16 @@ entregar os dados ao solver.</p>
   diretamente esses dois casos.
 - Nao houve validacao numerica legado x moderno e nenhum <code>.dat</code> foi usado como
   baseline.</p>
+<p><strong>Fase 6.7 (pós-processamento moderno LOT/PKN):</strong>
+- <code>postprocess/scripts/lot_pkn_report.py</code> lê <code>timeseries.csv</code> e <code>result.json</code>.
+- São gerados <code>pressure_vs_time.png</code>, <code>pressure_vs_volume.png</code>,
+  <code>length_vs_time.png</code>, <code>width_vs_time.png</code>, <code>leakoff_vs_time.png</code> e
+  <code>report.html</code>.
+- Os relatórios são rotulados como <code>Modern synthetic LOT/PKN output - no legacy regression</code>.
+- O script valida colunas obrigatórias, arquivos ausentes e valores <code>NaN</code>/<code>Inf</code>.
+- <code>reports/</code> permanece fora do versionamento.
+- Não houve regressão contra legado; R09 segue mitigado apenas para os PKN
+  auditados e ainda bloqueia <code>idQ == 4</code>.</p>
 <h2 id="fora-de-escopo-ate-r09-ser-totalmente-resolvido">Fora de escopo até R09 ser totalmente resolvido</h2>
 <ul>
 <li>Comparação numérica com <code>legance/LOT_Tese</code> ou <code>legance/LOT_APB_v5</code>.</li>
@@ -2684,8 +2847,6 @@ entregar os dados ao solver.</p>
 <p>Com R09 mitigado para os dois PKN auditados, mas ainda aberto para <code>idQ == 4</code>,
 seguir um destes caminhos:</p>
 <ol>
-<li>Criar pos-processamento moderno para os CSV/JSON LOT/PKN e comparacoes
-   qualitativas cuidadosamente rotuladas para os dois casos auditados.</li>
 <li>Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
    parsing com solver.</li>
 <li>Se for iniciar comparacao legado x moderno, primeiro confirmar o <code>idQ</code> de

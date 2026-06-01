@@ -8,6 +8,7 @@ legance/
 
 # --- Resultados de simulação (pesados, reproduzíveis pelo caso YAML) ---
 results/
+reports/
 *.vtu
 *.pvd
 *.h5

@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "case_id": "fixture_lot_pkn_modern",
+    "mode": "lot-pkn",
+    "validation_status": "synthetic_modern_no_legacy_regression"
+  },
+  "summary": {
+    "final_time_s": 120.0,
+    "final_injected_volume_m3": 0.02,
+    "final_fracture_length_m": 2.2,
+    "final_fracture_width_m": 0.0015,
+    "final_fracture_volume_m3": 0.0033,
+    "final_leakoff_volume_m3": 0.0001,
+    "final_net_pressure_Pa": 150000.0
+  },
+  "warnings": [
+    "No numerical regression against legacy was performed.",
+    "R09 remains blocker for legacy comparison."
+  ]
+}

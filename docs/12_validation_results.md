@@ -201,6 +201,43 @@ diretamente os dois PKN auditados, mas continua bloqueando regressao quantitativ
 para `idQ == 4`, para `.dat` sem metadado de `idQ` confirmado e para qualquer
 uso geral da familia `ConvflowRate()` como referencia fisica.
 
+## Fase 6.7 — Pós-processamento moderno LOT/PKN
+
+**Data:** 2026-06-01
+
+**Executado nesta fase:**
+
+- `python -m unittest discover tests\python`
+- `.\build\lot-sim.exe run --case cases\validation\lot_pkn_minimal.yaml --mode lot-pkn --output results\lot_pkn_minimal`
+- `.\build\lot-sim.exe run --case cases\validation\lot_pkn_with_leakoff.yaml --mode lot-pkn --output results\lot_pkn_with_leakoff`
+- `python postprocess\scripts\lot_pkn_report.py --run-dir results\lot_pkn_minimal --output reports\lot_pkn_minimal`
+- `python postprocess\scripts\lot_pkn_report.py --run-dir results\lot_pkn_with_leakoff --output reports\lot_pkn_with_leakoff`
+
+**Resultado Python:** 3 testes `unittest` executados, 3 passaram.
+
+**Observação sobre pytest:** `python -m pytest tests\python` foi tentado, mas o
+ambiente Python local não tinha `pytest` instalado. Os testes foram mantidos em
+formato compatível com descoberta futura por pytest, mas executados nesta fase
+com `unittest`, usando apenas biblioteca padrão.
+
+**Relatórios gerados localmente:**
+
+| Caso | Relatório | Figuras |
+|------|-----------|---------|
+| `lot_pkn_minimal` | `reports\lot_pkn_minimal\report.html` | 5 PNGs |
+| `lot_pkn_with_leakoff` | `reports\lot_pkn_with_leakoff\report.html` | 5 PNGs |
+
+Os relatórios contêm o aviso:
+
+```text
+This report uses modern synthetic LOT/PKN outputs only. No numerical regression against legacy was performed.
+```
+
+**Importante:** esta fase é apenas pós-processamento de outputs modernos
+sintéticos. Não houve leitura de `.dat`, comparação com `legance/LOT_Tese`,
+comparação com `legance/LOT_APB_v5` nem alteração de baselines. R09 continua
+`MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION`.
+
 ## Baselines capturados
 
 | Baseline | Arquivo | Status | Data |

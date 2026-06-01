@@ -70,6 +70,41 @@ lot-sim run --case cases/validation/lot_pkn_with_leakoff.yaml \
             --output results/lot_pkn_with_leakoff
 ```
 
+## Pós-processamento LOT/PKN moderno
+
+Após gerar `result.json` e `timeseries.csv`, o relatório moderno pode ser
+criado com:
+
+```bash
+python postprocess/scripts/lot_pkn_report.py \
+  --run-dir results/lot_pkn_minimal \
+  --output reports/lot_pkn_minimal
+```
+
+ou:
+
+```bash
+python postprocess/scripts/lot_pkn_report.py \
+  --input results/lot_pkn_minimal/timeseries.csv \
+  --summary results/lot_pkn_minimal/result.json \
+  --output reports/lot_pkn_minimal
+```
+
+Arquivos gerados:
+
+| Arquivo | Conteúdo |
+|---------|----------|
+| `pressure_vs_time.png` | Pressão líquida × tempo |
+| `pressure_vs_volume.png` | Pressão líquida × volume injetado |
+| `length_vs_time.png` | Comprimento de fratura × tempo |
+| `width_vs_time.png` | Abertura de fratura × tempo |
+| `leakoff_vs_time.png` | Volume de leakoff × tempo |
+| `report.html` | Relatório HTML com resumo, tabela final, figuras e limitações |
+
+Os relatórios são outputs de pós-processamento moderno sintético:
+`Modern synthetic LOT/PKN output - no legacy regression`. Eles não comparam com
+`legance/`, `.dat` ou baselines.
+
 ## Fora de escopo atual
 
 - `run --mode apb`, `salt`, `lot-salt`, `apb-salt` e `coupled`.
