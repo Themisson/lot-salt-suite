@@ -136,6 +136,7 @@ add_executable(tests_unit
     tests/cpp/test_openmp_consistency.cpp
     tests/cpp/test_damage_diagnostics.cpp
     tests/cpp/test_mesh_adaptation.cpp
+    tests/cpp/test_wall_pressure_field.cpp
     tests/cpp/test_edge_cases.cpp
     ${SALT_SOURCES})
 target_include_directories(tests_unit PRIVATE include)

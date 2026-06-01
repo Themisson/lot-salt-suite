@@ -15,6 +15,8 @@ struct VtuOutputOptions {
     int every_n_steps = 10;
     bool revolve_3d = false; // reserved; current writer exports the axisymmetric (r,z) sector
     std::string case_name;
+    double well_radius_m = 0.0;
+    double depth_origin_m = 0.0;
 };
 
 struct VtuFrame {

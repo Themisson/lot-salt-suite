@@ -1,11 +1,22 @@
 ﻿build/
 out/
 build_*/
-*.o *.so *.a *.exe
+build2/
+build_sanitize/
+build_werror/
+*.o
+*.obj
+*.so
+*.a
+*.exe
+*.pdb
+*.ilk
+*.lib
 results/
-docs/references/*.pdf
-docs/references/*.pptx
-docs/references/*.docx
+docs/references/**
+!docs/references/README.md
+legacy/sestsal/examples/*.out
+legacy/sestsal/examples/*.mp4
 .claude/settings.local.json
 .vscode/ .idea/ .DS_Store Thumbs.db *.swp *~
 __pycache__/

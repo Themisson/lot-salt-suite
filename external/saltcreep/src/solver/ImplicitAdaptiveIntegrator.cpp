@@ -45,12 +45,14 @@ ImplicitAdaptiveIntegrator::ImplicitAdaptiveIntegrator(
     std::vector<Stress> sigma_geo_gp,
     std::vector<int> fixed_dofs,
     ImplicitAdaptiveOptions options,
-    PerformanceStats initial_stats)
+    PerformanceStats initial_stats,
+    std::shared_ptr<const WallPressureField> wall_pressure)
     : mesh_(mesh)
     , element_(element)
     , model_(model)
     , thermal_(thermal)
     , f_external_(std::move(f_external))
+    , wall_pressure_(std::move(wall_pressure))
     , sigma_geo_gp_(std::move(sigma_geo_gp))
     , fixed_dofs_(std::move(fixed_dofs))
     , options_(options)
@@ -89,6 +91,13 @@ ImplicitAdaptiveIntegrator::ImplicitAdaptiveIntegrator(
     state_.state_gp.assign(total_gp, InternalState{});
     state_.sigma_gp.resize(total_gp);
     update_stresses(state_);
+}
+
+Eigen::VectorXd ImplicitAdaptiveIntegrator::pressure_load_at(double time_s) const {
+    if (!wall_pressure_)
+        return f_external_;
+    return Assembler::assemble_boundary_pressure(
+        mesh_, element_, *wall_pressure_, time_s, 0.0);
 }
 
 ImplicitAdaptiveIntegrator::LocalResult
@@ -193,7 +202,11 @@ ImplicitAdaptiveIntegrator::take_step(const TimeState& base,
         delta_eps_th[idx] = trial.state.eps_th_gp[idx] - base.eps_th_gp[idx];
     Eigen::VectorXd f_th = Assembler::assemble_pseudo_force(
         mesh_, element_, model_, delta_eps_th);
-    Eigen::VectorXd f_total = f_v + f_th;
+    Eigen::VectorXd f_pressure_delta = Eigen::VectorXd::Zero(mesh_.total_dofs());
+    if (wall_pressure_) {
+        f_pressure_delta = pressure_load_at(time_s + dt_s) - pressure_load_at(time_s);
+    }
+    Eigen::VectorXd f_total = f_v + f_th + f_pressure_delta;
     auto assembly_end = std::chrono::steady_clock::now();
     stats_.time_assembly_s += std::chrono::duration<double>(
         assembly_end - assembly_start).count();
@@ -248,6 +261,8 @@ double ImplicitAdaptiveIntegrator::advance(double dt_s) {
 
         state_ = std::move(half2.state);
         current_time_s_ += dt;
+        if (wall_pressure_)
+            f_external_ = pressure_load_at(current_time_s_);
         last_error_ = err;
         double factor = 1.25;
         if (err < 0.1 * options_.tol_global) {
@@ -332,21 +347,31 @@ void ImplicitAdaptiveIntegrator::run(double dt_s, double t_end_s, int output_eve
                                       VtuOutputOptions vtu_options,
                                       const DamageTrackingOptions& damage_options) {
     fs::create_directories(out_dir);
+    ConstantWallPressureField fallback_pressure(0.0);
+    const WallPressureField& pressure =
+        wall_pressure_ ? *wall_pressure_ : fallback_pressure;
     std::ofstream csv(out_dir / "closure.csv");
     std::ofstream profile_csv(out_dir / "displacements_profile.csv");
     std::ofstream wall_csv(out_dir / "wall_profile.csv");
+    std::ofstream pressure_csv(out_dir / "wall_pressure_profile.csv");
     time_output::write_closure_header(csv);
     time_output::write_displacement_profile_header(profile_csv);
     time_output::write_wall_profile_header(wall_csv);
+    time_output::write_wall_pressure_profile_header(pressure_csv);
     csv << std::fixed << std::setprecision(12);
     profile_csv << std::fixed << std::setprecision(12);
     wall_csv << std::fixed << std::setprecision(12);
+    pressure_csv << std::fixed << std::setprecision(12);
     time_output::write_closure_record(
         csv, mesh_, state_.u_total, 0.0, wall_closure_pct());
     time_output::write_displacement_profile_record(
         profile_csv, mesh_, state_.u_total, 0.0);
     time_output::write_wall_profile_record(
-        wall_csv, mesh_, state_.u_total, 0.0);
+        wall_csv, mesh_, state_.u_total, 0.0,
+        vtu_options.depth_origin_m, vtu_options.well_radius_m);
+    time_output::write_wall_pressure_profile_record(
+        pressure_csv, mesh_, pressure, thermal_, 0.0, 0.0,
+        vtu_options.depth_origin_m);
 
     double t = 0.0;
     int step = 0;
@@ -386,7 +411,11 @@ void ImplicitAdaptiveIntegrator::run(double dt_s, double t_end_s, int output_eve
             time_output::write_displacement_profile_record(
                 profile_csv, mesh_, state_.u_total, t_h);
             time_output::write_wall_profile_record(
-                wall_csv, mesh_, state_.u_total, t_h);
+                wall_csv, mesh_, state_.u_total, t_h,
+                vtu_options.depth_origin_m, vtu_options.well_radius_m);
+            time_output::write_wall_pressure_profile_record(
+                pressure_csv, mesh_, pressure, thermal_, t_h, t,
+                vtu_options.depth_origin_m);
         }
         write_vtu(t, false);
     }
@@ -395,7 +424,11 @@ void ImplicitAdaptiveIntegrator::run(double dt_s, double t_end_s, int output_eve
     time_output::write_displacement_profile_record(
         profile_csv, mesh_, state_.u_total, t / 3600.0);
     time_output::write_wall_profile_record(
-        wall_csv, mesh_, state_.u_total, t / 3600.0);
+        wall_csv, mesh_, state_.u_total, t / 3600.0,
+        vtu_options.depth_origin_m, vtu_options.well_radius_m);
+    time_output::write_wall_pressure_profile_record(
+        pressure_csv, mesh_, pressure, thermal_, t / 3600.0, t,
+        vtu_options.depth_origin_m);
     write_vtu(t, true);
     if (vtu_options.enabled)
         VtuWriter::write_pvd(out_dir / (vtu_case + ".pvd"), vtu_frames);
@@ -411,21 +444,31 @@ void ImplicitAdaptiveIntegrator::run_schedule(const std::vector<TimeSegment>& sc
         throw std::runtime_error("ImplicitAdaptiveIntegrator::run_schedule: empty schedule");
 
     fs::create_directories(out_dir);
+    ConstantWallPressureField fallback_pressure(0.0);
+    const WallPressureField& pressure =
+        wall_pressure_ ? *wall_pressure_ : fallback_pressure;
     std::ofstream csv(out_dir / "closure.csv");
     std::ofstream profile_csv(out_dir / "displacements_profile.csv");
     std::ofstream wall_csv(out_dir / "wall_profile.csv");
+    std::ofstream pressure_csv(out_dir / "wall_pressure_profile.csv");
     time_output::write_closure_header(csv);
     time_output::write_displacement_profile_header(profile_csv);
     time_output::write_wall_profile_header(wall_csv);
+    time_output::write_wall_pressure_profile_header(pressure_csv);
     csv << std::fixed << std::setprecision(12);
     profile_csv << std::fixed << std::setprecision(12);
     wall_csv << std::fixed << std::setprecision(12);
+    pressure_csv << std::fixed << std::setprecision(12);
     time_output::write_closure_record(
         csv, mesh_, state_.u_total, 0.0, wall_closure_pct());
     time_output::write_displacement_profile_record(
         profile_csv, mesh_, state_.u_total, 0.0);
     time_output::write_wall_profile_record(
-        wall_csv, mesh_, state_.u_total, 0.0);
+        wall_csv, mesh_, state_.u_total, 0.0,
+        vtu_options.depth_origin_m, vtu_options.well_radius_m);
+    time_output::write_wall_pressure_profile_record(
+        pressure_csv, mesh_, pressure, thermal_, 0.0, 0.0,
+        vtu_options.depth_origin_m);
 
     double t = 0.0;
     int step = 0;
@@ -478,7 +521,11 @@ void ImplicitAdaptiveIntegrator::run_schedule(const std::vector<TimeSegment>& sc
             time_output::write_displacement_profile_record(
                 profile_csv, mesh_, state_.u_total, t_h);
             time_output::write_wall_profile_record(
-                wall_csv, mesh_, state_.u_total, t_h);
+                wall_csv, mesh_, state_.u_total, t_h,
+                vtu_options.depth_origin_m, vtu_options.well_radius_m);
+            time_output::write_wall_pressure_profile_record(
+                pressure_csv, mesh_, pressure, thermal_, t_h, t,
+                vtu_options.depth_origin_m);
         }
         write_vtu(t, false);
     }
@@ -487,7 +534,11 @@ void ImplicitAdaptiveIntegrator::run_schedule(const std::vector<TimeSegment>& sc
     time_output::write_displacement_profile_record(
         profile_csv, mesh_, state_.u_total, t / 3600.0);
     time_output::write_wall_profile_record(
-        wall_csv, mesh_, state_.u_total, t / 3600.0);
+        wall_csv, mesh_, state_.u_total, t / 3600.0,
+        vtu_options.depth_origin_m, vtu_options.well_radius_m);
+    time_output::write_wall_pressure_profile_record(
+        pressure_csv, mesh_, pressure, thermal_, t / 3600.0, t,
+        vtu_options.depth_origin_m);
     write_vtu(t, true);
     if (vtu_options.enabled)
         VtuWriter::write_pvd(out_dir / (vtu_case + ".pvd"), vtu_frames);

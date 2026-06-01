@@ -23,6 +23,10 @@ $$\varepsilon = \varepsilon^{e} + \varepsilon^{v} + \varepsilon^{th}$$
 
 Resultado: K elástica continua constante; T só altera o lado direito (ε^th e ε̇^v).
 
+Convenção de unidade: os modelos constitutivos recebem sempre temperatura em Kelvin. O parser
+converte campos YAML com sufixo `_C` para K; campos `T_K` e parâmetros constitutivos `T0`
+devem ser fornecidos diretamente em Kelvin.
+
 Na implementação mecânica incremental:
 $$\varepsilon^{th} = \alpha (T_{gp} - T_{ref}) [1, 1, 1, 0]^T$$
 e a pseudo-força térmica é montada como

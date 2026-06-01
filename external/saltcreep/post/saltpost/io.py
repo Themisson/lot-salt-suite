@@ -53,6 +53,52 @@ class CaseResult:
                 return abs(u_wall) * 100.0 / abs(closure)
         return None
 
+    @property
+    def well_radius_m(self) -> float | None:
+        value = self.metadata.get("well_radius_m")
+        if value is not None:
+            return float(value)
+        return self.inner_radius_m
+
+    @property
+    def well_diameter_in(self) -> float | None:
+        value = self.metadata.get("well_diameter_in")
+        if value is not None:
+            return float(value)
+        radius = self.well_radius_m
+        if radius is None:
+            return None
+        return 2.0 * radius * 39.37007874015748
+
+    @property
+    def depth_origin_m(self) -> float:
+        return float(self.metadata.get("depth_origin_m") or 0.0)
+
+    @property
+    def lithology_primary(self) -> str:
+        lithology = self.metadata.get("lithology") or {}
+        if isinstance(lithology, dict):
+            return str(lithology.get("primary") or self.metadata.get("lithology_primary") or "")
+        return str(lithology)
+
+    @property
+    def lithology_layers(self) -> list[dict]:
+        lithology = self.metadata.get("lithology") or {}
+        if isinstance(lithology, dict):
+            layers = lithology.get("layers") or []
+            if layers:
+                return [dict(layer) for layer in layers]
+        thickness = self.metadata.get("layer_thickness_m")
+        primary = self.lithology_primary
+        if thickness is not None and primary:
+            return [{
+                "z_top_m": 0.0,
+                "z_bottom_m": float(thickness),
+                "material": primary,
+                "label": primary,
+            }]
+        return []
+
 
 def load_metadata(result_dir: Path) -> dict:
     metadata_path = result_dir / "metadata.json"

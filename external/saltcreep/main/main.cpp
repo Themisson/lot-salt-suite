@@ -27,11 +27,15 @@
 #include "solver/TimeIntegrator.hpp"
 #include "solver/ImplicitAdaptiveIntegrator.hpp"
 #include "solver/PerformanceStats.hpp"
+#include "solver/WallPressureField.hpp"
 #include "io/VtuWriter.hpp"
 #include "mesh/error_estimator.hpp"
 #include "mesh/mesh_refiner.hpp"
 
 namespace fs = std::filesystem;
+namespace {
+constexpr double kMetersToInches = 39.37007874015748;
+}
 
 // ── Helper: compute geostatic stress at each Gauss point ─────────────────────
 // tension-positive convention: compressive stresses are negative.
@@ -41,16 +45,33 @@ static std::vector<Stress> build_geostatic(const Mesh&     mesh,
                                             const Element&  element,
                                             double          k0,
                                             double          overburden_grad,
-                                            double          depth_m) {
+                                            double          depth_m,
+                                            bool            depth_profile = false) {
     const int n_gp = static_cast<int>(element.gauss_points().size());
     std::vector<Stress> geo(mesh.n_elements * n_gp);
 
     double sigma_v = -overburden_grad * depth_m;   // compressive → negative
     double sigma_h = k0 * sigma_v;
 
-    for (int e = 0; e < mesh.n_elements; ++e)
-        for (int g = 0; g < n_gp; ++g)
+    const int nne = element.n_nodes();
+    const auto gps = element.gauss_points();
+    for (int e = 0; e < mesh.n_elements; ++e) {
+        std::vector<Node> coords(nne);
+        for (int i = 0; i < nne; ++i)
+            coords[i] = mesh.nodes[mesh.elem_nodes[nne * e + i]];
+        for (int g = 0; g < n_gp; ++g) {
+            if (depth_profile) {
+                std::vector<double> N(nne);
+                element.shape_functions(gps[g], coords, N);
+                double z_gp = 0.0;
+                for (int i = 0; i < nne; ++i)
+                    z_gp += N[i] * coords[i].z;
+                sigma_v = -overburden_grad * (depth_m + z_gp);
+                sigma_h = k0 * sigma_v;
+            }
             geo[e * n_gp + g] = Stress{sigma_h, sigma_h, sigma_v, 0.0};
+        }
+    }
 
     return geo;
 }
@@ -171,6 +192,8 @@ static VtuOutputOptions make_vtu_options(const CaseData& cd) {
     options.every_n_steps = cd.output.vtu_every_n_steps;
     options.revolve_3d = cd.output.revolve_3d;
     options.case_name = cd.name;
+    options.well_radius_m = cd.geom.Ri;
+    options.depth_origin_m = cd.depths.burial_m + cd.depths.water_depth_m + cd.depths.salt_above_m;
     return options;
 }
 
@@ -192,6 +215,18 @@ static DamageTrackingOptions make_damage_options(const CaseData& cd) {
     options.nu = cd.nu;
     options.has_dm_reference = true;
     return options;
+}
+
+static std::shared_ptr<const WallPressureField> make_wall_pressure_field(
+    const CaseData& cd,
+    double depth_origin_m) {
+    if (cd.fluid.mode == "hydrostatic_depth_profile") {
+        return std::make_shared<HydrostaticMudPressureField>(
+            cd.fluid.weight_lb_per_gal,
+            depth_origin_m,
+            cd.fluid.surface_pressure_Pa);
+    }
+    return std::make_shared<ConstantWallPressureField>(cd.fluid_Pa);
 }
 
 static bool is_axisym_2d_element(const std::string& element_type) {
@@ -229,7 +264,7 @@ static int adapt_mesh_if_requested(const CaseData& cd,
                                    Mesh2D& mesh,
                                    const Element& elem,
                                    const ConstitutiveModel& model,
-                                   double fluid_Pa,
+                                   const WallPressureField& wall_pressure,
                                    double depth_m) {
     if (!cd.mesh.adaptive)
         return 0;
@@ -241,9 +276,10 @@ static int adapt_mesh_if_requested(const CaseData& cd,
 
     for (int iter = 0; iter < cd.mesh.max_refinement_levels; ++iter) {
         auto K = Assembler::assemble_K(mesh, elem, model);
-        auto f_ext = Assembler::assemble_boundary_pressure(mesh, elem, fluid_Pa, 0.0);
+        auto f_ext = Assembler::assemble_boundary_pressure(mesh, elem, wall_pressure, 0.0);
         auto sigma_geo = build_geostatic(mesh, elem, cd.k0,
-                                         cd.overburden_grad_Pa_per_m, depth_m);
+                                         cd.overburden_grad_Pa_per_m, depth_m,
+                                         cd.geostatic_mode == "depth_profile");
         auto fixed_dofs = build_fixed_dofs(mesh);
         TimeState state = compute_initial_time_state(
             mesh, elem, model, K, f_ext, sigma_geo, fixed_dofs);
@@ -304,9 +340,22 @@ static void write_metadata_json(const fs::path& out_dir,
 
     fs::create_directories(out_dir);
     std::ofstream json(out_dir / "metadata.json");
+    const double depth_origin_m = cd.depths.burial_m + cd.depths.water_depth_m + cd.depths.salt_above_m;
+    const double well_diameter_m = 2.0 * cd.geom.Ri;
     json << "{\n";
     json << "  \"case_name\": \"" << escape_json(cd.name) << "\",\n";
     json << "  \"element_type\": \"" << escape_json(cd.element_type) << "\",\n";
+    json << "  \"well_radius_m\": " << cd.geom.Ri << ",\n";
+    json << "  \"well_diameter_m\": " << well_diameter_m << ",\n";
+    json << "  \"well_diameter_in\": " << well_diameter_m * kMetersToInches << ",\n";
+    json << "  \"outer_radius_m\": " << cd.geom.Ri * cd.geom.outer_factor << ",\n";
+    json << "  \"depth_origin_m\": " << depth_origin_m << ",\n";
+    json << "  \"layer_thickness_m\": " << cd.geom.layer_thickness_m << ",\n";
+    json << "  \"fluid_mode\": \"" << escape_json(cd.fluid.mode) << "\",\n";
+    json << "  \"fluid_pressure_Pa\": " << cd.fluid_Pa << ",\n";
+    json << "  \"fluid_weight_lb_per_gal\": " << cd.fluid.weight_lb_per_gal << ",\n";
+    json << "  \"fluid_surface_pressure_Pa\": " << cd.fluid.surface_pressure_Pa << ",\n";
+    json << "  \"geostatic_mode\": \"" << escape_json(cd.geostatic_mode) << "\",\n";
     json << "  \"n_elements_radial\": " << cd.mesh.n_radial << ",\n";
     json << "  \"n_elements_axial\": " << cd.mesh.n_axial << ",\n";
     json << "  \"mesh_ratio\": " << cd.mesh.ratio << ",\n";
@@ -315,12 +364,31 @@ static void write_metadata_json(const fs::path& out_dir,
     json << "  \"final_n_elements\": " << mesh.n_elements << ",\n";
     json << "  \"n_dofs\": " << mesh.total_dofs() << ",\n";
     json << "  \"time_scheme\": \"" << escape_json(cd.time.scheme) << "\",\n";
+    json << "  \"lithology\": {\n";
+    json << "    \"primary\": \"" << escape_json(cd.lithology) << "\",\n";
+    json << "    \"layers\": [";
+    if (!cd.lithology_layers.empty())
+        json << "\n";
+    for (size_t i = 0; i < cd.lithology_layers.size(); ++i) {
+        const auto& layer = cd.lithology_layers[i];
+        json << "      {\"z_top_m\": " << layer.z_top_m
+             << ", \"z_bottom_m\": " << layer.z_bottom_m
+             << ", \"material\": \"" << escape_json(layer.material)
+             << "\", \"label\": \"" << escape_json(layer.label) << "\"}";
+        json << (i + 1 == cd.lithology_layers.size() ? "\n" : ",\n");
+    }
+    json << "    ]\n";
+    json << "  },\n";
+    json << "  \"primary_model\": \"" << escape_json(cd.creep.primary_model) << "\",\n";
+    json << "  \"tertiary_model\": \"" << escape_json(cd.creep.tertiary_model) << "\",\n";
+    json << "  \"dilatancy_envelope\": \"" << escape_json(cd.creep.dilatancy_envelope) << "\",\n";
     json << "  \"creep_flags\": {\n";
     json << "    \"secondary\": " << (cd.creep.secondary ? "true" : "false") << ",\n";
     json << "    \"primary\": " << (cd.creep.primary ? "true" : "false") << ",\n";
     json << "    \"tertiary\": " << (cd.creep.tertiary ? "true" : "false") << "\n";
     json << "  },\n";
     json << "  \"thermal_enabled\": " << (cd.thermal.enabled ? "true" : "false") << ",\n";
+    json << "  \"thermal_mode\": \"" << escape_json(cd.thermal.mode) << "\",\n";
     json << "  \"damage_tracking\": " << (cd.output.damage_tracking ? "true" : "false") << ",\n";
     json << "  \"damage_thresholds\": [";
     for (size_t i = 0; i < cd.output.damage_thresholds.size(); ++i) {
@@ -365,8 +433,7 @@ int main(int argc, char* argv[]) {
         mesh_1d = build_mesh_L3(Ri, Re, cd.mesh.n_radial, cd.mesh.ratio);
         mesh_ptr = &mesh_1d;
     } else if (is_axisym_2d_element(cd.element_type)) {
-        constexpr double unit_height = 1.0;
-        mesh_2d = build_mesh_structured_2d(cd.element_type, Ri, Re, unit_height,
+        mesh_2d = build_mesh_structured_2d(cd.element_type, Ri, Re, cd.geom.layer_thickness_m,
                                            cd.mesh.n_radial, cd.mesh.n_axial,
                                            cd.mesh.ratio);
         mesh_ptr = &mesh_2d;
@@ -400,6 +467,7 @@ int main(int argc, char* argv[]) {
     }
 
     double depth = cd.depths.burial_m + cd.depths.water_depth_m + cd.depths.salt_above_m;
+    auto wall_pressure = make_wall_pressure_field(cd, depth);
     int adaptive_iterations = 0;
     if (cd.mesh.adaptive) {
         if (is_1d) {
@@ -408,7 +476,7 @@ int main(int argc, char* argv[]) {
         }
         try {
             adaptive_iterations = adapt_mesh_if_requested(
-                cd, mesh_2d, *elem, *model, cd.fluid_Pa, depth);
+                cd, mesh_2d, *elem, *model, *wall_pressure, depth);
         } catch (const std::exception& ex) {
             std::cerr << "Error during mesh adaptation: " << ex.what() << "\n";
             return 3;
@@ -489,9 +557,8 @@ int main(int argc, char* argv[]) {
     auto K = Assembler::assemble_K(mesh, *elem, *model);
 
     // External load (fluid pressure traction at inner wall)
-    auto f_ext = (mesh.dofs_per_node == 1)
-        ? Assembler::assemble_neumann(mesh, cd.fluid_Pa, 0.0)
-        : Assembler::assemble_boundary_pressure(mesh, *elem, cd.fluid_Pa, 0.0);
+    auto f_ext = Assembler::assemble_boundary_pressure(
+        mesh, *elem, *wall_pressure, 0.0, 0.0);
     auto assembly_end = std::chrono::steady_clock::now();
     initial_stats.time_assembly_s += std::chrono::duration<double>(
         assembly_end - assembly_start).count();
@@ -531,7 +598,8 @@ int main(int argc, char* argv[]) {
 
     // ── time integration (secondary creep) ───────────────────────────────────
     auto sigma_geo = build_geostatic(mesh, *elem, cd.k0,
-                                     cd.overburden_grad_Pa_per_m, depth);
+                                     cd.overburden_grad_Pa_per_m, depth,
+                                     cd.geostatic_mode == "depth_profile");
 
     // Outer wall (u[Re]=0) must be pinned: without it, the geostatic force at Re
     // drives spurious outward expansion (see SESTSAL %SUPPORT condition).
@@ -550,7 +618,7 @@ int main(int argc, char* argv[]) {
         options.dt_max_s = cd.time.dt_max_s;
         ImplicitAdaptiveIntegrator integrator(mesh, *elem, *model, *thermal,
                                               K, f_ext, sigma_geo, fixed_dofs,
-                                              options, initial_stats);
+                                              options, initial_stats, wall_pressure);
         if (!cd.time.steps.empty())
             integrator.run_schedule(cd.time.steps, cd.time.total_s, output_every, out_dir,
                                     vtu_options, damage_options);
@@ -565,7 +633,7 @@ int main(int argc, char* argv[]) {
     } else if (cd.time.scheme == "explicit") {
         TimeIntegrator integrator(mesh, *elem, *model, *thermal,
                                   K, f_ext, sigma_geo, fixed_dofs,
-                                  initial_stats);
+                                  initial_stats, wall_pressure);
         if (!cd.time.steps.empty())
             integrator.run_schedule(cd.time.steps, cd.time.total_s, output_every, out_dir,
                                     vtu_options, damage_options);

@@ -6,6 +6,7 @@ from pathlib import Path
 import argparse
 
 from .compare import comparison_table
+from .axisym3d import make_axisym_3d
 from .animations import animate_result
 from .export import export_paper_bundle, write_table_formats
 from .plots import (
@@ -15,8 +16,11 @@ from .plots import (
     plot_closure,
     plot_field_map,
     plot_final_closure_vs_dofs,
+    plot_diameter_at_depth,
+    plot_lithology_column,
     plot_radial_profile,
     plot_relative_error,
+    plot_wellbore_diameter_profile,
     plot_wall_displacement,
     plot_wall_profile,
     plot_phase_space,
@@ -41,12 +45,19 @@ def build_parser() -> argparse.ArgumentParser:
         "--plot",
         choices=["all", "closure", "displacement", "radial_profile",
                  "wall_profile", "field_map", "damage", "creep_rate",
-                 "damage_comparison", "phase_space"],
+                 "damage_comparison", "phase_space", "diameter_profile",
+                 "diameter_time", "lithology_column", "axisym_3d"],
         default="all",
         help="Tipo de grafico a gerar.",
     )
     parser.add_argument("--time", type=float, default=None,
                         help="Tempo em horas para plots de perfil/mapa.")
+    parser.add_argument("--depth", type=float, default=None,
+                        help="Profundidade absoluta [m] para plots de diametro vs tempo.")
+    parser.add_argument("--angle", type=float, default=270.0,
+                        help="Angulo de revolucao para --plot axisym_3d.")
+    parser.add_argument("--scale", type=float, default=None,
+                        help="Escala da deformada para --plot axisym_3d.")
     parser.add_argument("--format", choices=["default", "paper"], default="default",
                         help="Formato de exportacao; paper cria nomes padronizados e LaTeX.")
     parser.add_argument("--report", action="store_true",
@@ -120,6 +131,22 @@ def main(argv: list[str] | None = None) -> int:
     if args.plot in {"field_map"}:
         for result in results:
             plot_field_map(result, out_dir, args.time)
+    if args.plot in {"diameter_profile"}:
+        plot_wellbore_diameter_profile(results, out_dir, args.time, group_by)
+    if args.plot in {"diameter_time"}:
+        plot_diameter_at_depth(results, out_dir, args.depth, group_by)
+    if args.plot in {"lithology_column"}:
+        for result in results:
+            plot_lithology_column(result, out_dir)
+    if args.plot in {"axisym_3d"}:
+        for result in results:
+            make_axisym_3d(
+                result.path,
+                out_dir / f"{result.case_name}_axisym_3d.png",
+                args.time,
+                args.angle,
+                args.scale,
+            )
     if args.plot in {"all", "damage"}:
         plot_damage_wall(results, out_dir, group_by)
     if args.plot in {"all", "creep_rate"}:

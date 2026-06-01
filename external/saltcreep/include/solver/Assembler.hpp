@@ -5,6 +5,7 @@
 #include "elements/Element.hpp"
 #include "constitutive/ConstitutiveModel.hpp"
 #include "mesh/Mesh.hpp"
+#include "solver/WallPressureField.hpp"
 
 // Build geometric-progression mesh for AxisymL3.
 // Ri: inner radius, Re: outer radius, n_elem: number of elements,
@@ -45,6 +46,15 @@ public:
         const Element& element,
         double p_inner,
         double p_outer);
+
+    // Assemble pressure with a wall field evaluated at boundary Gauss points.
+    // In 1D this reduces to the pressure at z=0. In 2D it supports p_wall(z,t).
+    static Eigen::VectorXd assemble_boundary_pressure(
+        const Mesh& mesh,
+        const Element& element,
+        const WallPressureField& inner_pressure,
+        double time_s,
+        double p_outer = 0.0);
 
     // Assemble incremental pseudo-force from viscous strain increments:
     //   f_v = Σ_e Σ_gp  Bᵀ · D · Δε^v · jacobian_weight

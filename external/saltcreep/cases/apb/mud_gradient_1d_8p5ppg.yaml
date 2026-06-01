@@ -1,0 +1,50 @@
+name: mud_gradient_1d_8p5ppg
+
+geometry:
+  well_radius_m: 0.155575
+  outer_radius_factor: 100
+
+depths:
+  water_depth_m: 1600
+  burial_m: 2500
+  salt_above_m: 0
+
+lithology:
+  primary: halita
+
+fluid:
+  mode: hydrostatic_depth_profile
+  weight_lb_per_gal: 8.5
+  surface_pressure_Pa: 0.0
+
+stress:
+  k0: 1.0
+  overburden_grad_Pa_per_m: 21000
+
+element:
+  type: axisym_1d_L3
+
+mesh:
+  n_elements_radial: 20
+  ratio: 100
+
+thermal:
+  enabled: false
+  mode: constant
+  T_K: 370.88
+
+creep:
+  elastic_only: false
+  secondary: false
+  primary: false
+  tertiary: false
+  damage: false
+
+time:
+  total_h: 2
+  dt_h: 1
+  scheme: explicit
+
+output:
+  every_n_steps: 1
+  vtu: false

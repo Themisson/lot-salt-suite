@@ -12,8 +12,10 @@ import numpy as np
 import pandas as pd
 
 from .compare import align_series, comparison_table
+from .diameter import diameter_at_depth, profile_at_time
 from .export import write_table_formats
 from .io import CaseResult
+from .layers import color_for_lithology, normalized_layers
 from .registry import label_for
 from .style import FIGSIZE, apply_style, color_for, get_color, get_marker, marker_for
 from .units import auto_displacement_unit
@@ -262,6 +264,148 @@ def plot_field_map(result: CaseResult, out_dir: Path,
     ax.set_ylabel("Profundidade local z [m]")
     ax.set_title(f"Mapa u_r - {result.case_name} - {_time_label(float(frame['t_h'].iloc[0]))}")
     save_figure(fig, out_dir, f"{result.case_name}_mapa_ur")
+
+
+def _add_lithology_bands(ax, result: CaseResult) -> None:
+    layers = normalized_layers(result)
+    if not layers:
+        return
+    x0, x1 = ax.get_xlim()
+    span = x1 - x0
+    text_x = x0 + 0.73 * span
+    for idx, layer in enumerate(layers):
+        top = -layer.absolute_top(result)
+        bottom = -layer.absolute_bottom(result)
+        ymin, ymax = sorted([top, bottom])
+        ax.axhspan(
+            ymin,
+            ymax,
+            color=color_for_lithology(layer.material, idx),
+            alpha=0.10,
+            linewidth=0,
+            zorder=0,
+        )
+        ax.text(
+            text_x,
+            0.5 * (top + bottom),
+            layer.label.capitalize(),
+            ha="left",
+            va="center",
+            fontsize=10,
+            alpha=0.85,
+        )
+
+
+def plot_wellbore_diameter_profile(results: list[CaseResult],
+                                   out_dir: Path,
+                                   target_h: float | None = None,
+                                   group_by: str | None = None) -> None:
+    series: list[tuple[CaseResult, pd.DataFrame]] = []
+    for result in results:
+        try:
+            series.append((result, profile_at_time(result, target_h)))
+        except ValueError:
+            continue
+    if not series:
+        return
+
+    apply_style()
+    fig, ax = plt.subplots(figsize=(7.0, 7.2))
+    all_same = _all_elements_same([result for result, _ in series])
+    for idx, (result, frame) in enumerate(series):
+        ax.plot(
+            frame["diameter_in"],
+            -frame["depth_m"],
+            label=label_for(result, group_by),
+            color=get_color(idx, result.element_type, all_same),
+            marker=get_marker(idx, result.element_type, all_same),
+            markevery=max(len(frame) // 8, 1),
+            zorder=3,
+        )
+    original = next(
+        (float(frame["original_diameter_in"].iloc[0]) for _, frame in series
+         if "original_diameter_in" in frame),
+        None,
+    )
+    if original is not None:
+        ax.axvline(original, color="#111111", linestyle="--", linewidth=1.5,
+                   label="diametro original", zorder=2)
+    _add_lithology_bands(ax, series[0][0])
+    selected_t = float(series[0][1]["t_h"].iloc[0])
+    ax.set_title(f"Diametro do poco - t = {_time_label(selected_t)}")
+    ax.set_xlabel("Diametro [in]")
+    ax.set_ylabel("Profundidade [m]")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    save_figure(fig, out_dir, "diametro_poco_vs_profundidade")
+
+
+def plot_diameter_at_depth(results: list[CaseResult],
+                           out_dir: Path,
+                           depth_m: float | None = None,
+                           group_by: str | None = None) -> None:
+    series: list[tuple[CaseResult, pd.DataFrame]] = []
+    for result in results:
+        try:
+            series.append((result, diameter_at_depth(result, depth_m)))
+        except ValueError:
+            continue
+    if not series:
+        return
+
+    actual_depth = float(series[0][1]["depth_m"].iloc[0])
+    apply_style()
+    fig, ax = plt.subplots(figsize=FIGSIZE)
+    all_same = _all_elements_same([result for result, _ in series])
+    for idx, (result, df) in enumerate(series):
+        ax.plot(
+            df["t_h"],
+            df["diameter_in"],
+            label=label_for(result, group_by),
+            color=get_color(idx, result.element_type, all_same),
+            marker=get_marker(idx, result.element_type, all_same),
+            markevery=max(len(df) // 8, 1),
+        )
+    ax.set_title(f"Profundidade: {-actual_depth:.1f} m")
+    ax.set_xlabel("Tempo [h]")
+    ax.set_ylabel("Diametro [in]")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    save_figure(fig, out_dir, "diametro_vs_tempo_na_profundidade")
+
+
+def plot_lithology_column(result: CaseResult, out_dir: Path) -> None:
+    layers = normalized_layers(result)
+    if not layers:
+        return
+
+    apply_style()
+    fig, ax = plt.subplots(figsize=(7.0, 5.0))
+    ax.set_xlim(0.0, 1.0)
+    y_values = []
+    for idx, layer in enumerate(layers):
+        top = -layer.absolute_top(result)
+        bottom = -layer.absolute_bottom(result)
+        ymin, ymax = sorted([top, bottom])
+        y_values.extend([ymin, ymax])
+        ax.axhspan(
+            ymin,
+            ymax,
+            xmin=0.0,
+            xmax=1.0,
+            color=color_for_lithology(layer.material, idx),
+            alpha=0.95,
+        )
+        ax.text(0.18, 0.5 * (top + bottom), layer.label.capitalize(),
+                ha="center", va="center", fontsize=16)
+        ax.text(0.65, 0.5 * (top + bottom),
+                f"{layer.absolute_top(result):.0f}-{layer.absolute_bottom(result):.0f}",
+                ha="center", va="center", fontsize=16)
+    ax.set_xticks([])
+    ax.set_ylabel("Profundidade [m]")
+    ax.set_title(f"Coluna litologica - {result.case_name}")
+    ax.set_ylim(min(y_values), max(y_values))
+    save_figure(fig, out_dir, f"{result.case_name}_coluna_litologica")
 
 
 def _damage_thresholds(result: CaseResult) -> list[float]:

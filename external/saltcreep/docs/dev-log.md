@@ -341,5 +341,40 @@ Formato: data, agente, resumo do que foi feito, contagem de testes.
 - Adicionados testes Python para descoberta de estudos, exportação paper, dashboard HTML, animação de fechamento e fluxo CLI combinado
 - **120/120 C++ verdes + 21/21 Python verdes**
 
+## 2026-06-01 — Codex — Limpeza Fase 1: artefatos versionados e referencias pesadas
+- Removido `build2/` do versionamento (artefatos CMake/Visual Studio, executaveis, PDB/ILK/LIB e dependencias FetchContent materializadas)
+- Removido `docs/references/new_references/` do versionamento; o conhecimento operacional permanece em `docs/reference-index.md`, `docs/reference-extraction-log.md` e demais documentos tecnicos
+- Removidos outputs binarios/textuais grandes de `legacy/sestsal/examples` (`*.out` e `mesh.mp4`) sem tocar no codigo legado
+- Reforcado `.gitignore` para bloquear builds, artefatos MSVC, resultados, referencias brutas e outputs temporarios do legado
+- Criado `docs/references/README.md` explicando a politica de referencias externas
+- **120/120 C++ verdes + 21/21 Python verdes**
+
+## 2026-06-01 — Codex — Compatibilizacao dos YAMLs SESTSAL legados
+- Atualizados 7 YAMLs em `cases/sestsal/` para o schema atual: `mesh.n_elements_radial`, `lithology.primary`, `time.total_h`, `time.dt_h` e `time.steps`
+- Corrigidos os campos de fluido dos casos convertidos incorretamente: valores de profundidade em `weight_lb_per_gal` foram substituidos pelos ppg lidos dos `.inp` legados (`14.75`, `16.0`, `17.5`)
+- Rodados `base_model`, `base_model2D`, `hello_repasse`, `hello_repasse2D`, `keywords`, `project61` e `repasse2D`; todos geraram `closure.csv` e `metadata.json` com fechamento final finito
+- Gerado pos-processamento por caso em `results/<caso>/postprocess_<caso>/` e comparacao nomeada em `results/comparisons/sestsal_legacy_fixed_7_cases/`
+- **120/120 C++ verdes + 21/21 Python verdes**
+
+## 2026-06-01 — Codex — Saltpost: diametro do poco, litologias e setor 3D
+- `metadata.json` passou a registrar geometria do poco, diametro original, profundidade de referencia, espessura 2D, modelos constitutivos/térmicos e camadas litologicas visuais
+- `closure.csv` e `wall_profile.csv` ganharam colunas retrocompativeis para diametro instantaneo em m/in e profundidade absoluta da parede
+- Parser aceita `geometry.layer_thickness_m` e `lithology.layers`/`intercalations` para anotacao visual; a fisica mecanica continua homogenea por `lithology.primary`
+- Criados `saltpost.diameter`, `saltpost.layers`, `saltpost.axisym3d` e o wrapper `post/axisym_solid_3d.py`
+- CLI ganhou `--plot diameter_profile`, `diameter_time`, `lithology_column` e `axisym_3d`, permitindo comparar DM vs EDMT por profundidade e reproduzir perfis de diametro tipo SESTSAL/ABAQUS
+- Manual, `docs/input-spec.md`, `docs/post-processing.md` e `AGENTS.md` atualizados
+- **120/120 C++ verdes + 25/25 Python verdes**
+
+## 2026-06-01 — Codex — Pressão hidrostática por peso de lama em 1D/2D
+- Criado `WallPressureField` com `ConstantWallPressureField` e `HydrostaticMudPressureField`
+- Parser aceita `fluid.mode: constant|hydrostatic_depth_profile`, `surface_pressure_Pa` e mantém `weight_lb_per_gal` legado retrocompatível
+- `Assembler` passou a avaliar pressão variável nos pontos de Gauss da parede interna 2D; no 1D a pressão é calculada na profundidade do caso
+- Integradores explícito e implícito adicionam o incremento de carga `f_p(t+dt)-f_p(t)` sem alterar a fatoração única de K
+- Saída temporal ganhou `wall_pressure_profile.csv` com `p_wall_Pa` e `T_wall_K` na parede interna
+- Criados casos `cases/apb/mud_gradient_1d_8p5ppg.yaml` e `cases/apb/mud_gradient_2d_Q8_8p5ppg.yaml`
+- Testes novos cobrem cálculo hidrostático, parser legado/APB, equivalência 1D, integração 2D da força na parede e execução real dos casos APB 1D/2D
+- Manual, `docs/input-spec.md`, `docs/post-processing.md`, `docs/architecture.md` e `AGENTS.md` atualizados
+- **125/125 C++ verdes + 26/26 Python verdes**
+
 ---
 *Próxima entrada: o agente que iniciar a próxima etapa registra aqui.*

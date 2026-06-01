@@ -412,8 +412,22 @@ Eigen::VectorXd Assembler::assemble_boundary_pressure(
     double p_inner,
     double p_outer)
 {
+    ConstantWallPressureField pressure(p_inner);
+    return assemble_boundary_pressure(mesh, element, pressure, 0.0, p_outer);
+}
+
+Eigen::VectorXd Assembler::assemble_boundary_pressure(
+    const Mesh& mesh,
+    const Element& element,
+    const WallPressureField& inner_pressure,
+    double time_s,
+    double p_outer)
+{
     if (mesh.dofs_per_node == 1)
-        return assemble_neumann(mesh, p_inner, p_outer);
+        return assemble_neumann(
+            mesh,
+            inner_pressure.pressure_at(Eigen::Vector2d{mesh.nodes.front().r, 0.0}, time_s),
+            p_outer);
 
     constexpr double kTwoPi = 2.0 * 3.14159265358979323846;
     const int nne = element.n_nodes();
@@ -430,7 +444,7 @@ Eigen::VectorXd Assembler::assemble_boundary_pressure(
         return std::abs(a - b) <= tol;
     };
 
-    auto add_edge = [&](int e, double xi, double pressure, bool radial_sign,
+    auto add_edge = [&](int e, double xi, bool inner_edge, bool radial_sign,
                         const std::vector<double>& params,
                         const std::vector<double>& weights) {
         std::vector<Node> coords(nne);
@@ -445,10 +459,12 @@ Eigen::VectorXd Assembler::assemble_boundary_pressure(
             element.shape_derivatives(gp, coords, dN_dxi, dN_deta);
 
             double r_gp = 0.0;
+            double z_gp = 0.0;
             double dr_ds = 0.0;
             double dz_ds = 0.0;
             for (int i = 0; i < nne; ++i) {
                 r_gp += N[i] * coords[i].r;
+                z_gp += N[i] * coords[i].z;
                 dr_ds += dN_deta[i] * coords[i].r;
                 dz_ds += dN_deta[i] * coords[i].z;
             }
@@ -456,6 +472,9 @@ Eigen::VectorXd Assembler::assemble_boundary_pressure(
             const double line_weight = kTwoPi * r_gp *
                 std::sqrt(dr_ds * dr_ds + dz_ds * dz_ds) * weights[q];
             const double sign = radial_sign ? 1.0 : -1.0;
+            const double pressure = inner_edge
+                ? inner_pressure.pressure_at(Eigen::Vector2d{r_gp, z_gp}, time_s)
+                : p_outer;
             for (int i = 0; i < nne; ++i) {
                 const int gn = mesh.elem_nodes[nne * e + i];
                 f[mesh.dof_index(gn, 0)] += sign * N[i] * pressure * line_weight;
@@ -463,7 +482,7 @@ Eigen::VectorXd Assembler::assemble_boundary_pressure(
         }
     };
 
-    auto add_tri_edge = [&](int e, double pressure, bool radial_sign, bool outer_edge,
+    auto add_tri_edge = [&](int e, bool inner_edge, bool radial_sign, bool outer_edge,
                             const std::vector<double>& params,
                             const std::vector<double>& weights) {
         std::vector<Node> coords(nne);
@@ -480,10 +499,12 @@ Eigen::VectorXd Assembler::assemble_boundary_pressure(
             element.shape_derivatives(gp, coords, dN_dxi, dN_deta);
 
             double r_gp = 0.0;
+            double z_gp = 0.0;
             double dr_ds = 0.0;
             double dz_ds = 0.0;
             for (int i = 0; i < nne; ++i) {
                 r_gp += N[i] * coords[i].r;
+                z_gp += N[i] * coords[i].z;
                 const double dN_ds = outer_edge
                     ? 0.5 * (-dN_dxi[i] + dN_deta[i])
                     : 0.5 * dN_deta[i];
@@ -494,6 +515,9 @@ Eigen::VectorXd Assembler::assemble_boundary_pressure(
             const double line_weight = kTwoPi * r_gp *
                 std::sqrt(dr_ds * dr_ds + dz_ds * dz_ds) * weights[q];
             const double sign = radial_sign ? 1.0 : -1.0;
+            const double pressure = inner_edge
+                ? inner_pressure.pressure_at(Eigen::Vector2d{r_gp, z_gp}, time_s)
+                : p_outer;
             for (int i = 0; i < nne; ++i) {
                 const int gn = mesh.elem_nodes[nne * e + i];
                 f[mesh.dof_index(gn, 0)] += sign * N[i] * pressure * line_weight;
@@ -517,25 +541,25 @@ Eigen::VectorXd Assembler::assemble_boundary_pressure(
             close(coords[0].r, Ri) && close(coords[3].r, Ri)) {
             const auto& points = (nne == 4) ? line_2 : line_3;
             const auto& weights = (nne == 4) ? w_2 : w_3;
-            add_edge(e, -1.0, p_inner, true, points, weights);
+            add_edge(e, -1.0, true, true, points, weights);
         }
         if ((nne == 4 || nne == 8 || nne == 9) &&
             close(coords[1].r, Re) && close(coords[2].r, Re) && p_outer != 0.0) {
             const auto& points = (nne == 4) ? line_2 : line_3;
             const auto& weights = (nne == 4) ? w_2 : w_3;
-            add_edge(e, 1.0, p_outer, false, points, weights);
+            add_edge(e, 1.0, false, false, points, weights);
         }
         if ((nne == 3 || nne == 6) &&
             close(coords[0].r, Ri) && close(coords[2].r, Ri)) {
             const auto& points = (nne == 3) ? line_2 : line_3;
             const auto& weights = (nne == 3) ? w_2 : w_3;
-            add_tri_edge(e, p_inner, true, false, points, weights);
+            add_tri_edge(e, true, true, false, points, weights);
         }
         if ((nne == 3 || nne == 6) &&
             close(coords[1].r, Re) && close(coords[2].r, Re) && p_outer != 0.0) {
             const auto& points = (nne == 3) ? line_2 : line_3;
             const auto& weights = (nne == 3) ? w_2 : w_3;
-            add_tri_edge(e, p_outer, false, true, points, weights);
+            add_tri_edge(e, false, false, true, points, weights);
         }
     }
 

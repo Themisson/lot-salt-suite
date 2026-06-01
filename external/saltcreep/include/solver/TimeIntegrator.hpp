@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>
 #include <filesystem>
+#include <memory>
 #include <Eigen/Sparse>
 #include <Eigen/SparseCholesky>
 
@@ -43,7 +44,8 @@ public:
                    Eigen::VectorXd             f_external,
                    std::vector<Stress>         sigma_geo_gp,
                    std::vector<int>            fixed_dofs = {},
-                   PerformanceStats            initial_stats = {});
+                   PerformanceStats            initial_stats = {},
+                   std::shared_ptr<const WallPressureField> wall_pressure = nullptr);
 
     // Execute one Euler step of size dt_s [s].
     void advance(double dt_s);
@@ -77,6 +79,7 @@ private:
 
     Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> ldlt_;
     Eigen::VectorXd      f_external_;
+    std::shared_ptr<const WallPressureField> wall_pressure_;
     std::vector<Stress>  sigma_geo_gp_;
     std::vector<int>     fixed_dofs_;
     PerformanceStats     stats_;
@@ -91,6 +94,7 @@ private:
 
     // Recompute sigma at all GPs from u_total, eps_v
     void update_stresses();
+    Eigen::VectorXd pressure_load_at(double time_s) const;
 
     // Compute r-coordinate of GP (e, g)
     double gauss_r(int e, int g) const;

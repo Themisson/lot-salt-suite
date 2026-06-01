@@ -155,6 +155,26 @@ f_geo = integral B^T * sigma_geo dOmega
 
 Nenhuma lei constitutiva foi alterada nesta refatoração.
 
+## Pressão na parede
+
+O carregamento de fluido na parede interna é descrito por `WallPressureField`:
+
+```cpp
+double pressure_at(Eigen::Vector2d x, double time_s) const;
+```
+
+O modo legado usa `ConstantWallPressureField` e preserva uma pressão única no poço. O modo
+`HydrostaticMudPressureField` calcula:
+
+```text
+p(z) = p_surface + MW * 119.826 * g * (depth_origin + z)
+```
+
+No 1D, `z=0` e a pressão é avaliada na profundidade do caso. No 2D, `Assembler` avalia
+`pressure_at()` nos pontos de Gauss da aresta interna, de modo que um peso de lama único gera
+um perfil hidrostático ao longo da profundidade. Durante a marcha no tempo, os integradores
+somam apenas o incremento `f_p(t+dt)-f_p(t)` ao lado direito, preservando a fatoração única de K.
+
 ## Como adicionar um elemento 2D na Etapa 3b
 
 Para cada novo elemento:

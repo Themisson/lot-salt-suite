@@ -194,11 +194,19 @@ name: edge_parser
 geometry:
   well_radius_m: 0.155575
   outer_radius_factor: 10
+  layer_thickness_m: 40
 depths:
   water_depth_m: 1000
   burial_m: 2000
 lithology:
   primary: halita
+  layers:
+    - z_top_m: 0
+      z_bottom_m: 10
+      material: halita
+    - z_top_m: 10
+      z_bottom_m: 40
+      material: carnalita
 fluid:
   weight_lb_per_gal: 10
 stress:
@@ -224,4 +232,7 @@ time:
     const CaseData cd = parse_case(yaml, find_data_dir());
     REQUIRE(cd.mesh.adaptive);
     REQUIRE(cd.mesh.max_refinement_levels == 0);
+    REQUIRE(cd.geom.layer_thickness_m == Catch::Approx(40.0));
+    REQUIRE(cd.lithology_layers.size() == 2);
+    REQUIRE(cd.lithology_layers[1].material == "carnalita");
 }

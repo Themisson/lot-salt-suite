@@ -9,7 +9,7 @@ name: modelo_A                 # nome do caso (vira pasta de saída results/mode
 geometry:
   well_radius_m: 0.1556        # Ri (12.25 pol → m)
   outer_radius_factor: 1000    # Re = factor * Ri (domínio semi-infinito)
-  layer_thickness_m: 20        # espessura da camada salina em estudo
+  layer_thickness_m: 20        # altura axial da malha 2D e espessura visual da zona
 
 depths:
   water_depth_m: 100           # lâmina d'água (LDA)
@@ -18,16 +18,30 @@ depths:
 
 lithology:
   primary: halita              # halita | taquidrita | carnalita
+  layers:                      # opcional; usado por metadata/saltpost e, hoje, nao altera a fisica
+    - z_top_m: 0
+      z_bottom_m: 8
+      material: halita
+    - z_top_m: 8
+      z_bottom_m: 12
+      material: carnalita
+    - z_top_m: 12
+      z_bottom_m: 20
+      material: halita
   intercalations:              # opcional; vazio se não houver
     - material: taquidrita
       thickness_m: 10
       position: center
 
 fluid:
-  weight_lb_per_gal: 10        # peso do fluido de perfuração
+  mode: constant               # constant | hydrostatic_depth_profile
+  weight_lb_per_gal: 10        # peso do fluido de perfuração; usado se pressure_Pa ausente
+  # pressure_Pa: 35.0e6        # opcional; se informado, bypassa o cálculo por peso da lama
+  surface_pressure_Pa: 0       # usado no modo hydrostatic_depth_profile
 
 stress:
   k0: 1.0                      # coeficiente de empuxo horizontal
+  geostatic_mode: constant     # constant | depth_profile
 
 # --- discretização: tipo de elemento e malha ---
 element:
@@ -164,6 +178,18 @@ output:
 - `primary_model: isv_sh_dm` exige `primary:true`; recomenda-se `secondary:true`, pois o termo
   primário seno-hiperbólico decai para zero e a saturação física vem da DM secundária.
 - `n_elements_axial > 1` exige um `element.type` 2D; com `axisym_1d_L3` deve ser 1.
+- `fluid.mode: constant` preserva o comportamento legado. Se `pressure_Pa` for informado, usa esse
+  valor diretamente; caso contrário calcula `p = weight_lb_per_gal * 119.826 * g * depth_origin`.
+  Em 1D, `fluid.mode: hydrostatic_depth_profile` dá o mesmo valor na altura do caso; em 2D, a
+  pressão é avaliada em cada ponto de Gauss da parede interna como
+  `p(z) = surface_pressure_Pa + weight_lb_per_gal * 119.826 * g * (depth_origin + z)`.
+- `stress.geostatic_mode: depth_profile` é opcional para casos 2D profundos e calcula a tensão
+  geostática no ponto de Gauss usando `depth_origin + z`; o default `constant` preserva todas as
+  regressões antigas.
+- `geometry.layer_thickness_m` define a altura local da malha 2D. Se ausente, o default é
+  `1.0 m` para preservar resultados antigos. `lithology.layers` e `lithology.intercalations`
+  são gravados no `metadata.json` para pós-processamento e anotação de perfis; a física
+  mecânica permanece homogênea por `lithology.primary` até a etapa de materiais por camada.
 - `mesh.adaptive:true` exige elemento 2D. O estimador Zienkiewicz-Zhu calcula erro em norma
   de energia para qualquer elemento 2D; a subdivisão conformante implementada atualmente cobre
   `axisym_2d_Q4` e `axisym_2d_T3`. Para outros elementos, se o estimador marcar refinamento, o
@@ -181,6 +207,8 @@ output:
 - `thermal.mode: conduction_2d` exige elemento 2D e aceita `outer_bc`, `top_bc` e `bottom_bc`
   como `prescribed` ou `flux_zero`; `layers` é opcional e, se omitido, usa `k_W_m_K`,
   `rho_kg_m3` e `cp_J_kg_K` uniformes.
+- A temperatura entregue aos modelos constitutivos é sempre Kelvin. Campos YAML com sufixo `_C`
+  são convertidos no parser; campos `T_K`/`T0` já devem ser fornecidos em Kelvin.
 - `tertiary_model: wang_2004` exige `tertiary:true` e `damage:true`; não usa `dilatancy_envelope`.
   Os parâmetros padrão de `wang_2004` vêm da litologia (`halita` ou `taquidrita`) e podem ser
   sobrescritos no YAML do caso.

@@ -92,6 +92,8 @@ Dois Eigens no repo intencionalmente: `include/Eigen/` (5.x, novo) e `legacy/ses
 ## Bibliografia — política
 - **PDFs em `docs/references/`** (gitignored por padrão; git-lfs se for crítico versionar).
   Não comitar PDFs grandes no git regular.
+- O diretório mantém apenas arquivos pequenos de controle, como `docs/references/README.md`;
+  referências brutas ficam em armazenamento externo e o conhecimento extraído vai para `docs/*.md`.
 - **Conhecimento operacional vai para `docs/*.md`.** Equações, algoritmos e convenções extraídos
   das referências viram docs curtos (ex.: `docs/thermal-coupling.md` carrega o algoritmo de
   Vasconcelos, 2019, sem o agente precisar reler o PDF a cada sessão).

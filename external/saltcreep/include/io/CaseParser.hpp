@@ -20,10 +20,18 @@ struct ThermalLayer {
     double cp_J_kg_K = 900.0;
 };
 
+struct LithologyLayer {
+    double z_top_m = 0.0;
+    double z_bottom_m = 0.0;
+    std::string material;
+    std::string label;
+};
+
 // ── Geometry ─────────────────────────────────────────────────────────────────
 struct GeomParams {
     double Ri;            // inner radius (m)
     double outer_factor;  // Re = outer_factor * Ri
+    double layer_thickness_m = 1.0; // 2D axial height; default preserves legacy unit-height meshes
 };
 
 // ── Mesh ─────────────────────────────────────────────────────────────────────
@@ -42,6 +50,13 @@ struct DepthParams {
     double burial_m;       // depth to top of salt layer (m)
     double water_depth_m;  // water depth (m)
     double salt_above_m;   // salt thickness above the zone of interest (m)
+};
+
+struct FluidParams {
+    std::string mode = "constant"; // constant | hydrostatic_depth_profile
+    double pressure_Pa = 0.0;
+    double weight_lb_per_gal = 0.0;
+    double surface_pressure_Pa = 0.0;
 };
 
 // ── Thermal parameters ───────────────────────────────────────────────────────
@@ -196,8 +211,11 @@ struct CaseData {
     DepthParams   depths;
     std::string   element_type;  // default: "axisym_1d_L3"
     std::string   lithology;     // "halita" | "taquidrita" | "carnalita"
+    std::vector<LithologyLayer> lithology_layers; // visual/metadata layers in local z
     double        fluid_Pa;      // drilling fluid pressure at wall (Pa)
+    FluidParams   fluid;
     double        k0;            // lateral earth pressure coefficient
+    std::string   geostatic_mode = "constant"; // constant | depth_profile
     double        overburden_grad_Pa_per_m;  // overburden stress gradient [Pa/m]
     DMParams      dm;
     EdmtParams    edmt;

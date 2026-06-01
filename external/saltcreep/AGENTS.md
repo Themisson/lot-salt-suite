@@ -19,6 +19,7 @@ Este arquivo é a referência ÚNICA para qualquer agente que trabalhe neste rep
 - `docs/final-validation-report.md` — credencial e advertência consolidada de validação.
 - `docs/developer-guide.md` — guia seguro para estender modelos, elementos e campos térmicos.
 - `docs/post-processing.md` — guia do saltpost: estudos, paper, dashboard e animações.
+- `docs/references/README.md` — política de referências externas não versionadas.
 - `docs/model-selection.md` — seleção de modelo de IA e economia de tokens.
 - `docs/method-decision.md` — por que FEM e não BEM/FVM/MPM (decisão fechada).
 
@@ -31,7 +32,7 @@ terciária + dano + acoplamento termomecânico fraco + múltiplos tipos de eleme
 
 ## Estado atual do projeto (manter atualizado aqui)
 **Última atualização:** 2026-06-01
-**Testes:** 120/120 C++ verdes + 21/21 Python saltpost/VTU/deslocamento/dano/viewer/benchmark/edge/dashboard verdes
+**Testes:** 125/125 C++ verdes + 26/26 Python saltpost/VTU/deslocamento/dano/viewer/benchmark/edge/dashboard/diâmetro/pressão verdes
 **Etapas concluídas:**
 - [x] Etapa 0: fundação elástica 1D axissimétrica + teste Lamé (8 testes)
 - [x] Etapa 1: mecanismo duplo (DM, fluência secundária) + loop temporal explícito +
@@ -59,6 +60,7 @@ terciária + dano + acoplamento termomecânico fraco + múltiplos tipos de eleme
 - [x] Etapa 7: `axisym_2d_AQ9` enriquecido com base de Lamé + alta precisão por GDL
 - [x] Etapa 8d: diagnóstico de falha por dano (`damage_events.csv`, `damage_wall.csv` e plots)
 - [x] Saltpost: cores/markers por caso quando o elemento é igual + viewer interativo `u_r(z)`
+- [x] Pressão hidrostática por peso de lama em 1D/2D (`WallPressureField`) + casos APB de verificação
 - [x] Etapa 8a: `Wang2004` CDM com dano não-linear acoplado à fluência
 - [x] Etapa 8b: `AubertinISVSHD` unificado com primária + secundária + terciária + dano
 - [x] Etapa 8c: `ISVSHDMunson` primária seno-hiperbólica Munson-Dawson/Chan
@@ -68,6 +70,8 @@ terciária + dano + acoplamento termomecânico fraco + múltiplos tipos de eleme
 - [x] Opção 2c: guia de desenvolvimento para extensões
 - [x] Opção 2d: limpeza de código, otimizações, sanitizers opcionais e testes de edge case
 - [x] Pós-processamento avançado: estudos declarativos, exportação paper, dashboard HTML e animações
+- [x] Pós-processamento: gráficos de diâmetro do poço, coluna litológica e setor 3D axissimétrico
+- [x] Limpeza Fase 1: remover artefatos de build e referências pesadas do versionamento
 
 **Próximas etapas (em ordem):**
 - [ ] Próxima etapa a definir

@@ -377,7 +377,7 @@
   <div class="brand">
     <h1>SaltCreep<span class="dot">.</span></h1>
     <div class="sub">Solver FEM de fluência em rocha salina</div>
-    <span class="ver">v1.0 · 120 testes C++ · 21 testes Py</span>
+    <span class="ver">v1.0 · 125 testes C++ · 26 testes Py</span>
   </div>
   <div class="search-wrap">
     <input type="text" id="navSearch" placeholder="buscar na navegação…" autocomplete="off">
@@ -431,7 +431,7 @@
       <div class="stat"><div class="n tealc">7</div><div class="l">tipos de elemento</div></div>
       <div class="stat"><div class="n coppc">6</div><div class="l">leis de fluência</div></div>
       <div class="stat"><div class="n tealc">2</div><div class="l">integradores temporais</div></div>
-      <div class="stat"><div class="n coppc">141</div><div class="l">testes verdes</div></div>
+      <div class="stat"><div class="n coppc">151</div><div class="l">testes verdes</div></div>
     </div>
   </div>
 
@@ -878,6 +878,7 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
   <section id="thermal">
     <h3>Campos térmicos</h3>
     <p class="lead">Implementações do ThermalField. A temperatura entra na mecânica via deformação térmica e via Arrhenius (acoplamento fraco).</p>
+    <p class="warn"><strong>Convenção de unidade:</strong> os modelos constitutivos recebem temperatura em Kelvin. Campos YAML com sufixo <code class="ic">_C</code> são convertidos pelo parser; campos <code class="ic">T_K</code> e parâmetros constitutivos <code class="ic">T0</code> já devem estar em Kelvin.</p>
 
     <div class="card" data-name="ProfileField perfil geotérmico T(z) estacionário">
       <div class="card-head">
@@ -957,6 +958,16 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
         <p>Monta a matriz de rigidez global <code class="ic">K_e += Bᵀ·D·B·jw</code> (esparsa) e os vetores de força. Quatro montagens: rigidez K, força geostática <code class="ic">f_geo = ∫Bᵀσ_geo·jw</code>, pseudo-força viscosa <code class="ic">f_v = ∫Bᵀ·D·Δε_v</code>, e pseudo-força térmica <code class="ic">f_th = ∫Bᵀ·D·Δε_th</code>. O espalhamento usa <code class="ic">mesh.dof_index()</code>, genérico para 1D e 2D.</p>
       </div>
     </div>
+    <div class="card" data-name="WallPressureField pressão lama hidrostática profundidade APB">
+      <div class="card-head">
+        <span class="ctag solver">solver</span><span class="cname">WallPressureField</span>
+        <span class="file">solver/WallPressureField</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Representa a pressão aplicada na parede interna. <code class="ic">ConstantWallPressureField</code> preserva o carregamento antigo. <code class="ic">HydrostaticMudPressureField</code> calcula <code class="ic">p(z)=p_surface+MW·119.826·g·(depth_origin+z)</code>. No 1D, z=0; no 2D, o Assembler avalia a pressão nos pontos de Gauss da aresta interna, permitindo peso de lama variável com profundidade.</p>
+      </div>
+    </div>
     <div class="card" data-name="ExplicitIntegrator TimeIntegrator Euler explícito marcha tempo">
       <div class="card-head">
         <span class="ctag solver">solver</span><span class="cname">TimeIntegrator (explícito)</span>
@@ -964,7 +975,7 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
       </div>
       <div class="card-body">
         <p class="role">Implementação</p>
-        <p>Integrador de Euler explícito. No construtor: monta f_geo, aplica Dirichlet (u=0 na borda externa), e <strong>fatora K uma vez</strong>. Cada passo: avalia a lei constitutiva em cada ponto de Gauss, monta as pseudo-forças, resolve <code class="ic">K·Δu = f_v + f_th</code> por back-substitution, atualiza tensões e estado. Adequado para halita e tensões moderadas. Schedule de Δt configurável com transições graduais.</p>
+        <p>Integrador de Euler explícito. No construtor: monta f_geo, aplica Dirichlet (u=0 na borda externa), e <strong>fatora K uma vez</strong>. Cada passo: avalia a lei constitutiva em cada ponto de Gauss, monta as pseudo-forças e o incremento de carga de parede <code class="ic">f_p(t+Δt)-f_p(t)</code>, resolve <code class="ic">K·Δu = f_v + f_th + Δf_p</code> por back-substitution, atualiza tensões e estado. Adequado para halita e tensões moderadas. Schedule de Δt configurável com transições graduais.</p>
       </div>
     </div>
     <div class="card" data-name="ImplicitAdaptiveIntegrator implícito backward Euler Newton local step doubling">
@@ -1025,8 +1036,9 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
     <pre><code><span class="tok-k">name</span>: <span class="tok-s">meu_poco</span>                  <span class="tok-c"># nome → vira results/meu_poco/</span>
 
 <span class="tok-k">geometry</span>:
-  <span class="tok-k">inner_radius_m</span>: <span class="tok-n">0.1079</span>        <span class="tok-c"># raio do poço (parede interna)</span>
-  <span class="tok-k">outer_radius_m</span>: <span class="tok-n">10.79</span>         <span class="tok-c"># raio externo do domínio</span>
+  <span class="tok-k">well_radius_m</span>: <span class="tok-n">0.1079</span>         <span class="tok-c"># raio do poço (parede interna)</span>
+  <span class="tok-k">outer_radius_factor</span>: <span class="tok-n">100</span>    <span class="tok-c"># Re = fator * Ri</span>
+  <span class="tok-k">layer_thickness_m</span>: <span class="tok-n">20</span>       <span class="tok-c"># altura axial da malha 2D / zona visual</span>
 
 <span class="tok-k">depths</span>:
   <span class="tok-k">water_depth_m</span>: <span class="tok-n">1000</span>          <span class="tok-c"># lâmina d'água</span>
@@ -1034,12 +1046,25 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
 
 <span class="tok-k">lithology</span>:
   <span class="tok-k">primary</span>: <span class="tok-s">halita</span>             <span class="tok-c"># lê data/litologias/halita.yaml</span>
+  <span class="tok-k">layers</span>:                       <span class="tok-c"># opcional; anotação visual no saltpost</span>
+    - <span class="tok-k">z_top_m</span>: <span class="tok-n">0</span>
+      <span class="tok-k">z_bottom_m</span>: <span class="tok-n">8</span>
+      <span class="tok-k">material</span>: <span class="tok-s">halita</span>
+    - <span class="tok-k">z_top_m</span>: <span class="tok-n">8</span>
+      <span class="tok-k">z_bottom_m</span>: <span class="tok-n">12</span>
+      <span class="tok-k">material</span>: <span class="tok-s">carnalita</span>
+    - <span class="tok-k">z_top_m</span>: <span class="tok-n">12</span>
+      <span class="tok-k">z_bottom_m</span>: <span class="tok-n">20</span>
+      <span class="tok-k">material</span>: <span class="tok-s">halita</span>
 
 <span class="tok-k">fluid</span>:
-  <span class="tok-k">mud_weight_kg_per_m3</span>: <span class="tok-n">1180</span>   <span class="tok-c"># peso do fluido de perfuração</span>
+  <span class="tok-k">mode</span>: <span class="tok-s">constant</span>             <span class="tok-c"># constant | hydrostatic_depth_profile</span>
+  <span class="tok-k">weight_lb_per_gal</span>: <span class="tok-n">9.6</span>       <span class="tok-c"># usado se pressure_Pa ausente</span>
+  <span class="tok-k">surface_pressure_Pa</span>: <span class="tok-n">0.0</span>    <span class="tok-c"># usado no perfil hidrostático</span>
 
 <span class="tok-k">stress</span>:
   <span class="tok-k">k0</span>: <span class="tok-n">1.0</span>                     <span class="tok-c"># razão de tensão horizontal/vertical</span>
+  <span class="tok-k">geostatic_mode</span>: <span class="tok-s">constant</span>   <span class="tok-c"># constant | depth_profile</span>
 
 <span class="tok-k">element</span>:
   <span class="tok-k">type</span>: <span class="tok-s">axisym_1d_L3</span>           <span class="tok-c"># L3 | Q4 | T3 | Q8 | Q9 | AQ9 | T6</span>
@@ -1151,6 +1176,10 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
       <span class="nt">Dica de validação</span>
       Comece sempre com <code class="ic">creep.elastic_only: true</code> para confirmar que a geometria e as tensões estão corretas (deve bater com Lamé), depois ligue a fluência. Erros de geometria/tensão são mais fáceis de pegar no caso elástico.
     </div>
+    <div class="note">
+      <span class="nt">Camadas litológicas</span>
+      <code class="ic">lithology.layers</code> é usado pelo <code class="ic">saltpost</code> para anotar perfis de diâmetro e coluna litológica. A física mecânica ainda usa <code class="ic">lithology.primary</code> como material homogêneo; contraste constitutivo real por camada deve entrar em uma etapa dedicada.
+    </div>
   </section>
 
   <!-- ============ INTERACTIVE BUILDER ============ -->
@@ -1168,6 +1197,9 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
             <div class="fg"><label>Raio interno (m)</label><input type="text" id="b_ri" value="0.1079"></div>
             <div class="fg"><label>Raio externo (m)</label><input type="text" id="b_re" value="10.79"></div>
           </div>
+          <div class="fg">
+            <label>Espessura/altura 2D (m)</label><input type="text" id="b_thick" value="20">
+          </div>
           <div class="fg-row">
             <div class="fg"><label>Lâmina d'água (m)</label><input type="text" id="b_wd" value="1000"></div>
             <div class="fg"><label>Soterramento (m)</label><input type="text" id="b_bur" value="2000"></div>
@@ -1177,7 +1209,7 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
               <label>Litologia</label>
               <select id="b_lith"><option>halita</option><option>taquidrita</option><option>carnalita</option></select>
             </div>
-            <div class="fg"><label>Peso do fluido (kg/m³)</label><input type="text" id="b_mud" value="1180"></div>
+            <div class="fg"><label>Peso do fluido (lb/gal)</label><input type="text" id="b_mud" value="9.6"></div>
           </div>
           <div class="fg-row">
             <div class="fg"><label>k0 <span class="hint">(tensão H/V)</span></label><input type="text" id="b_k0" value="1.0"></div>
@@ -1298,7 +1330,7 @@ cmake --build build -j
     <div class="code-head"><span>fluxo completo de execução</span><button class="copy-btn">copiar</button></div>
     <pre><code><span class="tok-c"># 1. Rodar uma simulação</span>
 ./build/saltcreep cases/meu_poco.yaml
-<span class="tok-c">#    → gera results/meu_poco/closure.csv, displacements.csv, metadata.json
+<span class="tok-c">#    → gera results/meu_poco/closure.csv, wall_pressure_profile.csv, metadata.json
 #      e, se output.vtu=true, meu_poco_0000.vtu + meu_poco.pvd</span>
 
 <span class="tok-c"># 2. Plotar o resultado de um caso</span>
@@ -1312,17 +1344,30 @@ python post/plot_case.py results/meu_poco
     <h4>O que é produzido</h4>
     <table>
       <tr><th>Arquivo</th><th>Conteúdo</th></tr>
-      <tr><td><code>closure.csv</code></td><td>série temporal: tempo [h], fechamento [%], deslocamento radial assinado <code>wall_disp_m</code> e magnitude física <code>u_wall_m</code></td></tr>
+      <tr><td><code>closure.csv</code></td><td>série temporal: tempo [h], fechamento [%], deslocamento radial assinado <code>wall_disp_m</code>, magnitude física <code>u_wall_m</code> e diâmetro instantâneo da parede em m/in</td></tr>
       <tr><td><code>displacements.csv</code></td><td>campo de deslocamento radial nodal para o caminho elástico</td></tr>
       <tr><td><code>displacements_profile.csv</code></td><td>perfil temporal nodal: <code>t_h</code>, <code>r_m</code>, <code>z_m</code>, <code>u_r_m</code>, <code>u_z_m</code></td></tr>
-      <tr><td><code>wall_profile.csv</code></td><td>perfil temporal na parede interna: <code>u_r(z)</code> para elementos 2D (e ponto único no L3)</td></tr>
+      <tr><td><code>wall_profile.csv</code></td><td>perfil temporal na parede interna: <code>u_r(z)</code>, <code>depth_m</code>, <code>diameter_m</code>, <code>diameter_in</code> e diâmetro original</td></tr>
+      <tr><td><code>wall_pressure_profile.csv</code></td><td>perfil temporal na parede interna: <code>p_wall_Pa</code> e <code>T_wall_K</code> por profundidade. Em <code>fluid.mode: hydrostatic_depth_profile</code>, a pressão 2D é avaliada com <code>depth_origin + z</code>.</td></tr>
       <tr><td><code>damage_wall.csv</code></td><td>quando habilitado: evolução de <code>D</code>, <code>eps_dot</code> e <code>sigma_ef</code> no ponto mais danificado da parede</td></tr>
       <tr><td><code>damage_events.csv</code></td><td>quando habilitado: eventos de limiar de dano, taxa acelerada e inflexão da fluência</td></tr>
-      <tr><td><code>metadata.json</code></td><td>elemento, malha, GDLs, esquema, flags, <code>omp_threads</code>, tempo total e timers granulares de montagem, solução e constitutivo</td></tr>
+      <tr><td><code>metadata.json</code></td><td>elemento, malha, GDLs, geometria do poço, profundidade de referência, litologias visuais, esquema, flags, <code>omp_threads</code> e timers granulares</td></tr>
       <tr><td><code>*.vtu</code></td><td>malha + campos para ParaView/PyVista: deslocamento, tensão, εv, dano, temperatura</td></tr>
       <tr><td><code>*.pvd</code></td><td>índice de série temporal VTU para abrir animação no ParaView</td></tr>
     </table>
     <p>O <code class="ic">metadata.json</code> é o que permite ao saltpost agrupar e comparar resultados automaticamente.</p>
+
+    <h4>Pressão de lama por profundidade</h4>
+    <p>Para usar o peso da lama como perfil hidrostático em 2D, defina <code class="ic">fluid.mode: hydrostatic_depth_profile</code>. O 1D calcula a pressão na profundidade do caso; o 2D avalia a pressão no ponto de integração da parede interna usando <code class="ic">depth_origin + z</code>.</p>
+    <div class="code-head"><span>casos de verificação APB</span><button class="copy-btn">copiar</button></div>
+    <pre><code>./build/saltcreep cases/apb/mud_gradient_1d_8p5ppg.yaml
+./build/saltcreep cases/apb/mud_gradient_2d_Q8_8p5ppg.yaml
+
+<span class="tok-c"># verificar a pressão aplicada na parede</span>
+python - <<'PY'
+import pandas as pd
+print(pd.read_csv("results/mud_gradient_2d_Q8_8p5ppg/wall_pressure_profile.csv").head())
+PY</code></pre>
   </section>
 
   <!-- ============ POST ============ -->
@@ -1356,7 +1401,13 @@ python post/compare_cases.py --study modelo_A --vary element --report
 
 <span class="tok-c"># Animações GIF/MP4</span>
 python post/compare_cases.py results/modelo_A_Q8 --animate closure
-python post/compare_cases.py results/modelo_A_Q8 --animate all --animation-format mp4</code></pre>
+python post/compare_cases.py results/modelo_A_Q8 --animate all --animation-format mp4
+
+<span class="tok-c"># Diâmetro do poço em profundidade/tempo e visualização 3D axissimétrica</span>
+python post/compare_cases.py results/modelo_A_Q8 --plot diameter_profile --time <span class="tok-n">360</span>
+python post/compare_cases.py results/modelo_A_Q8 --plot diameter_time --depth <span class="tok-n">4100</span>
+python post/compare_cases.py results/modelo_A_Q8 --plot lithology_column
+python post/compare_cases.py results/modelo_A_Q8 --plot axisym_3d --time <span class="tok-n">360</span></code></pre>
 
     <h4>Saídas geradas</h4>
     <ul class="clean">
@@ -1367,6 +1418,8 @@ python post/compare_cases.py results/modelo_A_Q8 --animate all --animation-forma
       <li><strong>paper/</strong> — quando <code class="ic">--format paper</code> é usado, contém figuras renomeadas, tabelas em CSV/Markdown/LaTeX e <code class="ic">paper_manifest.csv</code>.</li>
       <li><strong>results/report/index.html</strong> — dashboard HTML estático criado por <code class="ic">--report</code>.</li>
       <li><strong>*_anim_*.gif/mp4</strong> — animações de fechamento, deslocamento radial, dano e temperatura.</li>
+      <li><strong>diametro_*.png/pdf</strong> — diâmetro do poço × profundidade ou × tempo, com linha de diâmetro original.</li>
+      <li><strong>*_axisym_3d.png</strong> — setor 3D por revolução da parede original/deformada.</li>
     </ul>
     <p>Para campos espaciais, use <code class="ic">output.vtu: true</code>. O módulo <code class="ic">post/saltpost/vtk.py</code> fornece <code class="ic">load_vtu()</code> quando PyVista estiver instalado, permitindo inspecionar tensões, dano e temperatura em 2D. O guia completo está em <a href="post-processing.md"><code class="ic">docs/post-processing.md</code></a>.</p>
 
@@ -1417,6 +1470,16 @@ python post/compare_cases.py results/modelo_A_Q8 --plot wall_profile
 <span class="tok-c"># Mapa 2D u_r(r,z) no tempo mais próximo de 240 h</span>
 python post/compare_cases.py results/modelo_A_Q8 --plot field_map --time <span class="tok-n">240</span>
 
+<span class="tok-c"># Diâmetro do poço vs profundidade no tempo final ou em tempo alvo</span>
+python post/compare_cases.py results/modelo_A_Q8 --plot diameter_profile --time <span class="tok-n">360</span>
+
+<span class="tok-c"># Diâmetro do poço vs tempo em uma profundidade absoluta</span>
+python post/compare_cases.py results/modelo_A_Q8 --plot diameter_time --depth <span class="tok-n">4100</span>
+
+<span class="tok-c"># Coluna litológica e setor 3D axissimétrico da parede</span>
+python post/compare_cases.py results/modelo_A_Q8 --plot lithology_column
+python post/compare_cases.py results/modelo_A_Q8 --plot axisym_3d --time <span class="tok-n">360</span>
+
 <span class="tok-c"># D(t) na parede com limiares de falha</span>
 python post/compare_cases.py results/modelo_A_with_damage --plot damage
 
@@ -1456,6 +1519,15 @@ python post/displacement_viewer.py results/modelo_A_Q8
 <span class="tok-c"># HTML standalone para compartilhar ou abrir no navegador</span>
 python post/displacement_viewer.py results/modelo_A_Q8 --html</code></pre>
     <p>O HTML gerado em <code class="ic">results/&lt;caso&gt;/displacement_viewer.html</code> embute os dados do CSV, inverte o eixo de profundidade na convenção geológica, mostra tooltip com <code class="ic">z</code> e <code class="ic">u_r</code>, e inclui botão para exportar PNG do instante selecionado.</p>
+
+    <h4>Diâmetro do poço e visualização 3D axissimétrica</h4>
+    <p>Para comparar com perfis SESTSAL/ABAQUS, o saltpost converte <code class="ic">u_r(z,t)</code> em diâmetro do poço usando <code class="ic">D = 2(Ri + u_r)</code>. Os plots usam profundidade absoluta de <code class="ic">metadata.depth_origin_m</code> e podem anotar <code class="ic">lithology.layers</code> como bandas de Halita, Carnalita ou Taquidrita.</p>
+    <div class="code-head"><span>diâmetro, litologia e setor 3D</span><button class="copy-btn">copiar</button></div>
+    <pre><code>python post/compare_cases.py results/modelo_A_Q8 --plot diameter_profile --time 360
+python post/compare_cases.py results/modelo_A_Q8 --plot diameter_time --depth 4100
+python post/compare_cases.py results/modelo_A_Q8 --plot lithology_column
+python post/axisym_solid_3d.py results/modelo_A_Q8 --time 360 --save results/modelo_A_Q8/axisym_3d.png</code></pre>
+    <p>A coluna litológica é visual nesta versão: ela documenta e colore os intervalos, mas o modelo mecânico ainda usa <code class="ic">lithology.primary</code> como material homogêneo.</p>
 
     <h4>Estudo de convergência</h4>
     <p>Para reproduzir o estudo de Lamé com todos os elementos implementados, rode:</p>
@@ -1581,10 +1653,10 @@ python post/benchmark_suite.py --preset full --max-runs <span class="tok-n">50</
     <p class="lead">O protocolo de verificação roda em ordem; a construção para no primeiro teste que regredir. Tolerâncias nunca são relaxadas para um teste passar.</p>
 
     <div class="code-head"><span>rodar a bateria de testes</span><button class="copy-btn">copiar</button></div>
-    <pre><code><span class="tok-c"># Testes C++ (Catch2) — 120 testes</span>
+    <pre><code><span class="tok-c"># Testes C++ (Catch2) — 125 testes</span>
 ctest --test-dir build --output-on-failure
 
-<span class="tok-c"># Testes Python (saltpost/VTU/deslocamento/dano/viewer/benchmark/edge/dashboard) — 21 testes</span>
+<span class="tok-c"># Testes Python (saltpost/VTU/deslocamento/dano/viewer/benchmark/edge/dashboard/diâmetro/pressão) — 26 testes</span>
 python -m unittest discover tests/python -v</code></pre>
 
     <h4>Protocolo (ordem de verificação)</h4>
@@ -1599,7 +1671,7 @@ python -m unittest discover tests/python -v</code></pre>
     </ol>
     <div class="note">
       <span class="nt">Estado atual</span>
-      <strong>120 testes C++ + 21 testes Python — todos verdes.</strong> Todas as etapas do roadmap original (0 a 5) concluídas e a Fase 2 inclui saída VTU/PVD, visualização espacial, gráficos físicos de deslocamento, viewer interativo de parede, dashboard HTML, exportação paper, estudos declarativos, animações, diagnóstico de falha por dano, condução térmica 2D com camadas, paralelismo OpenMP opcional, benchmark de desempenho, benchmark suite integral, refinamento adaptativo h e testes de edge case: elástico, secundária, primária EDMT/ISV, terciária com dano Motta/Wang/Aubertin, envoltórias Spier/Ratigan/DeVries/Hunsche, 7 elementos, integrador implícito, acoplamento térmico fraco e pós-processamento.
+      <strong>125 testes C++ + 26 testes Python — todos verdes.</strong> Todas as etapas do roadmap original (0 a 5) concluídas e a Fase 2 inclui saída VTU/PVD, visualização espacial, gráficos físicos de deslocamento e diâmetro, pressão hidrostática por peso de lama em 1D/2D, viewer interativo de parede, dashboard HTML, exportação paper, estudos declarativos, animações, diagnóstico de falha por dano, condução térmica 2D com camadas, paralelismo OpenMP opcional, benchmark de desempenho, benchmark suite integral, refinamento adaptativo h e testes de edge case: elástico, secundária, primária EDMT/ISV, terciária com dano Motta/Wang/Aubertin, envoltórias Spier/Ratigan/DeVries/Hunsche, 7 elementos, integrador implícito, acoplamento térmico fraco e pós-processamento.
     </div>
   </section>
 
@@ -1608,7 +1680,7 @@ python -m unittest discover tests/python -v</code></pre>
 
 <footer>
   <p><strong>SaltCreep</strong> — solver FEM de fluência em rocha salina · C++20 / Python · Documentação técnica v1.0</p>
-  <p style="margin-top:6px">Verificador independente do SESTSAL · Construído incrementalmente com verificação em cada etapa · <span class="mono">120 testes C++ · 21 testes Python</span></p>
+  <p style="margin-top:6px">Verificador independente do SESTSAL · Construído incrementalmente com verificação em cada etapa · <span class="mono">125 testes C++ · 26 testes Python</span></p>
 </footer>
 
 <script>
@@ -1687,8 +1759,13 @@ python -m unittest discover tests/python -v</code></pre>
   });
 
   // ---------- interactive YAML builder ----------
-  const ids=['b_name','b_ri','b_re','b_wd','b_bur','b_lith','b_mud','b_k0','b_elem','b_nr','b_ratio','b_adapt','b_adapt_thr','b_adapt_levels','b_sec','b_pri','b_ter','b_env','b_therm','b_vtu','b_damage_tracking','b_scheme','b_time'];
+  const ids=['b_name','b_ri','b_re','b_thick','b_wd','b_bur','b_lith','b_mud','b_k0','b_elem','b_nr','b_ratio','b_adapt','b_adapt_thr','b_adapt_levels','b_sec','b_pri','b_ter','b_env','b_therm','b_vtu','b_damage_tracking','b_scheme','b_time'];
   function v(id){const el=document.getElementById(id);return el.type==='checkbox'?el.checked:el.value;}
+  function outerFactor(){
+    const ri=Number(v('b_ri')); const re=Number(v('b_re'));
+    if(Number.isFinite(ri)&&Number.isFinite(re)&&ri>0) return (re/ri).toPrecision(8);
+    return v('b_re');
+  }
   function genYAML(){
     const name=v('b_name')||'caso';
     const therm=v('b_therm');
@@ -1697,8 +1774,9 @@ python -m unittest discover tests/python -v</code></pre>
 `name: ${name}
 
 geometry:
-  inner_radius_m: ${v('b_ri')}
-  outer_radius_m: ${v('b_re')}
+  well_radius_m: ${v('b_ri')}
+  outer_radius_factor: ${outerFactor()}
+  layer_thickness_m: ${v('b_thick')}
 
 depths:
   water_depth_m: ${v('b_wd')}
@@ -1708,10 +1786,12 @@ lithology:
   primary: ${v('b_lith')}
 
 fluid:
-  mud_weight_kg_per_m3: ${v('b_mud')}
+  mode: constant
+  weight_lb_per_gal: ${v('b_mud')}
 
 stress:
   k0: ${v('b_k0')}
+  geostatic_mode: constant
 
 element:
   type: ${v('b_elem')}

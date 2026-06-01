@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <filesystem>
+#include <algorithm>
 
 namespace fs = std::filesystem;
 
@@ -25,6 +26,100 @@ int req_int(const YAML::Node& n, const std::string& key,
 }
 
 struct LitologiaData { DMParams dm; EdmtParams edmt; };
+
+LithologyLayer make_lithology_layer(double z_top_m,
+                                    double z_bottom_m,
+                                    const std::string& material,
+                                    const std::string& label = "") {
+    if (z_bottom_m <= z_top_m)
+        throw std::runtime_error("lithology.layers z_bottom_m must exceed z_top_m");
+    LithologyLayer layer;
+    layer.z_top_m = z_top_m;
+    layer.z_bottom_m = z_bottom_m;
+    layer.material = material;
+    layer.label = label.empty() ? material : label;
+    return layer;
+}
+
+void append_primary_gap(std::vector<LithologyLayer>& layers,
+                        double z_top_m,
+                        double z_bottom_m,
+                        const std::string& primary) {
+    constexpr double eps = 1.0e-12;
+    if (z_bottom_m > z_top_m + eps)
+        layers.push_back(make_lithology_layer(z_top_m, z_bottom_m, primary, primary));
+}
+
+std::vector<LithologyLayer> parse_lithology_layers(const YAML::Node& litho,
+                                                   const std::string& primary,
+                                                   double layer_thickness_m) {
+    std::vector<LithologyLayer> layers;
+    if (!litho)
+        return layers;
+
+    if (litho["layers"]) {
+        for (const auto& node : litho["layers"]) {
+            const std::string material = node["material"]
+                ? node["material"].as<std::string>()
+                : primary;
+            const std::string label = node["label"]
+                ? node["label"].as<std::string>()
+                : material;
+            layers.push_back(make_lithology_layer(
+                req_double(node, "z_top_m", "lithology.layers"),
+                req_double(node, "z_bottom_m", "lithology.layers"),
+                material,
+                label));
+        }
+        std::sort(layers.begin(), layers.end(), [](const auto& a, const auto& b) {
+            return a.z_top_m < b.z_top_m;
+        });
+        return layers;
+    }
+
+    if (!litho["intercalations"])
+        return layers;
+
+    std::vector<LithologyLayer> inclusions;
+    for (const auto& node : litho["intercalations"]) {
+        const std::string material = node["material"]
+            ? node["material"].as<std::string>()
+            : primary;
+        const double thickness = req_double(node, "thickness_m", "lithology.intercalations");
+        double z_top = 0.0;
+        if (node["z_top_m"]) {
+            z_top = node["z_top_m"].as<double>();
+        } else {
+            const std::string position = node["position"]
+                ? node["position"].as<std::string>()
+                : "center";
+            if (position == "top") {
+                z_top = 0.0;
+            } else if (position == "bottom") {
+                z_top = layer_thickness_m - thickness;
+            } else {
+                z_top = 0.5 * (layer_thickness_m - thickness);
+            }
+        }
+        inclusions.push_back(make_lithology_layer(
+            z_top,
+            z_top + thickness,
+            material,
+            node["label"] ? node["label"].as<std::string>() : material));
+    }
+    std::sort(inclusions.begin(), inclusions.end(), [](const auto& a, const auto& b) {
+        return a.z_top_m < b.z_top_m;
+    });
+
+    double cursor = 0.0;
+    for (const auto& layer : inclusions) {
+        append_primary_gap(layers, cursor, layer.z_top_m, primary);
+        layers.push_back(layer);
+        cursor = std::max(cursor, layer.z_bottom_m);
+    }
+    append_primary_gap(layers, cursor, layer_thickness_m, primary);
+    return layers;
+}
 
 Wang2004Params default_wang_params_for_lithology(const std::string& lithology) {
     Wang2004Params params;
@@ -90,6 +185,10 @@ CaseData parse_case(const fs::path& yaml_path, const fs::path& data_dir_hint) {
     if (!geom) throw std::runtime_error("Missing section: geometry");
     cd.geom.Ri           = req_double(geom, "well_radius_m",      "geometry");
     cd.geom.outer_factor = req_double(geom, "outer_radius_factor", "geometry");
+    cd.geom.layer_thickness_m =
+        geom["layer_thickness_m"] ? geom["layer_thickness_m"].as<double>() : 1.0;
+    if (cd.geom.layer_thickness_m <= 0.0)
+        throw std::runtime_error("geometry.layer_thickness_m must be positive");
 
     // mesh
     auto mesh = root["mesh"];
@@ -130,17 +229,32 @@ CaseData parse_case(const fs::path& yaml_path, const fs::path& data_dir_hint) {
     // fluid pressure
     auto fluid = root["fluid"];
     if (!fluid) throw std::runtime_error("Missing section: fluid");
+    cd.fluid.mode = fluid["mode"] ? fluid["mode"].as<std::string>() : "constant";
+    cd.fluid.surface_pressure_Pa =
+        fluid["surface_pressure_Pa"] ? fluid["surface_pressure_Pa"].as<double>() : 0.0;
+    const double depth_origin =
+        cd.depths.burial_m + cd.depths.water_depth_m + cd.depths.salt_above_m;
     if (fluid["pressure_Pa"]) {
         cd.fluid_Pa = fluid["pressure_Pa"].as<double>();
+        cd.fluid.pressure_Pa = cd.fluid_Pa;
     } else {
-        double ppg    = req_double(fluid, "weight_lb_per_gal", "fluid");
-        double depth  = cd.depths.burial_m + cd.depths.water_depth_m + cd.depths.salt_above_m;
-        cd.fluid_Pa   = ppg * 119.826 * 9.80665 * depth;
+        double ppg = req_double(fluid, "weight_lb_per_gal", "fluid");
+        cd.fluid.weight_lb_per_gal = ppg;
+        cd.fluid_Pa = cd.fluid.surface_pressure_Pa + ppg * 119.826 * 9.80665 * depth_origin;
+        cd.fluid.pressure_Pa = cd.fluid_Pa;
     }
+    if (cd.fluid.mode != "constant" && cd.fluid.mode != "hydrostatic_depth_profile")
+        throw std::runtime_error("fluid.mode must be constant or hydrostatic_depth_profile");
+    if (cd.fluid.mode == "hydrostatic_depth_profile" && cd.fluid.weight_lb_per_gal <= 0.0)
+        throw std::runtime_error("fluid.mode hydrostatic_depth_profile requires fluid.weight_lb_per_gal");
 
     // stress
     auto stress = root["stress"];
     cd.k0 = (stress && stress["k0"]) ? stress["k0"].as<double>() : 1.0;
+    cd.geostatic_mode =
+        (stress && stress["geostatic_mode"]) ? stress["geostatic_mode"].as<std::string>() : "constant";
+    if (cd.geostatic_mode != "constant" && cd.geostatic_mode != "depth_profile")
+        throw std::runtime_error("stress.geostatic_mode must be constant or depth_profile");
 
     // overburden gradient — Pa/m; default typical offshore Brazil ~21 kPa/m
     cd.overburden_grad_Pa_per_m =
@@ -152,6 +266,13 @@ CaseData parse_case(const fs::path& yaml_path, const fs::path& data_dir_hint) {
     auto litho = root["lithology"];
     cd.lithology = litho ? (litho["primary"] ? litho["primary"].as<std::string>() : "halita")
                          : "halita";
+    cd.lithology_layers = parse_lithology_layers(
+        litho, cd.lithology, cd.geom.layer_thickness_m);
+    if (!cd.lithology_layers.empty()) {
+        const double z_bottom = cd.lithology_layers.back().z_bottom_m;
+        if (z_bottom > cd.geom.layer_thickness_m)
+            cd.geom.layer_thickness_m = z_bottom;
+    }
 
     // Locate data/litologias/ directory
     fs::path data_dir = data_dir_hint;

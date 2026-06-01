@@ -7,6 +7,8 @@
 namespace time_output {
 namespace {
 
+constexpr double kMetersToInches = 39.37007874015748;
+
 double inner_radius(const Mesh& mesh) {
     const auto it = std::min_element(
         mesh.nodes.begin(), mesh.nodes.end(),
@@ -37,7 +39,8 @@ double wall_displacement_magnitude_m(const Mesh& mesh, const Eigen::VectorXd& u)
 }
 
 void write_closure_header(std::ofstream& csv) {
-    csv << "t_h,closure_pct,wall_disp_m,u_wall_m\n";
+    csv << "t_h,closure_pct,wall_disp_m,u_wall_m,"
+        << "diameter_wall_m,diameter_wall_in\n";
 }
 
 void write_closure_record(std::ofstream& csv,
@@ -45,9 +48,14 @@ void write_closure_record(std::ofstream& csv,
                           const Eigen::VectorXd& u,
                           double t_h,
                           double closure_pct) {
+    const double Ri = inner_radius(mesh);
+    const double u_wall = wall_displacement_magnitude_m(mesh, u);
+    const double diameter_m = 2.0 * (Ri - u_wall);
     csv << t_h << "," << closure_pct << ","
         << u_r_at(mesh, u, 0) << ","
-        << wall_displacement_magnitude_m(mesh, u) << "\n";
+        << u_wall << ","
+        << diameter_m << ","
+        << diameter_m * kMetersToInches << "\n";
 }
 
 void write_displacement_profile_header(std::ofstream& csv) {
@@ -68,19 +76,53 @@ void write_displacement_profile_record(std::ofstream& csv,
 }
 
 void write_wall_profile_header(std::ofstream& csv) {
-    csv << "t_h,node_id,z_m,u_r_m\n";
+    csv << "t_h,node_id,z_m,u_r_m,depth_m,"
+        << "diameter_m,diameter_in,original_diameter_in\n";
 }
 
 void write_wall_profile_record(std::ofstream& csv,
                                const Mesh& mesh,
                                const Eigen::VectorXd& u,
-                               double t_h) {
+                               double t_h,
+                               double depth_origin_m,
+                               double well_radius_m) {
+    const double Ri = well_radius_m > 0.0 ? well_radius_m : inner_radius(mesh);
+    const double original_diameter_in = 2.0 * Ri * kMetersToInches;
     for (int node_id = 0; node_id < mesh.n_nodes; ++node_id) {
         if (!is_inner_wall_node(mesh, node_id))
             continue;
+        const double ur = u_r_at(mesh, u, node_id);
+        const double diameter_m = 2.0 * (Ri + ur);
         csv << t_h << "," << node_id << ","
             << mesh.nodes[node_id].z << ","
-            << u_r_at(mesh, u, node_id) << "\n";
+            << ur << ","
+            << depth_origin_m + mesh.nodes[node_id].z << ","
+            << diameter_m << ","
+            << diameter_m * kMetersToInches << ","
+            << original_diameter_in << "\n";
+    }
+}
+
+void write_wall_pressure_profile_header(std::ofstream& csv) {
+    csv << "t_h,node_id,z_m,depth_m,p_wall_Pa,T_wall_K\n";
+}
+
+void write_wall_pressure_profile_record(std::ofstream& csv,
+                                        const Mesh& mesh,
+                                        const WallPressureField& pressure,
+                                        const ThermalField& thermal,
+                                        double t_h,
+                                        double time_s,
+                                        double depth_origin_m) {
+    for (int node_id = 0; node_id < mesh.n_nodes; ++node_id) {
+        if (!is_inner_wall_node(mesh, node_id))
+            continue;
+        const Eigen::Vector2d x{mesh.nodes[node_id].r, mesh.nodes[node_id].z};
+        csv << t_h << "," << node_id << ","
+            << mesh.nodes[node_id].z << ","
+            << depth_origin_m + mesh.nodes[node_id].z << ","
+            << pressure.pressure_at(x, time_s) << ","
+            << thermal.temperature_at(x, time_s) << "\n";
     }
 }
 

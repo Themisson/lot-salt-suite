@@ -1,5 +1,6 @@
 #pragma once
 #include <filesystem>
+#include <memory>
 #include <vector>
 #include <Eigen/Sparse>
 #include <Eigen/SparseCholesky>
@@ -36,7 +37,8 @@ public:
                                std::vector<Stress> sigma_geo_gp,
                                std::vector<int> fixed_dofs = {},
                                ImplicitAdaptiveOptions options = {},
-                               PerformanceStats initial_stats = {});
+                               PerformanceStats initial_stats = {},
+                               std::shared_ptr<const WallPressureField> wall_pressure = nullptr);
 
     // Try an adaptive step with initial size dt_s. Returns the accepted size.
     double advance(double dt_s);
@@ -79,6 +81,7 @@ private:
 
     Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> ldlt_;
     Eigen::VectorXd f_external_;
+    std::shared_ptr<const WallPressureField> wall_pressure_;
     std::vector<Stress> sigma_geo_gp_;
     std::vector<int> fixed_dofs_;
     ImplicitAdaptiveOptions options_;
@@ -100,6 +103,7 @@ private:
                                double T,
                                double dt_s) const;
     void update_stresses(TimeState& state) const;
+    Eigen::VectorXd pressure_load_at(double time_s) const;
     double gauss_r(int e, int g) const;
     Eigen::Vector2d gauss_position(int e, int g) const;
     Strain thermal_strain_at(int e, int g, double time_s) const;

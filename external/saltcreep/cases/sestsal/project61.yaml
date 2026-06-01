@@ -5,7 +5,7 @@ geometry:
   outer_radius_factor: 320
 
 mesh:
-  n_radial: 8
+  n_elements_radial: 8
   ratio: 1.05
 
 depths:
@@ -13,10 +13,11 @@ depths:
   water_depth_m: 0
   salt_above_m: 0
 
-lithology: halita
+lithology:
+  primary: halita
 
 fluid:
-  weight_lb_per_gal: 5030.0
+  weight_lb_per_gal: 17.5
 
 stress:
   k0: 1.0
@@ -31,8 +32,8 @@ thermal:
   T_K: 326.15
 
 time:
-  total_s: 3600
-  dt_s: 180
+  total_h: 7.25
+  dt_h: 0.05
   scheme: explicit
 
 creep:
