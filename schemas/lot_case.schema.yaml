@@ -223,6 +223,7 @@ properties:
           model:
             type: string
             enum: [none, carter, synthetic_constant]
+          coefficient_m_sqrt_s: {type: number, minimum: 0}
       detection:
         type: object
         required: [method]

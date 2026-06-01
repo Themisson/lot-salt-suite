@@ -106,6 +106,7 @@ lot:
   leakoff:
     enabled: true
     model: synthetic_constant
+    coefficient_m_sqrt_s: 0.000001
   detection:
     method: derivative_drop
 

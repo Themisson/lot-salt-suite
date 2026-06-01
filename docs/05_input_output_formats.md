@@ -70,6 +70,7 @@ lot:
   leakoff:
     enabled: true
     model: synthetic_constant
+    coefficient_m_sqrt_s: 1.0e-6
   detection:
     method: derivative_drop
 ```
@@ -86,6 +87,55 @@ Unidades aceitas no contrato:
 O caso migrado `cases/lot_tese_migrated/buz67d_pkn.yaml` e sintaticamente
 validavel, mas campos marcados como `R09_PENDING_REVIEW` nao podem ser usados
 como baseline numerico enquanto R09 estiver aberto.
+
+## Saída moderna LOT/PKN (Fase 6.5)
+
+O comando:
+
+```bash
+lot-sim run --case cases/validation/lot_pkn_minimal.yaml --mode lot-pkn --output results/lot_pkn_minimal
+```
+
+gera dois arquivos modernos e reproduzíveis no diretório informado. A pasta
+`results/` permanece ignorada pelo git.
+
+### `timeseries.csv`
+
+```text
+time_s,injected_volume_m3,fracture_length_m,fracture_width_m,fracture_volume_m3,leakoff_volume_m3,net_pressure_Pa
+```
+
+Todas as colunas estão em SI. O CSV contém a série temporal completa calculada
+por `PknModel::simulate`.
+
+### `result.json`
+
+```json
+{
+  "metadata": {
+    "case_id": "lot_pkn_minimal_validation",
+    "mode": "lot-pkn",
+    "validation_status": "synthetic_modern_no_legacy_regression"
+  },
+  "summary": {
+    "final_time_s": 600.0,
+    "final_injected_volume_m3": 0.3,
+    "final_fracture_length_m": 0.0,
+    "final_fracture_width_m": 0.0,
+    "final_fracture_volume_m3": 0.0,
+    "final_leakoff_volume_m3": 0.0,
+    "final_net_pressure_Pa": 0.0
+  },
+  "warnings": [
+    "No numerical regression against legacy was performed.",
+    "R09 remains blocker for legacy comparison."
+  ]
+}
+```
+
+O JSON guarda apenas o resumo final; a série completa fica no CSV. O status
+`synthetic_modern_no_legacy_regression` é deliberado: esta saída não é
+validação contra legado.
 
 ## Formato de saída CSV
 

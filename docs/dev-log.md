@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.4 implementada (PknModel fisico minimo em SI)
+Fase ativa  : 6.5 implementada (execucao moderna LOT/PKN CSV/JSON)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
-Testes C++  : 30 Catch2 (30 passaram em 2026-06-01)
+Testes C++  : 36 Catch2 (36 passaram em 2026-06-01)
 Testes Py   : 0
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
@@ -29,8 +29,8 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 - [x] Criar esqueleto sintetico de `lot::PknModel` com testes Catch2
 - [x] Auditar R09 antes de regressao numerica PKN legado x moderno
 - [x] Implementar `lot::PknModel` fisico minimo em SI com series temporais sinteticas
+- [x] Conectar LOT/PKN ao CLI moderno com saida CSV/JSON sem regressao legado
 - [ ] Executar ensaio comparativo controlado R09 (`/(pi*22)` vs `/(pi*2)`) sem alterar legado
-- [ ] Conectar LOT/PKN ao CLI somente apos contrato numerico testado
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
 
@@ -44,6 +44,27 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.5 — Execucao moderna LOT/PKN CSV/JSON — Codex
+**Status:** Implementado nesta sessao.
+**Testes:** `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`, `cmake --build build -j` e `ctest --test-dir build --output-on-failure` executados; 36/36 passaram.
+**Validacao CLI:** `lot-sim validate --case` retornou `OK` para `cases/validation/lot_pkn_minimal.yaml`, `cases/validation/lot_pkn_with_leakoff.yaml` e `cases/lot_tese_migrated/buz67d_pkn.yaml`.
+**Execucao CLI:** `lot-sim run --mode lot-pkn` executou `lot_pkn_minimal.yaml` e `lot_pkn_with_leakoff.yaml`, gerando `result.json` e `timeseries.csv` em `results\lot_pkn_minimal` e `results\lot_pkn_with_leakoff`.
+**Escopo:** nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/` ou `tests/baselines/` foi alterado. `results/` permanece ignorado pelo git.
+
+**Arquivos criados/alterados:**
+- `include/lot/PknRunner.hpp`, `src/lot/PknRunner.cpp` — convertem `CaseData` em `PknInput` e executam `PknModel`.
+- `include/io/ResultWriter.hpp`, `src/io/ResultWriter.cpp` — gravam `result.json` e `timeseries.csv`.
+- `apps/lot-sim.cpp` — adiciona `run --case ... --mode lot-pkn --output ...`.
+- `tests/cpp/test_pkn_runner.cpp`, `tests/cpp/test_result_writer.cpp` — cobrem runner, writer e CLI.
+- `include/core/types.hpp`, `src/io/CaseParser.cpp`, `schemas/lot_case.schema.yaml`, `cases/validation/lot_pkn_with_leakoff.yaml` — mantem viscosidade e coeficiente de leakoff em SI no contrato moderno.
+- `docs/11_cli_usage.md`, `docs/05_input_output_formats.md`, `docs/12_validation_results.md`, `docs/17_lot_pkn_roadmap.md`, `tools/docs_status.yaml`, `docs/index.html` — documentacao/status atualizados.
+
+**R09:** permanece blocker para validacao numerica legado x moderno. Esta fase nao executou regressao contra `.dat`, `legance/LOT_Tese` ou `legance/LOT_APB_v5`.
+
+**Proxima etapa recomendada:** criar ensaio comparativo controlado de R09 ou evoluir leakoff/breakdown com fixtures modernas pequenas, mantendo legado fora do caminho de validacao.
 
 ---
 

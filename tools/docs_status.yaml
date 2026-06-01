@@ -43,7 +43,7 @@ docs:
   known_issues:           in_progress
   migration_plan:         planned
   postprocessing:         planned
-  cli_usage:              planned
+  cli_usage:              in_progress
   validation_results:     in_progress    # NUNCA mudar para validated sem execução real
   coupling:               planned
   developer_guide:        planned
@@ -60,7 +60,7 @@ docs:
 # ============================================================
 modules:
   core:           not_started
-  io:             not_started
+  io:             in_progress
   units:          not_started
   wellbore:       not_started
   fluids:         not_started
@@ -72,7 +72,7 @@ modules:
   geomechanics:   not_started
   coupling:       not_started
   validation:     not_started
-  cli:            not_started
+  cli:            in_progress
 
 # ============================================================
 # Status de validação
@@ -93,7 +93,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 30         # Catch2 — verde na ultima execucao registrada
+  cpp_tests: 36         # Catch2 — verde na ultima execucao registrada
   python_tests: 0       # pytest — verde
   regression_baselines: 4
 

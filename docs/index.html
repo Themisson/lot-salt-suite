@@ -239,7 +239,7 @@
       </article>
       <article class="status-card">
         <h3>Testes C++</h3>
-        <span class="pill pill-info">30</span>
+        <span class="pill pill-info">36</span>
         <p>Testes Catch2 registrados como verdes na última execução documentada.</p>
       </article>
       <article class="status-card">
@@ -877,6 +877,7 @@ lot:
   leakoff:
     enabled: true
     model: synthetic_constant
+    coefficient_m_sqrt_s: 1.0e-6
   detection:
     method: derivative_drop
 </code></pre>
@@ -915,6 +916,42 @@ lot:
 <p>O caso migrado <code>cases/lot_tese_migrated/buz67d_pkn.yaml</code> e sintaticamente
 validavel, mas campos marcados como <code>R09_PENDING_REVIEW</code> nao podem ser usados
 como baseline numerico enquanto R09 estiver aberto.</p>
+<h2 id="saida-moderna-lotpkn-fase-65">Saída moderna LOT/PKN (Fase 6.5)</h2>
+<p>O comando:</p>
+<pre><code class="language-bash">lot-sim run --case cases/validation/lot_pkn_minimal.yaml --mode lot-pkn --output results/lot_pkn_minimal
+</code></pre>
+<p>gera dois arquivos modernos e reproduzíveis no diretório informado. A pasta
+<code>results/</code> permanece ignorada pelo git.</p>
+<h3 id="timeseriescsv"><code>timeseries.csv</code></h3>
+<pre><code class="language-text">time_s,injected_volume_m3,fracture_length_m,fracture_width_m,fracture_volume_m3,leakoff_volume_m3,net_pressure_Pa
+</code></pre>
+<p>Todas as colunas estão em SI. O CSV contém a série temporal completa calculada
+por <code>PknModel::simulate</code>.</p>
+<h3 id="resultjson"><code>result.json</code></h3>
+<pre><code class="language-json">{
+  &quot;metadata&quot;: {
+    &quot;case_id&quot;: &quot;lot_pkn_minimal_validation&quot;,
+    &quot;mode&quot;: &quot;lot-pkn&quot;,
+    &quot;validation_status&quot;: &quot;synthetic_modern_no_legacy_regression&quot;
+  },
+  &quot;summary&quot;: {
+    &quot;final_time_s&quot;: 600.0,
+    &quot;final_injected_volume_m3&quot;: 0.3,
+    &quot;final_fracture_length_m&quot;: 0.0,
+    &quot;final_fracture_width_m&quot;: 0.0,
+    &quot;final_fracture_volume_m3&quot;: 0.0,
+    &quot;final_leakoff_volume_m3&quot;: 0.0,
+    &quot;final_net_pressure_Pa&quot;: 0.0
+  },
+  &quot;warnings&quot;: [
+    &quot;No numerical regression against legacy was performed.&quot;,
+    &quot;R09 remains blocker for legacy comparison.&quot;
+  ]
+}
+</code></pre>
+<p>O JSON guarda apenas o resumo final; a série completa fica no CSV. O status
+<code>synthetic_modern_no_legacy_regression</code> é deliberado: esta saída não é
+validação contra legado.</p>
 <h2 id="formato-de-saida-csv">Formato de saída CSV</h2>
 <p><code>time_h, annular_A_pressure_Pa, annular_B_pressure_Pa,
 lot_pressure_Pa, lot_volume_m3, salt_closure_mm, ...</code>
@@ -1960,200 +1997,72 @@ time:
 <div class="section-header"><span class="section-kicker">Documento</span><span class="pill pill-muted">Não iniciado</span></div>
 <div class="section-source">11 — Uso da CLI lot-sim</div>
 <h1 id="11-uso-da-cli-lot-sim">11 — Uso da CLI lot-sim</h1>
-<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
-<h2 id="subcomandos">Subcomandos</h2>
-<h3 id="run">run</h3>
-<p><code>ash
-lot-sim run --case &lt;arquivo.yaml&gt; --mode &lt;modo&gt; [--output &lt;dir&gt;] [--verbose]</code></p>
-<p>Modos disponíveis:</p>
-<table>
-<thead>
-<tr>
-<th>Modo</th>
-<th>Descrição</th>
-<th>Fase</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>lot</code></td>
-<td>LOT isolado</td>
-<td>5-6</td>
-</tr>
-<tr>
-<td><code>apb</code></td>
-<td>APB isolado</td>
-<td>5-6</td>
-</tr>
-<tr>
-<td><code>salt</code></td>
-<td>Sal isolado</td>
-<td>8</td>
-</tr>
-<tr>
-<td><code>lot-salt</code></td>
-<td>LOT acoplado ao sal</td>
-<td>8</td>
-</tr>
-<tr>
-<td><code>apb-salt</code></td>
-<td>APB acoplado ao sal</td>
-<td>8</td>
-</tr>
-<tr>
-<td><code>coupled</code></td>
-<td>Acoplamento completo</td>
-<td>8-10</td>
-</tr>
-</tbody>
-</table>
+<p><strong>Status:</strong> Em andamento | <strong>Última atualização:</strong> 2026-06-01</p>
+<h2 id="subcomandos-disponiveis">Subcomandos disponíveis</h2>
 <h3 id="inspect">inspect</h3>
-<p><code>ash
-lot-sim inspect --case &lt;arquivo.yaml&gt;
-lot-sim inspect --case &lt;arquivo.json&gt; --format json</code></p>
-<p>Valida o arquivo de caso contra o schema e imprime resumo.</p>
+<pre><code class="language-bash">lot-sim inspect --case &lt;arquivo.yaml&gt;
+</code></pre>
+<p>Carrega o YAML pelo <code>CaseParser</code>, aplica conversões para SI e imprime um resumo
+do caso.</p>
 <h3 id="validate">validate</h3>
-<p><code>ash
-lot-sim validate --suite regression
-lot-sim validate --case &lt;arquivo.yaml&gt; --baseline &lt;baseline.json&gt;</code></p>
-<h3 id="migrate">migrate</h3>
-<p><code>ash
-lot-sim migrate --from-json &lt;arquivo.json&gt; --to-yaml &lt;saida.yaml&gt;</code></p>
-<p>Converte JSON legado para YAML.</p>
-<h3 id="list">list</h3>
-<p><code>ash
-lot-sim list --dir cases/</code></p>
-<h2 id="exemplos">Exemplos</h2>
-<p>`ash</p>
-<h1 id="inspecionar-caso-migrado">Inspecionar caso migrado</h1>
-<p>lot-sim inspect --case cases/lot_apb_v5_migrated/score_mro_28.yaml</p>
-<h1 id="executar-apb-com-caso-migrado">Executar APB com caso migrado</h1>
-<p>lot-sim run --case cases/lot_apb_v5_migrated/score_mro_28.yaml --mode apb</p>
-<h1 id="migrar-json-legado">Migrar JSON legado</h1>
-<p>lot-sim migrate --from-json legance/LOT_APB_v5/SCORE-MRO-28_input.json \
-                --to-yaml cases/lot_apb_v5_migrated/score_mro_28.yaml</p>
-<h1 id="validar-regressao">Validar regressão</h1>
-<p>lot-sim validate --suite regression
-`
-"@</p>
-<p>System.Collections.Hashtable["12_validation_results.md"] = @"</p>
-<h1 id="12-resultados-de-validacao">12 — Resultados de Validação</h1>
-<p><strong>Status:</strong> NÃO INICIADO | <strong>Última atualização:</strong> 2026-06-01</p>
-<blockquote>
-<h2 id="aviso-critico">AVISO CRÍTICO</h2>
-<p>Este arquivo não contém nenhum resultado real de execução ainda.
-Nenhuma validação foi executada no código novo.
-Não alterar este arquivo sem rodar os testes documentados em docs/06_validation_plan.md.</p>
-</blockquote>
-<h2 id="status-da-suite-v0-v9">Status da suíte V0-V9</h2>
+<pre><code class="language-bash">lot-sim validate --case &lt;arquivo.yaml&gt;
+</code></pre>
+<p>Carrega e valida semanticamente o contrato do caso. Para <code>simulation.mode:
+lot-pkn</code>, confirma que <code>lot.model</code> e <code>lot.fracture.geometry</code> são <code>pkn</code>, que os
+tempos de injeção são positivos e que altura/pressão de breakdown existem.</p>
+<h3 id="run-lotpkn">run LOT/PKN</h3>
+<pre><code class="language-bash">lot-sim run --case cases/validation/lot_pkn_minimal.yaml \
+            --mode lot-pkn \
+            --output results/lot_pkn_minimal
+</code></pre>
+<p>Fluxo executado:</p>
+<pre><code class="language-text">YAML -&gt; CaseParser -&gt; PknInput -&gt; PknModel -&gt; PknResult -&gt; CSV/JSON
+</code></pre>
+<p>O modo <code>lot-pkn</code> é moderno e sintético/dimensional nesta fase. Ele não compara
+resultados com <code>legance/</code>, <code>.dat</code> ou outputs legados.</p>
+<p>Arquivos gerados no diretório de saída:</p>
 <table>
 <thead>
 <tr>
-<th>Nível</th>
-<th>Status</th>
-<th>Data</th>
-<th>Resultado</th>
+<th>Arquivo</th>
+<th>Conteúdo</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>V0</td>
-<td>Não executado</td>
-<td>—</td>
-<td>—</td>
+<td><code>result.json</code></td>
+<td>Metadados do caso, status <code>synthetic_modern_no_legacy_regression</code>, resumo final e avisos sobre R09.</td>
 </tr>
 <tr>
-<td>V1</td>
-<td>Não executado</td>
-<td>—</td>
-<td>—</td>
-</tr>
-<tr>
-<td>V2</td>
-<td>Não executado</td>
-<td>—</td>
-<td>—</td>
-</tr>
-<tr>
-<td>V3</td>
-<td>Não executado</td>
-<td>—</td>
-<td>—</td>
-</tr>
-<tr>
-<td>V4</td>
-<td>Não executado</td>
-<td>—</td>
-<td>—</td>
-</tr>
-<tr>
-<td>V5</td>
-<td>Não executado</td>
-<td>—</td>
-<td>—</td>
-</tr>
-<tr>
-<td>V6</td>
-<td>Não executado</td>
-<td>—</td>
-<td>—</td>
-</tr>
-<tr>
-<td>V7</td>
-<td>Não executado</td>
-<td>—</td>
-<td>—</td>
-</tr>
-<tr>
-<td>V8</td>
-<td>Não executado</td>
-<td>—</td>
-<td>—</td>
-</tr>
-<tr>
-<td>V9</td>
-<td>Não executado</td>
-<td>—</td>
-<td>—</td>
+<td><code>timeseries.csv</code></td>
+<td>Série temporal em SI de tempo, volume injetado, comprimento/abertura de fratura, volume de fratura, leakoff e pressão líquida.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="como-atualizar-este-arquivo">Como atualizar este arquivo</h2>
-<p>Somente após executar os testes:</p>
-<p>`ash</p>
-<h1 id="exemplo-executar-v0-parser">Exemplo: executar V0 (parser)</h1>
-<p>./build/lot-sim inspect --case cases/validation/lot_simple.yaml</p>
-<h1 id="se-saiu-sem-erro-v0-passou">Se saiu sem erro: V0 = PASSOU</h1>
-<h1 id="atualizar-a-linha-correspondente-neste-arquivo-com">Atualizar a linha correspondente neste arquivo com:</h1>
-<h1 id="-status-passou-falhou">- Status: PASSOU / FALHOU</h1>
-<h1 id="-data-de-execucao">- Data de execução</h1>
-<h1 id="-erro-obtido-se-v2">- Erro obtido (se V2+)</h1>
-<h1 id="-tempo-de-execucao">- Tempo de execução</h1>
-<p>`
-"@</p>
-<p>System.Collections.Hashtable["13_coupling_lot_apb_salt.md"] = @"</p>
-<h1 id="13-acoplamento-lotapbsal">13 — Acoplamento LOT–APB–Sal</h1>
-<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
-<h2 id="algoritmo-de-acoplamento-a-implementar-na-fase-8">Algoritmo de acoplamento (a implementar na Fase 8)</h2>
-<p>O módulo <code>include/coupling/</code> orquestra a sequência:</p>
-<p><code>Para cada passo de tempo dt:
-1. Atualizar campo térmico T(z, t)
-2. Calcular estado geostático atualizado σ₀(t)
-3. LOT: calcular pressão de fratura e leakoff
-4. Sal: calcular deformação viscosa da parede do poço
-5. APB: calcular pressurização do anular com novo volume
-6. Verificar convergência (δP &lt; tolP)
-7. Avançar t → t + dt</code></p>
-<h2 id="interface-de-acoplamento">Interface de acoplamento</h2>
-<p>O acoplamento entre LOT e sal ocorre via:
-- Tensão na parede do poço → <code>SaltCreepInterface::evaluate()</code>
-- Retorno: taxa de deformação → variação de volume anular
-- Variação de volume anular → correção de pressão APB</p>
-<h2 id="convencao-de-sinais-a-verificar">Convenção de sinais (a verificar)</h2>
-<blockquote>
-<p>PENDENTE — verificar com <code>/formulation-audit</code> antes de implementar.</p>
-<p>Questão crítica: tensão compressiva é positiva ou negativa na interface LOT-sal?</p>
-</blockquote>
+<p>Cabeçalho do CSV:</p>
+<pre><code class="language-text">time_s,injected_volume_m3,fracture_length_m,fracture_width_m,fracture_volume_m3,leakoff_volume_m3,net_pressure_Pa
+</code></pre>
+<h2 id="exemplos">Exemplos</h2>
+<pre><code class="language-bash"># Validar caso mínimo LOT/PKN
+lot-sim validate --case cases/validation/lot_pkn_minimal.yaml
+
+# Executar caso mínimo LOT/PKN
+lot-sim run --case cases/validation/lot_pkn_minimal.yaml \
+            --mode lot-pkn \
+            --output results/lot_pkn_minimal
+
+# Executar caso LOT/PKN com leakoff simplificado
+lot-sim run --case cases/validation/lot_pkn_with_leakoff.yaml \
+            --mode lot-pkn \
+            --output results/lot_pkn_with_leakoff
+</code></pre>
+<h2 id="fora-de-escopo-atual">Fora de escopo atual</h2>
+<ul>
+<li><code>run --mode apb</code>, <code>salt</code>, <code>lot-salt</code>, <code>apb-salt</code> e <code>coupled</code>.</li>
+<li>Regressão numérica contra legado.</li>
+<li>Uso de <code>buz67d_pkn.yaml</code> como baseline físico.</li>
+<li>Acoplamento com APB ou sal.</li>
+</ul>
 </section>
 
 <section id="results" class="doc-section">
@@ -2386,6 +2295,74 @@ determinismo e rejeicao de entradas invalidas.</p>
 contra <code>legance/LOT_APB_v5</code>. O caso <code>buz67d_pkn.yaml</code> continua sendo contrato
 sintatico/migratorio. R09 continua bloqueando validacao numerica legado x
 moderno.</p>
+<h2 id="fase-65-execucao-moderna-lotpkn-yaml-csvjson">Fase 6.5 — Execucao moderna LOT/PKN YAML -&gt; CSV/JSON</h2>
+<p><strong>Data:</strong> 2026-06-01</p>
+<p><strong>Executado nesta fase:</strong></p>
+<ul>
+<li><code>cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug</code></li>
+<li><code>cmake --build build -j</code></li>
+<li><code>ctest --test-dir build --output-on-failure</code></li>
+<li><code>.\build\lot-sim.exe validate --case cases\validation\lot_pkn_minimal.yaml</code></li>
+<li><code>.\build\lot-sim.exe validate --case cases\validation\lot_pkn_with_leakoff.yaml</code></li>
+<li><code>.\build\lot-sim.exe validate --case cases\lot_tese_migrated\buz67d_pkn.yaml</code></li>
+<li><code>.\build\lot-sim.exe run --case cases\validation\lot_pkn_minimal.yaml --mode lot-pkn --output results\lot_pkn_minimal</code></li>
+<li><code>.\build\lot-sim.exe run --case cases\validation\lot_pkn_with_leakoff.yaml --mode lot-pkn --output results\lot_pkn_with_leakoff</code></li>
+</ul>
+<p><strong>Resultado CTest:</strong> 36 testes Catch2 executados, 36 passaram.</p>
+<p><strong>Resultado CLI validate:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Caso</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cases/validation/lot_pkn_minimal.yaml</code></td>
+<td><code>OK: lot_pkn_minimal_validation</code></td>
+</tr>
+<tr>
+<td><code>cases/validation/lot_pkn_with_leakoff.yaml</code></td>
+<td><code>OK: lot_pkn_with_leakoff_validation</code></td>
+</tr>
+<tr>
+<td><code>cases/lot_tese_migrated/buz67d_pkn.yaml</code></td>
+<td><code>OK: buz67d_pkn_migrated_contract</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Resultado CLI run:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Caso</th>
+<th>Saída</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lot_pkn_minimal.yaml</code></td>
+<td><code>results\lot_pkn_minimal</code></td>
+<td><code>result.json</code> e <code>timeseries.csv</code> gerados</td>
+</tr>
+<tr>
+<td><code>lot_pkn_with_leakoff.yaml</code></td>
+<td><code>results\lot_pkn_with_leakoff</code></td>
+<td><code>result.json</code> e <code>timeseries.csv</code> gerados</td>
+</tr>
+</tbody>
+</table>
+<p>O <code>timeseries.csv</code> usa o cabeçalho:</p>
+<pre><code class="language-text">time_s,injected_volume_m3,fracture_length_m,fracture_width_m,fracture_volume_m3,leakoff_volume_m3,net_pressure_Pa
+</code></pre>
+<p>O <code>result.json</code> usa <code>validation_status:
+synthetic_modern_no_legacy_regression</code> e inclui avisos explícitos de que não
+houve regressão numérica contra legado e de que R09 permanece blocker.</p>
+<p><strong>Importante:</strong> esta fase executou o fluxo moderno <code>YAML -&gt; CaseParser -&gt;
+PknInput -&gt; PknModel -&gt; PknResult -&gt; CSV/JSON</code>. Não houve comparação com
+arquivos <code>.dat</code>, <code>legance/LOT_Tese</code> ou <code>legance/LOT_APB_v5</code>.</p>
 <h2 id="baselines-capturados">Baselines capturados</h2>
 <table>
 <thead>
@@ -2842,7 +2819,10 @@ entregar os dados ao solver.</p>
    documental e o caminho PKN ainda exige ensaio comparativo controlado.
 4.8. Fase 6.4: substituir o esqueleto sintetico por <code>PknModel</code> fisico minimo
    em SI, com serie temporal, conservacao dimensional basica e testes Catch2,
-   sem regressao contra arquivos legados enquanto R09 permanecer aberto.</li>
+   sem regressao contra arquivos legados enquanto R09 permanecer aberto.
+4.9. Fase 6.5: conectar <code>PknModel</code> ao fluxo moderno de execucao
+   <code>YAML -&gt; CaseParser -&gt; PknInput -&gt; PknModel -&gt; PknResult -&gt; CSV/JSON</code>, com
+   <code>lot-sim run --mode lot-pkn</code>, sem declarar regressao contra legado.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -2879,11 +2859,20 @@ entregar os dados ao solver.</p>
   leakoff simplificado, determinismo e rejeicao de entradas invalidas.
 - A validacao CLI dos tres YAMLs <code>lot-pkn</code> continua sendo validacao de
   contrato, nao regressao numerica contra legado.</p>
+<p><strong>Fase 6.5 (execucao moderna LOT/PKN):</strong>
+- <code>lot-sim run --case ... --mode lot-pkn --output ...</code> executa casos YAML
+  LOT/PKN modernos.
+- <code>PknRunner</code> constrói <code>PknInput</code> a partir de <code>CaseData</code> em SI, escolhendo a
+  rocha da camada que contém a sapata e calculando <code>E' = E/(1 - nu^2)</code>.
+- <code>ResultWriter</code> grava <code>result.json</code> e <code>timeseries.csv</code> com unidades SI.
+- <code>results/</code> permanece fora do versionamento; fixtures de teste são geradas em
+  diretório temporário.
+- O status de saída é <code>synthetic_modern_no_legacy_regression</code>: não há validação
+  contra legado nesta fase.</p>
 <h2 id="fora-de-escopo-ate-r09-ser-resolvido">Fora de escopo até R09 ser resolvido</h2>
 <ul>
 <li>Comparação numérica com <code>legance/LOT_Tese</code> ou <code>legance/LOT_APB_v5</code>.</li>
 <li>Uso de <code>buz67d_pkn.yaml</code> como referência de resultado.</li>
-<li>Conexão do subcomando <code>run</code> ao <code>PknModel</code>.</li>
 <li>Acoplamento com sal ou APB.</li>
 </ul>
 <h2 id="proxima-fase-recomendada">Proxima fase recomendada</h2>
@@ -2891,10 +2880,10 @@ entregar os dados ao solver.</p>
 <ol>
 <li>Ensaio comparativo controlado das variantes de conversao (<code>/(pi*22)</code> versus
    <code>/(pi*2)</code>) em ferramenta externa ao legado congelado.</li>
-<li>Conectar <code>PknModel</code> ao subcomando <code>run</code> com saida CSV/JSON moderna e
-   documentar que <code>validate</code> segue restrito a schema/contrato.</li>
 <li>Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
    parsing com solver.</li>
+<li>Adicionar fixtures pequenas de golden output moderno, se necessário, sem
+   usar <code>.dat</code> legado como baseline.</li>
 </ol>
 <h2 id="riscos-tecnicos-a-resolver-antes-da-implementacao">Riscos tecnicos a resolver antes da implementacao</h2>
 <ul>

@@ -63,8 +63,10 @@ endif()
 
 set(LSS_CORE_SOURCES
   src/io/CaseParser.cpp
+  src/io/ResultWriter.cpp
   src/lot/BreakdownDetector.cpp
   src/lot/PknModel.cpp
+  src/lot/PknRunner.cpp
 )
 
 # ============================================================
@@ -91,6 +93,8 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_case_parser.cpp
     tests/cpp/test_breakdown_detector.cpp
     tests/cpp/test_pkn_model_synthetic.cpp
+    tests/cpp/test_pkn_runner.cpp
+    tests/cpp/test_result_writer.cpp
     ${LSS_CORE_SOURCES}
   )
   target_include_directories(lot_sim_tests PRIVATE
@@ -98,6 +102,9 @@ if(LSS_BUILD_TESTS)
     ${EIGEN_INCLUDE_DIR}
   )
   target_link_libraries(lot_sim_tests PRIVATE Catch2::Catch2WithMain yaml-cpp)
+  if(TARGET lot-sim)
+    add_dependencies(lot_sim_tests lot-sim)
+  endif()
   catch_discover_tests(lot_sim_tests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
 

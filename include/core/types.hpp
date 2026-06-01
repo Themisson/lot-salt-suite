@@ -86,6 +86,7 @@ struct LotConfig {
   std::string model;
   std::string fracture_geometry;
   double fracture_fluid_viscosity_cP = 0.0;
+  double fracture_fluid_viscosity_Pa_s = 0.0;
   double injection_rate_m3_s = 0.0;
   double injection_total_time_s = 0.0;
   double injection_dt_s = 0.0;
@@ -96,6 +97,7 @@ struct LotConfig {
   double breakdown_pressure_Pa = 0.0;
   bool leakoff_enabled = false;
   std::string leakoff_model;
+  double leakoff_coefficient_m_sqrt_s = 0.0;
   std::string detection_method;
 };
 

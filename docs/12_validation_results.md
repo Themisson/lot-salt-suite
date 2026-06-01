@@ -128,6 +128,52 @@ contra `legance/LOT_APB_v5`. O caso `buz67d_pkn.yaml` continua sendo contrato
 sintatico/migratorio. R09 continua bloqueando validacao numerica legado x
 moderno.
 
+## Fase 6.5 — Execucao moderna LOT/PKN YAML -> CSV/JSON
+
+**Data:** 2026-06-01
+
+**Executado nesta fase:**
+
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build -j`
+- `ctest --test-dir build --output-on-failure`
+- `.\build\lot-sim.exe validate --case cases\validation\lot_pkn_minimal.yaml`
+- `.\build\lot-sim.exe validate --case cases\validation\lot_pkn_with_leakoff.yaml`
+- `.\build\lot-sim.exe validate --case cases\lot_tese_migrated\buz67d_pkn.yaml`
+- `.\build\lot-sim.exe run --case cases\validation\lot_pkn_minimal.yaml --mode lot-pkn --output results\lot_pkn_minimal`
+- `.\build\lot-sim.exe run --case cases\validation\lot_pkn_with_leakoff.yaml --mode lot-pkn --output results\lot_pkn_with_leakoff`
+
+**Resultado CTest:** 36 testes Catch2 executados, 36 passaram.
+
+**Resultado CLI validate:**
+
+| Caso | Resultado |
+|------|-----------|
+| `cases/validation/lot_pkn_minimal.yaml` | `OK: lot_pkn_minimal_validation` |
+| `cases/validation/lot_pkn_with_leakoff.yaml` | `OK: lot_pkn_with_leakoff_validation` |
+| `cases/lot_tese_migrated/buz67d_pkn.yaml` | `OK: buz67d_pkn_migrated_contract` |
+
+**Resultado CLI run:**
+
+| Caso | Saída | Resultado |
+|------|-------|-----------|
+| `lot_pkn_minimal.yaml` | `results\lot_pkn_minimal` | `result.json` e `timeseries.csv` gerados |
+| `lot_pkn_with_leakoff.yaml` | `results\lot_pkn_with_leakoff` | `result.json` e `timeseries.csv` gerados |
+
+O `timeseries.csv` usa o cabeçalho:
+
+```text
+time_s,injected_volume_m3,fracture_length_m,fracture_width_m,fracture_volume_m3,leakoff_volume_m3,net_pressure_Pa
+```
+
+O `result.json` usa `validation_status:
+synthetic_modern_no_legacy_regression` e inclui avisos explícitos de que não
+houve regressão numérica contra legado e de que R09 permanece blocker.
+
+**Importante:** esta fase executou o fluxo moderno `YAML -> CaseParser ->
+PknInput -> PknModel -> PknResult -> CSV/JSON`. Não houve comparação com
+arquivos `.dat`, `legance/LOT_Tese` ou `legance/LOT_APB_v5`.
+
 ## Baselines capturados
 
 | Baseline | Arquivo | Status | Data |

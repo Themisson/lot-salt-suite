@@ -264,6 +264,8 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
     data.lot.fracture_fluid_viscosity_cP =
         require_as<double>(fracture["fluid_viscosity_cP"],
                            "lot.fracture.fluid_viscosity_cP");
+    data.lot.fracture_fluid_viscosity_Pa_s =
+        units::cP_to_Pa_s(data.lot.fracture_fluid_viscosity_cP);
   }
   if (fracture["height"]) {
     data.lot.fracture_height_m =
@@ -296,6 +298,11 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
     const YAML::Node leakoff = lot["leakoff"];
     data.lot.leakoff_enabled = require_as<bool>(leakoff["enabled"], "lot.leakoff.enabled");
     data.lot.leakoff_model = optional_string(leakoff, "model", "none");
+    if (leakoff["coefficient_m_sqrt_s"]) {
+      data.lot.leakoff_coefficient_m_sqrt_s =
+          require_as<double>(leakoff["coefficient_m_sqrt_s"],
+                             "lot.leakoff.coefficient_m_sqrt_s");
+    }
   }
   if (lot["detection"]) {
     data.lot.detection_method =
@@ -339,6 +346,12 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
     }
     if (data.lot.fracture_height_m <= 0.0 || data.lot.breakdown_pressure_Pa <= 0.0) {
       throw std::runtime_error("Validacao falhou: LOT/PKN exige altura e pressao de breakdown > 0");
+    }
+    if (data.lot.fracture_fluid_viscosity_Pa_s <= 0.0) {
+      throw std::runtime_error("Validacao falhou: LOT/PKN exige viscosidade de fratura > 0");
+    }
+    if (data.lot.leakoff_coefficient_m_sqrt_s < 0.0) {
+      throw std::runtime_error("Validacao falhou: LOT/PKN exige coeficiente de leakoff >= 0");
     }
   }
   validate_nonempty(!data.casings.empty(), "casings");

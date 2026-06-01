@@ -221,6 +221,7 @@ TEST_CASE("Minimal LOT PKN contract loads and converts schedule to SI") {
   CHECK(data.lot.injection_total_time_s == Catch::Approx(600.0));
   CHECK(data.lot.injection_dt_s == Catch::Approx(30.0));
   CHECK(data.lot.fracture_height_m == Catch::Approx(20.0));
+  CHECK(data.lot.fracture_fluid_viscosity_Pa_s == Catch::Approx(0.003));
   CHECK(data.lot.breakdown_pressure_Pa == Catch::Approx(45000000.0));
   CHECK(data.lot.detection_method == "derivative_drop");
 }
@@ -230,6 +231,7 @@ TEST_CASE("LOT PKN leakoff case preserves SI and leakoff flags") {
 
   CHECK(data.lot.leakoff_enabled);
   CHECK(data.lot.leakoff_model == "synthetic_constant");
+  CHECK(data.lot.leakoff_coefficient_m_sqrt_s == Catch::Approx(0.000001));
   CHECK(data.lot.injection_rate_m3_s == Catch::Approx(0.25 * 0.158987294928 / 60.0));
   CHECK(data.lot.injection_accommodation_time_s == Catch::Approx(120.0));
   CHECK(data.lot.breakdown_pressure_Pa == Catch::Approx(52000000.0));

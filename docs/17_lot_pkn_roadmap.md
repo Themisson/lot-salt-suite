@@ -62,6 +62,9 @@ entregar os dados ao solver.
 4.8. Fase 6.4: substituir o esqueleto sintetico por `PknModel` fisico minimo
    em SI, com serie temporal, conservacao dimensional basica e testes Catch2,
    sem regressao contra arquivos legados enquanto R09 permanecer aberto.
+4.9. Fase 6.5: conectar `PknModel` ao fluxo moderno de execucao
+   `YAML -> CaseParser -> PknInput -> PknModel -> PknResult -> CSV/JSON`, com
+   `lot-sim run --mode lot-pkn`, sem declarar regressao contra legado.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -103,11 +106,21 @@ entregar os dados ao solver.
 - A validacao CLI dos tres YAMLs `lot-pkn` continua sendo validacao de
   contrato, nao regressao numerica contra legado.
 
+**Fase 6.5 (execucao moderna LOT/PKN):**
+- `lot-sim run --case ... --mode lot-pkn --output ...` executa casos YAML
+  LOT/PKN modernos.
+- `PknRunner` constrói `PknInput` a partir de `CaseData` em SI, escolhendo a
+  rocha da camada que contém a sapata e calculando `E' = E/(1 - nu^2)`.
+- `ResultWriter` grava `result.json` e `timeseries.csv` com unidades SI.
+- `results/` permanece fora do versionamento; fixtures de teste são geradas em
+  diretório temporário.
+- O status de saída é `synthetic_modern_no_legacy_regression`: não há validação
+  contra legado nesta fase.
+
 ## Fora de escopo até R09 ser resolvido
 
 - Comparação numérica com `legance/LOT_Tese` ou `legance/LOT_APB_v5`.
 - Uso de `buz67d_pkn.yaml` como referência de resultado.
-- Conexão do subcomando `run` ao `PknModel`.
 - Acoplamento com sal ou APB.
 
 ## Proxima fase recomendada
@@ -116,10 +129,10 @@ Enquanto R09 permanecer aberto, seguir um destes caminhos:
 
 1. Ensaio comparativo controlado das variantes de conversao (`/(pi*22)` versus
    `/(pi*2)`) em ferramenta externa ao legado congelado.
-2. Conectar `PknModel` ao subcomando `run` com saida CSV/JSON moderna e
-   documentar que `validate` segue restrito a schema/contrato.
-3. Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
+2. Evoluir o leakoff para uma lei calibravel e conectar breakdown sem misturar
    parsing com solver.
+3. Adicionar fixtures pequenas de golden output moderno, se necessário, sem
+   usar `.dat` legado como baseline.
 
 ## Riscos tecnicos a resolver antes da implementacao
 
