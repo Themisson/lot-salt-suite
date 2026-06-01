@@ -43,6 +43,15 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 
 ---
 
+### [2026-06-01 14:45] `89d03e0` — Themisson
+**Commit:** `docs: clarify dt unit coupling with creep rate`
+**Testes C++:** 2 arquivos | **Testes Python:** 0 arquivos
+**Último resultado ctest:** All tests passed (2 assertions in 1 test case)
+**Arquivos alterados:**
+- `docs/08_known_issues.md`
+
+---
+
 ### [2026-06-01] Ajuste R08 — Codex + orientação do usuário
 **Status:** Documentação ajustada nesta sessão.
 **Testes:** não executados (mudança somente documental)
