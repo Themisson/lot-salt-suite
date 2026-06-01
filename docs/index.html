@@ -1398,8 +1398,38 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 <td>Alto</td>
 <td><strong>CONFIRMADO</strong> — <code>dt</code> deve ser coerente com a taxa de deformação; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]</td>
 </tr>
+<tr>
+<td>R09</td>
+<td>Expressão suspeita <code>/ M_PI / 22</code> na conversão de vazão PKN</td>
+<td>Alto</td>
+<td><strong>BLOCKER para validação numérica</strong> — ver abaixo</td>
+</tr>
 </tbody>
 </table>
+<h2 id="r09-expressao-suspeita-m_pi-22-na-conversao-de-vazao-pkn">R09 — Expressão suspeita <code>/ M_PI / 22</code> na conversão de vazão PKN</h2>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> BLOCKER para validação numérica PKN</p>
+<p><strong>Localização:</strong> <code>legance/LOT_Tese/src/apb_code/</code> — função de conversão de vazão
+(<code>bb/min → m³/h</code> ou equivalente), auditada em Fase 6.0.</p>
+<p><strong>Evidência:</strong> A função de conversão de vazão para PKN contém <code>/ M_PI / 22</code>.
+O divisor <code>22</code> parece erro de digitação: fisicamente, a conversão de barris por minuto
+para m³/s usa fatores tabelados sem <code>M_PI / 22</code> — o fator geométrico de PKN é separado.
+A hipótese mais provável é que deveria ser <code>/ M_PI / 2</code> (metade da circunferência ou
+fator de fratura bilateral).</p>
+<p><strong>Impacto:</strong>
+- Se <code>/ M_PI / 22</code> estiver incorreto, o volume de leakoff PKN estará errado por fator ≈ 11×.
+- Qualquer comparação numérica com o legado que use essa função como referência pode
+  estar errada no próprio legado.</p>
+<p><strong>Condição para desbloquear:</strong>
+1. Auditar a função de conversão no legado (<code>legance/LOT_Tese/src/apb_code/APB1da.cpp</code>
+   ou <code>Fluids.cpp</code>) e registrar o valor exato e o contexto.
+2. Verificar se os resultados <code>.dat</code> em <code>legance/LOT_Tese/Teste/</code> são consistentes
+   com a fórmula como está (possível que o legado seja auto-consistente mesmo com o
+   fator aparentemente errado).
+3. Documentar a escolha para o modelo moderno <strong>antes</strong> de usar o legado como baseline
+   numérico PKN.</p>
+<p><strong>Não bloqueia:</strong> implementação de tipos de entrada, estrutura do <code>PknModel</code> e testes
+unitários com entradas sintéticas. <strong>Bloqueia:</strong> comparação com baseline legado PKN.</p>
+<hr />
 <h2 id="itens-pendentes-apos-auditoria">Itens pendentes após auditoria</h2>
 <ul>
 <li>[x] Convenção de sinais → FA03 (compressão positiva)</li>
@@ -1407,6 +1437,7 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 <li>[x] Unidade de e0: [1/min] internamente → FA01</li>
 <li>[x] Mecanismo de acoplamento sal→APB → FA04</li>
 <li>[x] <strong>R08:</strong> <code>dt</code> deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]</li>
+<li>[ ] <strong>R09:</strong> Auditar <code>/ M_PI / 22</code> antes de usar baseline PKN legado</li>
 <li>[ ] Confirmar convenção de sinal de <code>u_wall</code> (positivo = inward ou outward?)
       — arquivo: <code>legance/LOT_APB_v5/include/apb/apb_salt_1d.h</code></li>
 <li>[ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)</li>
@@ -2373,9 +2404,14 @@ entregar os dados ao solver.</p>
 <li>Congelar a interpretacao tecnica do PKN legado em <code>docs/audits/pkn_legacy_path.md</code>.</li>
 <li>Criar tipos de entrada LOT em <code>include/lot/</code>, separados de parsing.</li>
 <li>Implementar <code>PknModel</code> com entradas SI e sem acesso direto a YAML/JSON.</li>
-<li>Implementar <code>BreakdownDetector</code> seguindo FA01-FA04 e os riscos registrados.</li>
+<li>Implementar <code>BreakdownDetector</code> seguindo FA01-FA04 e os riscos registrados.
+4.5. Criar <code>cases/lot_tese_migrated/buz67d_pkn.yaml</code> com os parâmetros
+   extraídos de <code>legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp</code> e validar
+   contra <code>schemas/lot_case.schema.yaml</code> antes de conectar ao CLI.
+   Este caso é a ponte entre o contrato numérico e o pipeline YAML→CLI.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
-<li>Conectar ao CLI apenas depois que o contrato numerico estiver testado.</li>
+<li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
+   caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
 <li>Comparar com arquivos legados somente quando o pipeline moderno produzir
    series equivalentes e documentar em <code>docs/12_validation_results.md</code>.</li>
 </ol>

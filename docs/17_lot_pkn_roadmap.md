@@ -49,8 +49,13 @@ entregar os dados ao solver.
 2. Criar tipos de entrada LOT em `include/lot/`, separados de parsing.
 3. Implementar `PknModel` com entradas SI e sem acesso direto a YAML/JSON.
 4. Implementar `BreakdownDetector` seguindo FA01-FA04 e os riscos registrados.
+4.5. Criar `cases/lot_tese_migrated/buz67d_pkn.yaml` com os parâmetros
+   extraídos de `legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp` e validar
+   contra `schemas/lot_case.schema.yaml` antes de conectar ao CLI.
+   Este caso é a ponte entre o contrato numérico e o pipeline YAML→CLI.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
-6. Conectar ao CLI apenas depois que o contrato numerico estiver testado.
+6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
+   caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
 7. Comparar com arquivos legados somente quando o pipeline moderno produzir
    series equivalentes e documentar em `docs/12_validation_results.md`.
 

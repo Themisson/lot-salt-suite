@@ -218,6 +218,39 @@ Arquivos auditados:
 | R06 | Temperatura: °C × K no SESTSAL | Crítico | **CONFIRMADO** — SESTSAL usa °C (FA02) |
 | R07 | Acoplamento sal-APB sequencial fraco | Médio | **CONFIRMADO** — staggered, uma iteração de sal/passo (FA04) |
 | R08 | Unidade de `dt` em modelos de fluência | Alto | **CONFIRMADO** — `dt` deve ser coerente com a taxa de deformação; no wrapper APB/SESTSAL do LOT_APB_v5 é [h] |
+| R09 | Expressão suspeita `/ M_PI / 22` na conversão de vazão PKN | Alto | **BLOCKER para validação numérica** — ver abaixo |
+
+## R09 — Expressão suspeita `/ M_PI / 22` na conversão de vazão PKN
+
+**Severidade:** Alta | **Status:** BLOCKER para validação numérica PKN
+
+**Localização:** `legance/LOT_Tese/src/apb_code/` — função de conversão de vazão
+(`bb/min → m³/h` ou equivalente), auditada em Fase 6.0.
+
+**Evidência:** A função de conversão de vazão para PKN contém `/ M_PI / 22`.
+O divisor `22` parece erro de digitação: fisicamente, a conversão de barris por minuto
+para m³/s usa fatores tabelados sem `M_PI / 22` — o fator geométrico de PKN é separado.
+A hipótese mais provável é que deveria ser `/ M_PI / 2` (metade da circunferência ou
+fator de fratura bilateral).
+
+**Impacto:**
+- Se `/ M_PI / 22` estiver incorreto, o volume de leakoff PKN estará errado por fator ≈ 11×.
+- Qualquer comparação numérica com o legado que use essa função como referência pode
+  estar errada no próprio legado.
+
+**Condição para desbloquear:**
+1. Auditar a função de conversão no legado (`legance/LOT_Tese/src/apb_code/APB1da.cpp`
+   ou `Fluids.cpp`) e registrar o valor exato e o contexto.
+2. Verificar se os resultados `.dat` em `legance/LOT_Tese/Teste/` são consistentes
+   com a fórmula como está (possível que o legado seja auto-consistente mesmo com o
+   fator aparentemente errado).
+3. Documentar a escolha para o modelo moderno **antes** de usar o legado como baseline
+   numérico PKN.
+
+**Não bloqueia:** implementação de tipos de entrada, estrutura do `PknModel` e testes
+unitários com entradas sintéticas. **Bloqueia:** comparação com baseline legado PKN.
+
+---
 
 ## Itens pendentes após auditoria
 
@@ -226,6 +259,7 @@ Arquivos auditados:
 - [x] Unidade de e0: [1/min] internamente → FA01
 - [x] Mecanismo de acoplamento sal→APB → FA04
 - [x] **R08:** `dt` deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]
+- [ ] **R09:** Auditar `/ M_PI / 22` antes de usar baseline PKN legado
 - [ ] Confirmar convenção de sinal de `u_wall` (positivo = inward ou outward?)
       — arquivo: `legance/LOT_APB_v5/include/apb/apb_salt_1d.h`
 - [ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)
