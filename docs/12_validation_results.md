@@ -1,18 +1,43 @@
 # 12 — Resultados de Validação
 
-**Status:** NÃO INICIADO | **Última atualização:** 2026-06-01
+**Status:** BASELINES CAPTURADOS | **Última atualização:** 2026-06-01
 
 ---
 
-> ## AVISO CRÍTICO
+> ## AVISO
 >
-> **Este arquivo não contém nenhum resultado real de execução.**
+> Nenhuma validação foi executada no **código novo** do `lot-salt-suite`.
+> Os baselines abaixo são saídas do **legado LOT_APB_v5** compilado e executado
+> em 2026-06-01 com g++ 16.1.0 + flags `-w -fpermissive`.
 >
-> Nenhuma validação foi executada no código novo do `lot-salt-suite`.
-> Nenhum baseline foi capturado dos legados ainda.
->
-> **Não alterar** este arquivo sem executar os testes descritos em
-> `docs/06_validation_plan.md` e registrar os outputs reais aqui.
+> Compilação: `cmake -G "MinGW Makefiles" -DCMAKE_CXX_FLAGS="-w -fpermissive"`
+
+---
+
+## Baselines LOT_APB_v5 capturados (2026-06-01)
+
+| Baseline | Arquivo | Tamanho | Execução | Status |
+|---------|---------|---------|---------|--------|
+| SCORE-MRO-28 completo (output) | `apbv5_SCORE-MRO-28_output.json` | 47 KB | 0.3 s | **Capturado** |
+| SCORE-MRO-28 original (output) | `apbv5_SCORE-MRO-28_original_output.json` | 27 KB | pré-existente | **Capturado** |
+| SCORE-MRO-28 Ev_temp (output) | `apbv5_SCORE-MRO-28_Ev_temp_output.json` | 47 KB | pré-existente | **Capturado** |
+| MRO-28 reduzido (input ref) | `apbv5_MRO-28_min_times_input.json` | 189 KB | ref de entrada | **Capturado** |
+
+> Arquivos de entrada completos (57 MB) e output detalhado (29 MB) mantidos
+> apenas localmente — excluídos do git por `.gitignore`.
+
+## Nota de compilação do legado
+
+```
+Compilador : g++ 16.1.0 (MSYS2/UCRT64)
+Flags      : -w -fpermissive (necessário por incompatibilidade Eigen antigo × GCC 16)
+Eigen      : versão bundled dentro de legance/LOT_APB_v5/include/Eigen/
+Data       : 2026-06-01
+Executável : legance/LOT_APB_v5/bin/apb.exe
+```
+
+**Risco registrado:** o uso de `-fpermissive` pode ocultar divergências de comportamento
+em relação ao compilador original. Documentado em `docs/08_known_issues.md`.
 
 ---
 

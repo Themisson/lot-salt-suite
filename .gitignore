@@ -14,11 +14,15 @@ results/
 *.hdf5
 *.xdmf
 
-# --- Baselines (gerenciar separadamente ou com Git LFS) ---
-# Descomente se quiser versionar baselines pequenos:
-# !tests/baselines/*.json
+# --- Baselines (pesados — manter apenas localmente) ---
+# Inputs completos (57MB cada) — não versionar
+tests/baselines/*_input.json
+# Output detalhado (29MB) — não versionar
+tests/baselines/*_detailed_output.json
+# Resultados VTU/CSV — não versionar
 tests/baselines/*.csv
 tests/baselines/*.vtu
+# Manter: outputs de referência pequenos (<100KB) são versionados normalmente
 
 # --- Build artifacts ---
 build/
