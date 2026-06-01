@@ -1,0 +1,96 @@
+cmake_minimum_required(VERSION 3.20)
+project(lot_salt_suite CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# ============================================================
+# Opções de build
+# ============================================================
+option(LSS_BUILD_TESTS "Build unit tests" ON)
+option(LSS_BUILD_APPS  "Build lot-sim executable" ON)
+option(LSS_ENABLE_OPENMP "Enable OpenMP parallelism" OFF)
+
+# ============================================================
+# Dependências externas via FetchContent
+# ============================================================
+include(FetchContent)
+
+# yaml-cpp
+FetchContent_Declare(
+  yaml-cpp
+  GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+  GIT_TAG        0.8.0
+)
+set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(yaml-cpp)
+
+# Catch2 v3 (apenas se testes habilitados)
+if(LSS_BUILD_TESTS)
+  FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.5.2
+  )
+  FetchContent_MakeAvailable(Catch2)
+  include(CTest)
+  include(Catch)
+endif()
+
+# ============================================================
+# Eigen (vendorizado do saltcreep — evitar duplicação)
+# ============================================================
+# Eigen está em external/saltcreep/include/Eigen/
+# Uso como header-only sem target separado.
+set(EIGEN_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/external/saltcreep/include")
+
+# ============================================================
+# OpenMP (opcional)
+# ============================================================
+if(LSS_ENABLE_OPENMP)
+  find_package(OpenMP)
+endif()
+
+# ============================================================
+# Sources dos módulos (a preencher na Fase 7)
+# ============================================================
+# TODO Fase 5: adicionar src/io/CaseParser.cpp
+# TODO Fase 5: adicionar src/units/units.cpp
+# TODO Fase 5: adicionar src/cli/cli.cpp
+# TODO Fase 7: adicionar src/wellbore/*.cpp, src/fluids/*.cpp, etc.
+
+set(LSS_CORE_SOURCES
+  # src/io/CaseParser.cpp
+  # src/units/units.cpp
+  # src/cli/cli.cpp
+)
+
+# ============================================================
+# Executável principal (Fase 5+)
+# ============================================================
+if(LSS_BUILD_APPS AND LSS_CORE_SOURCES)
+  add_executable(lot-sim apps/lot-sim.cpp ${LSS_CORE_SOURCES})
+  target_include_directories(lot-sim PRIVATE
+    include
+    ${EIGEN_INCLUDE_DIR}
+  )
+  target_link_libraries(lot-sim PRIVATE yaml-cpp)
+  if(LSS_ENABLE_OPENMP AND OpenMP_CXX_FOUND)
+    target_link_libraries(lot-sim PRIVATE OpenMP::OpenMP_CXX)
+  endif()
+endif()
+
+# ============================================================
+# Testes (Fase 5+)
+# ============================================================
+if(LSS_BUILD_TESTS)
+  # TODO Fase 5: adicionar test targets quando src existir
+  # add_executable(lot_sim_tests tests/cpp/test_case_parser.cpp ...)
+  # target_link_libraries(lot_sim_tests PRIVATE Catch2::Catch2WithMain yaml-cpp)
+  # catch_discover_tests(lot_sim_tests)
+endif()
+
+message(STATUS "lot-salt-suite configured. C++20, yaml-cpp, Eigen from saltcreep.")
+message(STATUS "Modules will be populated from Fase 5 onwards.")

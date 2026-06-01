@@ -1,0 +1,91 @@
+# ============================================================
+# lot-salt-suite — .gitignore
+# ============================================================
+
+# --- Resultados de simulação (pesados, reproduzíveis pelo caso YAML) ---
+results/
+*.vtu
+*.pvd
+*.h5
+*.hdf5
+*.xdmf
+
+# --- Baselines (gerenciar separadamente ou com Git LFS) ---
+# Descomente se quiser versionar baselines pequenos:
+# !tests/baselines/*.json
+tests/baselines/*.csv
+tests/baselines/*.vtu
+
+# --- Build artifacts ---
+build/
+Build/
+cmake-build-*/
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.exe
+*.out
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+install_manifest.txt
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg
+*.egg-info/
+dist/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+*.cover
+
+# --- Credenciais e segredos ---
+.env
+.env.*
+*.key
+*.pem
+*.p12
+secrets.yaml
+secrets.json
+.claude/settings.local.json
+
+# --- IDEs ---
+.vscode/settings.json
+.vscode/*.code-workspace
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Documentação gerada (exceto index.html que é commitado) ---
+docs/_build/
+docs/__pycache__/
+
+# --- Temporários ---
+*.tmp
+*.bak
+*.orig
+tmp/
+temp/

@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lotsaltpost"
+version = "0.1.0"
+description = "Post-processing package for lot-salt-suite (LOT, APB, Salt Creep)"
+readme = "postprocess/README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Themisson", email = "themisson@gmail.com" }]
+
+dependencies = [
+    "numpy>=1.24",
+    "matplotlib>=3.7",
+    "scipy>=1.10",
+    "pyyaml>=6.0",
+    "pandas>=2.0",
+    "jinja2>=3.1",
+    "markdown>=3.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.0",
+    "ruff>=0.1",
+    "mypy>=1.4",
+]
+vtk = [
+    "pyvista>=0.43",
+]
+report = [
+    "weasyprint>=60.0",
+]
+
+[project.scripts]
+lotsaltpost = "lotsaltpost.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["postprocess/lotsaltpost"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+addopts = "-v"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
