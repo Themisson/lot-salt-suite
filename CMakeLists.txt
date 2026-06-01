@@ -26,6 +26,9 @@ FetchContent_Declare(
 set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(yaml-cpp)
+if(TARGET yaml-cpp)
+  target_compile_options(yaml-cpp PRIVATE $<$<CXX_COMPILER_ID:GNU>:-include cstdint>)
+endif()
 
 # Catch2 v3 (apenas se testes habilitados)
 if(LSS_BUILD_TESTS)
@@ -54,17 +57,12 @@ if(LSS_ENABLE_OPENMP)
 endif()
 
 # ============================================================
-# Sources dos módulos (a preencher na Fase 7)
+# Sources dos módulos
 # ============================================================
-# TODO Fase 5: adicionar src/io/CaseParser.cpp
-# TODO Fase 5: adicionar src/units/units.cpp
-# TODO Fase 5: adicionar src/cli/cli.cpp
 # TODO Fase 7: adicionar src/wellbore/*.cpp, src/fluids/*.cpp, etc.
 
 set(LSS_CORE_SOURCES
-  # src/io/CaseParser.cpp
-  # src/units/units.cpp
-  # src/cli/cli.cpp
+  src/io/CaseParser.cpp
 )
 
 # ============================================================
@@ -86,10 +84,17 @@ endif()
 # Testes (Fase 5+)
 # ============================================================
 if(LSS_BUILD_TESTS)
-  # TODO Fase 5: adicionar test targets quando src existir
-  # add_executable(lot_sim_tests tests/cpp/test_case_parser.cpp ...)
-  # target_link_libraries(lot_sim_tests PRIVATE Catch2::Catch2WithMain yaml-cpp)
-  # catch_discover_tests(lot_sim_tests)
+  add_executable(lot_sim_tests
+    tests/cpp/test_units.cpp
+    tests/cpp/test_case_parser.cpp
+    ${LSS_CORE_SOURCES}
+  )
+  target_include_directories(lot_sim_tests PRIVATE
+    include
+    ${EIGEN_INCLUDE_DIR}
+  )
+  target_link_libraries(lot_sim_tests PRIVATE Catch2::Catch2WithMain yaml-cpp)
+  catch_discover_tests(lot_sim_tests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
 
 message(STATUS "lot-salt-suite configured. C++20, yaml-cpp, Eigen from saltcreep.")

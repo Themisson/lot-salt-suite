@@ -1,0 +1,207 @@
+# Schema principal de casos lot-salt-suite.
+# Formato: JSON Schema escrito em YAML para validar arquivos de caso.
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: lot-salt-suite case
+type: object
+required:
+  - metadata
+  - units
+  - wellbore
+  - casings
+  - cements
+  - annulars
+  - fluids
+  - temperature
+  - layers
+  - rocks
+  - lot
+  - apb
+  - time
+  - output
+additionalProperties: false
+properties:
+  metadata:
+    type: object
+    required: [name, version, mode]
+    additionalProperties: false
+    properties:
+      name: {type: string}
+      version: {type: string}
+      mode:
+        type: string
+        enum: [lot, apb, salt, lot-salt, apb-salt, coupled]
+      legacy_source: {type: string}
+  units:
+    type: object
+    required: [length, pressure, temperature, density, viscosity]
+    additionalProperties: false
+    properties:
+      length: {type: string, enum: [m, ft]}
+      pressure: {type: string, enum: [Pa, bar, psi]}
+      temperature: {type: string, enum: [degC, K]}
+      density: {type: string, enum: [kg_m3, ppg]}
+      viscosity: {type: string, enum: [Pa_s, cP]}
+  wellbore:
+    type: object
+    required: [airgap_m, water_depth_m, total_depth_m, shoe_depth_m]
+    additionalProperties: false
+    properties:
+      airgap_m: {type: number}
+      water_depth_m: {type: number}
+      total_depth_m: {type: number}
+      shoe_depth_m: {type: number}
+  casings:
+    type: array
+    items:
+      type: object
+      required: [id, top_m, base_m, di_in, de_in, E_Pa, nu]
+      additionalProperties: false
+      properties:
+        id: {type: string}
+        top_m: {type: number}
+        base_m: {type: number}
+        di_in: {type: number}
+        de_in: {type: number}
+        E_Pa: {type: number}
+        nu: {type: number}
+        weight_lbf_per_ft: {type: number}
+  cements:
+    type: array
+    items:
+      type: object
+      required: [id, top_m, base_m, di_in, de_in, E_Pa, nu]
+      additionalProperties: false
+      properties:
+        id: {type: string}
+        top_m: {type: number}
+        base_m: {type: number}
+        di_in: {type: number}
+        de_in: {type: number}
+        E_Pa: {type: number}
+        nu: {type: number}
+  annulars:
+    type: array
+    items:
+      type: object
+      required: [id, fluid, top_m, base_m]
+      additionalProperties: false
+      properties:
+        id: {type: string}
+        fluid: {type: string}
+        top_m: {type: number}
+        base_m: {type: number}
+  fluids:
+    type: array
+    items:
+      type: object
+      required: [id, density_ppg, compressibility_per_Pa, mode]
+      additionalProperties: false
+      properties:
+        id: {type: string}
+        density_ppg: {type: number}
+        viscosity_Pa_s: {type: number}
+        viscosity_cP: {type: number}
+        compressibility_per_Pa: {type: number}
+        mode:
+          type: string
+          enum: [constant, hydrostatic_depth_profile]
+        weight_lb_per_gal: {type: number}
+        surface_pressure_Pa: {type: number}
+      anyOf:
+        - required: [viscosity_Pa_s]
+        - required: [viscosity_cP]
+  temperature:
+    type: object
+    required: [mode, data]
+    additionalProperties: false
+    properties:
+      mode: {type: string, enum: [profile]}
+      data:
+        type: array
+        items:
+          type: object
+          required: [depth_m, temp_C]
+          additionalProperties: false
+          properties:
+            depth_m: {type: number}
+            temp_C: {type: number}
+  layers:
+    type: array
+    items:
+      type: object
+      required: [id, top_m, base_m, rock]
+      additionalProperties: false
+      properties:
+        id: {type: string}
+        top_m: {type: number}
+        base_m: {type: number}
+        rock: {type: string}
+  rocks:
+    type: array
+    items:
+      type: object
+      required: [id, model, E_Pa, nu, density_kg_m3]
+      additionalProperties: false
+      properties:
+        id: {type: string}
+        model: {type: string, enum: [elastic_isotropic, double_mechanism]}
+        E_Pa: {type: number}
+        nu: {type: number}
+        density_kg_m3: {type: number}
+        e0_per_h: {type: number}   # FA01: parser converte [1/h] para [1/min].
+        sig0_Pa: {type: number}
+        T0_degC: {type: number}    # FA02: SESTSAL usa degC; parser tambem calcula K.
+        n1: {type: number}
+        n2: {type: number}
+  lot:
+    type: object
+    required: [enabled, shoe_depth_m, fracture]
+    additionalProperties: false
+    properties:
+      enabled: {type: boolean}
+      shoe_depth_m: {type: number}
+      fracture:
+        type: object
+        required: [geometry, fluid_viscosity_cP]
+        additionalProperties: false
+        properties:
+          geometry:
+            type: string
+            enum: [circular, elliptical, penny_shaped, pkn]
+          fluid_viscosity_cP: {type: number}
+  apb:
+    type: object
+    required: [enabled, top_packer_m, leakage_enabled, venting_enabled]
+    additionalProperties: false
+    properties:
+      enabled: {type: boolean}
+      top_packer_m: {type: number}
+      leakage_enabled: {type: boolean}
+      venting_enabled: {type: boolean}
+  time:
+    type: object
+    required: [total_h, dt_h, scheme, solver]
+    additionalProperties: false
+    properties:
+      total_h: {type: number}
+      dt_h: {type: number}
+      scheme: {type: string, enum: [explicit, implicit_adaptive]}
+      solver:
+        type: object
+        required: [tol_pressure_bar, tol_eq, stabilization_h]
+        additionalProperties: false
+        properties:
+          tol_pressure_bar: {type: number}
+          tol_eq: {type: number}
+          stabilization_h: {type: number}
+  output:
+    type: object
+    required: [directory, every_n_steps, fields, format]
+    additionalProperties: false
+    properties:
+      directory: {type: string}
+      every_n_steps: {type: integer}
+      fields:
+        type: array
+        items: {type: string, enum: [pressure, displacement, stress, temperature]}
+      format: {type: string, enum: [csv, json]}

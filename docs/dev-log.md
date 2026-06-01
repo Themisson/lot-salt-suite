@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 4 concluída → iniciando Fase 5 (CLI + CaseParser)
+Fase ativa  : 5 em andamento (units + schema + CaseParser + CLI inspect)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
-Testes C++  : 0 (módulos ainda não implementados)
+Testes C++  : 12 Catch2 (12 passaram em 2026-06-01)
 Testes Py   : 0
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
@@ -22,11 +22,11 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ### Próximas tarefas (Fase 5)
 
 - [ ] R08 pendente: verificar unidade de `dt` em `legance/LOT_APB_v5/src/apb/apb_salt_1d.cpp`
-- [ ] `schemas/lot_case.schema.yaml`
-- [ ] `include/units/units.hpp` (conversões PPG→kg/m³, pol→m, etc.)
-- [ ] `include/core/types.hpp` (CaseData struct)
-- [ ] `include/io/CaseParser.hpp` + `src/io/CaseParser.cpp`
-- [ ] `apps/lot-sim.cpp` com subcomando `inspect`
+- [x] `schemas/lot_case.schema.yaml`
+- [x] `include/units/units.hpp` (conversões PPG→kg/m³, pol→m, etc.)
+- [x] `include/core/types.hpp` (CaseData struct)
+- [x] `include/io/CaseParser.hpp` + `src/io/CaseParser.cpp`
+- [x] `apps/lot-sim.cpp` com subcomando `inspect`
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
 
@@ -40,6 +40,27 @@ Saltcreep   : sincronizado — WallPressureField + cases/apb/ adicionados
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 5-A..5-D — Codex
+**Status:** Implementado nesta sessão.
+**Testes C++:** 12 Catch2 | **Resultado ctest:** 12 passaram
+**Validação YAML:** `cases/validation/lot_minimal.yaml` e `cases/validation/lot_double_mechanism_reference.yaml` válidos contra `schemas/lot_case.schema.yaml`
+
+**Arquivos adicionados/alterados:**
+- `include/units/units.hpp` — conversões header-only C++20, incluindo PPG, pol, psi, bar, cP, temperatura, torque e gradiente hidrostático
+- `include/core/types.hpp` — structs de `CaseData` e subestruturas com FA01/FA02 documentadas nos campos
+- `include/io/CaseParser.hpp` + `src/io/CaseParser.cpp` — parser YAML com conversões para SI e validações mínimas
+- `schemas/lot_case.schema.yaml` — schema principal comentado, incluindo `hydrostatic_depth_profile`
+- `cases/validation/lot_minimal.yaml` — caso mínimo LOT sem sal, validável
+- `cases/validation/lot_double_mechanism_reference.yaml` — caso pequeno para testar FA01/FA02
+- `apps/lot-sim.cpp` — subcomando `inspect --case`
+- `tests/cpp/test_units.cpp` + `tests/cpp/test_case_parser.cpp` — cobertura inicial Catch2
+- `CMakeLists.txt` — targets `lot-sim` e `lot_sim_tests`; workaround local para `yaml-cpp` com GCC 16
+
+**Execução manual:**
+`lot-sim inspect --case cases/validation/lot_minimal.yaml` imprime resumo do caso sem erro.
 
 ---
 
