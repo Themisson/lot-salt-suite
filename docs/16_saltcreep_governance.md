@@ -33,17 +33,24 @@ o nucleo numerico de fluencia, dano e campos de pressao aplicados a parede.
 
 `include/Eigen/` e o Eigen oficial do `lot-salt-suite` e deve ser exposto aos
 targets modernos pelo target CMake `lss::eigen`. A copia em
-`external/saltcreep/include/Eigen/` deve permanecer preservada para o saltcreep.
-Nenhum target deve receber simultaneamente `include/` e
-`external/saltcreep/include/` apenas para resolver Eigen.
+`external/saltcreep/include/Eigen/` permanece preservada como fallback.
 
-A Fase 6.10 confirmou que o `saltcreep` compila, testa e executa casos auditados
-com a copia vendorizada preservada. Um build experimental com `include/Eigen` no
-include path tambem passou, mas o gerador Visual Studio manteve
-`external/saltcreep/include` antes de `include/`, entao a migracao real para o
-Eigen oficial deve continuar atras de uma opcao CMake explicita futura. Ver
-`docs/audits/saltcreep_eigen_compatibility_audit.md` e
-`docs/20_saltcreep_eigen_migration_plan.md`.
+Desde a Fase 6.11, o `external/saltcreep/CMakeLists.txt` auto-detecta o contexto
+`lot-salt-suite` e ativa `include/Eigen` por padrao quando o saltcreep e buildado
+dentro da arvore do projeto. O mecanismo usa um diretorio proxy no build dir
+contendo apenas `Eigen/` (copiado de `include/Eigen/`), adicionado com
+`BEFORE PRIVATE` para garantir precedencia de include mesmo no gerador Visual
+Studio. Essa abordagem foi validada com 126/126 testes Catch2 e resultado APB
+identico ao baseline (`closure=0.300817%`).
+
+Nenhum target deve receber simultaneamente `include/` e
+`external/saltcreep/include/` como fontes ativas de Eigen; o proxy resolve apenas
+`Eigen/` e os includes relativos do saltcreep (`"io/CaseParser.hpp"` etc.)
+continuam resolvendo para `external/saltcreep/include/`.
+
+Ver `docs/audits/saltcreep_eigen_compatibility_audit.md`,
+`docs/20_saltcreep_eigen_migration_plan.md` e
+`docs/21_saltcreep_eigen_migration_result.md`.
 
 O adapter esperado e:
 
@@ -92,8 +99,13 @@ a compatibilidade Eigen. Nenhum arquivo do saltcreep foi alterado e as duas
 copias de Eigen foram preservadas.
 
 Na Fase 6.10B, `external/saltcreep/CMakeLists.txt` foi alterado com escopo
-explicito para adicionar a opcao `LSS_SALTCREEP_FORCE_LSS_EIGEN` e o arquivo
-de teste diagnostico `tests/test_eigen_source.cpp` foi criado. Nenhum modelo
-fisico, caso, resultado ou copia Eigen foi alterado. A prova de include order
-foi registrada em `docs/audits/saltcreep_eigen_compatibility_audit.md` e a
-decisao de migracao foi atualizada em `docs/20_saltcreep_eigen_migration_plan.md`.
+explicito para adicionar a opcao `LSS_SALTCREEP_FORCE_LSS_EIGEN` (default `OFF`)
+e o arquivo de teste diagnostico `tests/test_eigen_source.cpp` foi criado.
+Tres provas objetivas confirmaram que o build forcado usou `include/Eigen`.
+Decisao: `PROVEN_SAFE_TO_MIGRATE`.
+
+Na Fase 6.11, o default foi migrado de `OFF` para auto-deteccao: dentro da arvore
+`lot-salt-suite`, o CMake detecta automaticamente `include/Eigen` e ativa o modo
+integrado sem flags manuais. O build standalone fora do projeto usa Eigen interno
+(`internal fallback`). Resultado: 126/126 Catch2, `closure=0.300817%` no APB,
+47/47 no lot-salt-suite. Decisao: `MIGRATION_COMPLETED`.

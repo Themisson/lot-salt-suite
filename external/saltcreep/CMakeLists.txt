@@ -7,13 +7,26 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(ENABLE_SANITIZERS "Build saltcreep targets with available sanitizer flags" OFF)
 option(ENABLE_WERROR "Treat compiler warnings as errors for saltcreep targets" OFF)
 
-# ── LSS Eigen override ─────────────────────────────────────────────────────────
-# When ON, forces saltcreep targets to resolve <Eigen/...> from the
-# lot-salt-suite root include/ directory (BEFORE PRIVATE the vendored copy).
-# The vendored copy in include/Eigen/ is preserved; only include search order
-# changes. Default OFF preserves the validated baseline behaviour.
+# ── LSS Eigen integration (Fase 6.11) ─────────────────────────────────────────
+# Auto-detect whether saltcreep is being built within the lot-salt-suite tree
+# by checking for include/Eigen at the expected relative path (../../include).
+# When auto-detected (default ON within lot-salt-suite), saltcreep targets
+# resolve <Eigen/...> from a proxy dir containing only that copy, keeping
+# include search order correct for saltcreep's own relative headers.
+# The vendored copy in external/saltcreep/include/Eigen/ is always preserved.
+# Set -DLSS_SALTCREEP_FORCE_LSS_EIGEN=OFF explicitly for standalone builds
+# outside the lot-salt-suite tree, or to use the vendored copy as fallback.
+get_filename_component(_LSS_AUTO_DETECT_INCLUDE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../include" ABSOLUTE)
+if(EXISTS "${_LSS_AUTO_DETECT_INCLUDE}/Eigen")
+    set(_LSS_EIGEN_AUTO_DEFAULT ON)
+else()
+    set(_LSS_EIGEN_AUTO_DEFAULT OFF)
+endif()
+
 option(LSS_SALTCREEP_FORCE_LSS_EIGEN
-    "Force saltcreep to use lot-salt-suite root include/Eigen (BEFORE PRIVATE)" OFF)
+    "Use lot-salt-suite root include/Eigen instead of vendored copy (auto ON within lot-salt-suite)"
+    ${_LSS_EIGEN_AUTO_DEFAULT})
 
 if(LSS_SALTCREEP_FORCE_LSS_EIGEN)
     if(NOT DEFINED LSS_ROOT_INCLUDE_DIR)
@@ -23,7 +36,8 @@ if(LSS_SALTCREEP_FORCE_LSS_EIGEN)
     if(NOT EXISTS "${LSS_ROOT_INCLUDE_DIR}/Eigen")
         message(FATAL_ERROR
             "LSS_SALTCREEP_FORCE_LSS_EIGEN=ON but Eigen not found at "
-            "${LSS_ROOT_INCLUDE_DIR}/Eigen")
+            "${LSS_ROOT_INCLUDE_DIR}/Eigen. "
+            "Pass -DLSS_SALTCREEP_FORCE_LSS_EIGEN=OFF for standalone builds.")
     endif()
     # Create a proxy directory in the binary dir that contains ONLY Eigen/.
     # This prevents saltcreep's relative includes (e.g. "io/CaseParser.hpp")
@@ -39,7 +53,7 @@ if(LSS_SALTCREEP_FORCE_LSS_EIGEN)
         " (proxy at ${LSS_EIGEN_PROXY_DIR}/Eigen)")
     set(LSS_SALTCREEP_EIGEN_MODE_VALUE "lss")
 else()
-    message(STATUS "Saltcreep Eigen mode: internal (external/saltcreep/include/Eigen)")
+    message(STATUS "Saltcreep Eigen mode: internal fallback (external/saltcreep/include/Eigen)")
     set(LSS_SALTCREEP_EIGEN_MODE_VALUE "internal")
 endif()
 

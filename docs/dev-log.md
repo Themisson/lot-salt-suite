@@ -9,15 +9,15 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.10B concluida (prova forcada Eigen oficial no saltcreep)
+Fase ativa  : 6.11 concluida (migracao controlada Eigen oficial no saltcreep)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
 Testes C++  : 47 Catch2 lot-salt-suite (47 passaram em 2026-06-01)
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
-Saltcreep   : 126/126 testes Catch2 baseline e 126/126 build forcado LSS Eigen
-Eigen decisao: PROVEN_SAFE_TO_MIGRATE
+Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
+Eigen decisao: MIGRATION_COMPLETED
 ```
 
 ### Próximas tarefas (Fase 6)
@@ -37,6 +37,7 @@ Eigen decisao: PROVEN_SAFE_TO_MIGRATE
 - [x] Implementar `LeakoffModel` C++ estruturado com testes Catch2
 - [x] Auditar compatibilidade Eigen do saltcreep sem remover copias Eigen
 - [x] Provar forcadamente que saltcreep compila/testa com `include/Eigen` (Fase 6.10B)
+- [x] Migrar `include/Eigen` como modo integrado oficial do saltcreep com auto-deteccao (Fase 6.11)
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
 
@@ -50,6 +51,47 @@ Eigen decisao: PROVEN_SAFE_TO_MIGRATE
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.11 — Migracao controlada Eigen oficial no saltcreep — Claude Code
+**Status:** Concluido nesta sessao.
+**Decisao:** `MIGRATION_COMPLETED`
+
+**Objetivo:** Tornar `include/Eigen` o Eigen ativo do saltcreep por padrao no contexto do
+`lot-salt-suite`, sem flags manuais, preservando `external/saltcreep/include/Eigen` como fallback.
+
+**Mudanca implementada:**
+- `external/saltcreep/CMakeLists.txt` agora auto-detecta o contexto `lot-salt-suite` verificando
+  se `../../include/Eigen` existe. Se sim, `LSS_SALTCREEP_FORCE_LSS_EIGEN` default = `ON`.
+- Fora da arvore do projeto (standalone), o default e `OFF` (Eigen interno — sem quebra).
+- Mensagem de fallback atualizada: `Saltcreep Eigen mode: internal fallback`.
+
+**Tres provas objetivas (build migrado sem flag manual):**
+1. CMake configure: `Saltcreep Eigen mode: lot-salt-suite include/Eigen (proxy at ...)`
+2. `tests_unit.vcxproj` `AdditionalIncludeDirectories`: `lss_eigen_proxy` PRIMEIRO
+3. Macro runtime `test_eigen_source`: `LSS_SALTCREEP_EIGEN_MODE = lss`
+
+**Testes/builds executados:**
+- Build migrado (auto-detect ON, sem flag): 126/126 Catch2 passaram
+- Caso APB `mud_gradient_1d_8p5ppg.yaml`: `closure=0.300817%` (identico ao baseline)
+- lot-salt-suite: 47/47 Catch2, validates OK (3 casos), run lot-pkn OK
+
+**Escopo alterado:**
+- `external/saltcreep/CMakeLists.txt` — auto-deteccao de contexto, default ON dentro de lot-salt-suite
+- `docs/20_saltcreep_eigen_migration_plan.md` — decisao `MIGRATION_COMPLETED`, opcao D
+- `docs/16_saltcreep_governance.md` — politica Eigen atualizada
+- `docs/13_coupling_lot_apb_salt.md` — nota de dependencia Eigen atualizada
+- `docs/17_lot_pkn_roadmap.md` — Fase 6.11 registrada
+- `docs/21_saltcreep_eigen_migration_result.md` — criado com resultado completo
+- `docs/dev-log.md`, `tools/docs_status.yaml`
+
+**Nao alterado:**
+- `external/saltcreep/include/Eigen/` — preservado
+- `include/Eigen/` — preservado
+- `legance/`, `legacy/`, `tests/baselines/` — preservados
+- Modelos fisicos, casos e resultados do saltcreep — preservados
+- `PknModel`, `LeakoffModel`, `PknRunner`, `ResultWriter`, `CaseParser` — sem alteracao
 
 ---
 

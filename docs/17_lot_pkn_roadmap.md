@@ -182,6 +182,13 @@ entregar os dados ao solver.
   experimental; o build experimental ainda resolveu Eigen pela copia
   vendorizada devido a precedencia de include do CMake atual.
 
+**Fase 6.11 (migracao controlada Eigen oficial):**
+- `external/saltcreep/CMakeLists.txt` recebeu auto-deteccao de contexto `lot-salt-suite`.
+- Quando `../../include/Eigen` existe, `LSS_SALTCREEP_FORCE_LSS_EIGEN` default = `ON` automaticamente.
+- Build standalone fora da arvore usa Eigen interno sem quebra (fallback preservado).
+- Prova migrada: 126/126 testes Catch2, `closure=0.300817%` no APB, `LSS_SALTCREEP_EIGEN_MODE = lss`.
+- Decisao: `MIGRATION_COMPLETED`. Proximo passo: `SaltCreepInterface` / `SaltCreepSaltcreepAdapter`.
+
 **Fase 6.10B (prova forcada do Eigen oficial):**
 - `external/saltcreep/CMakeLists.txt` recebeu a opcao `LSS_SALTCREEP_FORCE_LSS_EIGEN`.
 - Mecanismo: diretorio proxy no build dir com apenas `Eigen/` + `BEFORE PRIVATE`

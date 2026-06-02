@@ -124,6 +124,9 @@ sal. O fluxo esperado e:
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que
 aponta para `include/Eigen/`. O acoplamento com `external/saltcreep/` deve ser
 feito por adapter e contrato de dados, sem misturar include paths apenas para
-resolver headers Eigen. A auditoria de Fase 6.10 recomenda manter a migracao do
-`saltcreep` para `include/Eigen` como opcao experimental futura, nao como
-pre-condicao para LOT/APB/sal.
+resolver headers Eigen.
+
+A Fase 6.11 completou a migracao Eigen do saltcreep (`MIGRATION_COMPLETED`):
+`external/saltcreep/CMakeLists.txt` agora auto-detecta o contexto `lot-salt-suite`
+e usa `include/Eigen` por padrao. A duplicacao de Eigen (via proxy no build dir)
+e aceitavel ate o adapter `SaltCreepSaltcreepAdapter` estabilizar.
