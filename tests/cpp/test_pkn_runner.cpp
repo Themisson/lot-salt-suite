@@ -40,10 +40,26 @@ std::string quote(const std::filesystem::path& path) {
 }
 
 std::filesystem::path lot_sim_executable() {
-#ifdef _WIN32
-  return std::filesystem::current_path() / "build" / "lot-sim.exe";
+#ifdef LSS_LOT_SIM_EXECUTABLE
+  // Set by CMake via $<TARGET_FILE:lot-sim>; resolves correctly for both
+  // single-config (Ninja/Make) and multi-config (Visual Studio) generators.
+  return std::filesystem::path(LSS_LOT_SIM_EXECUTABLE);
 #else
-  return std::filesystem::current_path() / "build" / "lot-sim";
+  // Fallback: probe multi-config subdirs then single-config root.
+  const auto base = std::filesystem::current_path() / "build";
+  for (const char* cfg : {"Debug", "Release", "RelWithDebInfo", "MinSizeRel"}) {
+#ifdef _WIN32
+    auto p = base / cfg / "lot-sim.exe";
+#else
+    auto p = base / cfg / "lot-sim";
+#endif
+    if (std::filesystem::exists(p)) return p;
+  }
+#ifdef _WIN32
+  return base / "lot-sim.exe";
+#else
+  return base / "lot-sim";
+#endif
 #endif
 }
 

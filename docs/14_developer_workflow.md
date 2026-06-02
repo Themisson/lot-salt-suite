@@ -65,6 +65,65 @@ automático sem fase dedicada ou caminho obrigatório para rodar LOT/APB/sal.
 3. `pytest tests/python -q` — 100% verde
 4. Revisar `docs/08_known_issues.md` — nenhum risco novo sem documentação
 
+## Windows / Visual Studio / CMake 4 — notas de compatibilidade
+
+### CMake 4 e yaml-cpp
+
+CMake 4 removeu a compatibilidade com `cmake_minimum_required(VERSION < 3.5)`. O `CMakeLists.txt`
+define `CMAKE_POLICY_VERSION_MINIMUM 3.5` antes de `FetchContent_MakeAvailable(yaml-cpp)`,
+o que elimina a necessidade de passar a flag manualmente.
+
+Após a correção, o configure funciona diretamente:
+
+```powershell
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+```
+
+### Visual Studio — gerador multi-config
+
+O Visual Studio é um gerador multi-config: o executável fica em subdiretório por configuração.
+
+```
+build\Debug\lot-sim.exe
+build\Release\lot-sim.exe
+```
+
+O build e os testes devem sempre especificar `--config Debug` (ou Release):
+
+```powershell
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build --config Debug -j
+ctest --test-dir build -C Debug --output-on-failure
+```
+
+Os testes C++ de CLI localizam `lot-sim.exe` automaticamente via macro
+`LSS_LOT_SIM_EXECUTABLE` injetada pelo CMake com `$<TARGET_FILE:lot-sim>`,
+que resolve o caminho correto para qualquer gerador (single-config ou multi-config).
+
+### Windows Defender Application Control (WDAC) / Device Guard
+
+Em máquinas com WDAC em modo **enforcement** (`UsermodeCodeIntegrityPolicyEnforcementStatus = 2`),
+binários não assinados compilados localmente podem ser bloqueados pelo kernel. Isso afeta
+os testes de CLI que invocam `lot-sim.exe` como subprocesso.
+
+**Sintoma:** `lot-sim.exe` bloqueado com mensagem "foi bloqueado pela política do Device Guard".
+
+**Verificação:**
+
+```powershell
+Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root/Microsoft/Windows/DeviceGuard |
+  Select-Object UsermodeCodeIntegrityPolicyEnforcementStatus
+# 2 = enforcement (bloqueia), 1 = audit (só loga), 0 = desabilitado
+```
+
+**Workaround para desenvolvimento:**
+- Desabilitar Smart App Control: Windows Security → App & browser control → Smart App Control → Off
+- Ou assinar os binários com um certificado de desenvolvedor
+- Ou colocar a política WDAC em modo audit durante o desenvolvimento
+
+**Impacto nos testes:** apenas os 2 testes de CLI (`CLI run succeeds for…`) são afetados;
+os 45 demais testes passam normalmente, pois executam a lógica internamente sem spawnar subprocesso.
+
 ## Skills disponíveis
 
 | Skill | Quando usar |

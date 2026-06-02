@@ -2690,6 +2690,43 @@ automático sem fase dedicada ou caminho obrigatório para rodar LOT/APB/sal.</p
 <li><code>pytest tests/python -q</code> — 100% verde</li>
 <li>Revisar <code>docs/08_known_issues.md</code> — nenhum risco novo sem documentação</li>
 </ol>
+<h2 id="windows-visual-studio-cmake-4-notas-de-compatibilidade">Windows / Visual Studio / CMake 4 — notas de compatibilidade</h2>
+<h3 id="cmake-4-e-yaml-cpp">CMake 4 e yaml-cpp</h3>
+<p>CMake 4 removeu a compatibilidade com <code>cmake_minimum_required(VERSION &lt; 3.5)</code>. O <code>CMakeLists.txt</code>
+define <code>CMAKE_POLICY_VERSION_MINIMUM 3.5</code> antes de <code>FetchContent_MakeAvailable(yaml-cpp)</code>,
+o que elimina a necessidade de passar a flag manualmente.</p>
+<p>Após a correção, o configure funciona diretamente:</p>
+<pre><code class="language-powershell">cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+</code></pre>
+<h3 id="visual-studio-gerador-multi-config">Visual Studio — gerador multi-config</h3>
+<p>O Visual Studio é um gerador multi-config: o executável fica em subdiretório por configuração.</p>
+<pre><code>build\Debug\lot-sim.exe
+build\Release\lot-sim.exe
+</code></pre>
+<p>O build e os testes devem sempre especificar <code>--config Debug</code> (ou Release):</p>
+<pre><code class="language-powershell">cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build --config Debug -j
+ctest --test-dir build -C Debug --output-on-failure
+</code></pre>
+<p>Os testes C++ de CLI localizam <code>lot-sim.exe</code> automaticamente via macro
+<code>LSS_LOT_SIM_EXECUTABLE</code> injetada pelo CMake com <code>$&lt;TARGET_FILE:lot-sim&gt;</code>,
+que resolve o caminho correto para qualquer gerador (single-config ou multi-config).</p>
+<h3 id="windows-defender-application-control-wdac-device-guard">Windows Defender Application Control (WDAC) / Device Guard</h3>
+<p>Em máquinas com WDAC em modo <strong>enforcement</strong> (<code>UsermodeCodeIntegrityPolicyEnforcementStatus = 2</code>),
+binários não assinados compilados localmente podem ser bloqueados pelo kernel. Isso afeta
+os testes de CLI que invocam <code>lot-sim.exe</code> como subprocesso.</p>
+<p><strong>Sintoma:</strong> <code>lot-sim.exe</code> bloqueado com mensagem "foi bloqueado pela política do Device Guard".</p>
+<p><strong>Verificação:</strong></p>
+<pre><code class="language-powershell">Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root/Microsoft/Windows/DeviceGuard |
+  Select-Object UsermodeCodeIntegrityPolicyEnforcementStatus
+# 2 = enforcement (bloqueia), 1 = audit (só loga), 0 = desabilitado
+</code></pre>
+<p><strong>Workaround para desenvolvimento:</strong>
+- Desabilitar Smart App Control: Windows Security → App &amp; browser control → Smart App Control → Off
+- Ou assinar os binários com um certificado de desenvolvedor
+- Ou colocar a política WDAC em modo audit durante o desenvolvimento</p>
+<p><strong>Impacto nos testes:</strong> apenas os 2 testes de CLI (<code>CLI run succeeds for…</code>) são afetados;
+os 45 demais testes passam normalmente, pois executam a lógica internamente sem spawnar subprocesso.</p>
 <h2 id="skills-disponiveis">Skills disponíveis</h2>
 <table>
 <thead>
@@ -4108,7 +4145,7 @@ provado.</p>
 
   </div>
 </main>
-<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-01 por <span class="mono">generate_docs_index.py</span></footer>
+<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-02 por <span class="mono">generate_docs_index.py</span></footer>
 <script>
   const sidebar = document.getElementById('sidebar');
   const menuBtn = document.getElementById('menuBtn');

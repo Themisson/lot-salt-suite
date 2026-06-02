@@ -9,15 +9,18 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.11 concluida (migracao controlada Eigen oficial no saltcreep)
+Fase ativa  : 6.12 concluida (compatibilidade Windows Visual Studio / CMake 4)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
-Último push : 2026-06-01
-Testes C++  : 47 Catch2 lot-salt-suite (47 passaram em 2026-06-01)
+Último push : 2026-06-02
+Testes C++  : 45/47 Catch2 lot-salt-suite passaram em 2026-06-02
+              (2 CLI tests bloqueados por WDAC enforcement nesta maquina — ver nota abaixo)
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
 Eigen decisao: MIGRATION_COMPLETED
+CMake 4     : SUPORTADO (CMAKE_POLICY_VERSION_MINIMUM 3.5, sem flag manual)
+VS generator: SUPORTADO (LSS_LOT_SIM_EXECUTABLE via $<TARGET_FILE:lot-sim>)
 ```
 
 ### Próximas tarefas (Fase 6)
@@ -51,6 +54,55 @@ Eigen decisao: MIGRATION_COMPLETED
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-02] Fase 6.12 — Compatibilidade Windows Visual Studio / CMake 4 — Claude Code
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Corrigir dois problemas ao buildar em nova maquina Windows com VS2026 e CMake 4.3:
+1. yaml-cpp via FetchContent falhava com CMake 4 (`Compatibility with CMake < 3.5 has been removed`)
+2. Testes CLI em `test_pkn_runner.cpp` procuravam `build/lot-sim.exe` mas VS usa `build/Debug/lot-sim.exe`
+
+**Mudancas implementadas:**
+
+**1. CMakeLists.txt — compatibilidade CMake 4:**
+- Adicionado `set(CMAKE_POLICY_VERSION_MINIMUM 3.5 ...)` antes de `FetchContent_MakeAvailable(yaml-cpp)`.
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug` agora funciona sem flag manual em CMake 4.
+
+**2. CMakeLists.txt — path do executavel via generator expression:**
+- `target_compile_definitions(lot_sim_tests PRIVATE LSS_LOT_SIM_EXECUTABLE="$<TARGET_FILE:lot-sim>")` no target `lot_sim_tests`.
+- Resolve para caminho absoluto correto em qualquer gerador (single-config e multi-config).
+
+**3. CMakeLists.txt — catch_discover_tests em modo PRE_TEST:**
+- `DISCOVERY_MODE PRE_TEST` evita erro `unknown error` no post-build step do MSBuild.
+- Descuberta de testes adiada para o momento em que `ctest` e invocado.
+
+**4. tests/cpp/test_pkn_runner.cpp — funcao lot_sim_executable() robusta:**
+- Usa `LSS_LOT_SIM_EXECUTABLE` (definido pelo CMake via generator expression).
+- Fallback: probe Debug/Release/RelWithDebInfo/MinSizeRel e raiz `build/`.
+
+**Resultados:**
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`: OK sem flag manual
+- `cmake --build build --config Debug -j`: OK, `build\Debug\lot-sim.exe` e `build\Debug\lot_sim_tests.exe`
+- `ctest --test-dir build -C Debug --output-on-failure`: **45/47 passaram**
+- 2 testes CLI falharam exclusivamente por WDAC enforcement mode nesta maquina
+  (`UsermodeCodeIntegrityPolicyEnforcementStatus = 2`). O path para `lot-sim.exe` esta correto;
+  o kernel bloqueia CreateProcess para binarios nao assinados.
+  Workaround: desabilitar Smart App Control ou assinar os binarios.
+  Ver `docs/14_developer_workflow.md` — secao "Windows / Visual Studio / CMake 4".
+
+**Escopo alterado:**
+- `CMakeLists.txt` — tres patches: CMAKE_POLICY_VERSION_MINIMUM, LSS_LOT_SIM_EXECUTABLE, DISCOVERY_MODE PRE_TEST
+- `tests/cpp/test_pkn_runner.cpp` — lot_sim_executable() robusto com fallback multi-config
+- `docs/14_developer_workflow.md` — secao "Windows / Visual Studio / CMake 4 notes"
+- `docs/dev-log.md`
+
+**Nao alterado:**
+- `legance/`, `legacy/`, `external/saltcreep/` — preservados
+- `include/Eigen/` — preservado
+- Modelos fisicos, PknModel, LeakoffModel, PknRunner, CaseParser, ResultWriter — sem alteracao
+- Baselines — preservados
 
 ---
 

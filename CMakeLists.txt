@@ -17,6 +17,12 @@ option(LSS_ENABLE_OPENMP "Enable OpenMP parallelism" OFF)
 # ============================================================
 include(FetchContent)
 
+# CMake 4 compatibility: yaml-cpp calls cmake_minimum_required with a version
+# below the CMake 4 threshold. CMAKE_POLICY_VERSION_MINIMUM raises the floor so
+# configure succeeds without a manual -DCMAKE_POLICY_VERSION_MINIMUM flag.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING
+    "Minimum CMake policy version for legacy FetchContent dependencies" FORCE)
+
 # yaml-cpp
 FetchContent_Declare(
   yaml-cpp
@@ -108,9 +114,20 @@ if(LSS_BUILD_TESTS)
   )
   target_link_libraries(lot_sim_tests PRIVATE Catch2::Catch2WithMain yaml-cpp lss::eigen)
   if(TARGET lot-sim)
+    # Pass the absolute executable path via generator expression so CLI tests
+    # locate lot-sim.exe correctly for both single-config and multi-config
+    # (Visual Studio) generators without hard-coding the Debug/Release subdir.
+    target_compile_definitions(lot_sim_tests PRIVATE
+      LSS_LOT_SIM_EXECUTABLE="$<TARGET_FILE:lot-sim>"
+    )
     add_dependencies(lot_sim_tests lot-sim)
   endif()
-  catch_discover_tests(lot_sim_tests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+  # PRE_TEST defers test discovery to ctest time instead of MSBuild post-build,
+  # which avoids the "unknown error" crash in Visual Studio multi-config generators.
+  catch_discover_tests(lot_sim_tests
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    DISCOVERY_MODE PRE_TEST
+  )
 endif()
 
 message(STATUS "lot-salt-suite configured. C++20, yaml-cpp, Eigen from include/Eigen.")
