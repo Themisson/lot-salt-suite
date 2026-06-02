@@ -7,6 +7,42 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(ENABLE_SANITIZERS "Build saltcreep targets with available sanitizer flags" OFF)
 option(ENABLE_WERROR "Treat compiler warnings as errors for saltcreep targets" OFF)
 
+# ── LSS Eigen override ─────────────────────────────────────────────────────────
+# When ON, forces saltcreep targets to resolve <Eigen/...> from the
+# lot-salt-suite root include/ directory (BEFORE PRIVATE the vendored copy).
+# The vendored copy in include/Eigen/ is preserved; only include search order
+# changes. Default OFF preserves the validated baseline behaviour.
+option(LSS_SALTCREEP_FORCE_LSS_EIGEN
+    "Force saltcreep to use lot-salt-suite root include/Eigen (BEFORE PRIVATE)" OFF)
+
+if(LSS_SALTCREEP_FORCE_LSS_EIGEN)
+    if(NOT DEFINED LSS_ROOT_INCLUDE_DIR)
+        get_filename_component(LSS_ROOT_INCLUDE_DIR
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../include" ABSOLUTE)
+    endif()
+    if(NOT EXISTS "${LSS_ROOT_INCLUDE_DIR}/Eigen")
+        message(FATAL_ERROR
+            "LSS_SALTCREEP_FORCE_LSS_EIGEN=ON but Eigen not found at "
+            "${LSS_ROOT_INCLUDE_DIR}/Eigen")
+    endif()
+    # Create a proxy directory in the binary dir that contains ONLY Eigen/.
+    # This prevents saltcreep's relative includes (e.g. "io/CaseParser.hpp")
+    # from resolving to lot-salt-suite headers when BEFORE PRIVATE is used.
+    set(LSS_EIGEN_PROXY_DIR "${CMAKE_BINARY_DIR}/lss_eigen_proxy")
+    file(MAKE_DIRECTORY "${LSS_EIGEN_PROXY_DIR}")
+    if(NOT EXISTS "${LSS_EIGEN_PROXY_DIR}/Eigen")
+        file(COPY "${LSS_ROOT_INCLUDE_DIR}/Eigen"
+             DESTINATION "${LSS_EIGEN_PROXY_DIR}")
+    endif()
+    message(STATUS
+        "Saltcreep Eigen mode: lot-salt-suite include/Eigen"
+        " (proxy at ${LSS_EIGEN_PROXY_DIR}/Eigen)")
+    set(LSS_SALTCREEP_EIGEN_MODE_VALUE "lss")
+else()
+    message(STATUS "Saltcreep Eigen mode: internal (external/saltcreep/include/Eigen)")
+    set(LSS_SALTCREEP_EIGEN_MODE_VALUE "internal")
+endif()
+
 # MSVC vs GCC/Clang warning flags
 if(MSVC)
     add_compile_options(/W4 /wd4100)  # /wd4100: unused parameter (common in virtual stubs)
@@ -89,6 +125,14 @@ file(GLOB_RECURSE SALT_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 # ── Main executable ───────────────────────────────────────────────────────────
 add_executable(saltcreep main/main.cpp ${SALT_SOURCES})
 target_include_directories(saltcreep PRIVATE include)
+if(LSS_SALTCREEP_FORCE_LSS_EIGEN)
+    # Prepend the proxy dir (contains ONLY Eigen/) BEFORE the vendored copy.
+    # Using the full lot-salt-suite include/ would shadow saltcreep's own
+    # relative includes (e.g. "io/CaseParser.hpp"). The proxy avoids this.
+    target_include_directories(saltcreep BEFORE PRIVATE "${LSS_EIGEN_PROXY_DIR}")
+endif()
+target_compile_definitions(saltcreep PRIVATE
+    LSS_SALTCREEP_EIGEN_MODE="${LSS_SALTCREEP_EIGEN_MODE_VALUE}")
 target_link_libraries(saltcreep PRIVATE yaml-cpp::yaml-cpp)
 configure_saltcreep_target(saltcreep)
 if(OpenMP_CXX_FOUND)
@@ -138,8 +182,14 @@ add_executable(tests_unit
     tests/cpp/test_mesh_adaptation.cpp
     tests/cpp/test_wall_pressure_field.cpp
     tests/cpp/test_edge_cases.cpp
+    tests/test_eigen_source.cpp
     ${SALT_SOURCES})
 target_include_directories(tests_unit PRIVATE include)
+if(LSS_SALTCREEP_FORCE_LSS_EIGEN)
+    target_include_directories(tests_unit BEFORE PRIVATE "${LSS_EIGEN_PROXY_DIR}")
+endif()
+target_compile_definitions(tests_unit PRIVATE
+    LSS_SALTCREEP_EIGEN_MODE="${LSS_SALTCREEP_EIGEN_MODE_VALUE}")
 target_link_libraries(tests_unit PRIVATE
     Catch2::Catch2WithMain
     yaml-cpp::yaml-cpp)

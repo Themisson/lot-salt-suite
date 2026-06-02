@@ -1,43 +1,41 @@
 # 20. Plano de migracao Eigen do saltcreep
 
-## Decisao atual
+## Decisao atual — apos Fase 6.10B
+
+```text
+PROVEN_SAFE_TO_MIGRATE
+```
 
 O Eigen oficial do `lot-salt-suite` e `include/Eigen/`, exposto aos targets
 modernos por `lss::eigen`. A copia em `external/saltcreep/include/Eigen/`
-permanece preservada porque o `saltcreep` ainda e um solver vendorizado ativo
-com CMake proprio e includes privados.
-
-A Fase 6.10 nao migra o `saltcreep` para `include/Eigen`. A recomendacao e
-manter uma rota experimental controlada ate existir adapter C++ de sal no build
-principal.
+permanece preservada. A Fase 6.10B provou que o saltcreep compila (build
+forcado) e testa (126/126 Catch2) e executa o caso APB com resultado identico
+(`closure=0.300817%`) quando forcado a usar `include/Eigen` via opcao CMake
+`LSS_SALTCREEP_FORCE_LSS_EIGEN=ON`.
 
 ## Opcoes avaliadas
 
 | Opcao | Descricao | Beneficio | Risco | Decisao |
 |-------|-----------|-----------|-------|---------|
-| A | Manter `external/saltcreep/include/Eigen` para builds do saltcreep | Preserva estabilidade e historico de validacao | Duplica Eigen no repositorio | Aceita por enquanto |
-| B | Forcar `include/Eigen` via flags externas | Teste rapido sem editar `external/saltcreep` | Nao garante precedencia no Visual Studio | Apenas diagnostico |
-| C | Criar opcao CMake explicita `SALTCREEP_USE_LSS_EIGEN` | Prova reprodutivel e reversivel | Exige alteracao governada no CMake do saltcreep | Recomendada para fase futura |
+| A | Manter `external/saltcreep/include/Eigen` para builds do saltcreep | Preserva estabilidade e historico de validacao | Duplica Eigen no repositorio | Aceita por enquanto (baseline) |
+| B | Forcar `include/Eigen` via `CMAKE_CXX_FLAGS` (Fase 6.10) | Teste rapido sem editar `external/saltcreep` | Nao garante precedencia no Visual Studio — provado nao funcionar | Descartada |
+| C | Opcao CMake `LSS_SALTCREEP_FORCE_LSS_EIGEN` com proxy dir (Fase 6.10B) | Prova reprodutivel e reversivel; funciona no VS | Proxy copiado no build dir; nao automaticamente sincronizado | Implementada e validada |
 
-## Plano recomendado
-
-1. Manter `include/Eigen/` e `external/saltcreep/include/Eigen/` no repositorio.
-2. Continuar usando `lss::eigen` nos targets modernos do `lot-salt-suite`.
-3. Quando o adapter `SaltCreepInterface` entrar no build, adicionar opcao
-   explicita no CMake do `saltcreep`, sem remover a copia vendorizada.
-4. A opcao futura deve garantir include order verificavel:
+## Opcao implementada — Fase 6.10B
 
 ```cmake
-option(SALTCREEP_USE_LSS_EIGEN "Use lot-salt-suite include/Eigen for saltcreep" OFF)
+option(LSS_SALTCREEP_FORCE_LSS_EIGEN
+    "Force saltcreep to use lot-salt-suite root include/Eigen (BEFORE PRIVATE)" OFF)
 ```
 
-5. A aceitacao da opcao deve exigir:
-   - build baseline com Eigen vendorizado;
-   - build experimental com `include/Eigen`;
-   - `ctest` completo do `saltcreep`;
-   - casos `lame_test.yaml` e `mud_gradient_1d_8p5ppg.yaml`;
-   - comparacao numerica de outputs principais;
-   - registro em `docs/audits/`.
+Mecanismo: um diretorio proxy `${CMAKE_BINARY_DIR}/lss_eigen_proxy/` e criado
+com apenas `Eigen/` (copiado de `include/Eigen/`). O proxy e prepended com
+`BEFORE PRIVATE` antes de `PRIVATE include` em ambos os targets `saltcreep` e
+`tests_unit`. Os includes relativos do saltcreep (ex: `"io/CaseParser.hpp"`)
+continuam resolvendo para `external/saltcreep/include/` normalmente.
+
+Arquivo de teste criado: `external/saltcreep/tests/test_eigen_source.cpp`
+(usa macro `LSS_SALTCREEP_EIGEN_MODE` para confirmar o modo em runtime).
 
 ## Criterios de rollback
 
@@ -50,8 +48,12 @@ um destes sinais:
 - necessidade de alterar modelo constitutivo para compilar;
 - conflito com o contrato de adapter C++.
 
-## Proximo passo
+## Proximo passo — Fase 6.11
 
-Implementar primeiro o adapter C++ de sal no `lot-salt-suite`. Depois disso,
-introduzir a opcao CMake experimental para o `saltcreep` como tarefa isolada,
-sem remover diretorios Eigen existentes.
+A decisao `PROVEN_SAFE_TO_MIGRATE` esta registrada. A Fase 6.11 pode prosseguir:
+
+1. Implementar `SaltCreepInterface` / `SaltCreepSaltcreepAdapter` em C++.
+2. Quando o adapter entrar no build principal do `lot-salt-suite`, ativar
+   `LSS_SALTCREEP_FORCE_LSS_EIGEN=ON` por padrao (ou via `lss::eigen`),
+   eliminando a duplicacao de Eigen no longo prazo.
+3. Ate la, a opcao permanece `OFF` por padrao para preservar o baseline.

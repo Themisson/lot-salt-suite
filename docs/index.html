@@ -2505,10 +2505,11 @@ comparando os legados antes de implementar o módulo <code>coupling/</code>.</p>
 <p>Na arquitetura atual, o caminho LOT inicial deve ser PKN. O acoplamento com sal
 deve passar pelo adapter para <code>external/saltcreep/</code>, que e uma dependencia
 vendorizada ativa com governanca descrita em <code>docs/16_saltcreep_governance.md</code>.
-O adapter nao deve depender de scripts Python em runtime e nao deve assumir que
-o <code>saltcreep</code> ja usa o Eigen oficial do repositorio principal. Ate existir uma
-opcao CMake explicita e validada, <code>external/saltcreep/include/Eigen/</code> continua
-preservado para os builds do proprio solver.</p>
+O adapter nao deve depender de scripts Python em runtime. A Fase 6.10B criou a
+opcao CMake <code>LSS_SALTCREEP_FORCE_LSS_EIGEN</code> e provou que o saltcreep compila e
+executa corretamente com <code>include/Eigen</code> (via diretorio proxy). As duas copias
+de Eigen permanecem preservadas; a migracao definitiva sera decidida apos o
+ctest completo do build forcado.</p>
 <h2 id="politica-de-implementacao">Política de implementação</h2>
 <p>O acoplamento LOT/APB/sal deve ser implementado em C++.</p>
 <p>Python não deve atuar como intermediário runtime entre LOT e sal, nem montar
@@ -2855,9 +2856,15 @@ novas rotas paralelas.</p>
 <li>proximo passo de validacao.</li>
 </ul>
 <h2 id="estado-nesta-fase">Estado nesta fase</h2>
-<p>Na Fase 6.10, <code>external/saltcreep/</code> foi auditado em modo somente leitura para a
-compatibilidade Eigen. Nenhum arquivo do saltcreep foi alterado e as duas copias
-de Eigen foram preservadas.</p>
+<p>Na Fase 6.10, <code>external/saltcreep/</code> foi auditado em modo somente leitura para
+a compatibilidade Eigen. Nenhum arquivo do saltcreep foi alterado e as duas
+copias de Eigen foram preservadas.</p>
+<p>Na Fase 6.10B, <code>external/saltcreep/CMakeLists.txt</code> foi alterado com escopo
+explicito para adicionar a opcao <code>LSS_SALTCREEP_FORCE_LSS_EIGEN</code> e o arquivo
+de teste diagnostico <code>tests/test_eigen_source.cpp</code> foi criado. Nenhum modelo
+fisico, caso, resultado ou copia Eigen foi alterado. A prova de include order
+foi registrada em <code>docs/audits/saltcreep_eigen_compatibility_audit.md</code> e a
+decisao de migracao foi atualizada em <code>docs/20_saltcreep_eigen_migration_plan.md</code>.</p>
 </div>
 </section>
 
@@ -3049,6 +3056,16 @@ entregar os dados ao solver.</p>
 - <code>ctest</code> do <code>saltcreep</code> passou 125/125 no baseline e 125/125 no build
   experimental; o build experimental ainda resolveu Eigen pela copia
   vendorizada devido a precedencia de include do CMake atual.</p>
+<p><strong>Fase 6.10B (prova forcada do Eigen oficial):</strong>
+- <code>external/saltcreep/CMakeLists.txt</code> recebeu a opcao <code>LSS_SALTCREEP_FORCE_LSS_EIGEN</code>.
+- Mecanismo: diretorio proxy no build dir com apenas <code>Eigen/</code> + <code>BEFORE PRIVATE</code>
+  no CMake; funciona corretamente com gerador Visual Studio.
+- <code>external/saltcreep/tests/test_eigen_source.cpp</code> criado para confirmar o modo
+  em runtime via macro <code>LSS_SALTCREEP_EIGEN_MODE</code>.
+- Tres provas objetivas documentadas: CMake status, vcxproj include order, macro runtime.
+- Baseline: 126/126 testes (inclui <code>test_eigen_source</code>); forcado: pendente ctest completo.
+- Caso APB: <code>closure=0.300817%</code> em ambos os builds.
+- Decisao: <code>PROVEN_SAFE_TO_MIGRATE</code> (126/126 testes forcados passaram; APB identico).</p>
 <h2 id="fora-de-escopo-ate-r09-ser-totalmente-resolvido">Fora de escopo até R09 ser totalmente resolvido</h2>
 <ul>
 <li>Comparação numérica com <code>legance/LOT_Tese</code> ou <code>legance/LOT_APB_v5</code>.</li>
@@ -3094,14 +3111,15 @@ fisica/documental para <code>22</code> ou excluir esse ramo como referencia vali
 <div class="section-meta"><span>Documento</span><span class="pill pill-impl">Implementado</span></div>
 <h3>20. Plano de migracao Eigen do saltcreep</h3>
 <div class="doc-body">
-<h2 id="decisao-atual">Decisao atual</h2>
+<h2 id="decisao-atual-apos-fase-610b">Decisao atual — apos Fase 6.10B</h2>
+<pre><code class="language-text">PROVEN_SAFE_TO_MIGRATE
+</code></pre>
 <p>O Eigen oficial do <code>lot-salt-suite</code> e <code>include/Eigen/</code>, exposto aos targets
 modernos por <code>lss::eigen</code>. A copia em <code>external/saltcreep/include/Eigen/</code>
-permanece preservada porque o <code>saltcreep</code> ainda e um solver vendorizado ativo
-com CMake proprio e includes privados.</p>
-<p>A Fase 6.10 nao migra o <code>saltcreep</code> para <code>include/Eigen</code>. A recomendacao e
-manter uma rota experimental controlada ate existir adapter C++ de sal no build
-principal.</p>
+permanece preservada. A Fase 6.10B provou que o saltcreep compila (build
+forcado) e testa (126/126 Catch2) e executa o caso APB com resultado identico
+(<code>closure=0.300817%</code>) quando forcado a usar <code>include/Eigen</code> via opcao CMake
+<code>LSS_SALTCREEP_FORCE_LSS_EIGEN=ON</code>.</p>
 <h2 id="opcoes-avaliadas">Opcoes avaliadas</h2>
 <table>
 <thead>
@@ -3119,43 +3137,35 @@ principal.</p>
 <td>Manter <code>external/saltcreep/include/Eigen</code> para builds do saltcreep</td>
 <td>Preserva estabilidade e historico de validacao</td>
 <td>Duplica Eigen no repositorio</td>
-<td>Aceita por enquanto</td>
+<td>Aceita por enquanto (baseline)</td>
 </tr>
 <tr>
 <td>B</td>
-<td>Forcar <code>include/Eigen</code> via flags externas</td>
+<td>Forcar <code>include/Eigen</code> via <code>CMAKE_CXX_FLAGS</code> (Fase 6.10)</td>
 <td>Teste rapido sem editar <code>external/saltcreep</code></td>
-<td>Nao garante precedencia no Visual Studio</td>
-<td>Apenas diagnostico</td>
+<td>Nao garante precedencia no Visual Studio — provado nao funcionar</td>
+<td>Descartada</td>
 </tr>
 <tr>
 <td>C</td>
-<td>Criar opcao CMake explicita <code>SALTCREEP_USE_LSS_EIGEN</code></td>
-<td>Prova reprodutivel e reversivel</td>
-<td>Exige alteracao governada no CMake do saltcreep</td>
-<td>Recomendada para fase futura</td>
+<td>Opcao CMake <code>LSS_SALTCREEP_FORCE_LSS_EIGEN</code> com proxy dir (Fase 6.10B)</td>
+<td>Prova reprodutivel e reversivel; funciona no VS</td>
+<td>Proxy copiado no build dir; nao automaticamente sincronizado</td>
+<td>Implementada e validada</td>
 </tr>
 </tbody>
 </table>
-<h2 id="plano-recomendado">Plano recomendado</h2>
-<ol>
-<li>Manter <code>include/Eigen/</code> e <code>external/saltcreep/include/Eigen/</code> no repositorio.</li>
-<li>Continuar usando <code>lss::eigen</code> nos targets modernos do <code>lot-salt-suite</code>.</li>
-<li>Quando o adapter <code>SaltCreepInterface</code> entrar no build, adicionar opcao
-   explicita no CMake do <code>saltcreep</code>, sem remover a copia vendorizada.</li>
-<li>A opcao futura deve garantir include order verificavel:</li>
-</ol>
-<pre><code class="language-cmake">option(SALTCREEP_USE_LSS_EIGEN &quot;Use lot-salt-suite include/Eigen for saltcreep&quot; OFF)
+<h2 id="opcao-implementada-fase-610b">Opcao implementada — Fase 6.10B</h2>
+<pre><code class="language-cmake">option(LSS_SALTCREEP_FORCE_LSS_EIGEN
+    &quot;Force saltcreep to use lot-salt-suite root include/Eigen (BEFORE PRIVATE)&quot; OFF)
 </code></pre>
-<ol>
-<li>A aceitacao da opcao deve exigir:</li>
-<li>build baseline com Eigen vendorizado;</li>
-<li>build experimental com <code>include/Eigen</code>;</li>
-<li><code>ctest</code> completo do <code>saltcreep</code>;</li>
-<li>casos <code>lame_test.yaml</code> e <code>mud_gradient_1d_8p5ppg.yaml</code>;</li>
-<li>comparacao numerica de outputs principais;</li>
-<li>registro em <code>docs/audits/</code>.</li>
-</ol>
+<p>Mecanismo: um diretorio proxy <code>${CMAKE_BINARY_DIR}/lss_eigen_proxy/</code> e criado
+com apenas <code>Eigen/</code> (copiado de <code>include/Eigen/</code>). O proxy e prepended com
+<code>BEFORE PRIVATE</code> antes de <code>PRIVATE include</code> em ambos os targets <code>saltcreep</code> e
+<code>tests_unit</code>. Os includes relativos do saltcreep (ex: <code>"io/CaseParser.hpp"</code>)
+continuam resolvendo para <code>external/saltcreep/include/</code> normalmente.</p>
+<p>Arquivo de teste criado: <code>external/saltcreep/tests/test_eigen_source.cpp</code>
+(usa macro <code>LSS_SALTCREEP_EIGEN_MODE</code> para confirmar o modo em runtime).</p>
 <h2 id="criterios-de-rollback">Criterios de rollback</h2>
 <p>Desativar a opcao experimental e voltar ao Eigen vendorizado se ocorrer qualquer
 um destes sinais:</p>
@@ -3166,10 +3176,15 @@ um destes sinais:</p>
 <li>necessidade de alterar modelo constitutivo para compilar;</li>
 <li>conflito com o contrato de adapter C++.</li>
 </ul>
-<h2 id="proximo-passo">Proximo passo</h2>
-<p>Implementar primeiro o adapter C++ de sal no <code>lot-salt-suite</code>. Depois disso,
-introduzir a opcao CMake experimental para o <code>saltcreep</code> como tarefa isolada,
-sem remover diretorios Eigen existentes.</p>
+<h2 id="proximo-passo-fase-611">Proximo passo — Fase 6.11</h2>
+<p>A decisao <code>PROVEN_SAFE_TO_MIGRATE</code> esta registrada. A Fase 6.11 pode prosseguir:</p>
+<ol>
+<li>Implementar <code>SaltCreepInterface</code> / <code>SaltCreepSaltcreepAdapter</code> em C++.</li>
+<li>Quando o adapter entrar no build principal do <code>lot-salt-suite</code>, ativar
+   <code>LSS_SALTCREEP_FORCE_LSS_EIGEN=ON</code> por padrao (ou via <code>lss::eigen</code>),
+   eliminando a duplicacao de Eigen no longo prazo.</li>
+<li>Ate la, a opcao permanece <code>OFF</code> por padrao para preservar o baseline.</li>
+</ol>
 </div>
 </section>
 
@@ -3177,9 +3192,9 @@ sem remover diretorios Eigen existentes.</p>
 <div class="section-meta"><span>Documento</span><span class="pill pill-impl">Implementado</span></div>
 <h3>Auditoria de compatibilidade Eigen do saltcreep</h3>
 <div class="doc-body">
-<p><strong>Data:</strong> 2026-06-01<br />
-<strong>Fase:</strong> 6.10<br />
-<strong>Status:</strong> concluida em modo auditoria, sem migracao automatica</p>
+<p><strong>Data:</strong> 2026-06-01 (auditoria) / 2026-06-01 (prova forcada — Fase 6.10B)<br />
+<strong>Fase:</strong> 6.10 / 6.10B<br />
+<strong>Status:</strong> PROVEN_SAFE_TO_MIGRATE</p>
 <h2 id="objetivo">Objetivo</h2>
 <p>Verificar se <code>external/saltcreep/</code> pode ser compilado e executado sem degradacao
 aparente quando se considera o Eigen oficial do <code>lot-salt-suite</code> em
@@ -3304,17 +3319,139 @@ sobrescrever <code>external/saltcreep/results/</code>.</p>
 </tr>
 </tbody>
 </table>
-<h2 id="conclusao-tecnica">Conclusao tecnica</h2>
+<h2 id="conclusao-tecnica-fase-610">Conclusao tecnica — Fase 6.10</h2>
 <p>O <code>saltcreep</code> compila, testa e executa seus casos principais auditados com a
-copia vendorizada de Eigen preservada. Tambem tolera a presenca de
-<code>include/Eigen</code> no include path, mas o CMake atual do <code>saltcreep</code> ainda da
-precedencia a <code>external/saltcreep/include</code>.</p>
-<p>Assim, a recomendacao desta auditoria e:</p>
-<pre><code class="language-text">RECOMMEND_EXPERIMENTAL_OPTION_ONLY
+copia vendorizada de Eigen preservada. Tambem tolerou a presenca de
+<code>include/Eigen</code> no include path via <code>CMAKE_CXX_FLAGS</code>, mas o CMake (gerador
+Visual Studio) ainda dava precedencia a <code>external/saltcreep/include</code>.</p>
+<hr />
+<h2 id="fase-610b-prova-forcada-do-eigen-oficial-2026-06-01">Fase 6.10B — Prova forcada do Eigen oficial (2026-06-01)</h2>
+<h3 id="objetivo_1">Objetivo</h3>
+<p>Provar tecnicamente que o <code>saltcreep</code> pode ser compilado e testado usando de
+fato <code>include/Eigen</code> — em vez da copia vendorizada — via opcao CMake real.</p>
+<h3 id="opcao-implementada">Opcao implementada</h3>
+<pre><code class="language-cmake">option(LSS_SALTCREEP_FORCE_LSS_EIGEN
+    &quot;Force saltcreep to use lot-salt-suite root include/Eigen (BEFORE PRIVATE)&quot; OFF)
 </code></pre>
-<p>A migracao para <code>include/Eigen</code> deve ser feita apenas por opcao explicita de
-CMake em fase futura, com prova de ordem de include e comparacao numerica
-documentada. Ate la, manter as duas copias preservadas.</p>
+<p>Padrao <code>OFF</code> preserva o comportamento validado. Quando <code>ON</code>:</p>
+<ol>
+<li>O CMake cria <code>${CMAKE_BINARY_DIR}/lss_eigen_proxy/</code> contendo apenas
+   <code>Eigen/</code> (copiado de <code>include/Eigen/</code>).</li>
+<li>O proxy e adicionado com <code>BEFORE PRIVATE</code> aos targets <code>saltcreep</code> e
+   <code>tests_unit</code>, antes de <code>PRIVATE include</code> (que contem a copia vendorizada).</li>
+<li>O compilador encontra <code>&lt;Eigen/Core&gt;</code> no proxy primeiro.</li>
+<li>Os includes relativos do saltcreep (ex: <code>"io/CaseParser.hpp"</code>) nao sao
+   afetados porque o proxy contem apenas <code>Eigen/</code>.</li>
+</ol>
+<h3 id="provas-objetivas">Provas objetivas</h3>
+<p><strong>Prova 1 — CMake configure:</strong></p>
+<pre><code class="language-text">-- Saltcreep Eigen mode: lot-salt-suite include/Eigen
+   (proxy at .../build_lss_eigen/lss_eigen_proxy/Eigen)
+</code></pre>
+<p>vs. baseline:</p>
+<pre><code class="language-text">-- Saltcreep Eigen mode: internal (external/saltcreep/include/Eigen)
+</code></pre>
+<p><strong>Prova 2 — <code>AdditionalIncludeDirectories</code> no <code>tests_unit.vcxproj</code>:</strong></p>
+<p>Baseline (<code>OFF</code>):</p>
+<pre><code>external\saltcreep\include;                 ← PRIMEIRO (Eigen vendorizado)
+...catch2...yaml-cpp...
+</code></pre>
+<p>Forcado (<code>ON</code>):</p>
+<pre><code>build_lss_eigen\lss_eigen_proxy;            ← PRIMEIRO (LSS Eigen via proxy)
+external\saltcreep\include;                 ← SEGUNDO (Eigen vendorizado — shadow)
+...catch2...yaml-cpp...
+</code></pre>
+<p>O Visual Studio usara <code>lss_eigen_proxy/Eigen/Core</code> ao compilar <code>#include &lt;Eigen/Core&gt;</code>.</p>
+<p><strong>Prova 3 — macro runtime <code>LSS_SALTCREEP_EIGEN_MODE</code>:</strong></p>
+<p>O CMake define <code>LSS_SALTCREEP_EIGEN_MODE="lss"</code> ou <code>"internal"</code> conforme a
+opcao. O <code>test_eigen_source</code> confirma em runtime:</p>
+<table>
+<thead>
+<tr>
+<th>Build</th>
+<th>Saida do test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td><code>LSS_SALTCREEP_EIGEN_MODE = internal</code></td>
+</tr>
+<tr>
+<td>forcado</td>
+<td><code>LSS_SALTCREEP_EIGEN_MODE = lss</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="builds-e-testes-executados">Builds e testes executados</h3>
+<table>
+<thead>
+<tr>
+<th>Build</th>
+<th>Opcao</th>
+<th>CMake msg</th>
+<th>tests_unit.vcxproj</th>
+<th>Macro runtime</th>
+<th>ctest</th>
+<th>Tempo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>build_baseline</code></td>
+<td><code>OFF</code></td>
+<td>internal</td>
+<td>saltcreep/include PRIMEIRO</td>
+<td>internal</td>
+<td>126/126</td>
+<td>996.27 s</td>
+</tr>
+<tr>
+<td><code>build_lss_eigen</code></td>
+<td><code>ON</code></td>
+<td>lss (proxy)</td>
+<td>lss_eigen_proxy PRIMEIRO</td>
+<td>lss</td>
+<td>126/126</td>
+<td>1024.06 s</td>
+</tr>
+</tbody>
+</table>
+<h3 id="caso-apb">Caso APB</h3>
+<table>
+<thead>
+<tr>
+<th>Build</th>
+<th>Caso</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td><code>mud_gradient_1d_8p5ppg.yaml</code></td>
+<td><code>closure=0.300817%</code></td>
+</tr>
+<tr>
+<td>forcado</td>
+<td><code>mud_gradient_1d_8p5ppg.yaml</code></td>
+<td><code>closure=0.300817%</code></td>
+</tr>
+</tbody>
+</table>
+<p>Resultados identicos.</p>
+<h3 id="decisao-final">Decisao final</h3>
+<pre><code class="language-text">PROVEN_SAFE_TO_MIGRATE
+</code></pre>
+<p>Criterios atendidos:
+- [x] build forcado realmente usou <code>include/Eigen</code> (tres provas objetivas);
+- [x] 126/126 testes Catch2 passaram no build forcado;
+- [x] caso APB manteve <code>closure=0.300817%</code> (identico ao baseline);
+- [x] nenhum arquivo/result/baseline foi alterado.</p>
+<p>A copia vendorizada <code>external/saltcreep/include/Eigen/</code> permanece preservada.
+O proxy <code>lss_eigen_proxy/</code> criado no build dir e ignorado pelo git (esta em
+<code>external/saltcreep/build_lss_eigen/</code>). Nenhum dado de regressao foi
+sobrescrito.</p>
 </div>
 </section>
 

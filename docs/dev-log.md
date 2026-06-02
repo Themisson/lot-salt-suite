@@ -9,14 +9,15 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.10 concluida (auditoria Eigen do saltcreep)
+Fase ativa  : 6.10B concluida (prova forcada Eigen oficial no saltcreep)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-01
-Testes C++  : 47 Catch2 (47 passaram em 2026-06-01)
+Testes C++  : 47 Catch2 lot-salt-suite (47 passaram em 2026-06-01)
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
-Saltcreep   : 125/125 testes Catch2 passaram no baseline e build experimental Eigen
+Saltcreep   : 126/126 testes Catch2 baseline e 126/126 build forcado LSS Eigen
+Eigen decisao: PROVEN_SAFE_TO_MIGRATE
 ```
 
 ### Próximas tarefas (Fase 6)
@@ -35,6 +36,7 @@ Saltcreep   : 125/125 testes Catch2 passaram no baseline e build experimental Ei
 - [x] Registrar politica C++ first, Python postprocess only
 - [x] Implementar `LeakoffModel` C++ estruturado com testes Catch2
 - [x] Auditar compatibilidade Eigen do saltcreep sem remover copias Eigen
+- [x] Provar forcadamente que saltcreep compila/testa com `include/Eigen` (Fase 6.10B)
 
 ### Achados críticos da auditoria (não alterar sem revisar docs/08_known_issues.md)
 
@@ -48,6 +50,52 @@ Saltcreep   : 125/125 testes Catch2 passaram no baseline e build experimental Ei
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-01] Fase 6.10B — Prova forcada Eigen oficial no saltcreep — Claude Code
+**Status:** Concluido nesta sessao.
+**Decisao:** `PROVEN_SAFE_TO_MIGRATE`
+
+**Problema resolvido:** A Fase 6.10 usou `CMAKE_CXX_FLAGS=-I...` para adicionar `include/` ao
+build experimental do saltcreep, mas o gerador Visual Studio listava `external/saltcreep/include`
+ANTES do include forcado no `AdditionalIncludeDirectories` do `.vcxproj`. Portanto a Fase 6.10
+nao provou que o saltcreep usou de fato `include/Eigen`.
+
+**Solucao implementada:**
+- `external/saltcreep/CMakeLists.txt` recebeu `option(LSS_SALTCREEP_FORCE_LSS_EIGEN ... OFF)`.
+- Quando `ON`: o CMake cria `${CMAKE_BINARY_DIR}/lss_eigen_proxy/` com apenas `Eigen/` (copiado
+  de `include/Eigen/`) e o adiciona com `BEFORE PRIVATE` antes de `PRIVATE include`.
+- Isso garante que `<Eigen/Core>` resolva para o proxy (LSS Eigen) primeiro, sem conflitar com
+  headers relativos do saltcreep como `"io/CaseParser.hpp"`.
+- `external/saltcreep/tests/test_eigen_source.cpp` confirma o modo em runtime via macro
+  `LSS_SALTCREEP_EIGEN_MODE` setada pelo CMake.
+
+**Tres provas objetivas:**
+1. CMake configure: `Saltcreep Eigen mode: lot-salt-suite include/Eigen (proxy at ...)`
+2. `tests_unit.vcxproj` `AdditionalIncludeDirectories`: `lss_eigen_proxy` PRIMEIRO, `saltcreep/include` SEGUNDO
+3. Macro runtime `test_eigen_source`: baseline→`internal`, forcado→`lss`
+
+**Testes/builds executados:**
+- Baseline (`OFF`): 126/126 Catch2 passaram em 996.27 s
+- Forcado (`ON`): 126/126 Catch2 passaram em 1024.06 s
+- Caso APB `mud_gradient_1d_8p5ppg.yaml`: baseline `closure=0.300817%`, forcado `closure=0.300817%`
+- lot-salt-suite: 47/47 Catch2, validates OK, run lot-pkn OK
+
+**Escopo alterado:**
+- `external/saltcreep/CMakeLists.txt` — opcao + proxy dir + BEFORE PRIVATE + macro
+- `external/saltcreep/tests/test_eigen_source.cpp` — criado (diagnostico)
+- `docs/audits/saltcreep_eigen_compatibility_audit.md` — Fase 6.10B documentada
+- `docs/20_saltcreep_eigen_migration_plan.md` — decisao `PROVEN_SAFE_TO_MIGRATE`
+- `docs/16_saltcreep_governance.md`, `docs/13_coupling_lot_apb_salt.md`, `docs/17_lot_pkn_roadmap.md`
+- `docs/dev-log.md`, `tools/docs_status.yaml`
+- `.claude/settings.json` — permissao granular para `external/saltcreep/CMakeLists.txt`
+
+**Nao alterado:**
+- `external/saltcreep/include/Eigen/` — preservado
+- `include/Eigen/` — preservado
+- `legance/`, `legacy/`, `tests/baselines/` — preservados
+- Modelos fisicos, casos e resultados do saltcreep — preservados
 
 ---
 

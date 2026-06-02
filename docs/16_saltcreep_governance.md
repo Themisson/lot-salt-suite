@@ -87,6 +87,13 @@ Ao finalizar, registrar:
 
 ## Estado nesta fase
 
-Na Fase 6.10, `external/saltcreep/` foi auditado em modo somente leitura para a
-compatibilidade Eigen. Nenhum arquivo do saltcreep foi alterado e as duas copias
-de Eigen foram preservadas.
+Na Fase 6.10, `external/saltcreep/` foi auditado em modo somente leitura para
+a compatibilidade Eigen. Nenhum arquivo do saltcreep foi alterado e as duas
+copias de Eigen foram preservadas.
+
+Na Fase 6.10B, `external/saltcreep/CMakeLists.txt` foi alterado com escopo
+explicito para adicionar a opcao `LSS_SALTCREEP_FORCE_LSS_EIGEN` e o arquivo
+de teste diagnostico `tests/test_eigen_source.cpp` foi criado. Nenhum modelo
+fisico, caso, resultado ou copia Eigen foi alterado. A prova de include order
+foi registrada em `docs/audits/saltcreep_eigen_compatibility_audit.md` e a
+decisao de migracao foi atualizada em `docs/20_saltcreep_eigen_migration_plan.md`.

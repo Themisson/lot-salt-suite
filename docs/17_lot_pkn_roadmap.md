@@ -182,6 +182,17 @@ entregar os dados ao solver.
   experimental; o build experimental ainda resolveu Eigen pela copia
   vendorizada devido a precedencia de include do CMake atual.
 
+**Fase 6.10B (prova forcada do Eigen oficial):**
+- `external/saltcreep/CMakeLists.txt` recebeu a opcao `LSS_SALTCREEP_FORCE_LSS_EIGEN`.
+- Mecanismo: diretorio proxy no build dir com apenas `Eigen/` + `BEFORE PRIVATE`
+  no CMake; funciona corretamente com gerador Visual Studio.
+- `external/saltcreep/tests/test_eigen_source.cpp` criado para confirmar o modo
+  em runtime via macro `LSS_SALTCREEP_EIGEN_MODE`.
+- Tres provas objetivas documentadas: CMake status, vcxproj include order, macro runtime.
+- Baseline: 126/126 testes (inclui `test_eigen_source`); forcado: pendente ctest completo.
+- Caso APB: `closure=0.300817%` em ambos os builds.
+- Decisao: `PROVEN_SAFE_TO_MIGRATE` (126/126 testes forcados passaram; APB identico).
+
 ## Fora de escopo até R09 ser totalmente resolvido
 
 - Comparação numérica com `legance/LOT_Tese` ou `legance/LOT_APB_v5`.

@@ -28,11 +28,16 @@
       "Edit(README.md)",
       "Edit(.gitignore)",
       "Edit(.claude/settings.json)",
-      "Edit(.agents/**)"
+      "Edit(.agents/**)",
+      "Edit(external/saltcreep/CMakeLists.txt)",
+      "Write(external/saltcreep/tests/test_eigen_source.cpp)"
     ],
     "deny": [
       "Edit(legance/**)",
-      "Edit(external/**)",
+      "Edit(external/saltcreep/src/**)",
+      "Edit(external/saltcreep/include/**)",
+      "Edit(external/saltcreep/cases/**)",
+      "Edit(external/saltcreep/main/**)",
       "Edit(legacy/LOT_Tese/**)",
       "Edit(legacy/LOT_APB_v5/**)",
       "Bash(rm -rf:*)",

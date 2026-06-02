@@ -50,8 +50,8 @@ docs:
   changelog:              in_progress
   saltcreep_governance:   implemented
   lot_pkn_roadmap:        implemented
-  saltcreep_eigen_migration_plan: implemented
-  saltcreep_eigen_compatibility_audit: implemented
+  saltcreep_eigen_migration_plan: implemented   # 6.10B: PROVEN_SAFE_TO_MIGRATE
+  saltcreep_eigen_compatibility_audit: implemented  # 6.10B: tres provas objetivas
   lot_legacy_inventory:   implemented
   pkn_legacy_path:        implemented
   non_pkn_models_status:  implemented
@@ -96,7 +96,8 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 47         # Catch2 — verde na ultima execucao registrada
+  cpp_tests: 47         # Catch2 lot-salt-suite — verde (2026-06-01)
+  saltcreep_tests: 126  # Catch2 saltcreep baseline — 126/126 passaram (2026-06-01)
   python_tests: 3       # unittest — verde; pytest indisponivel no ambiente local
   regression_baselines: 4
 
@@ -104,5 +105,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-01"
-updated_by: "codex"
+updated_by: "claude-code (Fase 6.10B)"
 project_version: "0.1.0"
