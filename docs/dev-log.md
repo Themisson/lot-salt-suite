@@ -54,6 +54,25 @@ Eigen decisao: MIGRATION_COMPLETED
 
 ---
 
+### [2026-06-01 21:51] `eac8fac` — Themisson
+**Commit:** `feat(saltcreep): migrate to lss Eigen by default via auto-detection (Fase 6.11)`
+**Testes C++:** 7 arquivos | **Testes Python:** 1 arquivos
+**Último resultado ctest:** nenhum (módulos ainda não implementados)
+**Arquivos alterados:**
+- `docs/13_coupling_lot_apb_salt.md`
+- `docs/16_saltcreep_governance.md`
+- `docs/17_lot_pkn_roadmap.md`
+- `docs/20_saltcreep_eigen_migration_plan.md`
+- `docs/21_saltcreep_eigen_migration_result.md`
+- `docs/index.html`
+- `tools/docs_status.yaml`
+
+**⚠ Modificações em external/saltcreep/:**
+- `external/saltcreep/CMakeLists.txt`
+> Atualizar a seção 'Modificações em andamento no saltcreep' abaixo.
+
+---
+
 ### [2026-06-01] Fase 6.11 — Migracao controlada Eigen oficial no saltcreep — Claude Code
 **Status:** Concluido nesta sessao.
 **Decisao:** `MIGRATION_COMPLETED`
