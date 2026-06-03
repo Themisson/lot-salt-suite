@@ -116,6 +116,10 @@ entregar os dados ao solver.
    `TimeIntegrator` segue fora do target principal por conflito potencial de
    `io/CaseParser.hpp`, enquanto malha, elemento, material, matriz de rigidez,
    geostatica e graus fixos passam a ser cacheados pelo adapter.
+4.21. Fase 7.8: criar target bridge para `TimeIntegrator` com include boundary
+   controlada. Resultado: `SaltCreepTimeBridge` executa `advance()` em target
+   isolado sem vazar `io/CaseParser.hpp` para headers publicos; LOT/PKN/APB
+   seguem desacoplados.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -303,6 +307,17 @@ entregar os dados ao solver.
   construcao preguiçosa, reuso do cache, rejeicao de tempo decrescente e
   configuracao fora da superficie minima.
 - LOT/PKN, APB, modelos fisicos e `external/saltcreep/` permanecem sem
+  alteracao.
+
+**Fase 7.8 (bridge temporal isolado):**
+- `SaltCreepTimeBridge` cria uma API publica SI limpa para provar
+  `TimeIntegrator::advance()` sem expor headers de I/O do `external/saltcreep`.
+- `lss_saltcreep_time_bridge` controla a ordem de includes:
+  proxy Eigen, `external/saltcreep/include`, depois `include/`.
+- `saltcreep_time_bridge_tests` cobre compilacao do header limpo, resultado
+  finito, avanço de tempo, rejeicao de tempo decrescente e ausencia de
+  dependencia LOT/PKN.
+- `external/saltcreep/`, LOT/PKN, APB e modelos fisicos permanecem sem
   alteracao.
 
 **Fase 6.10B (prova forcada do Eigen oficial):**

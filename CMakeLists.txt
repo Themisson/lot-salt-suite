@@ -81,6 +81,28 @@ set(LSS_SALTCREEP_MINIMUM_BACKEND_SOURCES
   external/saltcreep/src/solver/WallPressureField.cpp
 )
 
+set(LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR
+    "${CMAKE_BINARY_DIR}/lss_saltcreep_controlled_eigen_proxy")
+file(MAKE_DIRECTORY "${LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR}")
+if(NOT EXISTS "${LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR}/Eigen")
+  file(COPY "${LSS_INCLUDE_DIR}/Eigen"
+       DESTINATION "${LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR}")
+endif()
+
+set(LSS_SALTCREEP_CONTROLLED_SOURCES
+  ${LSS_SALTCREEP_MINIMUM_BACKEND_SOURCES}
+)
+
+set(LSS_SALTCREEP_TIME_GEOSTATIC_SOURCES
+  ${LSS_SALTCREEP_CONTROLLED_SOURCES}
+  external/saltcreep/src/constitutive/double_mechanism.cpp
+  external/saltcreep/src/io/VtuWriter.cpp
+  external/saltcreep/src/solver/DamageDiagnostics.cpp
+  external/saltcreep/src/solver/TimeIntegrator.cpp
+  external/saltcreep/src/solver/TimeOutput.cpp
+  external/saltcreep/src/thermal/profile_field.cpp
+)
+
 set(LSS_CORE_SOURCES
   src/io/CaseParser.cpp
   src/io/ResultWriter.cpp
@@ -94,6 +116,20 @@ set(LSS_CORE_SOURCES
   src/salt/SaltCreepSaltcreepAdapter.cpp
   ${LSS_SALTCREEP_MINIMUM_BACKEND_SOURCES}
 )
+
+add_library(lss_saltcreep_time_bridge STATIC
+  src/salt/SaltCreepTimeBridge.cpp
+  ${LSS_SALTCREEP_TIME_GEOSTATIC_SOURCES}
+)
+target_include_directories(lss_saltcreep_time_bridge
+  BEFORE PRIVATE
+    ${LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR}
+    ${CMAKE_SOURCE_DIR}/external/saltcreep/include
+)
+target_include_directories(lss_saltcreep_time_bridge PRIVATE
+  ${LSS_INCLUDE_DIR}
+)
+target_link_libraries(lss_saltcreep_time_bridge PRIVATE lss::eigen)
 
 # ============================================================
 # Executável principal (Fase 5+)
@@ -156,18 +192,6 @@ if(LSS_BUILD_TESTS)
     DISCOVERY_MODE PRE_TEST
   )
 
-  set(LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR
-      "${CMAKE_BINARY_DIR}/lss_saltcreep_controlled_eigen_proxy")
-  file(MAKE_DIRECTORY "${LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR}")
-  if(NOT EXISTS "${LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR}/Eigen")
-    file(COPY "${LSS_INCLUDE_DIR}/Eigen"
-         DESTINATION "${LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR}")
-  endif()
-
-  set(LSS_SALTCREEP_CONTROLLED_SOURCES
-    ${LSS_SALTCREEP_MINIMUM_BACKEND_SOURCES}
-  )
-
   add_executable(saltcreep_backend_controlled_tests
     tests/cpp/test_saltcreep_backend_controlled_case.cpp
     ${LSS_SALTCREEP_CONTROLLED_SOURCES}
@@ -187,16 +211,6 @@ if(LSS_BUILD_TESTS)
     DISCOVERY_MODE PRE_TEST
   )
 
-  set(LSS_SALTCREEP_TIME_GEOSTATIC_SOURCES
-    ${LSS_SALTCREEP_CONTROLLED_SOURCES}
-    external/saltcreep/src/constitutive/double_mechanism.cpp
-    external/saltcreep/src/io/VtuWriter.cpp
-    external/saltcreep/src/solver/DamageDiagnostics.cpp
-    external/saltcreep/src/solver/TimeIntegrator.cpp
-    external/saltcreep/src/solver/TimeOutput.cpp
-    external/saltcreep/src/thermal/profile_field.cpp
-  )
-
   add_executable(saltcreep_backend_time_geostatic_tests
     tests/cpp/test_saltcreep_backend_time_geostatic_case.cpp
     ${LSS_SALTCREEP_TIME_GEOSTATIC_SOURCES}
@@ -212,6 +226,21 @@ if(LSS_BUILD_TESTS)
     Catch2::Catch2WithMain
   )
   catch_discover_tests(saltcreep_backend_time_geostatic_tests
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    DISCOVERY_MODE PRE_TEST
+  )
+
+  add_executable(saltcreep_time_bridge_tests
+    tests/cpp/test_salt_creep_time_bridge.cpp
+  )
+  target_include_directories(saltcreep_time_bridge_tests PRIVATE
+    ${LSS_INCLUDE_DIR}
+  )
+  target_link_libraries(saltcreep_time_bridge_tests PRIVATE
+    Catch2::Catch2WithMain
+    lss_saltcreep_time_bridge
+  )
+  catch_discover_tests(saltcreep_time_bridge_tests
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     DISCOVERY_MODE PRE_TEST
   )

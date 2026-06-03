@@ -171,6 +171,10 @@ entre queries, mas `TimeIntegrator` continua fora do target principal por
 fronteira de includes entre `external/saltcreep/include/io/CaseParser.hpp` e
 `include/io/CaseParser.hpp`. Portanto, ainda nao ha acoplamento temporal real
 de fluencia nem chamada do sal pelo fluxo LOT/PKN/APB.
+Na Fase 7.8, `SaltCreepTimeBridge` passou a compilar e executar
+`TimeIntegrator::advance()` em target isolado com include boundary controlada.
+Isso resolve a prova tecnica do integrador temporal, mas ainda nao conecta o
+bridge ao adapter principal nem ao fluxo LOT/PKN/APB.
 
 ## Dependencia Eigen no acoplamento
 

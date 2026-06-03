@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">16/23</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">91</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">17/24</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">97</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2701,7 +2701,11 @@ Na Fase 7.7, o adapter passou a persistir os objetos dessa superficie minima
 entre queries, mas <code>TimeIntegrator</code> continua fora do target principal por
 fronteira de includes entre <code>external/saltcreep/include/io/CaseParser.hpp</code> e
 <code>include/io/CaseParser.hpp</code>. Portanto, ainda nao ha acoplamento temporal real
-de fluencia nem chamada do sal pelo fluxo LOT/PKN/APB.</p>
+de fluencia nem chamada do sal pelo fluxo LOT/PKN/APB.
+Na Fase 7.8, <code>SaltCreepTimeBridge</code> passou a compilar e executar
+<code>TimeIntegrator::advance()</code> em target isolado com include boundary controlada.
+Isso resolve a prova tecnica do integrador temporal, mas ainda nao conecta o
+bridge ao adapter principal nem ao fluxo LOT/PKN/APB.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser
@@ -3068,6 +3072,11 @@ includes e estado temporal.</p>
 arquivo em <code>external/saltcreep/</code> foi alterado. O adapter passou a persistir
 malha, elemento, material, matriz de rigidez, vetor geostatico e graus fixos da
 rota minima entre queries.</p>
+<p>Na Fase 7.8, o bloqueio foi resolvido por target intermediario no
+<code>lot-salt-suite</code>, sem alterar <code>external/saltcreep/</code>. O target
+<code>lss_saltcreep_time_bridge</code> compila <code>TimeIntegrator</code> com include order
+controlada e expõe apenas <code>SaltCreepTimeBridge.hpp</code> como header publico limpo.
+Classificacao: <code>TIME_BRIDGE_CONNECTED</code>. LOT/PKN/APB seguem desacoplados.</p>
 </div>
 </section>
 
@@ -3202,7 +3211,11 @@ entregar os dados ao solver.</p>
    persistir a rota minima do adapter entre queries. Resultado:
    <code>TimeIntegrator</code> segue fora do target principal por conflito potencial de
    <code>io/CaseParser.hpp</code>, enquanto malha, elemento, material, matriz de rigidez,
-   geostatica e graus fixos passam a ser cacheados pelo adapter.</li>
+   geostatica e graus fixos passam a ser cacheados pelo adapter.
+4.21. Fase 7.8: criar target bridge para <code>TimeIntegrator</code> com include boundary
+   controlada. Resultado: <code>SaltCreepTimeBridge</code> executa <code>advance()</code> em target
+   isolado sem vazar <code>io/CaseParser.hpp</code> para headers publicos; LOT/PKN/APB
+   seguem desacoplados.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -3372,6 +3385,16 @@ entregar os dados ao solver.</p>
   construcao preguiçosa, reuso do cache, rejeicao de tempo decrescente e
   configuracao fora da superficie minima.
 - LOT/PKN, APB, modelos fisicos e <code>external/saltcreep/</code> permanecem sem
+  alteracao.</p>
+<p><strong>Fase 7.8 (bridge temporal isolado):</strong>
+- <code>SaltCreepTimeBridge</code> cria uma API publica SI limpa para provar
+  <code>TimeIntegrator::advance()</code> sem expor headers de I/O do <code>external/saltcreep</code>.
+- <code>lss_saltcreep_time_bridge</code> controla a ordem de includes:
+  proxy Eigen, <code>external/saltcreep/include</code>, depois <code>include/</code>.
+- <code>saltcreep_time_bridge_tests</code> cobre compilacao do header limpo, resultado
+  finito, avanço de tempo, rejeicao de tempo decrescente e ausencia de
+  dependencia LOT/PKN.
+- <code>external/saltcreep/</code>, LOT/PKN, APB e modelos fisicos permanecem sem
   alteracao.</p>
 <p><strong>Fase 6.10B (prova forcada do Eigen oficial):</strong>
 - <code>external/saltcreep/CMakeLists.txt</code> recebeu a opcao <code>LSS_SALTCREEP_FORCE_LSS_EIGEN</code>.

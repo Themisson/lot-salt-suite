@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 7.7 concluida (estado temporal persistido do adapter saltcreep)
+Fase ativa  : 7.8 concluida (target bridge temporal isolado do saltcreep)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-03
-Testes C++  : 91/91 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
+Testes C++  : 97/97 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
@@ -54,6 +54,54 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-03] Fase 7.8 — Target bridge para TimeIntegrator — Codex
+
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Criar uma camada C++/CMake intermediaria para compilar e executar
+`TimeIntegrator::advance()` sem vazar os headers de I/O do `external/saltcreep`
+para os headers publicos ou targets principais do `lot-salt-suite`.
+
+**Classificacao:** `TIME_BRIDGE_CONNECTED`.
+
+**Mudanca implementada:**
+- Criado `include/salt/SaltCreepTimeBridge.hpp` com API publica SI limpa.
+- Criado `src/salt/SaltCreepTimeBridge.cpp`, unico arquivo do LSS que inclui
+  `solver/TimeIntegrator.hpp`.
+- Criado target CMake isolado `lss_saltcreep_time_bridge` com include order:
+  proxy Eigen, `external/saltcreep/include`, depois `include/`.
+- Criado target Catch2 `saltcreep_time_bridge_tests`, sem include publico para
+  `external/saltcreep/include`.
+- Criado `tests/cpp/test_salt_creep_time_bridge.cpp`.
+- Criado `docs/28_saltcreep_time_bridge.md`.
+
+**Limite deliberado:**
+- O bridge ainda nao e chamado por `SaltCreepSaltcreepAdapter`.
+- LOT/PKN/APB seguem desacoplados do sal temporal.
+- Nenhum arquivo em `external/saltcreep/`, modelos fisicos, LOT/PKN, APB,
+  parser ou writer foi alterado.
+
+**Testes/builds executados:**
+- `Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue`
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build --config Debug -j`
+- `ctest --test-dir build -C Debug --output-on-failure`
+- Resultado: 97/97 Catch2 passaram no modo padrao
+  `LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON`.
+- `ctest --test-dir build -C Debug -R "SaltCreep|saltcreep|salt|Bridge" --output-on-failure`
+  passou 44/44 testes de contrato/adapter/backend/bridge de sal.
+- `ctest --test-dir build -C Debug -R "Saltcreep backend" --output-on-failure`
+  passou 4/4 testes controlados do backend.
+
+**Validacao manual CLI:**
+- `lot_pkn_minimal.yaml` retornou `OK`.
+- `lot_pkn_with_leakoff.yaml` retornou `OK`.
+- `buz67d_pkn.yaml` retornou `OK`.
+- `lot-sim run --mode lot-pkn` gerou `result.json` e `timeseries.csv` em
+  `results\lot_pkn_minimal_time_bridge_review`.
 
 ---
 

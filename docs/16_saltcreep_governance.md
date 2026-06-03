@@ -156,3 +156,9 @@ Na Fase 7.7, a fronteira de includes do `TimeIntegrator` foi auditada em
 arquivo em `external/saltcreep/` foi alterado. O adapter passou a persistir
 malha, elemento, material, matriz de rigidez, vetor geostatico e graus fixos da
 rota minima entre queries.
+
+Na Fase 7.8, o bloqueio foi resolvido por target intermediario no
+`lot-salt-suite`, sem alterar `external/saltcreep/`. O target
+`lss_saltcreep_time_bridge` compila `TimeIntegrator` com include order
+controlada e expõe apenas `SaltCreepTimeBridge.hpp` como header publico limpo.
+Classificacao: `TIME_BRIDGE_CONNECTED`. LOT/PKN/APB seguem desacoplados.

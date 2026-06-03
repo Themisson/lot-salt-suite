@@ -1,7 +1,7 @@
 # Auditoria — Fronteira de includes do TimeIntegrator
 
-**Status:** `TIMEINTEGRATOR_BLOCKED_BY_INCLUDE_BOUNDARY`
-**Fase:** 7.7
+**Status:** `TIME_BRIDGE_CONNECTED`
+**Fase:** 7.7-7.8
 **Data:** 2026-06-03
 
 ## Objetivo
@@ -53,11 +53,22 @@ saltcreep_backend_time_geostatic_tests
 Nesse target, o include do saltcreep e isolado e o teste de tempo/geostatica
 permanece uma prova util da API direta.
 
-Para o adapter principal, a classificacao desta fase e:
+Para o adapter principal, a classificacao da Fase 7.7 foi:
 
 ```text
 TIMEINTEGRATOR_BLOCKED_BY_INCLUDE_BOUNDARY
 ```
+
+A Fase 7.8 resolveu a fronteira para uso controlado por meio de uma ponte
+C++/CMake isolada:
+
+```text
+TIME_BRIDGE_CONNECTED
+```
+
+O bloqueio permanece valido para inclusao direta de `TimeIntegrator.hpp` nos
+targets principais, mas nao impede mais uma rota intermediaria com include
+order controlada.
 
 ## Decisao da Fase 7.7
 
@@ -92,3 +103,32 @@ escolher uma das rotas:
 
 Qualquer uma dessas rotas exige testes dedicados e registro em
 `docs/16_saltcreep_governance.md`.
+
+## Resultado da Fase 7.8
+
+A rota escolhida foi criar `SaltCreepTimeBridge` no `lot-salt-suite`:
+
+```text
+include/salt/SaltCreepTimeBridge.hpp
+src/salt/SaltCreepTimeBridge.cpp
+```
+
+O header publico nao inclui `TimeIntegrator.hpp`, `io/CaseParser.hpp` nem
+headers de I/O do `external/saltcreep`. Os headers do backend ficam somente no
+`.cpp`.
+
+O target isolado `lss_saltcreep_time_bridge` compila o bridge com:
+
+```text
+build/lss_saltcreep_controlled_eigen_proxy/
+external/saltcreep/include/
+include/
+```
+
+Essa ordem preserva a resolucao de `"io/CaseParser.hpp"` para o header do
+saltcreep durante a compilacao do bridge. O target `saltcreep_time_bridge_tests`
+inclui apenas `include/` publicamente e linka a biblioteca bridge, provando que
+a API publica nao vaza `solver/TimeIntegrator.hpp`.
+
+O `TimeIntegrator::advance()` foi executado em teste com campo termico neutro e
+pressao de parede constante. LOT/PKN/APB continuam desacoplados.

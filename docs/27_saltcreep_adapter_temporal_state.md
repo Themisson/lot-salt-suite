@@ -1,6 +1,6 @@
 # 27 — Estado temporal persistido do SaltCreepSaltcreepAdapter
 
-**Status:** Implementado e isolado — Fase 7.7
+**Status:** Implementado e isolado — Fase 7.7 | Ponte temporal criada na Fase 7.8
 **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
@@ -66,3 +66,14 @@ Esta fase nao muda:
 `radial_strain` continua sendo o proxy `u_r / r_i` documentado na Fase 7.6.
 Uma fase futura com fluencia real deve substituir esse campo por uma grandeza
 derivada do campo adequado, se o contrato exigir deformacao radial verdadeira.
+
+## Relacao com a Fase 7.8
+
+A Fase 7.8 criou `SaltCreepTimeBridge`, uma ponte isolada que executa
+`TimeIntegrator::advance()` sem expor os headers de I/O do `external/saltcreep`
+aos headers publicos do `lot-salt-suite`.
+
+Esse bridge ainda nao substitui o cache elastico do
+`SaltCreepSaltcreepAdapter`. A decisao de integrar o bridge ao adapter deve ser
+uma fase futura, com mapeamento explicito de configuracao, pressao temporal e
+estado retornado.

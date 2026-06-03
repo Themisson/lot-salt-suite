@@ -1,6 +1,6 @@
 # 24 — Design do SaltCreepSaltcreepAdapter
 
-**Status:** Backend minimo persistido — Fases 7.2-7.7 | **Ultima atualizacao:** 2026-06-03
+**Status:** Backend minimo persistido; bridge temporal isolado — Fases 7.2-7.8 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -185,6 +185,18 @@ A auditoria completa da fronteira de includes esta em
 `docs/audits/saltcreep_timeintegrator_include_boundary.md`, e o contrato de
 estado persistido esta em `docs/27_saltcreep_adapter_temporal_state.md`.
 
+## Bridge temporal isolado
+
+A Fase 7.8 cria `SaltCreepTimeBridge`, documentado em
+`docs/28_saltcreep_time_bridge.md`. Ele compila e executa
+`TimeIntegrator::advance()` em target CMake isolado, com include boundary
+controlada para que `"io/CaseParser.hpp"` resolva para o header do
+`external/saltcreep`.
+
+O bridge nao e chamado por `SaltCreepSaltcreepAdapter` nesta fase. Ele apenas
+remove o bloqueio tecnico de includes e prova uma API publica limpa para uma
+futura substituicao do cache elastico por integrador temporal.
+
 ## Por que o backend temporal real ainda nao foi ligado
 
 Ainda nao ha uma API temporal de producao do tipo "avaliar resposta de parede"
@@ -226,5 +238,7 @@ Fase 7.6 e ativar somente a rota elastica/geostatica minima.
 3. Persistir objetos do backend minimo entre chamadas. **Concluido na Fase 7.7
    sem `TimeIntegrator`.**
 4. Resolver a rota temporal com `TimeIntegrator` sem conflito de includes.
-5. Somente depois conectar o adapter a `coupling/`, ainda sem modificar
+   **Concluido como bridge isolado na Fase 7.8.**
+5. Conectar o bridge ao adapter principal, ainda sem modificar `PknModel`.
+6. Somente depois conectar o adapter a `coupling/`, ainda sem modificar
    `PknModel`.
