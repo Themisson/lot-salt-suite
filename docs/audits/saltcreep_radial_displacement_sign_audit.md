@@ -54,3 +54,19 @@ O mapeamento de pressao de parede deve ser provado na fase do adapter real:
 `WallPressureField` existe, mas a conversao da pressao compressiva positiva do
 LOT/APB para a condicao de contorno completa do backend ainda precisa de teste
 dedicado.
+
+## Complemento Fase 7.3
+
+`docs/audits/saltcreep_backend_controlled_case.md` adiciona uma prova C++
+controlada com Lame elastico. O resultado confirma a convencao de deslocamento
+assinado e explicita o papel da condicao de contorno:
+
+- pressao interna positiva aplicada por `WallPressureField` produz `u_r > 0`
+  na parede interna, isto e, expansao para fora;
+- pressao externa/confinante positiva produz `u_r < 0`, isto e, fechamento para
+  dentro;
+- fechamento positivo continua sendo `max(0, -u_r)`.
+
+Assim, o contrato de sinais permanece valido, mas o futuro adapter real deve
+mapear a pressao compressiva positiva do LOT/APB para o conjunto fisico correto
+de pressoes e tensoes do backend.

@@ -123,3 +123,11 @@ neutras. A auditoria `docs/audits/saltcreep_radial_displacement_sign_audit.md`
 confirmou que, nos caminhos auditados do `external/saltcreep`, `u_r < 0`
 representa fechamento para dentro e fechamento positivo e calculado como
 `-u_r`. O `external/saltcreep/` permaneceu somente leitura nesta fase.
+
+Na Fase 7.3, o `lot-salt-suite` adicionou um teste Catch2 separado que compila
+fontes minimas do `external/saltcreep` para um caso elastico de Lame controlado.
+O teste confirma que a API C++ direta do backend e viavel para esse caso
+isolado e que o sinal de fechamento depende da condicao de contorno fisica:
+pressao interna positiva expande a parede, pressao externa/confinante positiva
+fecha. Nenhum arquivo em `external/saltcreep/` foi alterado, e o adapter
+permaneceu neutro com `is_available() = false`.

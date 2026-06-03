@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">11/18</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">64</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">12/19</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">66</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2556,7 +2556,13 @@ magnitude positiva separada.
 A Fase 7.2 criou <code>SaltCreepSaltcreepAdapter</code> como adapter C++ experimental e
 isolado. Ele valida queries e preserva a convencao de fechamento, mas ainda
 retorna resposta neutra com <code>is_available() = false</code>; portanto nao ha
-acoplamento LOT/sal nem chamada fisica ao <code>external/saltcreep</code>.</p>
+acoplamento LOT/sal nem chamada fisica ao <code>external/saltcreep</code>.
+A Fase 7.3 provou um caso C++ controlado e isolado do backend <code>saltcreep</code> com
+Lame elastico, mas manteve o adapter neutro. O teste mostrou que pressao
+interna positiva no <code>WallPressureField</code> expande a parede (<code>u_r &gt; 0</code>), enquanto
+pressao externa/confinante fecha (<code>u_r &lt; 0</code>). Portanto, o futuro acoplamento
+deve mapear cuidadosamente pressoes internas, externas e geostaticas antes de
+converter resposta do backend em <code>radial_closure_m</code>.</p>
 <p>Fluxo esperado:</p>
 <pre><code class="language-text">YAML/JSON → C++ parser → C++ LOT/APB/salt coupling → C++ writer → CSV/JSON
 </code></pre>
@@ -2674,7 +2680,10 @@ positiva de fechamento.
 Na Fase 7.2, <code>SaltCreepSaltcreepAdapter</code> implementa a mesma interface, mas
 permanece neutro e indisponivel enquanto a configuracao completa do backend
 (malha, material, temperatura, geostatica, pressao de parede e integrador) nao
-for formalizada.</p>
+for formalizada.
+Na Fase 7.3, a rota C++ direta do backend foi validada apenas para um caso
+elastico controlado em target Catch2 separado. Isso reduz risco de integracao,
+mas nao autoriza acoplamento LOT/sal nem mudanca em <code>PknModel</code>.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser
@@ -3013,6 +3022,13 @@ neutras. A auditoria <code>docs/audits/saltcreep_radial_displacement_sign_audit.
 confirmou que, nos caminhos auditados do <code>external/saltcreep</code>, <code>u_r &lt; 0</code>
 representa fechamento para dentro e fechamento positivo e calculado como
 <code>-u_r</code>. O <code>external/saltcreep/</code> permaneceu somente leitura nesta fase.</p>
+<p>Na Fase 7.3, o <code>lot-salt-suite</code> adicionou um teste Catch2 separado que compila
+fontes minimas do <code>external/saltcreep</code> para um caso elastico de Lame controlado.
+O teste confirma que a API C++ direta do backend e viavel para esse caso
+isolado e que o sinal de fechamento depende da condicao de contorno fisica:
+pressao interna positiva expande a parede, pressao externa/confinante positiva
+fecha. Nenhum arquivo em <code>external/saltcreep/</code> foi alterado, e o adapter
+permaneceu neutro com <code>is_available() = false</code>.</p>
 </div>
 </section>
 
@@ -3127,7 +3143,11 @@ entregar os dados ao solver.</p>
    <code>docs/23_lot_salt_sign_convention.md</code>.
 4.15. Fase 7.2: criar <code>SaltCreepSaltcreepAdapter</code> experimental e isolado.
    Resultado: adapter C++ compila, valida queries, retorna resposta neutra
-   documentada com <code>is_available() = false</code> e nao acopla LOT/PKN ao sal.</li>
+   documentada com <code>is_available() = false</code> e nao acopla LOT/PKN ao sal.
+4.16. Fase 7.3: criar caso de integracao controlado do backend <code>saltcreep</code>.
+   Resultado: target Catch2 separado executa um caso elastico de Lame com API
+   C++ direta do backend, sem alterar <code>external/saltcreep/</code>, sem conectar o
+   adapter real e sem acoplar LOT/PKN ao sal.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -3248,6 +3268,15 @@ entregar os dados ao solver.</p>
   de que <code>u_r &lt; 0</code> representa fechamento nos caminhos auditados do saltcreep.
 - <code>PknModel</code>, <code>PknRunner</code>, <code>LeakoffModel</code>, <code>ResultWriter</code>, <code>CaseParser</code>,
   <code>src/lot/</code>, <code>include/lot/</code> e <code>external/saltcreep/</code> permanecem sem alteracao.</p>
+<p><strong>Fase 7.3 (caso controlado backend saltcreep):</strong>
+- <code>tests/cpp/test_saltcreep_backend_controlled_case.cpp</code> instancia diretamente
+  uma rota elastica minima do backend <code>external/saltcreep</code>.
+- O caso compara deslocamento radial de parede contra Lame para pressao interna
+  e pressao externa/confinante, com erro relativo menor que <code>1e-6</code>.
+- <code>docs/audits/saltcreep_backend_controlled_case.md</code> registra que a API C++
+  direta e viavel para caso elastico controlado, mas o adapter real ainda exige
+  configuracao completa de malha, material, temperatura, geostatica e tempo.
+- LOT/PKN, APB, adapter neutro e <code>external/saltcreep/</code> permanecem sem alteracao.</p>
 <p><strong>Fase 6.10B (prova forcada do Eigen oficial):</strong>
 - <code>external/saltcreep/CMakeLists.txt</code> recebeu a opcao <code>LSS_SALTCREEP_FORCE_LSS_EIGEN</code>.
 - Mecanismo: diretorio proxy no build dir com apenas <code>Eigen/</code> + <code>BEFORE PRIVATE</code>
@@ -3273,7 +3302,8 @@ priorizar desenvolvimento C++ nesta ordem:</p>
 <li>Consolidar <code>BreakdownCriterion</code> C++ e remover qualquer heuristica solta de
    pos-processamento.</li>
 <li>Evoluir <code>SaltCreepSaltcreepAdapter</code> de neutro para backend real, com
-   configuracao explicita de malha, material, temperatura, pressao e integrador.</li>
+   configuracao explicita de malha, material, temperatura, pressoes internas e
+   externas, geostatica e integrador.</li>
 <li>Se o adapter exigir unificacao de Eigen, adicionar opcao CMake experimental
    no <code>saltcreep</code> e repetir a auditoria 6.10 com prova de include order.</li>
 <li>Implementar acoplamento LOT/sal em C++ e só depois ampliar

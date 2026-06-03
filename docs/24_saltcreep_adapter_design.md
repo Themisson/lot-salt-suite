@@ -1,6 +1,6 @@
 # 24 — Design do SaltCreepSaltcreepAdapter
 
-**Status:** Experimental e isolado — Fase 7.2 | **Ultima atualizacao:** 2026-06-03
+**Status:** Experimental e isolado — Fases 7.2-7.3 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -76,6 +76,26 @@ caminhos auditados do `external/saltcreep` armazenam o deslocamento radial da
 parede como `u_r` assinado, com fechamento para dentro representado por
 `u_r < 0`, e calculam fechamento positivo como `-u_r`.
 
+## Caso controlado do backend
+
+A Fase 7.3 adiciona `tests/cpp/test_saltcreep_backend_controlled_case.cpp` e
+`docs/audits/saltcreep_backend_controlled_case.md`. O teste compila um target
+Catch2 separado, `saltcreep_backend_controlled_tests`, com um subconjunto minimo
+das fontes do `external/saltcreep`, sem alterar o backend vendorizado e sem
+linkar `lot-sim` ou `lot_sim_tests` ao solver de sal.
+
+O caso usa Lame elastico axisimetrico para provar a rota C++ direta:
+
+- pressao interna positiva aplicada como `WallPressureField` produz
+  `u_r > 0`, isto e, deslocamento para fora e fechamento nulo;
+- pressao externa/confinante positiva produz `u_r < 0`, isto e, fechamento
+  para dentro com `radial_closure_m = max(0, -u_r)`;
+- ambos os casos batem a solucao analitica com erro relativo menor que `1e-6`.
+
+Esse resultado mostra que existe uma API C++ direta para um caso elastico
+controlado. Ele nao muda o status do adapter: o backend real ainda nao esta
+conectado a `SaltCreepSaltcreepAdapter`.
+
 ## Por que o backend real nao foi ligado
 
 Nao ha, ainda, uma API simples do tipo "avaliar resposta de parede" que aceite
@@ -103,12 +123,13 @@ classe e seus testes isolados, mantendo `is_available() = false`.
 | Tempo e passo do backend | `SaltCreepQuery` traz tempo absoluto; adapter real precisara de estado ou agenda temporal. |
 | Temperatura | Contrato usa K; backend real deve receber campo termico coerente. |
 | Acoplamento LOT/sal prematuro | `lot-sim run` e `PknModel` permanecem intocados nesta fase. |
+| Sinal da pressao aplicada | Fase 7.3 provou que pressao interna positiva expande a parede; o adapter real deve mapear pressoes internas, externas e geostaticas deliberadamente. |
 
 ## Proximos passos
 
 1. Projetar configuracao explicita do adapter real: geometria, malha, material,
    integrador e campo termico.
-2. Criar caso C++ controlado que rode `external/saltcreep` isoladamente e
-   compare `u_r`, `radial_closure_m` e `wall_closure_pct`.
+2. Evoluir o caso controlado para cobrir integrador temporal, campo termico e
+   tensao geostatica antes de expor o backend por `SaltCreepSaltcreepAdapter`.
 3. Somente depois conectar o adapter a `coupling/`, ainda sem modificar
    `PknModel`.

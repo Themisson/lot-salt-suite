@@ -96,6 +96,10 @@ entregar os dados ao solver.
 4.15. Fase 7.2: criar `SaltCreepSaltcreepAdapter` experimental e isolado.
    Resultado: adapter C++ compila, valida queries, retorna resposta neutra
    documentada com `is_available() = false` e nao acopla LOT/PKN ao sal.
+4.16. Fase 7.3: criar caso de integracao controlado do backend `saltcreep`.
+   Resultado: target Catch2 separado executa um caso elastico de Lame com API
+   C++ direta do backend, sem alterar `external/saltcreep/`, sem conectar o
+   adapter real e sem acoplar LOT/PKN ao sal.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -230,6 +234,16 @@ entregar os dados ao solver.
 - `PknModel`, `PknRunner`, `LeakoffModel`, `ResultWriter`, `CaseParser`,
   `src/lot/`, `include/lot/` e `external/saltcreep/` permanecem sem alteracao.
 
+**Fase 7.3 (caso controlado backend saltcreep):**
+- `tests/cpp/test_saltcreep_backend_controlled_case.cpp` instancia diretamente
+  uma rota elastica minima do backend `external/saltcreep`.
+- O caso compara deslocamento radial de parede contra Lame para pressao interna
+  e pressao externa/confinante, com erro relativo menor que `1e-6`.
+- `docs/audits/saltcreep_backend_controlled_case.md` registra que a API C++
+  direta e viavel para caso elastico controlado, mas o adapter real ainda exige
+  configuracao completa de malha, material, temperatura, geostatica e tempo.
+- LOT/PKN, APB, adapter neutro e `external/saltcreep/` permanecem sem alteracao.
+
 **Fase 6.10B (prova forcada do Eigen oficial):**
 - `external/saltcreep/CMakeLists.txt` recebeu a opcao `LSS_SALTCREEP_FORCE_LSS_EIGEN`.
 - Mecanismo: diretorio proxy no build dir com apenas `Eigen/` + `BEFORE PRIVATE`
@@ -257,7 +271,8 @@ priorizar desenvolvimento C++ nesta ordem:
 2. Consolidar `BreakdownCriterion` C++ e remover qualquer heuristica solta de
    pos-processamento.
 3. Evoluir `SaltCreepSaltcreepAdapter` de neutro para backend real, com
-   configuracao explicita de malha, material, temperatura, pressao e integrador.
+   configuracao explicita de malha, material, temperatura, pressoes internas e
+   externas, geostatica e integrador.
 4. Se o adapter exigir unificacao de Eigen, adicionar opcao CMake experimental
    no `saltcreep` e repetir a auditoria 6.10 com prova de include order.
 5. Implementar acoplamento LOT/sal em C++ e só depois ampliar

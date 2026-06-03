@@ -138,6 +138,41 @@ if(LSS_BUILD_TESTS)
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     DISCOVERY_MODE PRE_TEST
   )
+
+  set(LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR
+      "${CMAKE_BINARY_DIR}/lss_saltcreep_controlled_eigen_proxy")
+  file(MAKE_DIRECTORY "${LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR}")
+  if(NOT EXISTS "${LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR}/Eigen")
+    file(COPY "${LSS_INCLUDE_DIR}/Eigen"
+         DESTINATION "${LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR}")
+  endif()
+
+  set(LSS_SALTCREEP_CONTROLLED_SOURCES
+    external/saltcreep/src/constitutive/elastic_isotropic.cpp
+    external/saltcreep/src/elements/axisym_1d_L3.cpp
+    external/saltcreep/src/solver/Assembler.cpp
+    external/saltcreep/src/solver/ElasticSolver.cpp
+    external/saltcreep/src/solver/WallPressureField.cpp
+  )
+
+  add_executable(saltcreep_backend_controlled_tests
+    tests/cpp/test_saltcreep_backend_controlled_case.cpp
+    ${LSS_SALTCREEP_CONTROLLED_SOURCES}
+  )
+  target_include_directories(saltcreep_backend_controlled_tests
+    BEFORE PRIVATE
+      ${LSS_SALTCREEP_CONTROLLED_EIGEN_PROXY_DIR}
+  )
+  target_include_directories(saltcreep_backend_controlled_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/external/saltcreep/include
+  )
+  target_link_libraries(saltcreep_backend_controlled_tests PRIVATE
+    Catch2::Catch2WithMain
+  )
+  catch_discover_tests(saltcreep_backend_controlled_tests
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    DISCOVERY_MODE PRE_TEST
+  )
 endif()
 
 message(STATUS "lot-salt-suite configured. C++20, yaml-cpp, Eigen from include/Eigen.")

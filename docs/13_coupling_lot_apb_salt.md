@@ -43,6 +43,12 @@ A Fase 7.2 criou `SaltCreepSaltcreepAdapter` como adapter C++ experimental e
 isolado. Ele valida queries e preserva a convencao de fechamento, mas ainda
 retorna resposta neutra com `is_available() = false`; portanto nao ha
 acoplamento LOT/sal nem chamada fisica ao `external/saltcreep`.
+A Fase 7.3 provou um caso C++ controlado e isolado do backend `saltcreep` com
+Lame elastico, mas manteve o adapter neutro. O teste mostrou que pressao
+interna positiva no `WallPressureField` expande a parede (`u_r > 0`), enquanto
+pressao externa/confinante fecha (`u_r < 0`). Portanto, o futuro acoplamento
+deve mapear cuidadosamente pressoes internas, externas e geostaticas antes de
+converter resposta do backend em `radial_closure_m`.
 
 Fluxo esperado:
 
@@ -144,6 +150,9 @@ Na Fase 7.2, `SaltCreepSaltcreepAdapter` implementa a mesma interface, mas
 permanece neutro e indisponivel enquanto a configuracao completa do backend
 (malha, material, temperatura, geostatica, pressao de parede e integrador) nao
 for formalizada.
+Na Fase 7.3, a rota C++ direta do backend foi validada apenas para um caso
+elastico controlado em target Catch2 separado. Isso reduz risco de integracao,
+mas nao autoriza acoplamento LOT/sal nem mudanca em `PknModel`.
 
 ## Dependencia Eigen no acoplamento
 

@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 7.2 concluida (SaltCreepSaltcreepAdapter experimental e isolado)
+Fase ativa  : 7.3 concluida (caso C++ controlado do backend saltcreep)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-03
-Testes C++  : 64/64 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
+Testes C++  : 66/66 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
@@ -54,6 +54,71 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-03] Fase 7.3 — Caso C++ controlado do backend saltcreep — Codex
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Provar uma rota C++ direta e isolada para instanciar o nucleo do
+`external/saltcreep` em um caso elastico sintetico, sem conectar o backend ao
+`SaltCreepSaltcreepAdapter` real e sem acoplar LOT/PKN ao sal.
+
+**Mudanca implementada:**
+- Criado `tests/cpp/test_saltcreep_backend_controlled_case.cpp`.
+- `CMakeLists.txt` adiciona o target separado
+  `saltcreep_backend_controlled_tests`, que compila somente fontes minimas do
+  backend para o caso de Lame.
+- O target usa um proxy de Eigen no build dir, copiado de `include/Eigen/`,
+  antes de `external/saltcreep/include`, preservando o Eigen oficial do projeto
+  sem alterar as copias versionadas.
+- Criado `docs/audits/saltcreep_backend_controlled_case.md`.
+
+**Resultado tecnico:**
+- Pressao interna positiva aplicada via `ConstantWallPressureField` produz
+  deslocamento radial de parede para fora (`u_r > 0`) e fechamento nulo.
+- Pressao externa/confinante positiva produz deslocamento para dentro
+  (`u_r < 0`) e fechamento positivo `max(0, -u_r)`.
+- Ambos os casos batem a solucao analitica de Lame no raio interno com erro
+  relativo menor que `1e-6`.
+- Conclusao: a API C++ direta do backend e viavel para caso elastico controlado,
+  mas o adapter real ainda exige configuracao completa de malha, material,
+  temperatura, geostatica, pressoes e integrador.
+
+**Testes/builds executados:**
+- `Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue`
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build --config Debug -j`
+- `ctest --test-dir build -C Debug --output-on-failure`
+- Resultado: 66/66 Catch2 passaram no modo padrao
+  `LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON`.
+
+**Validacao manual CLI:**
+- `lot_pkn_minimal.yaml` retornou `OK`.
+- `lot_pkn_with_leakoff.yaml` retornou `OK`.
+- `buz67d_pkn.yaml` retornou `OK`.
+
+**Escopo alterado:**
+- `CMakeLists.txt`
+- `tests/cpp/test_saltcreep_backend_controlled_case.cpp`
+- `docs/audits/saltcreep_backend_controlled_case.md`
+- `docs/audits/saltcreep_radial_displacement_sign_audit.md`
+- `docs/24_saltcreep_adapter_design.md`
+- `docs/13_coupling_lot_apb_salt.md`
+- `docs/16_saltcreep_governance.md`
+- `docs/17_lot_pkn_roadmap.md`
+- `docs/dev-log.md`
+- `tools/docs_status.yaml`
+- `docs/index.html`
+
+**Nao alterado:**
+- `legance/`, `legacy/`, `external/saltcreep/`, `include/Eigen/`,
+  `external/saltcreep/include/Eigen/`, `tests/baselines/` e
+  `postprocess/scripts/` preservados.
+- `SaltCreepSaltcreepAdapter::is_available()` permanece `false`.
+- `PknModel`, `PknRunner`, `LeakoffModel`, `ResultWriter`, `CaseParser`,
+  `src/lot/`, `include/lot/`, APB e modelos fisicos sem alteracao.
+- Nenhum script Python novo e nenhum acoplamento LOT/sal implementado.
 
 ---
 
