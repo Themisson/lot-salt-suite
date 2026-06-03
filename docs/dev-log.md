@@ -81,6 +81,8 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
   (`u_r < 0`) e fechamento positivo `max(0, -u_r)`.
 - Ambos os casos batem a solucao analitica de Lame no raio interno com erro
   relativo menor que `1e-6`.
+- Hipoteses do caso: elasticidade linear, pequenas deformacoes, sem fluencia,
+  sem dano, sem acoplamento termico e geometria sintetica.
 - Conclusao: a API C++ direta do backend e viavel para caso elastico controlado,
   mas o adapter real ainda exige configuracao completa de malha, material,
   temperatura, geostatica, pressoes e integrador.

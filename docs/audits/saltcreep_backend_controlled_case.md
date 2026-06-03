@@ -60,6 +60,16 @@ copiado de `include/Eigen/`, para manter a precedencia do Eigen oficial do
 
 O caso e um cilindro elastico espesso axisimetrico em deformacao plana, com:
 
+Hipoteses do teste:
+
+- elasticidade linear;
+- pequenas deformacoes;
+- sem fluencia;
+- sem dano;
+- sem acoplamento termico;
+- geometria sintetica;
+- sem acoplamento LOT/PKN/APB.
+
 ```text
 Ri = 0.1556 m
 Re = 10 Ri

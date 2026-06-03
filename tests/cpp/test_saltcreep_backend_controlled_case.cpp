@@ -43,6 +43,8 @@ double positive_closure(double radial_displacement_m) {
 }
 
 Eigen::VectorXd run_controlled_lame(double p_inner, double p_outer) {
+  // Controlled synthetic Lame case: linear elasticity, small strains,
+  // no creep, no damage, no thermal coupling, no LOT/PKN coupling.
   AxisymL3 element;
   ElasticIsotropic model(kE, kNu);
   Mesh1D mesh = build_mesh_L3(kRi, kRe, 100, 1000.0);
