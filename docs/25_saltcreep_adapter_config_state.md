@@ -1,6 +1,6 @@
 # 25 — Configuracao e estado do SaltCreepSaltcreepAdapter
 
-**Status:** Implementado e isolado — Fase 7.5 | **Ultima atualizacao:** 2026-06-03
+**Status:** Implementado e usado pelo backend minimo — Fases 7.5-7.6 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -30,8 +30,8 @@ Testes Catch2 novos:
 O `SaltCreepSaltcreepAdapter` agora aceita uma `SaltCreepAdapterConfig`
 validada, inicializa `SaltCreepAdapterState` com tempo e pressao inicial, e
 expoe `config()` e `state()` para inspecao. O metodo
-`evaluate_wall_response()` continua validando a query e retornando resposta
-neutra.
+`evaluate_wall_response()` usa esses dados para montar o backend elastico
+minimo da Fase 7.6 e registrar a resposta no estado.
 
 ## Configuracao
 
@@ -73,14 +73,13 @@ campos finitos. `reset()` retorna ao estado neutro nao inicializado.
 
 ## O que permanece fora de escopo
 
-Esta fase nao chama `external/saltcreep`, nao instancia `TimeIntegrator` no
-adapter real, nao cria malha ou material do backend no runtime, nao acopla
+Esta fase nao instancia `TimeIntegrator` no adapter real, nao acopla
 LOT/PKN/APB ao sal e nao muda nenhum modelo fisico.
 
 `SaltCreepSaltcreepAdapter::is_available()` permanece:
 
 ```text
-false
+true para configuracoes suportadas pelo backend minimo
 ```
 
 ## Relacao com os testes controlados do backend
@@ -90,3 +89,9 @@ caso elastico de Lame, `WallPressureField`, `ProfileField`, geostatica explicita
 e `TimeIntegrator`. A Fase 7.5 nao conecta essas rotas ao adapter; ela apenas
 cria a estrutura de configuracao e estado que sera necessaria para uma fase
 posterior de ligacao real.
+
+Na Fase 7.6, a configuracao passou a alimentar uma rota elastica/geostatica
+minima (`AxisymL3`, `ElasticIsotropic`, `Assembler`, `ElasticSolver`) e
+`state_` passou a ser `mutable` para permitir registro em
+`evaluate_wall_response() const`. Ver
+`docs/26_saltcreep_adapter_backend_minimum.md`.

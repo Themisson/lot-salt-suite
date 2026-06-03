@@ -1,6 +1,6 @@
 # 24 — Design do SaltCreepSaltcreepAdapter
 
-**Status:** Experimental e isolado — Fases 7.2-7.5 | **Ultima atualizacao:** 2026-06-03
+**Status:** Backend minimo isolado — Fases 7.2-7.6 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -12,27 +12,26 @@ Nesta fase ele e deliberadamente isolado:
 - nao e conectado ao LOT/PKN;
 - nao e conectado ao APB;
 - nao e chamado por `lot-sim run`;
-- nao linka o target principal contra objetos do `external/saltcreep`;
-- nao executa o solver FEM de sal.
+- linka apenas a rota elastica minima do `external/saltcreep`;
+- executa um caso elastico/geostatico controlado em memoria.
 
 ## Status do backend
 
-O adapter existe, compila e valida queries, mas o backend real ainda nao esta
-conectado.
+O adapter existe, compila, valida queries e executa uma rota real minima do
+backend `external/saltcreep`.
 
 ```text
-SaltCreepSaltcreepAdapter::is_available() = false
+SaltCreepSaltcreepAdapter::is_available() = true
 ```
 
-Esse valor significa que a superficie C++ do adapter existe, mas nao ha
-execucao fisica do `saltcreep` por tras dela. A resposta para query valida e
-neutra e documentada.
+Esse valor significa que a configuracao e suportada pelo backend minimo
+elastico/geostatico: `AxisymL3`, `ElasticIsotropic`, `Assembler`,
+`ConstantWallPressureField` e `ElasticSolver`.
 
 Desde a Fase 7.5, o adapter tambem aceita uma configuracao explicita
 `SaltCreepAdapterConfig`, inicializa um `SaltCreepAdapterState` local e expoe
-`config()` / `state()` para testes e futura integracao. Essa mudanca nao liga o
-backend real: `evaluate_wall_response()` continua neutro e `is_available()`
-continua `false`.
+`config()` / `state()` para testes e futura integracao. Desde a Fase 7.6,
+`evaluate_wall_response()` grava a resposta no estado interno.
 
 ## Entrada
 
@@ -49,19 +48,19 @@ Valores invalidos lancam `std::invalid_argument`.
 
 ## Saida nesta fase
 
-Para query valida, o adapter retorna:
+Para query valida, o adapter retorna a resposta calculada pelo backend minimo:
 
 ```text
-radial_displacement_m = 0
-radial_closure_m = 0
-radial_strain = 0
+radial_displacement_m = u_wall assinado
+radial_closure_m = max(0, -u_wall)
+radial_strain = u_wall / inner_radius_m
 effective_closure_pressure_Pa = 0
 valid = true
 ```
 
-O estado interno inicializa tempo e pressao de parede a partir da configuracao,
-mas nao e avancado por `evaluate_wall_response()` nesta fase porque ainda nao
-ha execucao real do integrador.
+`effective_closure_pressure_Pa` permanece zero porque a Fase 7.6 nao estima
+pressao efetiva a partir do campo elastico. O estado interno registra cada
+resposta por `SaltCreepAdapterState::record_response()`.
 
 ## Convencao de sinais
 
@@ -147,10 +146,31 @@ Resumo:
 
 Essa estrutura prepara a ligacao futura com `TimeIntegrator`, mas nao a executa.
 
-## Por que o backend real nao foi ligado
+## Backend minimo conectado
 
-Nao ha, ainda, uma API simples do tipo "avaliar resposta de parede" que aceite
-apenas `SaltCreepQuery`. O uso real do `saltcreep` exige selecionar e construir:
+A Fase 7.6 conecta o adapter a uma rota elastica minima do backend:
+
+- `build_mesh_L3`;
+- `AxisymL3`;
+- `ElasticIsotropic`;
+- `Assembler::assemble_K`;
+- `Assembler::assemble_boundary_pressure`;
+- `Assembler::assemble_geostatic_force`, quando a geostatica esta habilitada;
+- `ConstantWallPressureField`;
+- `ElasticSolver`.
+
+Detalhes completos estao em
+`docs/26_saltcreep_adapter_backend_minimum.md`.
+
+`TimeIntegrator` permanece validado em target separado, mas nao e linkado ao
+target principal nesta fase por risco de conflito de include com
+`io/CaseParser.hpp`.
+
+## Por que o backend temporal real ainda nao foi ligado
+
+Ainda nao ha uma API temporal de producao do tipo "avaliar resposta de parede"
+que aceite apenas `SaltCreepQuery`. O uso completo do `saltcreep` exige
+selecionar e construir:
 
 - malha;
 - elemento;
@@ -161,9 +181,9 @@ apenas `SaltCreepQuery`. O uso real do `saltcreep` exige selecionar e construir:
 - condicoes de contorno;
 - integrador explicito ou implicito.
 
-Conectar parcialmente esses objetos nesta fase criaria acoplamento falso e
-risco de reinterpretar a fisica. A decisao tecnica da Fase 7.2 e preparar a
-classe e seus testes isolados, mantendo `is_available() = false`.
+Conectar parcialmente o integrador temporal nesta fase criaria risco de
+reinterpretar a fisica e de misturar headers homonimos. A decisao tecnica da
+Fase 7.6 e ativar somente a rota elastica/geostatica minima.
 
 ## Riscos
 
@@ -171,7 +191,7 @@ classe e seus testes isolados, mantendo `is_available() = false`.
 |-------|-----------|
 | Mapeamento de pressao de parede incompleto | Fase 7.4 testou `WallPressureField` + `TimeIntegrator`; adapter real ainda precisa mapear condicoes fisicas LOT/APB. |
 | Tensao geostatica e sinal interno do backend | Preservar FA03 no contrato moderno e testar conversao no adapter real. |
-| Tempo e passo do backend | `SaltCreepQuery` traz tempo absoluto; adapter real precisara de estado ou agenda temporal. |
+| Tempo e passo do backend | Fase 7.6 registra tempo no estado, mas ainda nao usa `TimeIntegrator` no adapter. |
 | Temperatura | Contrato usa K; backend real deve receber campo termico coerente. |
 | Acoplamento LOT/sal prematuro | `lot-sim run` e `PknModel` permanecem intocados nesta fase. |
 | Sinal da pressao aplicada | Fase 7.3 provou que pressao interna positiva expande a parede; o adapter real deve mapear pressoes internas, externas e geostaticas deliberadamente. |
@@ -182,6 +202,8 @@ classe e seus testes isolados, mantendo `is_available() = false`.
    integrador e campo termico. **Concluido na Fase 7.5 como contrato C++ ainda
    neutro.**
 2. Conectar `SaltCreepAdapterConfig` aos objetos reais do backend em teste
-   isolado antes de ativar `is_available()`.
-3. Somente depois conectar o adapter a `coupling/`, ainda sem modificar
+   isolado antes de ativar `is_available()`. **Concluido parcialmente na Fase
+   7.6 para backend elastico/geostatico minimo.**
+3. Resolver a rota temporal com `TimeIntegrator` sem conflito de includes.
+4. Somente depois conectar o adapter a `coupling/`, ainda sem modificar
    `PknModel`.

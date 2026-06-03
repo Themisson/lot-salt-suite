@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 7.5 concluida (configuracao e state machine do adapter saltcreep)
+Fase ativa  : 7.6 concluida (backend minimo do adapter saltcreep)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-03
-Testes C++  : 82/82 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
+Testes C++  : 88/88 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
@@ -54,6 +54,64 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-03] Fase 7.6 — Backend minimo do adapter saltcreep — Codex
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Conectar `SaltCreepSaltcreepAdapter::evaluate_wall_response()` a
+uma rota real minima do backend `external/saltcreep`, mantendo LOT/PKN/APB
+desacoplados do sal.
+
+**Mudanca implementada:**
+- `SaltCreepSaltcreepAdapter::is_available()` passa a retornar `true` para
+  configuracoes suportadas pelo backend minimo.
+- `state_` passa a ser `mutable` por constancia logica, permitindo registrar
+  respostas em `evaluate_wall_response() const`.
+- `evaluate_wall_response()` monta e executa uma rota elastica/geostatica com
+  `build_mesh_L3`, `AxisymL3`, `ElasticIsotropic`, `Assembler`,
+  `ConstantWallPressureField` e `ElasticSolver`.
+- Criado `tests/cpp/test_salt_creep_saltcreep_adapter_backend.cpp`.
+- Criado `docs/26_saltcreep_adapter_backend_minimum.md`.
+
+**Limite deliberado:**
+- `TimeIntegrator` permanece nos targets Catch2 controlados separados nesta
+  fase. Ele nao foi linkado ao target principal para evitar conflito de include
+  entre `external/saltcreep/include/io/CaseParser.hpp` e
+  `include/io/CaseParser.hpp`.
+
+**Testes/builds executados:**
+- `Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue`
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build --config Debug -j`
+- `ctest --test-dir build -C Debug --output-on-failure`
+- Resultado: 88/88 Catch2 passaram no modo padrao
+  `LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON`.
+- `ctest --test-dir build -C Debug -R "SaltCreep|saltcreep|salt" --output-on-failure`
+  passou 35/35 testes de contrato/adapter de sal.
+- `ctest --test-dir build -C Debug -R "Saltcreep backend" --output-on-failure`
+  passou 4/4 testes controlados do backend.
+
+**Validacao manual CLI:**
+- `lot_pkn_minimal.yaml` retornou `OK`.
+- `lot_pkn_with_leakoff.yaml` retornou `OK`.
+- `buz67d_pkn.yaml` retornou `OK`.
+- `lot-sim run --mode lot-pkn` gerou `result.json` e `timeseries.csv` em
+  `results\lot_pkn_minimal_adapter_backend_review`.
+
+**Verificacao de desacoplamento:**
+- Busca em `src/lot`, `include/lot`, `apps/lot-sim.cpp`, `src/io` e
+  `include/io` nao encontrou instanciacao de `SaltCreepSaltcreepAdapter` nem
+  uso de `SaltCreepInterface` no caminho LOT/PKN.
+
+**Nao alterado:**
+- `legance/`, `legacy/`, `external/saltcreep/`, `include/Eigen/`,
+  `external/saltcreep/include/Eigen/`, `tests/baselines/` e
+  `postprocess/scripts/` preservados.
+- `PknModel`, `PknRunner`, `LeakoffModel`, `ResultWriter`, `CaseParser`,
+  `src/lot/`, `include/lot/`, APB e modelos fisicos sem alteracao.
+- Nenhum script Python novo e nenhum acoplamento LOT/sal implementado.
 
 ---
 

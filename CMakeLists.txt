@@ -73,6 +73,14 @@ endif()
 # ============================================================
 # TODO Fase 7: adicionar src/wellbore/*.cpp, src/fluids/*.cpp, etc.
 
+set(LSS_SALTCREEP_MINIMUM_BACKEND_SOURCES
+  external/saltcreep/src/constitutive/elastic_isotropic.cpp
+  external/saltcreep/src/elements/axisym_1d_L3.cpp
+  external/saltcreep/src/solver/Assembler.cpp
+  external/saltcreep/src/solver/ElasticSolver.cpp
+  external/saltcreep/src/solver/WallPressureField.cpp
+)
+
 set(LSS_CORE_SOURCES
   src/io/CaseParser.cpp
   src/io/ResultWriter.cpp
@@ -84,6 +92,7 @@ set(LSS_CORE_SOURCES
   src/salt/SaltCreepAdapterState.cpp
   src/salt/SaltCreepInterface.cpp
   src/salt/SaltCreepSaltcreepAdapter.cpp
+  ${LSS_SALTCREEP_MINIMUM_BACKEND_SOURCES}
 )
 
 # ============================================================
@@ -93,6 +102,7 @@ if(LSS_BUILD_APPS AND LSS_CORE_SOURCES)
   add_executable(lot-sim apps/lot-sim.cpp ${LSS_CORE_SOURCES})
   target_include_directories(lot-sim PRIVATE
     ${LSS_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/external/saltcreep/include
   )
   target_link_libraries(lot-sim PRIVATE yaml-cpp lss::eigen)
   if(LSS_ENABLE_OPENMP AND OpenMP_CXX_FOUND)
@@ -115,11 +125,13 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_salt_creep_adapter_config.cpp
     tests/cpp/test_salt_creep_adapter_state.cpp
     tests/cpp/test_salt_creep_interface.cpp
+    tests/cpp/test_salt_creep_saltcreep_adapter_backend.cpp
     tests/cpp/test_salt_creep_saltcreep_adapter.cpp
     ${LSS_CORE_SOURCES}
   )
   target_include_directories(lot_sim_tests PRIVATE
     ${LSS_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/external/saltcreep/include
   )
   target_link_libraries(lot_sim_tests PRIVATE Catch2::Catch2WithMain yaml-cpp lss::eigen)
   if(LSS_ENABLE_CLI_SUBPROCESS_TESTS)
@@ -152,11 +164,7 @@ if(LSS_BUILD_TESTS)
   endif()
 
   set(LSS_SALTCREEP_CONTROLLED_SOURCES
-    external/saltcreep/src/constitutive/elastic_isotropic.cpp
-    external/saltcreep/src/elements/axisym_1d_L3.cpp
-    external/saltcreep/src/solver/Assembler.cpp
-    external/saltcreep/src/solver/ElasticSolver.cpp
-    external/saltcreep/src/solver/WallPressureField.cpp
+    ${LSS_SALTCREEP_MINIMUM_BACKEND_SOURCES}
   )
 
   add_executable(saltcreep_backend_controlled_tests

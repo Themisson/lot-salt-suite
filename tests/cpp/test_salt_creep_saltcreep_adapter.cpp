@@ -1,4 +1,5 @@
 #include <limits>
+#include <cmath>
 #include <stdexcept>
 
 #include <catch2/catch_approx.hpp>
@@ -31,13 +32,13 @@ TEST_CASE("SaltCreepSaltcreepAdapter compiles as a SaltCreepInterface") {
   const lss::salt::SaltCreepSaltcreepAdapter adapter;
   const lss::salt::SaltCreepInterface& interface = adapter;
 
-  CHECK_FALSE(interface.is_available());
+  CHECK(interface.is_available());
 }
 
-TEST_CASE("SaltCreepSaltcreepAdapter documents unavailable backend") {
+TEST_CASE("SaltCreepSaltcreepAdapter documents available minimum backend") {
   const lss::salt::SaltCreepSaltcreepAdapter adapter;
 
-  CHECK_FALSE(adapter.is_available());
+  CHECK(adapter.is_available());
 }
 
 TEST_CASE("SaltCreepSaltcreepAdapter accepts validated explicit config") {
@@ -60,15 +61,15 @@ TEST_CASE("SaltCreepSaltcreepAdapter rejects invalid config") {
                   std::invalid_argument);
 }
 
-TEST_CASE("SaltCreepSaltcreepAdapter returns neutral response while backend is disconnected") {
+TEST_CASE("SaltCreepSaltcreepAdapter returns finite response from minimum backend") {
   const lss::salt::SaltCreepSaltcreepAdapter adapter;
 
   const auto response = adapter.evaluate_wall_response(valid_query());
 
   CHECK(response.valid);
-  CHECK(response.radial_displacement_m == Catch::Approx(0.0));
-  CHECK(response.radial_closure_m == Catch::Approx(0.0));
-  CHECK(response.radial_strain == Catch::Approx(0.0));
+  CHECK(std::isfinite(response.radial_displacement_m));
+  CHECK(std::isfinite(response.radial_closure_m));
+  CHECK(std::isfinite(response.radial_strain));
   CHECK(response.effective_closure_pressure_Pa == Catch::Approx(0.0));
 }
 
@@ -111,6 +112,6 @@ TEST_CASE("SaltCreepSaltcreepAdapter maps outward or neutral displacement to zer
 TEST_CASE("SaltCreepSaltcreepAdapter does not expose LOT PKN dependencies") {
   const lss::salt::SaltCreepSaltcreepAdapter adapter;
 
-  CHECK_FALSE(adapter.is_available());
+  CHECK(adapter.is_available());
   CHECK(adapter.evaluate_wall_response(valid_query()).valid);
 }

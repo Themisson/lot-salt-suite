@@ -24,7 +24,9 @@ class SaltCreepSaltcreepAdapter final : public SaltCreepInterface {
 
  private:
   SaltCreepAdapterConfig config_;
-  SaltCreepAdapterState state_;
+  // Logically const: evaluate_wall_response() does not change configuration or
+  // physical model choices, but it records the latest backend response.
+  mutable SaltCreepAdapterState state_;
 };
 
 }  // namespace lss::salt

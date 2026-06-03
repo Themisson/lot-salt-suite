@@ -1,6 +1,6 @@
 # 22 — Contrato SaltCreepInterface
 
-**Status:** Implementado — Fases 7.0-7.5 | **Última atualização:** 2026-06-03
+**Status:** Implementado — Fases 7.0-7.6 | **Última atualização:** 2026-06-03
 
 ## Objetivo
 
@@ -34,7 +34,8 @@ FEM, não altera LOT/PKN, não altera APB e não muda nenhum modelo físico.
 
 ## O que não existe nesta fase
 
-- Não há chamada para `external/saltcreep`.
+- O adapter `SaltCreepSaltcreepAdapter` chama uma rota elastica minima do
+  `external/saltcreep`.
 - Não há acoplamento LOT/sal.
 - Não há atualização de volume anular, APB ou dano.
 - Não há leitura de arquivos legados ou baselines.
@@ -103,28 +104,30 @@ conectado. `valid = true` significa que a query foi validada e que a resposta
 neutra foi calculada corretamente. Essa separação permite que testes e futuros
 orquestradores diferenciem “solver indisponível” de “entrada inválida”.
 
-## Adapter saltcreep experimental
+## Adapter saltcreep com backend minimo
 
-A Fase 7.2 adicionou `SaltCreepSaltcreepAdapter`. Nesta fase ele e
-intencionalmente equivalente a um adapter neutro documentado:
+A Fase 7.2 adicionou `SaltCreepSaltcreepAdapter`. A Fase 7.6 conectou esse
+adapter a uma rota elastica minima do backend:
 
 ```text
-SaltCreepSaltcreepAdapter::is_available() = false
+SaltCreepSaltcreepAdapter::is_available() = true
 ```
 
-Ele valida a query com as mesmas regras do contrato, retorna resposta neutra
-valida e testa explicitamente a regra:
+para configuracoes suportadas pela superficie minima. Ele valida a query com as
+mesmas regras do contrato, calcula deslocamento radial assinado via backend
+elastico/geostatico e testa explicitamente a regra:
 
 ```text
 radial_closure_m = max(0, -radial_displacement_m)
 ```
 
-O adapter ainda nao instancia malha, elemento, material, campo termico,
-geostatica, `WallPressureField` ou integrador do `external/saltcreep`.
-Desde a Fase 7.5, ele aceita configuracao SI validada e inicializa um estado
-local, mas isso continua sendo estrutura de fronteira, nao execucao do backend.
+O adapter ainda nao instancia `TimeIntegrator`, dano ou fluencia real. Desde a
+Fase 7.5, ele aceita configuracao SI validada e inicializa um estado local.
+Desde a Fase 7.6, `evaluate_wall_response()` registra a resposta nesse estado.
 Detalhes em `docs/24_saltcreep_adapter_design.md` e
 `docs/25_saltcreep_adapter_config_state.md`.
+Detalhes do backend minimo em
+`docs/26_saltcreep_adapter_backend_minimum.md`.
 
 ## Por que LOT/PKN ainda não foi acoplado
 

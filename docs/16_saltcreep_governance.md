@@ -143,3 +143,9 @@ implementados no `lot-salt-suite` para formalizar configuracao SI e estado
 temporal do futuro adapter real. Nenhum arquivo em `external/saltcreep/` foi
 alterado; `SaltCreepSaltcreepAdapter::is_available()` permanece `false` e nao
 ha chamada ao backend real.
+
+Na Fase 7.6, `SaltCreepSaltcreepAdapter` passou a compilar e executar uma rota
+elastica/geostatica minima do backend `external/saltcreep` por adapter, usando
+fontes vendorizadas sem modifica-las. `TimeIntegrator` permanece apenas nos
+targets controlados separados ate uma fase dedicada resolver a fronteira de
+includes e estado temporal.

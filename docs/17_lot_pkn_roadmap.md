@@ -108,6 +108,9 @@ entregar os dados ao solver.
    `SaltCreepSaltcreepAdapter`. Resultado: geometria, malha, material,
    termico, geostatica, tempo e pressao inicial de parede ficam validados em
    C++; o adapter continua neutro, indisponivel e sem acoplamento LOT/PKN/APB.
+4.19. Fase 7.6: conectar backend real minimo do adapter. Resultado:
+   `SaltCreepSaltcreepAdapter` executa rota elastica/geostatica controlada do
+   `external/saltcreep`, registra estado e permanece fora do caminho LOT/PKN/APB.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -270,6 +273,18 @@ entregar os dados ao solver.
 - `SaltCreepSaltcreepAdapter` aceita config validada e inicializa o estado, mas
   `evaluate_wall_response()` continua retornando resposta neutra e
   `is_available()` continua `false`.
+- LOT/PKN, APB, modelos fisicos e `external/saltcreep/` permanecem sem
+  alteracao.
+
+**Fase 7.6 (backend minimo do adapter):**
+- `SaltCreepSaltcreepAdapter::evaluate_wall_response()` monta malha L3,
+  material elastico, pressao de parede constante e geostatica opcional usando o
+  backend vendorizado.
+- `is_available()` passa a representar suporte da configuracao pelo backend
+  minimo.
+- `state_` e `mutable` por constancia logica e registra cada resposta.
+- `TimeIntegrator` continua fora do adapter principal; segue coberto por target
+  controlado separado.
 - LOT/PKN, APB, modelos fisicos e `external/saltcreep/` permanecem sem
   alteracao.
 

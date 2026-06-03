@@ -162,6 +162,10 @@ adicionados como fronteira C++ testada para geometria, malha, material,
 termico, geostatica, tempo e pressao inicial de parede. O adapter continua sem
 chamar o backend real: `evaluate_wall_response()` permanece neutro e
 `is_available()` permanece `false`.
+Na Fase 7.6, o adapter passou a chamar uma rota elastica/geostatica minima do
+backend `external/saltcreep`, ainda isolada. `is_available()` agora indica que
+a configuracao e suportada por essa superficie minima. Isso nao conecta
+LOT/PKN/APB ao sal e nao altera `PknModel` ou `lot-sim run --mode lot-pkn`.
 
 ## Dependencia Eigen no acoplamento
 

@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">14/21</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">82</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">15/22</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">88</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2692,7 +2692,11 @@ Na Fase 7.5, <code>SaltCreepAdapterConfig</code> e <code>SaltCreepAdapterState</
 adicionados como fronteira C++ testada para geometria, malha, material,
 termico, geostatica, tempo e pressao inicial de parede. O adapter continua sem
 chamar o backend real: <code>evaluate_wall_response()</code> permanece neutro e
-<code>is_available()</code> permanece <code>false</code>.</p>
+<code>is_available()</code> permanece <code>false</code>.
+Na Fase 7.6, o adapter passou a chamar uma rota elastica/geostatica minima do
+backend <code>external/saltcreep</code>, ainda isolada. <code>is_available()</code> agora indica que
+a configuracao e suportada por essa superficie minima. Isso nao conecta
+LOT/PKN/APB ao sal e nao altera <code>PknModel</code> ou <code>lot-sim run --mode lot-pkn</code>.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser
@@ -3048,6 +3052,11 @@ implementados no <code>lot-salt-suite</code> para formalizar configuracao SI e e
 temporal do futuro adapter real. Nenhum arquivo em <code>external/saltcreep/</code> foi
 alterado; <code>SaltCreepSaltcreepAdapter::is_available()</code> permanece <code>false</code> e nao
 ha chamada ao backend real.</p>
+<p>Na Fase 7.6, <code>SaltCreepSaltcreepAdapter</code> passou a compilar e executar uma rota
+elastica/geostatica minima do backend <code>external/saltcreep</code> por adapter, usando
+fontes vendorizadas sem modifica-las. <code>TimeIntegrator</code> permanece apenas nos
+targets controlados separados ate uma fase dedicada resolver a fronteira de
+includes e estado temporal.</p>
 </div>
 </section>
 
@@ -3174,7 +3183,10 @@ entregar os dados ao solver.</p>
 4.18. Fase 7.5: adicionar configuracao SI e state machine do
    <code>SaltCreepSaltcreepAdapter</code>. Resultado: geometria, malha, material,
    termico, geostatica, tempo e pressao inicial de parede ficam validados em
-   C++; o adapter continua neutro, indisponivel e sem acoplamento LOT/PKN/APB.</li>
+   C++; o adapter continua neutro, indisponivel e sem acoplamento LOT/PKN/APB.
+4.19. Fase 7.6: conectar backend real minimo do adapter. Resultado:
+   <code>SaltCreepSaltcreepAdapter</code> executa rota elastica/geostatica controlada do
+   <code>external/saltcreep</code>, registra estado e permanece fora do caminho LOT/PKN/APB.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -3321,6 +3333,17 @@ entregar os dados ao solver.</p>
 - <code>SaltCreepSaltcreepAdapter</code> aceita config validada e inicializa o estado, mas
   <code>evaluate_wall_response()</code> continua retornando resposta neutra e
   <code>is_available()</code> continua <code>false</code>.
+- LOT/PKN, APB, modelos fisicos e <code>external/saltcreep/</code> permanecem sem
+  alteracao.</p>
+<p><strong>Fase 7.6 (backend minimo do adapter):</strong>
+- <code>SaltCreepSaltcreepAdapter::evaluate_wall_response()</code> monta malha L3,
+  material elastico, pressao de parede constante e geostatica opcional usando o
+  backend vendorizado.
+- <code>is_available()</code> passa a representar suporte da configuracao pelo backend
+  minimo.
+- <code>state_</code> e <code>mutable</code> por constancia logica e registra cada resposta.
+- <code>TimeIntegrator</code> continua fora do adapter principal; segue coberto por target
+  controlado separado.
 - LOT/PKN, APB, modelos fisicos e <code>external/saltcreep/</code> permanecem sem
   alteracao.</p>
 <p><strong>Fase 6.10B (prova forcada do Eigen oficial):</strong>
