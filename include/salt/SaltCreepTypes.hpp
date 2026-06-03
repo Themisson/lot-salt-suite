@@ -16,6 +16,7 @@ struct SaltCreepQuery {
 
 struct SaltCreepResponse {
   double radial_displacement_m = 0.0;
+  double radial_closure_m = 0.0;
   double radial_strain = 0.0;
   double effective_closure_pressure_Pa = 0.0;
   bool valid = false;

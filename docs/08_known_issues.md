@@ -115,7 +115,20 @@ cm << (1-nu)*fac, nu*fac, ...    // lei de Hooke com compressão > 0
 **Impacto para o código novo:**
 - Todo módulo `lot/`, `apb/`, `geomechanics/`, `salt/` deve usar a MESMA convenção.
 - Documentar em `include/core/types.hpp` com comentário explícito.
-- O `saltcreep` usa mesma convenção (verificar antes da integração).
+- O contrato LOT-sal moderno da Fase 7.1 usa `wall_pressure_Pa >= 0` como
+  pressao compressiva positiva e separa isso do sinal geometrico do
+  deslocamento radial.
+
+**Contrato Fase 7.1 para LOT-saltcreep:**
+- `radial_displacement_m > 0`: deslocamento radial para fora.
+- `radial_displacement_m < 0`: deslocamento radial para dentro.
+- `radial_closure_m >= 0`: magnitude positiva de fechamento,
+  `max(0, -radial_displacement_m)`.
+- `radial_strain` segue o deslocamento radial: positivo em expansao e negativo
+  em fechamento.
+- `effective_closure_pressure_Pa >= 0`: pressao efetiva compressiva positiva.
+- O futuro adapter para `external/saltcreep` deve provar o mapeamento de sinal
+  da condicao de contorno do backend antes de acoplar LOT/APB.
 
 ---
 
@@ -279,6 +292,9 @@ unitários com entradas sintéticas. **Bloqueia:** comparação com baseline leg
 - [x] Mecanismo de acoplamento sal→APB → FA04
 - [x] **R08:** `dt` deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]
 - [x] **R09:** Fase 6.6 executou ensaio analitico controlado; mitigado para os dois PKN auditados (`idQ == 6`), ainda blocker para `idQ == 4` e regressao quantitativa ampla
-- [ ] Confirmar convenção de sinal de `u_wall` (positivo = inward ou outward?)
+- [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
+      — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
+- [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar
+      `LOT_APB_v5` como referencia numerica direta
       — arquivo: `legance/LOT_APB_v5/include/apb/apb_salt_1d.h`
 - [ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)

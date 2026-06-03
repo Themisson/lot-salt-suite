@@ -23,6 +23,7 @@ phases:
   phase_6_migration:        in_progress
   phase_7_refactor:         not_started
   phase_7_0_saltcreep_interface: completed
+  phase_7_1_lot_salt_sign_convention: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -57,6 +58,7 @@ docs:
   saltcreep_eigen_compatibility_audit: implemented  # 6.10B+6.11: tres provas objetivas, auto-detect
   saltcreep_eigen_migration_result: implemented     # 6.11: resultado completo da migracao
   saltcreep_interface_contract: implemented
+  lot_salt_sign_convention: implemented
   lot_legacy_inventory:   implemented
   pkn_legacy_path:        implemented
   non_pkn_models_status:  implemented
@@ -101,7 +103,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 56         # Catch2 lot-salt-suite — Fase 7.0 adicionou 9 testes de interface salt
+  cpp_tests: 57         # Catch2 lot-salt-suite — Fase 7.1 adicionou teste de convencao LOT-salt
   saltcreep_tests: 126  # Catch2 saltcreep baseline — 126/126 passaram (2026-06-01)
   python_tests: 3       # unittest — verde; pytest indisponivel no ambiente local
   regression_baselines: 4
@@ -110,5 +112,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-03"
-updated_by: "codex (Fase 7.0)"
+updated_by: "codex (Fase 7.1)"
 project_version: "0.1.0"

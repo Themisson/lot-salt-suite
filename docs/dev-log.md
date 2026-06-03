@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 7.0 concluida (SaltCreepInterface C++ minima e nao acoplada)
+Fase ativa  : 7.1 concluida (convencao de sinais LOT-saltcreep)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-03
-Testes C++  : 56/56 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
+Testes C++  : 57/57 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
@@ -54,6 +54,59 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-03] Fase 7.1 — Convencao de sinais LOT-saltcreep — Codex
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Fixar o contrato de sinais, unidades e fronteira de dados entre
+LOT/PKN e um futuro adapter para `external/saltcreep`, sem acoplamento fisico e
+sem alterar solver/modelos.
+
+**Mudanca implementada:**
+- `SaltCreepResponse` passa a expor `radial_closure_m` como magnitude positiva
+  de fechamento.
+- O contrato LOT-sal define `wall_pressure_Pa >= 0` como pressao compressiva
+  positiva.
+- `radial_displacement_m` e deslocamento radial assinado: positivo para fora e
+  negativo para dentro.
+- `radial_closure_m = max(0, -radial_displacement_m)`.
+- `radial_strain` segue o sinal do deslocamento radial.
+- `effective_closure_pressure_Pa >= 0` permanece compressivo positivo.
+- `docs/23_lot_salt_sign_convention.md` criado como referencia central.
+
+**Testes/builds executados:**
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build --config Debug -j`
+- `ctest --test-dir build -C Debug --output-on-failure`
+- Resultado: 57/57 Catch2 passaram no modo padrao
+  `LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON`.
+
+**Validacao manual CLI:**
+- `lot_pkn_minimal.yaml` retornou `OK`.
+- `lot_pkn_with_leakoff.yaml` retornou `OK`.
+- `buz67d_pkn.yaml` retornou `OK`.
+
+**Escopo alterado:**
+- `include/salt/SaltCreepTypes.hpp`
+- `tests/cpp/test_salt_creep_interface.cpp`
+- `docs/08_known_issues.md`
+- `docs/13_coupling_lot_apb_salt.md`
+- `docs/17_lot_pkn_roadmap.md`
+- `docs/22_saltcreep_interface_contract.md`
+- `docs/23_lot_salt_sign_convention.md`
+- `docs/dev-log.md`
+- `tools/docs_status.yaml`
+- `docs/index.html`
+
+**Nao alterado:**
+- `legance/`, `legacy/`, `external/saltcreep/`, `include/Eigen/`,
+  `external/saltcreep/include/Eigen/`, `tests/baselines/` e
+  `postprocess/scripts/` preservados.
+- `PknModel`, `LeakoffModel`, `PknRunner`, `ResultWriter`, `CaseParser`,
+  `src/lot/` e `include/lot/` sem alteracao.
+- Nenhum adapter real, chamada ao saltcreep ou acoplamento LOT/sal implementado.
 
 ---
 

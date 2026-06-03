@@ -32,6 +32,7 @@ TEST_CASE("NullSaltCreepInterface returns neutral response for valid SI query") 
 
   CHECK(response.valid);
   CHECK(response.radial_displacement_m == Catch::Approx(0.0));
+  CHECK(response.radial_closure_m == Catch::Approx(0.0));
   CHECK(response.radial_strain == Catch::Approx(0.0));
   CHECK(response.effective_closure_pressure_Pa == Catch::Approx(0.0));
 }
@@ -97,4 +98,32 @@ TEST_CASE("Salt creep contract stores wall pressure samples in SI units") {
   CHECK(query.wall_pressure_Pa == Catch::Approx(35.0e6));
   CHECK(query.temperature_K == Catch::Approx(363.15));
   CHECK(query.radial_position_m == Catch::Approx(0.155575));
+}
+
+TEST_CASE("Salt creep response sign convention separates displacement from closure") {
+  lss::salt::SaltCreepResponse inward;
+  inward.radial_displacement_m = -2.0e-3;
+  inward.radial_closure_m = 2.0e-3;
+  inward.radial_strain = -1.0e-2;
+  inward.effective_closure_pressure_Pa = 5.0e6;
+  inward.valid = true;
+
+  CHECK(inward.valid);
+  CHECK(inward.radial_displacement_m < 0.0);
+  CHECK(inward.radial_closure_m == Catch::Approx(-inward.radial_displacement_m));
+  CHECK(inward.radial_strain < 0.0);
+  CHECK(inward.effective_closure_pressure_Pa >= 0.0);
+
+  lss::salt::SaltCreepResponse outward;
+  outward.radial_displacement_m = 1.0e-3;
+  outward.radial_closure_m = 0.0;
+  outward.radial_strain = 5.0e-3;
+  outward.effective_closure_pressure_Pa = 0.0;
+  outward.valid = true;
+
+  CHECK(outward.valid);
+  CHECK(outward.radial_displacement_m > 0.0);
+  CHECK(outward.radial_closure_m == Catch::Approx(0.0));
+  CHECK(outward.radial_strain > 0.0);
+  CHECK(outward.effective_closure_pressure_Pa == Catch::Approx(0.0));
 }

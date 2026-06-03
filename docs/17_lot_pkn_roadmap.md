@@ -88,6 +88,11 @@ entregar os dados ao solver.
    alterar o solver. Resultado: baseline e build experimental passaram 125/125
    testes Catch2 do saltcreep e casos `lame_test`/`mud_gradient_1d_8p5ppg`, mas
    a migracao real para `include/Eigen` fica como opcao CMake futura.
+4.14. Fase 7.1: fixar a convencao LOT-saltcreep antes do adapter real.
+   Resultado: pressao de parede compressiva positiva, deslocamento radial
+   assinado (`+` para fora, `-` para dentro), fechamento radial positivo
+   `radial_closure_m = max(0, -radial_displacement_m)` e documentacao em
+   `docs/23_lot_salt_sign_convention.md`.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -202,6 +207,16 @@ entregar os dados ao solver.
 - Nao ha adapter real, chamada para `external/saltcreep` nem acoplamento com
   `PknModel`.
 
+**Fase 7.1 (convencao de sinais LOT-saltcreep):**
+- `SaltCreepResponse` passa a expor `radial_closure_m` como magnitude positiva
+  de fechamento.
+- `docs/23_lot_salt_sign_convention.md` fixa a fronteira: pressao compressiva
+  positiva, deslocamento radial assinado e fechamento separado.
+- `docs/08_known_issues.md`, `docs/13_coupling_lot_apb_salt.md` e
+  `docs/22_saltcreep_interface_contract.md` apontam para o mesmo contrato.
+- Nenhum solver, modelo fisico, `src/lot/`, `include/lot/` ou
+  `external/saltcreep/` foi alterado.
+
 **Fase 6.10B (prova forcada do Eigen oficial):**
 - `external/saltcreep/CMakeLists.txt` recebeu a opcao `LSS_SALTCREEP_FORCE_LSS_EIGEN`.
 - Mecanismo: diretorio proxy no build dir com apenas `Eigen/` + `BEFORE PRIVATE`
@@ -228,8 +243,8 @@ priorizar desenvolvimento C++ nesta ordem:
    volume, largura e comprimento.
 2. Consolidar `BreakdownCriterion` C++ e remover qualquer heuristica solta de
    pos-processamento.
-3. Criar `SaltCreepLotAdapter`/`SaltCreepInterface` C++ para integrar
-   `external/saltcreep` sem script Python intermediario.
+3. Criar `SaltCreepSaltcreepAdapter` C++ usando a convencao da Fase 7.1 para
+   integrar `external/saltcreep` sem script Python intermediario.
 4. Se o adapter exigir unificacao de Eigen, adicionar opcao CMake experimental
    no `saltcreep` e repetir a auditoria 6.10 com prova de include order.
 5. Implementar acoplamento LOT/sal em C++ e só depois ampliar

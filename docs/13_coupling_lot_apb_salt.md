@@ -35,6 +35,10 @@ deve ocorrer por interfaces C++, como `SaltCreepInterface`,
 A Fase 7.0 criou apenas o contrato minimo `SaltCreepQuery` /
 `SaltCreepResponse` e `NullSaltCreepInterface`; ainda nao ha chamada para
 `external/saltcreep` nem acoplamento LOT/sal.
+A Fase 7.1 fixou a convencao de sinais LOT-sal em
+`docs/23_lot_salt_sign_convention.md`: pressoes compressivas sao positivas,
+deslocamento radial positivo aponta para fora e fechamento radial e uma
+magnitude positiva separada.
 
 Fluxo esperado:
 
@@ -60,8 +64,8 @@ Para cada passo de tempo dt:
   4. Calcular tensão na parede do poço:
      σ_wall = f(P_anular, P_poros, σ₀, geometria)
   5. Chamar SaltCreepInterface::evaluate_wall_response(query):
-     - Entradas: tempo [s], pressao de parede [Pa], temperatura [K] e posicao radial [m]
-     - Retorna: deslocamento radial [m], deformacao radial e pressao efetiva de fechamento [Pa]
+     - Entradas: tempo [s], pressao de parede compressiva [Pa], temperatura [K] e posicao radial [m]
+     - Retorna: deslocamento radial assinado [m], fechamento radial positivo [m], deformacao radial e pressao efetiva de fechamento [Pa]
   6. Calcular variação de volume anular:
      δV_anular = f(ε, geometria do poço)
   7. Atualizar pressão APB:
@@ -119,14 +123,19 @@ sal. O fluxo esperado e:
 2. `coupling/` transforma a pressao anular/LOT em condicoes de contorno para sal.
 3. `SaltCreepSaltcreepAdapter` delega para o `external/saltcreep/`, usando
    mecanismos existentes de pressao de parede quando aplicaveis.
-4. O retorno do sal atualiza fechamento radial, volume anular e diagnosticos de
-   dano.
+4. O retorno do sal atualiza deslocamento radial assinado, fechamento radial
+   positivo, volume anular e diagnosticos de dano.
 5. `apb/` atualiza pressao anular a partir do volume e compressibilidade.
 
 Na Fase 7.0, somente o `NullSaltCreepInterface` existe. Ele valida entradas SI
 e retorna resposta neutra valida (`u_r = 0`, `strain = 0`,
 `effective_closure_pressure_Pa = 0`) com `is_available() = false`, para deixar
 claro que o solver real ainda nao esta conectado.
+Na Fase 7.1, o contrato passou a expor tambem `radial_closure_m = 0` na
+resposta neutra. Para respostas reais futuras, `radial_displacement_m < 0`
+significa fechamento para dentro e `radial_closure_m = max(0,
+-radial_displacement_m)` deve ser usado por calculos que esperam magnitude
+positiva de fechamento.
 
 ## Dependencia Eigen no acoplamento
 
