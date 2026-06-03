@@ -124,6 +124,37 @@ Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root/Microsoft/Windows/D
 **Impacto nos testes:** apenas os 2 testes de CLI (`CLI run succeeds for…`) são afetados;
 os 45 demais testes passam normalmente, pois executam a lógica internamente sem spawnar subprocesso.
 
+### Desabilitar apenas testes CLI por subprocesso
+
+Em ambientes Windows com WDAC/Smart App Control bloqueando binários não assinados como
+subprocesso, mantenha todos os testes de solver/parser/writer ativos e desabilite somente
+os testes que executam `lot-sim.exe` via `std::system`:
+
+```powershell
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DLSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF
+cmake --build build --config Debug -j
+ctest --test-dir build -C Debug --output-on-failure
+```
+
+O padrão permanece `ON`, portanto CI e ambientes sem WDAC continuam exercitando a CLI por
+subprocesso:
+
+```powershell
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build --config Debug -j
+ctest --test-dir build -C Debug --output-on-failure
+```
+
+Quando `LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF`, rode a CLI manualmente para confirmar o
+executável:
+
+```powershell
+.\build\Debug\lot-sim.exe validate --case cases\validation\lot_pkn_minimal.yaml
+.\build\Debug\lot-sim.exe validate --case cases\validation\lot_pkn_with_leakoff.yaml
+.\build\Debug\lot-sim.exe validate --case cases\lot_tese_migrated\buz67d_pkn.yaml
+.\build\Debug\lot-sim.exe run --case cases\validation\lot_pkn_minimal.yaml --mode lot-pkn --output results\lot_pkn_minimal_wdac_manual
+```
+
 ## Skills disponíveis
 
 | Skill | Quando usar |

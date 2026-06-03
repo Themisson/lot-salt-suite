@@ -9,18 +9,19 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.12 concluida (compatibilidade Windows Visual Studio / CMake 4)
+Fase ativa  : 6.12B concluida (testes CLI por subprocesso opcionais para Windows WDAC)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
-Último push : 2026-06-02
-Testes C++  : 45/47 Catch2 lot-salt-suite passaram em 2026-06-02
-              (2 CLI tests bloqueados por WDAC enforcement nesta maquina — ver nota abaixo)
+Último push : 2026-06-03
+Testes C++  : 47/47 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
+              46/46 Catch2 passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF em 2026-06-03
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
 Eigen decisao: MIGRATION_COMPLETED
 CMake 4     : SUPORTADO (CMAKE_POLICY_VERSION_MINIMUM 3.5, sem flag manual)
 VS generator: SUPORTADO (LSS_LOT_SIM_EXECUTABLE via $<TARGET_FILE:lot-sim>)
+WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas subprocess CLI)
 ```
 
 ### Próximas tarefas (Fase 6)
@@ -54,6 +55,52 @@ VS generator: SUPORTADO (LSS_LOT_SIM_EXECUTABLE via $<TARGET_FILE:lot-sim>)
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-03] Fase 6.12B — CLI subprocess tests opcionais para Windows WDAC — Codex
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Permitir que ambientes Windows com WDAC/Smart App Control bloqueando
+binarios nao assinados executem toda a suite Catch2 sem os dois testes que spawnam
+`lot-sim.exe` como subprocesso, mantendo o padrao `ON` para CI e maquinas normais.
+
+**Mudanca implementada:**
+- `CMakeLists.txt` adiciona `option(LSS_ENABLE_CLI_SUBPROCESS_TESTS ... ON)`.
+- `lot_sim_tests` recebe `LSS_ENABLE_CLI_SUBPROCESS_TESTS=1` quando a opcao esta `ON`
+  e `=0` quando esta `OFF`.
+- `tests/cpp/test_pkn_runner.cpp` compila os dois testes `CLI run succeeds...` somente
+  quando a macro esta ativa; no modo `OFF`, registra um teste sentinela
+  `CLI subprocess tests disabled by CMake option`.
+- `docs/14_developer_workflow.md` documenta o fluxo Windows WDAC/Smart App Control com
+  `-DLSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF` e validacao manual de CLI.
+
+**Testes/builds executados:**
+- Modo padrao `ON`: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`,
+  `cmake --build build --config Debug -j`, `ctest --test-dir build -C Debug --output-on-failure`.
+  Resultado: 47/47 Catch2 passaram nesta execucao.
+- Modo `OFF`: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DLSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF`,
+  `cmake --build build --config Debug -j`, `ctest --test-dir build -C Debug --output-on-failure`.
+  Resultado: 46/46 Catch2 passaram; os dois testes de subprocesso foram substituidos por
+  um teste sentinela.
+- Validates manuais: `lot_pkn_minimal.yaml`, `lot_pkn_with_leakoff.yaml` e
+  `buz67d_pkn.yaml` retornaram `OK`.
+- Run manual: `lot_pkn_minimal.yaml --mode lot-pkn` gerou `result.json` e
+  `timeseries.csv` em `results\lot_pkn_minimal_wdac_manual`.
+
+**Escopo alterado:**
+- `CMakeLists.txt`
+- `tests/cpp/test_pkn_runner.cpp`
+- `docs/14_developer_workflow.md`
+- `docs/dev-log.md`
+- `docs/index.html`
+- `tools/docs_status.yaml`
+
+**Nao alterado:**
+- `legance/`, `legacy/`, `external/saltcreep/`, `include/Eigen/`,
+  `external/saltcreep/include/Eigen/` e `tests/baselines/` preservados.
+- Modelos fisicos, `PknModel`, `LeakoffModel`, `PknRunner`, `ResultWriter` e
+  `CaseParser` sem alteracao.
 
 ---
 

@@ -23,6 +23,7 @@ phases:
   phase_6_migration:        in_progress
   phase_7_refactor:         not_started
   phase_6_11_eigen_migration: completed
+  phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
   phase_9_postprocess:      not_started
   phase_10_validation:      not_started
@@ -98,7 +99,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 47         # Catch2 lot-salt-suite — verde (2026-06-01)
+  cpp_tests: 47         # Catch2 lot-salt-suite — 47/47 ON e 46/46 OFF passaram (2026-06-03)
   saltcreep_tests: 126  # Catch2 saltcreep baseline — 126/126 passaram (2026-06-01)
   python_tests: 3       # unittest — verde; pytest indisponivel no ambiente local
   regression_baselines: 4
@@ -106,6 +107,6 @@ test_counts:
 # ============================================================
 # Metadados
 # ============================================================
-last_updated: "2026-06-01"
-updated_by: "claude-code (Fase 6.11)"
+last_updated: "2026-06-03"
+updated_by: "codex (Fase 6.12B)"
 project_version: "0.1.0"

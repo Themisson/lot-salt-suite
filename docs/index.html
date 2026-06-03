@@ -234,7 +234,7 @@
   <div class="brand">
     <h1>lot-salt-suite<span class="dot">.</span></h1>
     <div class="sub">LOT · APB · Fluência de sal</div>
-    <span class="ver">v0.1.0 · atualizado 2026-06-01</span>
+    <span class="ver">v0.1.0 · atualizado 2026-06-03</span>
   </div>
   <div class="search-wrap">
     <input type="text" id="navSearch" placeholder="buscar na navegação..." autocomplete="off">
@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">7/14</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">8/15</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">47</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -2727,6 +2727,27 @@ os testes de CLI que invocam <code>lot-sim.exe</code> como subprocesso.</p>
 - Ou colocar a política WDAC em modo audit durante o desenvolvimento</p>
 <p><strong>Impacto nos testes:</strong> apenas os 2 testes de CLI (<code>CLI run succeeds for…</code>) são afetados;
 os 45 demais testes passam normalmente, pois executam a lógica internamente sem spawnar subprocesso.</p>
+<h3 id="desabilitar-apenas-testes-cli-por-subprocesso">Desabilitar apenas testes CLI por subprocesso</h3>
+<p>Em ambientes Windows com WDAC/Smart App Control bloqueando binários não assinados como
+subprocesso, mantenha todos os testes de solver/parser/writer ativos e desabilite somente
+os testes que executam <code>lot-sim.exe</code> via <code>std::system</code>:</p>
+<pre><code class="language-powershell">cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DLSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF
+cmake --build build --config Debug -j
+ctest --test-dir build -C Debug --output-on-failure
+</code></pre>
+<p>O padrão permanece <code>ON</code>, portanto CI e ambientes sem WDAC continuam exercitando a CLI por
+subprocesso:</p>
+<pre><code class="language-powershell">cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build --config Debug -j
+ctest --test-dir build -C Debug --output-on-failure
+</code></pre>
+<p>Quando <code>LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF</code>, rode a CLI manualmente para confirmar o
+executável:</p>
+<pre><code class="language-powershell">.\build\Debug\lot-sim.exe validate --case cases\validation\lot_pkn_minimal.yaml
+.\build\Debug\lot-sim.exe validate --case cases\validation\lot_pkn_with_leakoff.yaml
+.\build\Debug\lot-sim.exe validate --case cases\lot_tese_migrated\buz67d_pkn.yaml
+.\build\Debug\lot-sim.exe run --case cases\validation\lot_pkn_minimal.yaml --mode lot-pkn --output results\lot_pkn_minimal_wdac_manual
+</code></pre>
 <h2 id="skills-disponiveis">Skills disponíveis</h2>
 <table>
 <thead>
@@ -4145,7 +4166,7 @@ provado.</p>
 
   </div>
 </main>
-<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-02 por <span class="mono">generate_docs_index.py</span></footer>
+<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-03 por <span class="mono">generate_docs_index.py</span></footer>
 <script>
   const sidebar = document.getElementById('sidebar');
   const menuBtn = document.getElementById('menuBtn');

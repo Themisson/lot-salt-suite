@@ -9,6 +9,10 @@
 #include "io/CaseParser.hpp"
 #include "lot/PknRunner.hpp"
 
+#ifndef LSS_ENABLE_CLI_SUBPROCESS_TESTS
+#define LSS_ENABLE_CLI_SUBPROCESS_TESTS 1
+#endif
+
 namespace {
 
 constexpr const char* kPknMinimalCasePath = "cases/validation/lot_pkn_minimal.yaml";
@@ -104,6 +108,7 @@ TEST_CASE("Migrated BUZ67D PKN case remains validation-only contract") {
   CHECK(data.legacy_source.find("LOT_Tese") != std::string::npos);
 }
 
+#if LSS_ENABLE_CLI_SUBPROCESS_TESTS
 TEST_CASE("CLI run succeeds for minimal LOT PKN case") {
   const auto output_dir = std::filesystem::temp_directory_path() / "lss_cli_lot_pkn_minimal";
   std::filesystem::remove_all(output_dir);
@@ -135,3 +140,8 @@ TEST_CASE("CLI run succeeds for simplified leakoff LOT PKN case") {
   CHECK(std::filesystem::exists(output_dir / "timeseries.csv"));
   std::filesystem::remove_all(output_dir);
 }
+#else
+TEST_CASE("CLI subprocess tests disabled by CMake option", "[cli][disabled]") {
+  SUCCEED("CLI subprocess tests disabled with LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF");
+}
+#endif

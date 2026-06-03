@@ -11,6 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(LSS_BUILD_TESTS "Build unit tests" ON)
 option(LSS_BUILD_APPS  "Build lot-sim executable" ON)
 option(LSS_ENABLE_OPENMP "Enable OpenMP parallelism" OFF)
+option(LSS_ENABLE_CLI_SUBPROCESS_TESTS "Enable tests that execute lot-sim as a subprocess" ON)
 
 # ============================================================
 # Dependências externas via FetchContent
@@ -113,6 +114,11 @@ if(LSS_BUILD_TESTS)
     ${LSS_INCLUDE_DIR}
   )
   target_link_libraries(lot_sim_tests PRIVATE Catch2::Catch2WithMain yaml-cpp lss::eigen)
+  if(LSS_ENABLE_CLI_SUBPROCESS_TESTS)
+    target_compile_definitions(lot_sim_tests PRIVATE LSS_ENABLE_CLI_SUBPROCESS_TESTS=1)
+  else()
+    target_compile_definitions(lot_sim_tests PRIVATE LSS_ENABLE_CLI_SUBPROCESS_TESTS=0)
+  endif()
   if(TARGET lot-sim)
     # Pass the absolute executable path via generator expression so CLI tests
     # locate lot-sim.exe correctly for both single-config and multi-config
