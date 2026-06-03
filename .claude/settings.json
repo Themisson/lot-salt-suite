@@ -10,7 +10,11 @@
       "Bash(git log:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
+      "Bash(git push:*)",
       "Bash(./build/lot-sim:*)",
+      "Bash(./build/Debug/lot-sim.exe:*)",
+      "Bash(./build/Release/lot-sim.exe:*)",
+      "Bash(./build/RelWithDebInfo/lot-sim.exe:*)",
       "Read(./**)",
       "Edit(apps/**)",
       "Edit(src/**)",
@@ -41,7 +45,6 @@
       "Edit(legacy/LOT_Tese/**)",
       "Edit(legacy/LOT_APB_v5/**)",
       "Bash(rm -rf:*)",
-      "Bash(git push:*)",
       "Bash(git reset --hard:*)",
       "Bash(git push --force:*)"
     ]

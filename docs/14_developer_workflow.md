@@ -65,6 +65,22 @@ automático sem fase dedicada ou caminho obrigatório para rodar LOT/APB/sal.
 3. `pytest tests/python -q` — 100% verde
 4. Revisar `docs/08_known_issues.md` — nenhum risco novo sem documentação
 
+## Claude Code operational permissions
+
+Claude Code is authorized to run the following without prompting for confirmation at each step, as long as the action is within the current task scope:
+
+**Always allowed (no confirmation needed):**
+- Read / search: `git status`, `git log`, `git diff`, `Get-ChildItem`, `rg`, reading any project file
+- Build: `cmake -S`, `cmake --build`, any build flag
+- Tests: `ctest`, `pytest`, direct execution of `lot_sim_tests.exe`
+- Validation: `lot-sim validate`, `lot-sim run`, any `lot-sim` subcommand
+- Docs: `python tools/generate_docs_index.py`, any doc-generation script under `tools/`
+- Commits & push: `git add`, `git commit`, `git push` when the task explicitly requests a commit/push or a patch review applies a minimum fix within scope
+- Cleanup: removing `build/` or temp directories created by the current task
+
+**Always require confirmation:**
+`git push --force` · modifying `legance/` or `legacy/` · modifying `external/saltcreep/` without explicit scope · overwriting `tests/baselines/` · deleting project files outside `build/` · altering physical models outside task scope · any git history rewrite · credentials or secrets
+
 ## Windows / Visual Studio / CMake 4 — notas de compatibilidade
 
 ### CMake 4 e yaml-cpp

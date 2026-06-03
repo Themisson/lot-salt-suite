@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 6.12B concluida (testes CLI por subprocesso opcionais para Windows WDAC)
+Fase ativa  : docs — permissões operacionais Claude Code codificadas (CLAUDE.md, AGENTS.md, docs/14_developer_workflow.md, .claude/settings.json)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-03
@@ -55,6 +55,25 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-03] docs — permissões operacionais Claude Code — Claude Code
+
+**Status:** Concluído.
+
+**Objetivo:** Codificar política permanente de autorização operacional para reduzir
+confirmações desnecessárias durante desenvolvimento, sem relaxar restrições de segurança.
+
+**Arquivos alterados:**
+- `CLAUDE.md` — nova seção "Autorização operacional — Claude Code" com tabelas allow/confirm
+- `AGENTS.md` — nova seção compacta "Autorização operacional — Claude Code / Codex"
+- `docs/14_developer_workflow.md` — nova seção "Claude Code operational permissions"
+- `.claude/settings.json` — `git push` movido de deny para allow; `git push --force` permanece em deny; adicionados paths `build/Debug/lot-sim.exe`, `Release`, `RelWithDebInfo`
+- `docs/dev-log.md` — esta entrada
+- `docs/index.html` — regenerado
+
+**Nenhum código C++, CMake, solver ou arquivo de teste foi alterado.**
 
 ---
 

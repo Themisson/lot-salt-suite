@@ -43,6 +43,37 @@ Criar uma arquitetura modular C++ com:
 12. **`docs/12_validation_results.md`** nunca deve declarar validações como executadas sem rodá-las.
 13. **`docs/index.html`** status de seção = "validado" somente após CI verde documentado.
 
+## Autorização operacional — Claude Code
+
+Claude Code está autorizado a executar os comandos abaixo **sem pedir confirmação a cada passo**, desde que estejam dentro do escopo da tarefa em andamento.
+
+### Sempre autorizados (sem confirmação)
+
+| Categoria | Comandos / ações |
+|-----------|-----------------|
+| Leitura e busca | `git status`, `git log`, `git diff`, `git diff --check`, `Get-ChildItem`, `Select-String`, `rg`, leitura de qualquer arquivo do projeto |
+| Configuração e build | `cmake -S`, `cmake --build`, qualquer flag de configuração de build |
+| Testes | `ctest`, `pytest`, executar `lot_sim_tests.exe` diretamente |
+| Validação e run | `lot-sim validate`, `lot-sim run`, qualquer subcomando de `lot-sim` |
+| Documentação | `python tools/generate_docs_index.py`, qualquer script em `tools/` que gere documentação |
+| Pós-processamento | Scripts Python em `postprocess/` quando a tarefa envolver postprocess |
+| Commits e push | `git add`, `git commit`, `git push` quando a tarefa explicitamente pedir commit/push ou quando uma revisão aplicar patch mínimo dentro do escopo |
+| Limpeza | Remover `build/` ou diretórios temporários criados pela própria tarefa |
+
+### Sempre requerem confirmação
+
+- Apagar arquivos relevantes do projeto fora de `build/` e diretórios temporários da própria tarefa
+- Apagar diretórios que não sejam `build/` ou temporários criados na própria tarefa
+- Modificar `legance/`, `legacy/`, `external/saltcreep/` (quando não autorizado explicitamente pela tarefa)
+- Apagar ou mover `include/Eigen/` ou `external/saltcreep/include/Eigen/`
+- Sobrescrever `tests/baselines/`
+- Alterar modelos físicos fora do escopo explícito da tarefa
+- Executar refatoração ampla não solicitada
+- Alterar histórico Git (`rebase`, `reset --hard`, `amend` em commits já publicados)
+- `git push --force`
+- Remover arquivos fora do escopo da tarefa
+- Mexer em credenciais, tokens ou secrets
+
 ## Política — C++ first, Python postprocess only
 
 O motor de simulação do projeto é C++. Modelos físicos, parsing, conversões de

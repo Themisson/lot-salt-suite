@@ -72,6 +72,14 @@ Fluxo permitido de pós-processamento:
 CSV/JSON → Python plot/report → PNG/HTML
 ```
 
+## Autorização operacional — Claude Code / Codex
+
+Agentes estão autorizados a executar os itens abaixo **sem pedir confirmação a cada passo**, desde que estejam dentro do escopo da tarefa:
+
+**Sempre autorizados:** `git status/log/diff`, leitura de arquivos, `cmake`, `cmake --build`, `ctest`, `pytest`, `lot-sim validate`, `lot-sim run`, `python tools/generate_docs_index.py`, `git add`, `git commit`, `git push` (quando a tarefa pedir), remoção de `build/` ou temporários da própria tarefa.
+
+**Sempre requerem confirmação:** apagar arquivos do projeto (fora de `build/`), modificar `legance/`/`legacy/`/`external/saltcreep/` sem autorização explícita, sobrescrever `tests/baselines/`, alterar modelos físicos fora do escopo, `git push --force`, qualquer operação sobre credenciais ou secrets.
+
 ## Leitura obrigatória antes de qualquer tarefa
 
 ```

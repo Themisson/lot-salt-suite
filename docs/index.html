@@ -2690,6 +2690,18 @@ automático sem fase dedicada ou caminho obrigatório para rodar LOT/APB/sal.</p
 <li><code>pytest tests/python -q</code> — 100% verde</li>
 <li>Revisar <code>docs/08_known_issues.md</code> — nenhum risco novo sem documentação</li>
 </ol>
+<h2 id="claude-code-operational-permissions">Claude Code operational permissions</h2>
+<p>Claude Code is authorized to run the following without prompting for confirmation at each step, as long as the action is within the current task scope:</p>
+<p><strong>Always allowed (no confirmation needed):</strong>
+- Read / search: <code>git status</code>, <code>git log</code>, <code>git diff</code>, <code>Get-ChildItem</code>, <code>rg</code>, reading any project file
+- Build: <code>cmake -S</code>, <code>cmake --build</code>, any build flag
+- Tests: <code>ctest</code>, <code>pytest</code>, direct execution of <code>lot_sim_tests.exe</code>
+- Validation: <code>lot-sim validate</code>, <code>lot-sim run</code>, any <code>lot-sim</code> subcommand
+- Docs: <code>python tools/generate_docs_index.py</code>, any doc-generation script under <code>tools/</code>
+- Commits &amp; push: <code>git add</code>, <code>git commit</code>, <code>git push</code> when the task explicitly requests a commit/push or a patch review applies a minimum fix within scope
+- Cleanup: removing <code>build/</code> or temp directories created by the current task</p>
+<p><strong>Always require confirmation:</strong>
+<code>git push --force</code> · modifying <code>legance/</code> or <code>legacy/</code> · modifying <code>external/saltcreep/</code> without explicit scope · overwriting <code>tests/baselines/</code> · deleting project files outside <code>build/</code> · altering physical models outside task scope · any git history rewrite · credentials or secrets</p>
 <h2 id="windows-visual-studio-cmake-4-notas-de-compatibilidade">Windows / Visual Studio / CMake 4 — notas de compatibilidade</h2>
 <h3 id="cmake-4-e-yaml-cpp">CMake 4 e yaml-cpp</h3>
 <p>CMake 4 removeu a compatibilidade com <code>cmake_minimum_required(VERSION &lt; 3.5)</code>. O <code>CMakeLists.txt</code>
