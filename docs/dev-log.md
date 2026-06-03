@@ -57,6 +57,22 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-03] Revisão 7.6 — patch documental radial_strain — Claude Code
+
+**Status:** Patch aplicado.
+
+**Achado:** `radial_strain = u_r / r_i` é tecnicamente `ε_θ` (hoop strain),
+não `ε_r` (radial strain). O sinal está correto para o contrato de dados, mas
+a nomenclatura pode confundir em fases futuras com fluência real.
+
+**Patch:** adicionada nota explicativa em
+`docs/26_saltcreep_adapter_backend_minimum.md` clarificando a aproximação usada
+e quando ela deve ser revisada.
+
+**Verificações:** 88/88 Catch2 passaram. 3 validates LOT/PKN: OK.
+
+---
+
 ### [2026-06-03] Fase 7.6 — Backend minimo do adapter saltcreep — Codex
 **Status:** Concluido nesta sessao.
 

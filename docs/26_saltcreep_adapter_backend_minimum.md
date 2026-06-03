@@ -107,6 +107,13 @@ radial_strain         = radial_displacement_m / inner_radius_m
 effective_closure_pressure_Pa = 0
 ```
 
+`radial_strain` usa a aproximacao `u_r / r_i`, que e tecnicamente a deformacao
+circunferencial (hoop strain `epsilon_theta = u/r`) avaliada no raio interno.
+A deformacao radial exata seria `epsilon_r = du/dr`. Para o backend minimo
+elastico sem fluencia, o sinal e correto (positivo em expansao, negativo em
+fechamento) e o erro de nomenclatura nao afeta o contrato de dados. Uma fase
+futura com fluencia real deve revisar e corrigir essa convencao se necessario.
+
 `effective_closure_pressure_Pa` permanece zero porque esta fase nao estima uma
 pressao efetiva de fechamento a partir do campo elastico. Esse campo continuara
 reservado para uma fase com mapeamento fisico mais completo.
