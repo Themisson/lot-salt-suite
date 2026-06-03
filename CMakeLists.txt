@@ -114,7 +114,6 @@ set(LSS_CORE_SOURCES
   src/salt/SaltCreepAdapterState.cpp
   src/salt/SaltCreepInterface.cpp
   src/salt/SaltCreepSaltcreepAdapter.cpp
-  ${LSS_SALTCREEP_MINIMUM_BACKEND_SOURCES}
 )
 
 add_library(lss_saltcreep_time_bridge STATIC
@@ -138,9 +137,8 @@ if(LSS_BUILD_APPS AND LSS_CORE_SOURCES)
   add_executable(lot-sim apps/lot-sim.cpp ${LSS_CORE_SOURCES})
   target_include_directories(lot-sim PRIVATE
     ${LSS_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/external/saltcreep/include
   )
-  target_link_libraries(lot-sim PRIVATE yaml-cpp lss::eigen)
+  target_link_libraries(lot-sim PRIVATE yaml-cpp lss::eigen lss_saltcreep_time_bridge)
   if(LSS_ENABLE_OPENMP AND OpenMP_CXX_FOUND)
     target_link_libraries(lot-sim PRIVATE OpenMP::OpenMP_CXX)
   endif()
@@ -162,15 +160,20 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_salt_creep_adapter_state.cpp
     tests/cpp/test_salt_creep_interface.cpp
     tests/cpp/test_salt_creep_saltcreep_adapter_backend.cpp
+    tests/cpp/test_salt_creep_saltcreep_adapter_time_bridge.cpp
     tests/cpp/test_salt_creep_saltcreep_adapter_temporal_state.cpp
     tests/cpp/test_salt_creep_saltcreep_adapter.cpp
     ${LSS_CORE_SOURCES}
   )
   target_include_directories(lot_sim_tests PRIVATE
     ${LSS_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/external/saltcreep/include
   )
-  target_link_libraries(lot_sim_tests PRIVATE Catch2::Catch2WithMain yaml-cpp lss::eigen)
+  target_link_libraries(lot_sim_tests PRIVATE
+    Catch2::Catch2WithMain
+    yaml-cpp
+    lss::eigen
+    lss_saltcreep_time_bridge
+  )
   if(LSS_ENABLE_CLI_SUBPROCESS_TESTS)
     target_compile_definitions(lot_sim_tests PRIVATE LSS_ENABLE_CLI_SUBPROCESS_TESTS=1)
   else()

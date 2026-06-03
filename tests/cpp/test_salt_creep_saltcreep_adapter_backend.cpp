@@ -23,6 +23,7 @@ lss::salt::SaltCreepAdapterConfig elastic_config() {
   config.material.elastic_modulus_Pa = kE;
   config.material.poisson_ratio = kNu;
   config.time.total_time_s = 240.0;
+  config.wall_pressure.initial_wall_pressure_Pa = kPressure;
   return config;
 }
 
@@ -87,6 +88,7 @@ TEST_CASE("SaltCreepSaltcreepAdapter minimum backend maps geostatic compression 
   config.geostatic.radial_stress_Pa = -2.0e6;
   config.geostatic.hoop_stress_Pa = -2.0e6;
   config.geostatic.vertical_stress_Pa = -2.0e6;
+  config.wall_pressure.initial_wall_pressure_Pa = 0.0;
   const lss::salt::SaltCreepSaltcreepAdapter adapter(config);
 
   const auto response = adapter.evaluate_wall_response(query(60.0, 0.0));

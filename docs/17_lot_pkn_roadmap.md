@@ -120,6 +120,9 @@ entregar os dados ao solver.
    controlada. Resultado: `SaltCreepTimeBridge` executa `advance()` em target
    isolado sem vazar `io/CaseParser.hpp` para headers publicos; LOT/PKN/APB
    seguem desacoplados.
+4.22. Fase 7.9: conectar `SaltCreepSaltcreepAdapter` ao
+   `SaltCreepTimeBridge`. Resultado: adapter usa bridge temporal persistente,
+   com politica de pressao constante e sem acoplar LOT/PKN/APB.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -318,6 +321,17 @@ entregar os dados ao solver.
   finito, avanço de tempo, rejeicao de tempo decrescente e ausencia de
   dependencia LOT/PKN.
 - `external/saltcreep/`, LOT/PKN, APB e modelos fisicos permanecem sem
+  alteracao.
+
+**Fase 7.9 (adapter conectado ao bridge temporal):**
+- `SaltCreepSaltcreepAdapter` passa a mapear `SaltCreepAdapterConfig` para
+  `SaltCreepTimeBridgeConfig`.
+- O cache opaco do adapter passa a possuir um `SaltCreepTimeBridge` persistente.
+- A pressao de parede ainda e constante: queries com pressao diferente da
+  pressao inicial da configuracao sao rejeitadas.
+- Testes Catch2 cobrem disponibilidade, avanço temporal, Lamé elastico,
+  rejeicao de pressao dinamica e configuracao fora da superficie suportada.
+- LOT/PKN, APB, modelos fisicos e `external/saltcreep/` permanecem sem
   alteracao.
 
 **Fase 6.10B (prova forcada do Eigen oficial):**

@@ -1,6 +1,6 @@
 # 24 — Design do SaltCreepSaltcreepAdapter
 
-**Status:** Backend minimo persistido; bridge temporal isolado — Fases 7.2-7.8 | **Ultima atualizacao:** 2026-06-03
+**Status:** Adapter conectado ao bridge temporal — Fases 7.2-7.9 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -197,6 +197,21 @@ O bridge nao e chamado por `SaltCreepSaltcreepAdapter` nesta fase. Ele apenas
 remove o bloqueio tecnico de includes e prova uma API publica limpa para uma
 futura substituicao do cache elastico por integrador temporal.
 
+## Adapter conectado ao bridge
+
+A Fase 7.9 conecta `SaltCreepSaltcreepAdapter` ao `SaltCreepTimeBridge`.
+`BackendCache` permanece opaco e preguiçoso, mas agora guarda um bridge
+persistente em vez de montar diretamente `AxisymL3`, `Assembler` e
+`ElasticSolver` dentro do adapter.
+
+O adapter nao inclui headers do `external/saltcreep`; a rota temporal fica
+atraves do bridge isolado. A politica de pressao desta fase e constante:
+`query.wall_pressure_Pa` deve coincidir com
+`config.wall_pressure.initial_wall_pressure_Pa`.
+
+Detalhes completos em
+`docs/29_saltcreep_adapter_time_bridge_connection.md`.
+
 ## Por que o backend temporal real ainda nao foi ligado
 
 Ainda nao ha uma API temporal de producao do tipo "avaliar resposta de parede"
@@ -240,5 +255,6 @@ Fase 7.6 e ativar somente a rota elastica/geostatica minima.
 4. Resolver a rota temporal com `TimeIntegrator` sem conflito de includes.
    **Concluido como bridge isolado na Fase 7.8.**
 5. Conectar o bridge ao adapter principal, ainda sem modificar `PknModel`.
+   **Concluido na Fase 7.9 com pressao constante.**
 6. Somente depois conectar o adapter a `coupling/`, ainda sem modificar
    `PknModel`.

@@ -1,6 +1,6 @@
 # 28 — Bridge temporal para o TimeIntegrator do saltcreep
 
-**Status:** Implementado e isolado — Fase 7.8
+**Status:** Implementado e consumido pelo adapter — Fases 7.8-7.9
 **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
@@ -18,6 +18,10 @@ TIME_BRIDGE_CONNECTED
 Isto significa que `TimeIntegrator::advance()` compila e executa por uma
 camada intermediaria isolada. Nao significa acoplamento LOT/PKN/APB e nao
 substitui ainda o backend minimo do `SaltCreepSaltcreepAdapter`.
+
+Na Fase 7.9, o bridge passou a ser consumido pelo
+`SaltCreepSaltcreepAdapter`. O bridge continua isolado do LOT/PKN/APB e a
+politica de pressao ainda e constante.
 
 ## Problema resolvido
 
@@ -107,9 +111,9 @@ material elastico e geostatica opcional. Como o material usado na prova e
 `ElasticIsotropic`, o `advance()` confirma a rota temporal e a manutencao do
 estado do integrador, mas nao introduz fluencia real nem dano.
 
-O `SaltCreepSaltcreepAdapter` continua usando seu backend minimo elastico e
-cacheado da Fase 7.7. A troca do cache elastico pelo bridge temporal deve ser
-uma fase futura, com testes especificos de contrato e sem alterar LOT/PKN/APB.
+Na Fase 7.9, o `SaltCreepSaltcreepAdapter` passou a usar o bridge temporal no
+seu cache opaco. A conexao ainda usa material elastico, campo termico neutro e
+pressao de parede constante; portanto nao introduz fluencia real nem dano.
 
 ## Proximos passos
 

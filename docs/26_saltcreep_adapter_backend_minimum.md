@@ -1,6 +1,6 @@
 # 26 — Backend minimo do SaltCreepSaltcreepAdapter
 
-**Status:** Implementado, isolado e persistido — Fases 7.6-7.7 | **Ultima atualizacao:** 2026-06-03
+**Status:** Substituido pelo bridge temporal no adapter — Fases 7.6-7.9 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -36,6 +36,19 @@ O backend e compilado no target principal apenas com os fontes minimos:
 - `external/saltcreep/src/solver/WallPressureField.cpp`.
 
 Nenhum arquivo em `external/saltcreep/` foi alterado.
+
+## Situacao apos a Fase 7.9
+
+A rota elastica minima direta permanece documentada como prova da Fase 7.6 e
+continua sendo usada por testes controlados separados. No adapter principal,
+ela foi substituida pelo `SaltCreepTimeBridge` na Fase 7.9.
+
+Com isso, `SaltCreepSaltcreepAdapter` nao monta mais diretamente malha,
+material, matriz de rigidez ou solver elastico. Ele delega a rota temporal ao
+bridge persistente, que por sua vez executa `TimeIntegrator::advance()` em
+target CMake isolado.
+
+Ver `docs/29_saltcreep_adapter_time_bridge_connection.md`.
 
 ## Persistencia adicionada na Fase 7.7
 

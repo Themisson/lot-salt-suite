@@ -35,7 +35,7 @@ class SaltCreepSaltcreepAdapter final : public SaltCreepInterface {
  private:
   struct BackendCache;
 
-  [[nodiscard]] const BackendCache& backend() const;
+  [[nodiscard]] BackendCache& backend() const;
 
   SaltCreepAdapterConfig config_;
   // Logically const: evaluate_wall_response() does not change configuration or

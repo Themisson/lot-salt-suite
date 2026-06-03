@@ -2,18 +2,12 @@
 
 #include <algorithm>
 #include <cmath>
-#include <Eigen/Sparse>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <utility>
-#include <vector>
 
-#include "constitutive/elastic_isotropic.hpp"
-#include "elements/axisym_1d_L3.hpp"
-#include "solver/Assembler.hpp"
-#include "solver/ElasticSolver.hpp"
-#include "solver/WallPressureField.hpp"
+#include "salt/SaltCreepTimeBridge.hpp"
 
 namespace lss::salt {
 namespace {
@@ -51,53 +45,63 @@ void validate_query(const SaltCreepQuery& query) {
 
 bool backend_minimum_supported(const SaltCreepAdapterConfig& config) {
   return config.geometry.axisymmetric && config.geometry.plane_strain &&
-         config.mesh.axial_elements == 1;
+         config.mesh.axial_elements == 1 &&
+         config.geostatic.use_explicit_gauss_point_vector;
 }
 
-std::vector<Stress> build_geostatic_vector(const Mesh& mesh,
-                                           const Element& element,
-                                           const SaltCreepAdapterConfig& config) {
-  const int total_gp =
-      mesh.n_elements * static_cast<int>(element.gauss_points().size());
-  if (!config.geostatic.enabled) {
-    return std::vector<Stress>(total_gp, Stress::Zero());
-  }
+SaltCreepTimeBridgeConfig make_bridge_config(
+    const SaltCreepAdapterConfig& config) {
+  SaltCreepTimeBridgeConfig bridge_config;
+  bridge_config.inner_radius_m = config.geometry.inner_radius_m;
+  bridge_config.outer_radius_m = config.geometry.outer_radius_m;
+  bridge_config.height_m = config.geometry.height_m;
+  bridge_config.radial_elements = config.mesh.radial_elements;
+  bridge_config.elastic_modulus_Pa = config.material.elastic_modulus_Pa;
+  bridge_config.poisson_ratio = config.material.poisson_ratio;
+  bridge_config.temperature_K = config.thermal.temperature_K;
+  bridge_config.reference_temperature_K =
+      config.thermal.reference_temperature_K;
+  bridge_config.alpha_thermal_1_K = config.thermal.alpha_thermal_1_K;
+  bridge_config.wall_pressure_Pa =
+      config.wall_pressure.initial_wall_pressure_Pa;
+  bridge_config.geostatic_enabled = config.geostatic.enabled;
+  bridge_config.geostatic_radial_stress_Pa =
+      config.geostatic.radial_stress_Pa;
+  bridge_config.geostatic_hoop_stress_Pa =
+      config.geostatic.hoop_stress_Pa;
+  bridge_config.geostatic_vertical_stress_Pa =
+      config.geostatic.vertical_stress_Pa;
+  bridge_config.fix_outer_wall = config.geostatic.enabled;
+  return bridge_config;
+}
 
-  const Stress stress{config.geostatic.radial_stress_Pa,
-                      config.geostatic.hoop_stress_Pa,
-                      config.geostatic.vertical_stress_Pa,
-                      0.0};
-  return std::vector<Stress>(total_gp, stress);
+bool nearly_equal(double lhs, double rhs) {
+  const double scale = std::max({1.0, std::abs(lhs), std::abs(rhs)});
+  return std::abs(lhs - rhs) <= 1.0e-12 * scale;
+}
+
+void require_constant_wall_pressure_policy(const SaltCreepAdapterConfig& config,
+                                           const SaltCreepQuery& query) {
+  if (!nearly_equal(query.wall_pressure_Pa,
+                    config.wall_pressure.initial_wall_pressure_Pa)) {
+    throw std::invalid_argument(
+        "SaltCreepSaltcreepAdapter: dynamic wall pressure is not supported by "
+        "the time bridge in this phase; query.wall_pressure_Pa must match "
+        "config.wall_pressure.initial_wall_pressure_Pa");
+  }
 }
 
 }  // namespace
 
 struct SaltCreepSaltcreepAdapter::BackendCache {
   explicit BackendCache(const SaltCreepAdapterConfig& config)
-      : model(config.material.elastic_modulus_Pa,
-              config.material.poisson_ratio),
-        mesh(build_mesh_L3(config.geometry.inner_radius_m,
-                           config.geometry.outer_radius_m,
-                           config.mesh.radial_elements,
-                           1.0)),
-        stiffness(Assembler::assemble_K(mesh, element, model)),
-        geostatic_force(Eigen::VectorXd::Zero(mesh.total_dofs())),
-        geostatic_enabled(config.geostatic.enabled) {
-    if (geostatic_enabled) {
-      const auto sigma_geo = build_geostatic_vector(mesh, element, config);
-      geostatic_force =
-          Assembler::assemble_geostatic_force(mesh, element, sigma_geo);
-      fixed_dofs.push_back(mesh.dof_index(mesh.n_nodes - 1, 0));
+      : bridge(make_bridge_config(config)) {
+    if (config.time.initial_time_s > 0.0) {
+      (void)bridge.advance_to(config.time.initial_time_s);
     }
   }
 
-  AxisymL3 element;
-  ElasticIsotropic model;
-  Mesh1D mesh;
-  Eigen::SparseMatrix<double> stiffness;
-  Eigen::VectorXd geostatic_force;
-  std::vector<int> fixed_dofs;
-  bool geostatic_enabled = false;
+  SaltCreepTimeBridge bridge;
 };
 
 SaltCreepSaltcreepAdapter::SaltCreepSaltcreepAdapter()
@@ -135,7 +139,7 @@ int SaltCreepSaltcreepAdapter::backend_build_count() const {
   return backend_build_count_;
 }
 
-const SaltCreepSaltcreepAdapter::BackendCache&
+SaltCreepSaltcreepAdapter::BackendCache&
 SaltCreepSaltcreepAdapter::backend() const {
   if (!backend_cache_) {
     backend_cache_ = std::make_unique<BackendCache>(config_);
@@ -149,32 +153,14 @@ SaltCreepResponse SaltCreepSaltcreepAdapter::evaluate_wall_response(
   validate_query(query);
   if (!is_available()) {
     throw std::logic_error(
-        "SaltCreepSaltcreepAdapter: minimum backend is unavailable for config");
+        "SaltCreepSaltcreepAdapter: time bridge is unavailable for config");
   }
+  require_constant_wall_pressure_policy(config_, query);
 
-  const auto& cached_backend = backend();
-  const ConstantWallPressureField wall_pressure(query.wall_pressure_Pa);
-
-  auto K = cached_backend.stiffness;
-  auto f = Assembler::assemble_boundary_pressure(
-      cached_backend.mesh,
-      cached_backend.element,
-      wall_pressure,
-      query.time_s,
-      0.0);
-  if (cached_backend.geostatic_enabled) {
-    f -= cached_backend.geostatic_force;
-  }
-
-  const auto solver_result =
-      ElasticSolver{}.solve(std::move(K),
-                            std::move(f),
-                            cached_backend.fixed_dofs);
-  const double radial_displacement_m =
-      solver_result.u[cached_backend.mesh.dof_index(0, 0)];
+  const auto bridge_result = backend().bridge.advance_to(query.time_s);
 
   SaltCreepResponse response;
-  response.radial_displacement_m = radial_displacement_m;
+  response.radial_displacement_m = bridge_result.wall_displacement_m;
   response.radial_closure_m =
       radial_closure_from_displacement(response.radial_displacement_m);
   // This is a wall hoop-strain proxy (u/r_i) kept for the minimum backend

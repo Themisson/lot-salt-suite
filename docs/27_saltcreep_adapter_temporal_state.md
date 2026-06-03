@@ -1,6 +1,6 @@
 # 27 — Estado temporal persistido do SaltCreepSaltcreepAdapter
 
-**Status:** Implementado e isolado — Fase 7.7 | Ponte temporal criada na Fase 7.8
+**Status:** Implementado e conectado ao bridge — Fases 7.7-7.9
 **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
@@ -73,7 +73,16 @@ A Fase 7.8 criou `SaltCreepTimeBridge`, uma ponte isolada que executa
 `TimeIntegrator::advance()` sem expor os headers de I/O do `external/saltcreep`
 aos headers publicos do `lot-salt-suite`.
 
-Esse bridge ainda nao substitui o cache elastico do
-`SaltCreepSaltcreepAdapter`. A decisao de integrar o bridge ao adapter deve ser
-uma fase futura, com mapeamento explicito de configuracao, pressao temporal e
-estado retornado.
+Na Fase 7.8, esse bridge ainda nao substituia o cache elastico do
+`SaltCreepSaltcreepAdapter`; ele apenas provava a fronteira tecnica. A Fase 7.9
+fez a conexao ao adapter principal.
+
+## Relacao com a Fase 7.9
+
+A Fase 7.9 substituiu o cache elastico direto do adapter por um
+`SaltCreepTimeBridge` persistente. O estado temporal externo do adapter continua
+em `SaltCreepAdapterState`, enquanto o bridge guarda o estado interno do
+`TimeIntegrator`.
+
+A politica de pressao permanece restrita: a query deve usar a pressao inicial
+da configuracao ate que o bridge suporte pressao variavel.

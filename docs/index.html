@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">17/24</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">97</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">18/25</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">102</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2705,7 +2705,10 @@ de fluencia nem chamada do sal pelo fluxo LOT/PKN/APB.
 Na Fase 7.8, <code>SaltCreepTimeBridge</code> passou a compilar e executar
 <code>TimeIntegrator::advance()</code> em target isolado com include boundary controlada.
 Isso resolve a prova tecnica do integrador temporal, mas ainda nao conecta o
-bridge ao adapter principal nem ao fluxo LOT/PKN/APB.</p>
+bridge ao adapter principal nem ao fluxo LOT/PKN/APB.
+Na Fase 7.9, o <code>SaltCreepSaltcreepAdapter</code> passou a consumir esse bridge
+temporal internamente. Ainda assim, <code>lot-sim run --mode lot-pkn</code>, <code>PknModel</code>,
+<code>PknRunner</code>, APB e <code>coupling/</code> continuam sem instanciar o adapter de sal.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser
@@ -3077,6 +3080,10 @@ rota minima entre queries.</p>
 <code>lss_saltcreep_time_bridge</code> compila <code>TimeIntegrator</code> com include order
 controlada e expõe apenas <code>SaltCreepTimeBridge.hpp</code> como header publico limpo.
 Classificacao: <code>TIME_BRIDGE_CONNECTED</code>. LOT/PKN/APB seguem desacoplados.</p>
+<p>Na Fase 7.9, <code>SaltCreepSaltcreepAdapter</code> passou a usar
+<code>SaltCreepTimeBridge</code> como backend interno persistente. A integracao continua
+dentro de <code>src/salt/</code> e <code>include/salt/</code>; nenhum arquivo em
+<code>external/saltcreep/</code> foi alterado e LOT/PKN/APB permanecem desacoplados.</p>
 </div>
 </section>
 
@@ -3215,7 +3222,10 @@ entregar os dados ao solver.</p>
 4.21. Fase 7.8: criar target bridge para <code>TimeIntegrator</code> com include boundary
    controlada. Resultado: <code>SaltCreepTimeBridge</code> executa <code>advance()</code> em target
    isolado sem vazar <code>io/CaseParser.hpp</code> para headers publicos; LOT/PKN/APB
-   seguem desacoplados.</li>
+   seguem desacoplados.
+4.22. Fase 7.9: conectar <code>SaltCreepSaltcreepAdapter</code> ao
+   <code>SaltCreepTimeBridge</code>. Resultado: adapter usa bridge temporal persistente,
+   com politica de pressao constante e sem acoplar LOT/PKN/APB.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -3395,6 +3405,16 @@ entregar os dados ao solver.</p>
   finito, avanço de tempo, rejeicao de tempo decrescente e ausencia de
   dependencia LOT/PKN.
 - <code>external/saltcreep/</code>, LOT/PKN, APB e modelos fisicos permanecem sem
+  alteracao.</p>
+<p><strong>Fase 7.9 (adapter conectado ao bridge temporal):</strong>
+- <code>SaltCreepSaltcreepAdapter</code> passa a mapear <code>SaltCreepAdapterConfig</code> para
+  <code>SaltCreepTimeBridgeConfig</code>.
+- O cache opaco do adapter passa a possuir um <code>SaltCreepTimeBridge</code> persistente.
+- A pressao de parede ainda e constante: queries com pressao diferente da
+  pressao inicial da configuracao sao rejeitadas.
+- Testes Catch2 cobrem disponibilidade, avanço temporal, Lamé elastico,
+  rejeicao de pressao dinamica e configuracao fora da superficie suportada.
+- LOT/PKN, APB, modelos fisicos e <code>external/saltcreep/</code> permanecem sem
   alteracao.</p>
 <p><strong>Fase 6.10B (prova forcada do Eigen oficial):</strong>
 - <code>external/saltcreep/CMakeLists.txt</code> recebeu a opcao <code>LSS_SALTCREEP_FORCE_LSS_EIGEN</code>.

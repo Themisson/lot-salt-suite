@@ -162,3 +162,8 @@ Na Fase 7.8, o bloqueio foi resolvido por target intermediario no
 `lss_saltcreep_time_bridge` compila `TimeIntegrator` com include order
 controlada e expõe apenas `SaltCreepTimeBridge.hpp` como header publico limpo.
 Classificacao: `TIME_BRIDGE_CONNECTED`. LOT/PKN/APB seguem desacoplados.
+
+Na Fase 7.9, `SaltCreepSaltcreepAdapter` passou a usar
+`SaltCreepTimeBridge` como backend interno persistente. A integracao continua
+dentro de `src/salt/` e `include/salt/`; nenhum arquivo em
+`external/saltcreep/` foi alterado e LOT/PKN/APB permanecem desacoplados.

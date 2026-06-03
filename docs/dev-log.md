@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 7.8 concluida (target bridge temporal isolado do saltcreep)
+Fase ativa  : 7.9 concluida (adapter conectado ao bridge temporal)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-03
-Testes C++  : 97/97 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
+Testes C++  : 102/102 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
@@ -54,6 +54,56 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-03] Fase 7.9 — Adapter conectado ao SaltCreepTimeBridge — Codex
+
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Fazer `SaltCreepSaltcreepAdapter` usar `SaltCreepTimeBridge`
+persistente como backend temporal interno, mantendo LOT/PKN/APB desacoplados.
+
+**Mudanca implementada:**
+- `SaltCreepSaltcreepAdapter` passou a mapear `SaltCreepAdapterConfig` para
+  `SaltCreepTimeBridgeConfig`.
+- O `BackendCache` opaco do adapter agora guarda um `SaltCreepTimeBridge`.
+- `evaluate_wall_response()` avanca o bridge ate `query.time_s`, converte o
+  resultado para `SaltCreepResponse` e registra `SaltCreepAdapterState`.
+- O target principal deixou de compilar diretamente os fontes minimos do
+  `external/saltcreep`; a rota temporal fica atras de
+  `lss_saltcreep_time_bridge`.
+- Criado `tests/cpp/test_salt_creep_saltcreep_adapter_time_bridge.cpp`.
+- Criado `docs/29_saltcreep_adapter_time_bridge_connection.md`.
+
+**Politica de pressao:** Nesta fase, `query.wall_pressure_Pa` deve ser igual a
+`config.wall_pressure.initial_wall_pressure_Pa`. Pressao dinamica e rejeitada
+ate o bridge suportar historico/campo temporal de pressao.
+
+**Limite deliberado:**
+- O bridge usa material elastico, campo termico neutro e pressao constante.
+- LOT/PKN/APB seguem sem instanciar o adapter de sal.
+- Nenhum arquivo em `external/saltcreep/`, modelos fisicos, LOT/PKN, APB,
+  parser ou writer foi alterado.
+
+**Testes/builds executados:**
+- `Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue`
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build --config Debug -j`
+- `ctest --test-dir build -C Debug --output-on-failure`
+- Resultado: 102/102 Catch2 passaram no modo padrao
+  `LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON`.
+- `ctest --test-dir build -C Debug -R "SaltCreep|saltcreep|salt|bridge" --output-on-failure`
+  passou 49/49 testes de contrato/adapter/backend/bridge de sal.
+- `ctest --test-dir build -C Debug -R "Saltcreep backend" --output-on-failure`
+  passou 4/4 testes controlados do backend.
+
+**Validacao manual CLI:**
+- `lot_pkn_minimal.yaml` retornou `OK`.
+- `lot_pkn_with_leakoff.yaml` retornou `OK`.
+- `buz67d_pkn.yaml` retornou `OK`.
+- `lot-sim run --mode lot-pkn` gerou `result.json` e `timeseries.csv` em
+  `results\lot_pkn_minimal_adapter_bridge_review`.
 
 ---
 

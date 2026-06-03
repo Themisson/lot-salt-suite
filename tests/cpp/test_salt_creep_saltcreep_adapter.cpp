@@ -12,7 +12,7 @@ namespace {
 lss::salt::SaltCreepQuery valid_query() {
   return {
       3600.0,    // time_s
-      35.0e6,    // wall_pressure_Pa
+      0.0,       // wall_pressure_Pa
       363.15,    // temperature_K
       0.155575,  // radial_position_m
   };

@@ -20,6 +20,7 @@ lss::salt::SaltCreepAdapterConfig temporal_config() {
   config.time.dt_s = 60.0;
   config.time.total_time_s = 240.0;
   config.time.max_steps = 4;
+  config.wall_pressure.initial_wall_pressure_Pa = kPressure;
   return config;
 }
 
@@ -43,7 +44,7 @@ TEST_CASE("SaltCreepSaltcreepAdapter persists minimum backend objects across tem
   const auto first = adapter.evaluate_wall_response(
       temporal_query(60.0, kPressure));
   const auto second = adapter.evaluate_wall_response(
-      temporal_query(120.0, 1.2 * kPressure));
+      temporal_query(120.0, kPressure));
 
   CHECK(first.valid);
   CHECK(second.valid);
@@ -52,8 +53,7 @@ TEST_CASE("SaltCreepSaltcreepAdapter persists minimum backend objects across tem
   CHECK(adapter.backend_build_count() == 1);
   CHECK(adapter.state().step_count() == 2);
   CHECK(adapter.state().current_time_s() == Catch::Approx(120.0));
-  CHECK(adapter.state().last_wall_pressure_Pa() ==
-        Catch::Approx(1.2 * kPressure));
+  CHECK(adapter.state().last_wall_pressure_Pa() == Catch::Approx(kPressure));
 }
 
 TEST_CASE("SaltCreepSaltcreepAdapter preserves cached backend when state rejects decreasing time") {
@@ -84,4 +84,14 @@ TEST_CASE("SaltCreepSaltcreepAdapter does not build backend cache for unsupporte
                   std::logic_error);
 
   CHECK(adapter.backend_build_count() == 0);
+}
+
+TEST_CASE("SaltCreepSaltcreepAdapter rejects dynamic wall pressure until bridge supports it") {
+  const lss::salt::SaltCreepSaltcreepAdapter adapter(temporal_config());
+
+  CHECK_THROWS_AS(adapter.evaluate_wall_response(
+                      temporal_query(60.0, 1.2 * kPressure)),
+                  std::invalid_argument);
+  CHECK(adapter.backend_build_count() == 0);
+  CHECK(adapter.state().step_count() == 0);
 }

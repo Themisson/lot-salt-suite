@@ -175,6 +175,9 @@ Na Fase 7.8, `SaltCreepTimeBridge` passou a compilar e executar
 `TimeIntegrator::advance()` em target isolado com include boundary controlada.
 Isso resolve a prova tecnica do integrador temporal, mas ainda nao conecta o
 bridge ao adapter principal nem ao fluxo LOT/PKN/APB.
+Na Fase 7.9, o `SaltCreepSaltcreepAdapter` passou a consumir esse bridge
+temporal internamente. Ainda assim, `lot-sim run --mode lot-pkn`, `PknModel`,
+`PknRunner`, APB e `coupling/` continuam sem instanciar o adapter de sal.
 
 ## Dependencia Eigen no acoplamento
 

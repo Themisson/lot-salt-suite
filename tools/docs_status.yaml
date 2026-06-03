@@ -31,6 +31,7 @@ phases:
   phase_7_6_saltcreep_adapter_backend_minimum: completed
   phase_7_7_saltcreep_adapter_temporal_state: completed
   phase_7_8_saltcreep_time_bridge: completed
+  phase_7_9_saltcreep_adapter_time_bridge_connection: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -71,6 +72,7 @@ docs:
   saltcreep_adapter_backend_minimum: implemented
   saltcreep_adapter_temporal_state: implemented
   saltcreep_time_bridge: implemented
+  saltcreep_adapter_time_bridge_connection: implemented
   saltcreep_timeintegrator_include_boundary: implemented
   saltcreep_radial_displacement_sign_audit: implemented
   saltcreep_backend_controlled_case: implemented
@@ -119,7 +121,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 97         # Catch2 lot-salt-suite — Fase 7.8 conectou bridge temporal isolado do saltcreep
+  cpp_tests: 102        # Catch2 lot-salt-suite — Fase 7.9 conectou adapter ao bridge temporal
   saltcreep_tests: 126  # Catch2 saltcreep baseline — 126/126 passaram (2026-06-01)
   python_tests: 3       # unittest — verde; pytest indisponivel no ambiente local
   regression_baselines: 4
@@ -128,5 +130,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-03"
-updated_by: "codex (Fase 7.8)"
+updated_by: "codex (Fase 7.9)"
 project_version: "0.1.0"
