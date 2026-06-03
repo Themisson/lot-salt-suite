@@ -128,3 +128,11 @@ passado como escalar positivo esperando fechamento.
 - LOT/PKN, APB, `PknModel`, `PknRunner`, `LeakoffModel`, `ResultWriter` e
   `CaseParser` nao foram alterados.
 - Nenhum script Python novo foi criado.
+
+## Complemento Fase 7.4
+
+`docs/audits/saltcreep_backend_time_geostatic_case.md` amplia esta prova para
+`TimeIntegrator`, campo termico constante neutro, geostatica simplificada e
+pressao de parede constante. A classificacao dessa superficie e
+`TIME_THERMAL_GEOSTATIC_CONTROLLED_TEST_READY`, ainda sem adapter real e sem
+acoplamento LOT/PKN/APB.

@@ -1,6 +1,6 @@
 # 24 — Design do SaltCreepSaltcreepAdapter
 
-**Status:** Experimental e isolado — Fases 7.2-7.3 | **Ultima atualizacao:** 2026-06-03
+**Status:** Experimental e isolado — Fases 7.2-7.4 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -96,6 +96,28 @@ Esse resultado mostra que existe uma API C++ direta para um caso elastico
 controlado. Ele nao muda o status do adapter: o backend real ainda nao esta
 conectado a `SaltCreepSaltcreepAdapter`.
 
+## Caso controlado com tempo, geostatica e termico neutro
+
+A Fase 7.4 adiciona `tests/cpp/test_saltcreep_backend_time_geostatic_case.cpp`
+e `docs/audits/saltcreep_backend_time_geostatic_case.md`. O target Catch2
+separado `saltcreep_backend_time_geostatic_tests` instancia `TimeIntegrator`
+com:
+
+- material elastico `ElasticIsotropic`;
+- `ProfileField::make_constant()` com `alpha_thermal = 0`;
+- `ConstantWallPressureField`;
+- vetor geostatico explicito por ponto de Gauss;
+- um ou poucos passos `advance(dt_s)`.
+
+O teste confirma que campos neutros preservam a resposta elastica estatica e
+que uma geostatica compressiva simplificada, com parede externa fixa, produz
+fechamento assinado (`u_r < 0`) e fechamento positivo (`max(0, -u_r)`).
+
+Classificacao da API: `TIME_THERMAL_GEOSTATIC_CONTROLLED_TEST_READY`.
+
+Esse resultado prova uma superficie C++ controlada mais rica, mas ainda nao
+transforma `SaltCreepSaltcreepAdapter` em backend real.
+
 ## Por que o backend real nao foi ligado
 
 Nao ha, ainda, uma API simples do tipo "avaliar resposta de parede" que aceite
@@ -118,7 +140,7 @@ classe e seus testes isolados, mantendo `is_available() = false`.
 
 | Risco | Mitigacao |
 |-------|-----------|
-| Mapeamento de pressao de parede incompleto | Fase futura deve testar `WallPressureField` + integrador com caso controlado. |
+| Mapeamento de pressao de parede incompleto | Fase 7.4 testou `WallPressureField` + `TimeIntegrator`; adapter real ainda precisa mapear condicoes fisicas LOT/APB. |
 | Tensao geostatica e sinal interno do backend | Preservar FA03 no contrato moderno e testar conversao no adapter real. |
 | Tempo e passo do backend | `SaltCreepQuery` traz tempo absoluto; adapter real precisara de estado ou agenda temporal. |
 | Temperatura | Contrato usa K; backend real deve receber campo termico coerente. |
@@ -129,7 +151,7 @@ classe e seus testes isolados, mantendo `is_available() = false`.
 
 1. Projetar configuracao explicita do adapter real: geometria, malha, material,
    integrador e campo termico.
-2. Evoluir o caso controlado para cobrir integrador temporal, campo termico e
-   tensao geostatica antes de expor o backend por `SaltCreepSaltcreepAdapter`.
+2. Definir configuracao/state machine do adapter real para preservar estado
+   temporal entre chamadas.
 3. Somente depois conectar o adapter a `coupling/`, ainda sem modificar
    `PknModel`.

@@ -70,3 +70,10 @@ assinado e explicita o papel da condicao de contorno:
 Assim, o contrato de sinais permanece valido, mas o futuro adapter real deve
 mapear a pressao compressiva positiva do LOT/APB para o conjunto fisico correto
 de pressoes e tensoes do backend.
+
+## Complemento Fase 7.4
+
+O teste `tests/cpp/test_saltcreep_backend_time_geostatic_case.cpp` confirma a
+mesma convencao no caminho `TimeIntegrator`: `wall_displacement_m()` preserva
+`u_r` assinado e `wall_closure_pct()` permanece positivo quando a geostatica
+compressiva simplificada produz deslocamento para dentro.

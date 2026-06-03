@@ -100,6 +100,10 @@ entregar os dados ao solver.
    Resultado: target Catch2 separado executa um caso elastico de Lame com API
    C++ direta do backend, sem alterar `external/saltcreep/`, sem conectar o
    adapter real e sem acoplar LOT/PKN ao sal.
+4.17. Fase 7.4: evoluir o caso controlado para tempo, geostatica simplificada e
+   campo termico neutro. Resultado: target Catch2 separado executa
+   `TimeIntegrator::advance()` com `ProfileField`, `ConstantWallPressureField`
+   e vetor geostatico explicito, ainda sem adapter real e sem acoplamento LOT.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -243,6 +247,16 @@ entregar os dados ao solver.
   direta e viavel para caso elastico controlado, mas o adapter real ainda exige
   configuracao completa de malha, material, temperatura, geostatica e tempo.
 - LOT/PKN, APB, adapter neutro e `external/saltcreep/` permanecem sem alteracao.
+
+**Fase 7.4 (tempo/geostatica/termico neutro controlados):**
+- `tests/cpp/test_saltcreep_backend_time_geostatic_case.cpp` instancia
+  `TimeIntegrator` diretamente com campo termico constante neutro, pressao de
+  parede constante e vetor geostatico por ponto de Gauss.
+- O caso elastico neutro permanece compativel com a resposta estatica; o caso
+  geostatico compressivo simplificado produz `u_r < 0` e fechamento positivo.
+- `docs/audits/saltcreep_backend_time_geostatic_case.md` classifica a API como
+  `TIME_THERMAL_GEOSTATIC_CONTROLLED_TEST_READY`.
+- Adapter, LOT/PKN, APB e `external/saltcreep/` permanecem sem alteracao.
 
 **Fase 6.10B (prova forcada do Eigen oficial):**
 - `external/saltcreep/CMakeLists.txt` recebeu a opcao `LSS_SALTCREEP_FORCE_LSS_EIGEN`.

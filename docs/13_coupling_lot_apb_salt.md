@@ -153,6 +153,10 @@ for formalizada.
 Na Fase 7.3, a rota C++ direta do backend foi validada apenas para um caso
 elastico controlado em target Catch2 separado. Isso reduz risco de integracao,
 mas nao autoriza acoplamento LOT/sal nem mudanca em `PknModel`.
+Na Fase 7.4, `TimeIntegrator` tambem foi exercitado em target Catch2 separado
+com campo termico constante neutro, vetor geostatico simplificado e pressao de
+parede constante. Isso confirma uma rota controlada para tempo/geostatica, mas
+continua fora do `coupling/` e nao muda o status neutro do adapter.
 
 ## Dependencia Eigen no acoplamento
 

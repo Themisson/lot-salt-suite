@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 7.3 concluida (caso C++ controlado do backend saltcreep)
+Fase ativa  : 7.4 concluida (tempo/geostatica/termico neutro controlados no backend saltcreep)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-03
-Testes C++  : 66/66 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
+Testes C++  : 68/68 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
@@ -54,6 +54,75 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-03] Fase 7.4 — Tempo, geostatica e termico neutro no backend saltcreep — Codex
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Evoluir o caso controlado do backend `external/saltcreep` para
+exercitar tempo, campo termico constante neutro, geostatica simplificada e
+pressao de parede constante, sem ligar o backend ao adapter real e sem acoplar
+LOT/PKN/APB ao sal.
+
+**Auditoria:**
+- Criado `docs/audits/saltcreep_backend_time_geostatic_case.md`.
+- Classificacao: `TIME_THERMAL_GEOSTATIC_CONTROLLED_TEST_READY`.
+- Achado: `TimeIntegrator` aceita `ThermalField`, vetor geostatico por ponto de
+  Gauss, `WallPressureField` opcional e passos `advance(dt_s)`.
+
+**Mudanca implementada:**
+- Criado `tests/cpp/test_saltcreep_backend_time_geostatic_case.cpp`.
+- `CMakeLists.txt` adiciona target separado
+  `saltcreep_backend_time_geostatic_tests`.
+- O teste usa `ElasticIsotropic`, `ProfileField::make_constant()` com
+  `alpha_thermal = 0`, `ConstantWallPressureField`, geostatica explicita e
+  `TimeIntegrator::advance()`.
+
+**Resultado tecnico:**
+- Caso neutro: dois passos temporais preservam a resposta elastica estatica
+  contra `ElasticSolver`.
+- Caso geostatico: compressao uniforme simplificada com parede externa fixa
+  produz `u_r < 0`, fechamento positivo e `wall_closure_pct() > 0`.
+- Nenhum output versionado e gerado pelo teste.
+
+**Testes/builds executados:**
+- `Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue`
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build --config Debug -j`
+- `ctest --test-dir build -C Debug --output-on-failure`
+- Resultado: 68/68 Catch2 passaram no modo padrao
+  `LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON`.
+- `ctest --test-dir build -C Debug -R "Saltcreep backend" --output-on-failure`
+  passou 4/4.
+
+**Validacao manual CLI:**
+- `lot_pkn_minimal.yaml` retornou `OK`.
+- `lot_pkn_with_leakoff.yaml` retornou `OK`.
+- `buz67d_pkn.yaml` retornou `OK`.
+
+**Escopo alterado:**
+- `CMakeLists.txt`
+- `tests/cpp/test_saltcreep_backend_time_geostatic_case.cpp`
+- `docs/audits/saltcreep_backend_time_geostatic_case.md`
+- `docs/audits/saltcreep_backend_controlled_case.md`
+- `docs/audits/saltcreep_radial_displacement_sign_audit.md`
+- `docs/24_saltcreep_adapter_design.md`
+- `docs/13_coupling_lot_apb_salt.md`
+- `docs/16_saltcreep_governance.md`
+- `docs/17_lot_pkn_roadmap.md`
+- `docs/dev-log.md`
+- `tools/docs_status.yaml`
+- `docs/index.html`
+
+**Nao alterado:**
+- `legance/`, `legacy/`, `external/saltcreep/`, `include/Eigen/`,
+  `external/saltcreep/include/Eigen/`, `tests/baselines/` e
+  `postprocess/scripts/` preservados.
+- `SaltCreepSaltcreepAdapter::is_available()` permanece `false`.
+- `PknModel`, `PknRunner`, `LeakoffModel`, `ResultWriter`, `CaseParser`,
+  `src/lot/`, `include/lot/`, APB e modelos fisicos sem alteracao.
+- Nenhum script Python novo e nenhum acoplamento LOT/sal implementado.
 
 ---
 

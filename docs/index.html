@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">12/19</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">66</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">13/20</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">68</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2683,7 +2683,11 @@ permanece neutro e indisponivel enquanto a configuracao completa do backend
 for formalizada.
 Na Fase 7.3, a rota C++ direta do backend foi validada apenas para um caso
 elastico controlado em target Catch2 separado. Isso reduz risco de integracao,
-mas nao autoriza acoplamento LOT/sal nem mudanca em <code>PknModel</code>.</p>
+mas nao autoriza acoplamento LOT/sal nem mudanca em <code>PknModel</code>.
+Na Fase 7.4, <code>TimeIntegrator</code> tambem foi exercitado em target Catch2 separado
+com campo termico constante neutro, vetor geostatico simplificado e pressao de
+parede constante. Isso confirma uma rota controlada para tempo/geostatica, mas
+continua fora do <code>coupling/</code> e nao muda o status neutro do adapter.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser
@@ -3029,6 +3033,11 @@ isolado e que o sinal de fechamento depende da condicao de contorno fisica:
 pressao interna positiva expande a parede, pressao externa/confinante positiva
 fecha. Nenhum arquivo em <code>external/saltcreep/</code> foi alterado, e o adapter
 permaneceu neutro com <code>is_available() = false</code>.</p>
+<p>Na Fase 7.4, outro target Catch2 separado passou a compilar <code>TimeIntegrator</code>,
+<code>ProfileField</code>, <code>ConstantWallPressureField</code> e a montagem geostatica do backend
+em um caso controlado sem outputs versionados. Classificacao:
+<code>TIME_THERMAL_GEOSTATIC_CONTROLLED_TEST_READY</code>. O <code>external/saltcreep/</code>
+permaneceu somente leitura e o adapter continuou neutro.</p>
 </div>
 </section>
 
@@ -3147,7 +3156,11 @@ entregar os dados ao solver.</p>
 4.16. Fase 7.3: criar caso de integracao controlado do backend <code>saltcreep</code>.
    Resultado: target Catch2 separado executa um caso elastico de Lame com API
    C++ direta do backend, sem alterar <code>external/saltcreep/</code>, sem conectar o
-   adapter real e sem acoplar LOT/PKN ao sal.</li>
+   adapter real e sem acoplar LOT/PKN ao sal.
+4.17. Fase 7.4: evoluir o caso controlado para tempo, geostatica simplificada e
+   campo termico neutro. Resultado: target Catch2 separado executa
+   <code>TimeIntegrator::advance()</code> com <code>ProfileField</code>, <code>ConstantWallPressureField</code>
+   e vetor geostatico explicito, ainda sem adapter real e sem acoplamento LOT.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -3277,6 +3290,15 @@ entregar os dados ao solver.</p>
   direta e viavel para caso elastico controlado, mas o adapter real ainda exige
   configuracao completa de malha, material, temperatura, geostatica e tempo.
 - LOT/PKN, APB, adapter neutro e <code>external/saltcreep/</code> permanecem sem alteracao.</p>
+<p><strong>Fase 7.4 (tempo/geostatica/termico neutro controlados):</strong>
+- <code>tests/cpp/test_saltcreep_backend_time_geostatic_case.cpp</code> instancia
+  <code>TimeIntegrator</code> diretamente com campo termico constante neutro, pressao de
+  parede constante e vetor geostatico por ponto de Gauss.
+- O caso elastico neutro permanece compativel com a resposta estatica; o caso
+  geostatico compressivo simplificado produz <code>u_r &lt; 0</code> e fechamento positivo.
+- <code>docs/audits/saltcreep_backend_time_geostatic_case.md</code> classifica a API como
+  <code>TIME_THERMAL_GEOSTATIC_CONTROLLED_TEST_READY</code>.
+- Adapter, LOT/PKN, APB e <code>external/saltcreep/</code> permanecem sem alteracao.</p>
 <p><strong>Fase 6.10B (prova forcada do Eigen oficial):</strong>
 - <code>external/saltcreep/CMakeLists.txt</code> recebeu a opcao <code>LSS_SALTCREEP_FORCE_LSS_EIGEN</code>.
 - Mecanismo: diretorio proxy no build dir com apenas <code>Eigen/</code> + <code>BEFORE PRIVATE</code>

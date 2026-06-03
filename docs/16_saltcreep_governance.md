@@ -131,3 +131,9 @@ isolado e que o sinal de fechamento depende da condicao de contorno fisica:
 pressao interna positiva expande a parede, pressao externa/confinante positiva
 fecha. Nenhum arquivo em `external/saltcreep/` foi alterado, e o adapter
 permaneceu neutro com `is_available() = false`.
+
+Na Fase 7.4, outro target Catch2 separado passou a compilar `TimeIntegrator`,
+`ProfileField`, `ConstantWallPressureField` e a montagem geostatica do backend
+em um caso controlado sem outputs versionados. Classificacao:
+`TIME_THERMAL_GEOSTATIC_CONTROLLED_TEST_READY`. O `external/saltcreep/`
+permaneceu somente leitura e o adapter continuou neutro.
