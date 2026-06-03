@@ -1,6 +1,6 @@
 # 13 — Acoplamento LOT–APB–Sal
 
-**Status:** Planejado | **Última atualização:** 2026-06-01
+**Status:** Planejado | **Última atualização:** 2026-06-03
 
 > A formulação detalhada deve ser verificada via `/formulation-audit`
 > comparando os legados antes de implementar o módulo `coupling/`.
@@ -166,6 +166,11 @@ Na Fase 7.6, o adapter passou a chamar uma rota elastica/geostatica minima do
 backend `external/saltcreep`, ainda isolada. `is_available()` agora indica que
 a configuracao e suportada por essa superficie minima. Isso nao conecta
 LOT/PKN/APB ao sal e nao altera `PknModel` ou `lot-sim run --mode lot-pkn`.
+Na Fase 7.7, o adapter passou a persistir os objetos dessa superficie minima
+entre queries, mas `TimeIntegrator` continua fora do target principal por
+fronteira de includes entre `external/saltcreep/include/io/CaseParser.hpp` e
+`include/io/CaseParser.hpp`. Portanto, ainda nao ha acoplamento temporal real
+de fluencia nem chamada do sal pelo fluxo LOT/PKN/APB.
 
 ## Dependencia Eigen no acoplamento
 

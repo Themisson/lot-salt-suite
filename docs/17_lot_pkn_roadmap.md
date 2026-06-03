@@ -111,6 +111,11 @@ entregar os dados ao solver.
 4.19. Fase 7.6: conectar backend real minimo do adapter. Resultado:
    `SaltCreepSaltcreepAdapter` executa rota elastica/geostatica controlada do
    `external/saltcreep`, registra estado e permanece fora do caminho LOT/PKN/APB.
+4.20. Fase 7.7: auditar a fronteira de includes do `TimeIntegrator` e
+   persistir a rota minima do adapter entre queries. Resultado:
+   `TimeIntegrator` segue fora do target principal por conflito potencial de
+   `io/CaseParser.hpp`, enquanto malha, elemento, material, matriz de rigidez,
+   geostatica e graus fixos passam a ser cacheados pelo adapter.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -285,6 +290,18 @@ entregar os dados ao solver.
 - `state_` e `mutable` por constancia logica e registra cada resposta.
 - `TimeIntegrator` continua fora do adapter principal; segue coberto por target
   controlado separado.
+- LOT/PKN, APB, modelos fisicos e `external/saltcreep/` permanecem sem
+  alteracao.
+
+**Fase 7.7 (estado temporal persistido sem TimeIntegrator):**
+- `docs/audits/saltcreep_timeintegrator_include_boundary.md` classifica a rota
+  `TimeIntegrator` como bloqueada para o target principal por fronteira de
+  includes.
+- `SaltCreepSaltcreepAdapter` passa a cachear a rota minima elastica/geostatica
+  entre queries da mesma instancia.
+- `tests/cpp/test_salt_creep_saltcreep_adapter_temporal_state.cpp` cobre
+  construcao preguiçosa, reuso do cache, rejeicao de tempo decrescente e
+  configuracao fora da superficie minima.
 - LOT/PKN, APB, modelos fisicos e `external/saltcreep/` permanecem sem
   alteracao.
 

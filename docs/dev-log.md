@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 7.6 concluida (backend minimo do adapter saltcreep)
+Fase ativa  : 7.7 concluida (estado temporal persistido do adapter saltcreep)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-03
-Testes C++  : 88/88 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
+Testes C++  : 91/91 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
@@ -54,6 +54,54 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-03] Fase 7.7 — Estado temporal persistido sem TimeIntegrator — Codex
+
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Resolver a fronteira tecnica do `TimeIntegrator` antes de tentar
+usa-lo no adapter principal e persistir a rota minima do backend entre queries.
+
+**Classificacao:** `TEMPORAL_STATE_READY_WITHOUT_TIMEINTEGRATOR` para o adapter
+principal; `TIMEINTEGRATOR_BLOCKED_BY_INCLUDE_BOUNDARY` para a tentativa de
+trazer `TimeIntegrator` ao target `lot-sim`/`lot_sim_tests`.
+
+**Mudanca implementada:**
+- Criado `docs/audits/saltcreep_timeintegrator_include_boundary.md`.
+- Criado `docs/27_saltcreep_adapter_temporal_state.md`.
+- `SaltCreepSaltcreepAdapter` passou a ter cache privado e opaco para
+  elemento, material, malha, matriz de rigidez, vetor geostatico e graus fixos.
+- `evaluate_wall_response()` continua montando somente a pressao de parede da
+  query e registrando resposta em `SaltCreepAdapterState`.
+- Criado `tests/cpp/test_salt_creep_saltcreep_adapter_temporal_state.cpp`.
+
+**Limite deliberado:**
+- `TimeIntegrator` nao foi conectado ao adapter principal porque
+  `external/saltcreep/include/solver/TimeIntegrator.hpp` inclui
+  `io/CaseParser.hpp`, nome que tambem existe em `include/io/CaseParser.hpp`.
+- Nenhum arquivo em `external/saltcreep/`, LOT/PKN, APB ou modelos fisicos foi
+  alterado.
+
+**Testes/builds executados:**
+- `Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue`
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build --config Debug -j`
+- `ctest --test-dir build -C Debug --output-on-failure`
+- Resultado: 91/91 Catch2 passaram no modo padrao
+  `LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON`.
+- `ctest --test-dir build -C Debug -R "SaltCreep|saltcreep|salt" --output-on-failure`
+  passou 38/38 testes de contrato/adapter/backend de sal.
+- `ctest --test-dir build -C Debug -R "Saltcreep backend" --output-on-failure`
+  passou 4/4 testes controlados do backend.
+
+**Validacao manual CLI:**
+- `lot_pkn_minimal.yaml` retornou `OK`.
+- `lot_pkn_with_leakoff.yaml` retornou `OK`.
+- `buz67d_pkn.yaml` retornou `OK`.
+- `lot-sim run --mode lot-pkn` gerou `result.json` e `timeseries.csv` em
+  `results\lot_pkn_minimal_adapter_temporal_state`.
 
 ---
 

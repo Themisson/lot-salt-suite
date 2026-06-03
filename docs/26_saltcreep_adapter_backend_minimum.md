@@ -1,6 +1,6 @@
 # 26 — Backend minimo do SaltCreepSaltcreepAdapter
 
-**Status:** Implementado e isolado — Fase 7.6 | **Ultima atualizacao:** 2026-06-03
+**Status:** Implementado, isolado e persistido — Fases 7.6-7.7 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -37,6 +37,26 @@ O backend e compilado no target principal apenas com os fontes minimos:
 
 Nenhum arquivo em `external/saltcreep/` foi alterado.
 
+## Persistencia adicionada na Fase 7.7
+
+Na Fase 7.6, a rota minima era reconstruida em cada
+`evaluate_wall_response()`. Na Fase 7.7, esses objetos passaram para um cache
+privado e preguiçoso do adapter:
+
+- elemento;
+- material;
+- malha;
+- matriz de rigidez;
+- vetor geostatico;
+- graus de liberdade fixos.
+
+Cada query continua montando o vetor de pressao de parede especifico do tempo e
+da pressao solicitados. O solver elastico ainda resolve uma copia da matriz
+persistida, preservando o contrato de chamada sem introduzir estado numerico de
+fluencia.
+
+Detalhes em `docs/27_saltcreep_adapter_temporal_state.md`.
+
 ## Limite deliberado
 
 `TimeIntegrator` continua provado nos targets Catch2 separados das Fases 7.4,
@@ -50,6 +70,10 @@ Assim, o backend minimo do adapter usa a rota elastica controlada. O caminho
 com `TimeIntegrator`, campo termico e geostatica temporal permanece isolado em
 `saltcreep_backend_time_geostatic_tests` ate haver uma fase dedicada para
 resolver a fronteira de includes e estado temporal real.
+
+A Fase 7.7 formaliza essa decisao em
+`docs/audits/saltcreep_timeintegrator_include_boundary.md` com classificacao
+`TIMEINTEGRATOR_BLOCKED_BY_INCLUDE_BOUNDARY`.
 
 ## Configuracao minima
 
@@ -136,7 +160,7 @@ instanciar `SaltCreepSaltcreepAdapter`.
 1. Resolver a fronteira de includes para trazer `TimeIntegrator` ao adapter sem
    conflito entre parsers `io/CaseParser.hpp`.
 2. Persistir objetos do backend entre chamadas, em vez de reconstruir o caso
-   elastico a cada query.
+   elastico a cada query. **Concluido na Fase 7.7 para a rota minima.**
 3. Definir mapeamento fisico de pressao LOT/APB para pressao interna, externa e
    geostatica.
 4. Introduzir campo termico real e integrador temporal apenas depois de testes

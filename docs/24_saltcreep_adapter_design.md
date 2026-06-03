@@ -1,6 +1,6 @@
 # 24 — Design do SaltCreepSaltcreepAdapter
 
-**Status:** Backend minimo isolado — Fases 7.2-7.6 | **Ultima atualizacao:** 2026-06-03
+**Status:** Backend minimo persistido — Fases 7.2-7.7 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -14,6 +14,7 @@ Nesta fase ele e deliberadamente isolado:
 - nao e chamado por `lot-sim run`;
 - linka apenas a rota elastica minima do `external/saltcreep`;
 - executa um caso elastico/geostatico controlado em memoria.
+- persiste objetos do backend minimo entre queries da mesma instancia.
 
 ## Status do backend
 
@@ -166,6 +167,24 @@ Detalhes completos estao em
 target principal nesta fase por risco de conflito de include com
 `io/CaseParser.hpp`.
 
+## Estado temporal persistido
+
+A Fase 7.7 adiciona um cache privado ao `SaltCreepSaltcreepAdapter` para evitar
+reconstruir malha, elemento, material, matriz de rigidez, vetor geostatico e
+graus fixos a cada query. A primeira chamada valida de
+`evaluate_wall_response()` cria esse cache; chamadas seguintes reutilizam a
+mesma superficie minima e montam apenas o vetor de pressao de parede da query.
+
+Classificacao:
+
+```text
+TEMPORAL_STATE_READY_WITHOUT_TIMEINTEGRATOR
+```
+
+A auditoria completa da fronteira de includes esta em
+`docs/audits/saltcreep_timeintegrator_include_boundary.md`, e o contrato de
+estado persistido esta em `docs/27_saltcreep_adapter_temporal_state.md`.
+
 ## Por que o backend temporal real ainda nao foi ligado
 
 Ainda nao ha uma API temporal de producao do tipo "avaliar resposta de parede"
@@ -204,6 +223,8 @@ Fase 7.6 e ativar somente a rota elastica/geostatica minima.
 2. Conectar `SaltCreepAdapterConfig` aos objetos reais do backend em teste
    isolado antes de ativar `is_available()`. **Concluido parcialmente na Fase
    7.6 para backend elastico/geostatico minimo.**
-3. Resolver a rota temporal com `TimeIntegrator` sem conflito de includes.
-4. Somente depois conectar o adapter a `coupling/`, ainda sem modificar
+3. Persistir objetos do backend minimo entre chamadas. **Concluido na Fase 7.7
+   sem `TimeIntegrator`.**
+4. Resolver a rota temporal com `TimeIntegrator` sem conflito de includes.
+5. Somente depois conectar o adapter a `coupling/`, ainda sem modificar
    `PknModel`.

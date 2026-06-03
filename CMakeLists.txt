@@ -126,6 +126,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_salt_creep_adapter_state.cpp
     tests/cpp/test_salt_creep_interface.cpp
     tests/cpp/test_salt_creep_saltcreep_adapter_backend.cpp
+    tests/cpp/test_salt_creep_saltcreep_adapter_temporal_state.cpp
     tests/cpp/test_salt_creep_saltcreep_adapter.cpp
     ${LSS_CORE_SOURCES}
   )

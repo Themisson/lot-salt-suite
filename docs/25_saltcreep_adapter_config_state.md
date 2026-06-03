@@ -1,6 +1,6 @@
 # 25 — Configuracao e estado do SaltCreepSaltcreepAdapter
 
-**Status:** Implementado e usado pelo backend minimo — Fases 7.5-7.6 | **Ultima atualizacao:** 2026-06-03
+**Status:** Implementado e usado pelo backend minimo — Fases 7.5-7.7 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -95,3 +95,10 @@ minima (`AxisymL3`, `ElasticIsotropic`, `Assembler`, `ElasticSolver`) e
 `state_` passou a ser `mutable` para permitir registro em
 `evaluate_wall_response() const`. Ver
 `docs/26_saltcreep_adapter_backend_minimum.md`.
+
+Na Fase 7.7, a configuracao tambem passou a alimentar um cache privado do
+backend minimo. O cache persiste malha, elemento, material, matriz de rigidez,
+vetor geostatico e graus fixos entre queries, enquanto `SaltCreepAdapterState`
+continua responsavel pelo tempo atual, ultima pressao, ultimo deslocamento,
+ultimo fechamento e contador de passos. Ver
+`docs/27_saltcreep_adapter_temporal_state.md`.

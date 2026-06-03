@@ -149,3 +149,10 @@ elastica/geostatica minima do backend `external/saltcreep` por adapter, usando
 fontes vendorizadas sem modifica-las. `TimeIntegrator` permanece apenas nos
 targets controlados separados ate uma fase dedicada resolver a fronteira de
 includes e estado temporal.
+
+Na Fase 7.7, a fronteira de includes do `TimeIntegrator` foi auditada em
+`docs/audits/saltcreep_timeintegrator_include_boundary.md` e classificada como
+`TIMEINTEGRATOR_BLOCKED_BY_INCLUDE_BOUNDARY` para o target principal. Nenhum
+arquivo em `external/saltcreep/` foi alterado. O adapter passou a persistir
+malha, elemento, material, matriz de rigidez, vetor geostatico e graus fixos da
+rota minima entre queries.
