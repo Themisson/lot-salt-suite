@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">10/17</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">57</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">11/18</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">64</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2552,7 +2552,11 @@ A Fase 7.0 criou apenas o contrato minimo <code>SaltCreepQuery</code> /
 A Fase 7.1 fixou a convencao de sinais LOT-sal em
 <code>docs/23_lot_salt_sign_convention.md</code>: pressoes compressivas sao positivas,
 deslocamento radial positivo aponta para fora e fechamento radial e uma
-magnitude positiva separada.</p>
+magnitude positiva separada.
+A Fase 7.2 criou <code>SaltCreepSaltcreepAdapter</code> como adapter C++ experimental e
+isolado. Ele valida queries e preserva a convencao de fechamento, mas ainda
+retorna resposta neutra com <code>is_available() = false</code>; portanto nao ha
+acoplamento LOT/sal nem chamada fisica ao <code>external/saltcreep</code>.</p>
 <p>Fluxo esperado:</p>
 <pre><code class="language-text">YAML/JSON → C++ parser → C++ LOT/APB/salt coupling → C++ writer → CSV/JSON
 </code></pre>
@@ -2666,7 +2670,11 @@ Na Fase 7.1, o contrato passou a expor tambem <code>radial_closure_m = 0</code> 
 resposta neutra. Para respostas reais futuras, <code>radial_displacement_m &lt; 0</code>
 significa fechamento para dentro e <code>radial_closure_m = max(0,
 -radial_displacement_m)</code> deve ser usado por calculos que esperam magnitude
-positiva de fechamento.</p>
+positiva de fechamento.
+Na Fase 7.2, <code>SaltCreepSaltcreepAdapter</code> implementa a mesma interface, mas
+permanece neutro e indisponivel enquanto a configuracao completa do backend
+(malha, material, temperatura, geostatica, pressao de parede e integrador) nao
+for formalizada.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser
@@ -2998,6 +3006,13 @@ integrado sem flags manuais. O build standalone fora do projeto usa Eigen intern
 <code>src/salt/</code>. O <code>external/saltcreep/</code> permaneceu somente leitura; nenhum target
 do projeto passou a linkar o solver vendorizado. O contrato estabiliza tipos SI
 para futura integracao, mas ainda nao implementa adapter nem acoplamento fisico.</p>
+<p>Na Fase 7.2, o <code>lot-salt-suite</code> criou <code>SaltCreepSaltcreepAdapter</code> como adapter
+C++ experimental em <code>include/salt/</code> e <code>src/salt/</code>. O adapter ainda nao linka nem
+executa o backend real: <code>is_available() = false</code> e respostas validas sao
+neutras. A auditoria <code>docs/audits/saltcreep_radial_displacement_sign_audit.md</code>
+confirmou que, nos caminhos auditados do <code>external/saltcreep</code>, <code>u_r &lt; 0</code>
+representa fechamento para dentro e fechamento positivo e calculado como
+<code>-u_r</code>. O <code>external/saltcreep/</code> permaneceu somente leitura nesta fase.</p>
 </div>
 </section>
 
@@ -3109,7 +3124,10 @@ entregar os dados ao solver.</p>
    Resultado: pressao de parede compressiva positiva, deslocamento radial
    assinado (<code>+</code> para fora, <code>-</code> para dentro), fechamento radial positivo
    <code>radial_closure_m = max(0, -radial_displacement_m)</code> e documentacao em
-   <code>docs/23_lot_salt_sign_convention.md</code>.</li>
+   <code>docs/23_lot_salt_sign_convention.md</code>.
+4.15. Fase 7.2: criar <code>SaltCreepSaltcreepAdapter</code> experimental e isolado.
+   Resultado: adapter C++ compila, valida queries, retorna resposta neutra
+   documentada com <code>is_available() = false</code> e nao acopla LOT/PKN ao sal.</li>
 <li>Adicionar testes Catch2 com casos sinteticos e regressao dimensional.</li>
 <li>Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.</li>
@@ -3221,6 +3239,15 @@ entregar os dados ao solver.</p>
   <code>docs/22_saltcreep_interface_contract.md</code> apontam para o mesmo contrato.
 - Nenhum solver, modelo fisico, <code>src/lot/</code>, <code>include/lot/</code> ou
   <code>external/saltcreep/</code> foi alterado.</p>
+<p><strong>Fase 7.2 (SaltCreepSaltcreepAdapter experimental):</strong>
+- <code>SaltCreepSaltcreepAdapter</code> implementa <code>SaltCreepInterface</code> em <code>include/salt/</code>
+  e <code>src/salt/</code>.
+- O backend real ainda nao esta conectado: <code>is_available() = false</code> e resposta
+  neutra para query valida.
+- <code>docs/audits/saltcreep_radial_displacement_sign_audit.md</code> registra evidencia
+  de que <code>u_r &lt; 0</code> representa fechamento nos caminhos auditados do saltcreep.
+- <code>PknModel</code>, <code>PknRunner</code>, <code>LeakoffModel</code>, <code>ResultWriter</code>, <code>CaseParser</code>,
+  <code>src/lot/</code>, <code>include/lot/</code> e <code>external/saltcreep/</code> permanecem sem alteracao.</p>
 <p><strong>Fase 6.10B (prova forcada do Eigen oficial):</strong>
 - <code>external/saltcreep/CMakeLists.txt</code> recebeu a opcao <code>LSS_SALTCREEP_FORCE_LSS_EIGEN</code>.
 - Mecanismo: diretorio proxy no build dir com apenas <code>Eigen/</code> + <code>BEFORE PRIVATE</code>
@@ -3245,8 +3272,8 @@ priorizar desenvolvimento C++ nesta ordem:</p>
    volume, largura e comprimento.</li>
 <li>Consolidar <code>BreakdownCriterion</code> C++ e remover qualquer heuristica solta de
    pos-processamento.</li>
-<li>Criar <code>SaltCreepSaltcreepAdapter</code> C++ usando a convencao da Fase 7.1 para
-   integrar <code>external/saltcreep</code> sem script Python intermediario.</li>
+<li>Evoluir <code>SaltCreepSaltcreepAdapter</code> de neutro para backend real, com
+   configuracao explicita de malha, material, temperatura, pressao e integrador.</li>
 <li>Se o adapter exigir unificacao de Eigen, adicionar opcao CMake experimental
    no <code>saltcreep</code> e repetir a auditoria 6.10 com prova de include order.</li>
 <li>Implementar acoplamento LOT/sal em C++ e só depois ampliar

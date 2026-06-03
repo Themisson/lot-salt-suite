@@ -93,6 +93,9 @@ entregar os dados ao solver.
    assinado (`+` para fora, `-` para dentro), fechamento radial positivo
    `radial_closure_m = max(0, -radial_displacement_m)` e documentacao em
    `docs/23_lot_salt_sign_convention.md`.
+4.15. Fase 7.2: criar `SaltCreepSaltcreepAdapter` experimental e isolado.
+   Resultado: adapter C++ compila, valida queries, retorna resposta neutra
+   documentada com `is_available() = false` e nao acopla LOT/PKN ao sal.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -217,6 +220,16 @@ entregar os dados ao solver.
 - Nenhum solver, modelo fisico, `src/lot/`, `include/lot/` ou
   `external/saltcreep/` foi alterado.
 
+**Fase 7.2 (SaltCreepSaltcreepAdapter experimental):**
+- `SaltCreepSaltcreepAdapter` implementa `SaltCreepInterface` em `include/salt/`
+  e `src/salt/`.
+- O backend real ainda nao esta conectado: `is_available() = false` e resposta
+  neutra para query valida.
+- `docs/audits/saltcreep_radial_displacement_sign_audit.md` registra evidencia
+  de que `u_r < 0` representa fechamento nos caminhos auditados do saltcreep.
+- `PknModel`, `PknRunner`, `LeakoffModel`, `ResultWriter`, `CaseParser`,
+  `src/lot/`, `include/lot/` e `external/saltcreep/` permanecem sem alteracao.
+
 **Fase 6.10B (prova forcada do Eigen oficial):**
 - `external/saltcreep/CMakeLists.txt` recebeu a opcao `LSS_SALTCREEP_FORCE_LSS_EIGEN`.
 - Mecanismo: diretorio proxy no build dir com apenas `Eigen/` + `BEFORE PRIVATE`
@@ -243,8 +256,8 @@ priorizar desenvolvimento C++ nesta ordem:
    volume, largura e comprimento.
 2. Consolidar `BreakdownCriterion` C++ e remover qualquer heuristica solta de
    pos-processamento.
-3. Criar `SaltCreepSaltcreepAdapter` C++ usando a convencao da Fase 7.1 para
-   integrar `external/saltcreep` sem script Python intermediario.
+3. Evoluir `SaltCreepSaltcreepAdapter` de neutro para backend real, com
+   configuracao explicita de malha, material, temperatura, pressao e integrador.
 4. Se o adapter exigir unificacao de Eigen, adicionar opcao CMake experimental
    no `saltcreep` e repetir a auditoria 6.10 com prova de include order.
 5. Implementar acoplamento LOT/sal em C++ e só depois ampliar

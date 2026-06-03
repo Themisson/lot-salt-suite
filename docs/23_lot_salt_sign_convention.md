@@ -1,6 +1,6 @@
 # 23 — Convencao de sinais LOT-saltcreep
 
-**Status:** Implementado — Fase 7.1 | **Ultima atualizacao:** 2026-06-03
+**Status:** Implementado — Fases 7.1-7.2 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -51,6 +51,9 @@ precisar da reducao positiva de raio/volume, e deve consumir
 A inspecao de Fase 7.1 encontrou saidas existentes em `external/saltcreep/` nas
 quais o deslocamento de parede bruto `u_r` e negativo para fechamento interno, e
 metricas de fechamento sao calculadas como magnitude positiva `-u_r`.
+A auditoria formal de Fase 7.2 esta em
+`docs/audits/saltcreep_radial_displacement_sign_audit.md` e confirmou esse
+sinal para os caminhos auditados de integradores, saida temporal e testes.
 
 Por isso, o futuro `SaltCreepSaltcreepAdapter` deve:
 
@@ -63,6 +66,10 @@ Por isso, o futuro `SaltCreepSaltcreepAdapter` deve:
 
 Essa regra evita misturar a convencao externa de pressoes compressivas positivas
 com detalhes internos de tensao, tracao ou vetor normal do backend FEM.
+
+Na Fase 7.2, `SaltCreepSaltcreepAdapter` aplica apenas a parte cinemática dessa
+regra (`radial_closure_m = max(0, -radial_displacement_m)`) e retorna resposta
+neutra porque o backend real ainda nao esta conectado.
 
 ## Escopo preservado
 

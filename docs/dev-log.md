@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 7.1 concluida (convencao de sinais LOT-saltcreep)
+Fase ativa  : 7.2 concluida (SaltCreepSaltcreepAdapter experimental e isolado)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-03
-Testes C++  : 57/57 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
+Testes C++  : 64/64 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
@@ -54,6 +54,75 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-03] Fase 7.2 — SaltCreepSaltcreepAdapter experimental e isolado — Codex
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Criar o primeiro adapter C++ concreto para preparar a integracao
+com `external/saltcreep`, mantendo LOT/PKN, APB e o backend de sal sem
+acoplamento fisico nesta fase.
+
+**Auditoria de sinal radial:**
+- Criado `docs/audits/saltcreep_radial_displacement_sign_audit.md`.
+- Resultado: `SIGN_CONFIRMED_FOR_WALL_DISPLACEMENT_OUTPUT`.
+- Evidencias auditadas: `wall_displacement_m()` retorna `state_.u_total[0]`,
+  `wall_closure_pct()` calcula `-u_r/Ri*100`, `TimeOutput.cpp` grava
+  `wall_disp_m` assinado e `u_wall_m` positivo, e testes do saltcreep exigem
+  `wall_displacement_m() < 0` para fechamento.
+
+**Mudanca implementada:**
+- `include/salt/SaltCreepSaltcreepAdapter.hpp` define o adapter experimental.
+- `src/salt/SaltCreepSaltcreepAdapter.cpp` implementa validacao de query,
+  `is_available() = false`, resposta neutra valida e
+  `radial_closure_from_displacement()`.
+- `tests/cpp/test_salt_creep_saltcreep_adapter.cpp` cobre compilacao,
+  disponibilidade documentada, resposta neutra, rejeicoes de query invalida e
+  convencao `radial_closure_m = max(0, -radial_displacement_m)`.
+- O backend real nao foi conectado porque ainda nao ha API simples do tipo
+  "avaliar resposta de parede"; a execucao real exige malha, elemento,
+  material, temperatura, geostatica, pressao de parede e integrador.
+
+**Testes/builds executados:**
+- `Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue`
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build --config Debug -j`
+- `ctest --test-dir build -C Debug --output-on-failure`
+- Resultado: 64/64 Catch2 passaram no modo padrao
+  `LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON`.
+
+**Validacao manual CLI:**
+- `lot_pkn_minimal.yaml` retornou `OK`.
+- `lot_pkn_with_leakoff.yaml` retornou `OK`.
+- `buz67d_pkn.yaml` retornou `OK`.
+- `lot-sim run --mode lot-pkn` gerou `result.json` e `timeseries.csv` em
+  `results\lot_pkn_minimal_salt_adapter_review`.
+
+**Escopo alterado:**
+- `CMakeLists.txt`
+- `include/salt/SaltCreepSaltcreepAdapter.hpp`
+- `src/salt/SaltCreepSaltcreepAdapter.cpp`
+- `tests/cpp/test_salt_creep_saltcreep_adapter.cpp`
+- `docs/audits/saltcreep_radial_displacement_sign_audit.md`
+- `docs/24_saltcreep_adapter_design.md`
+- `docs/13_coupling_lot_apb_salt.md`
+- `docs/16_saltcreep_governance.md`
+- `docs/17_lot_pkn_roadmap.md`
+- `docs/22_saltcreep_interface_contract.md`
+- `docs/23_lot_salt_sign_convention.md`
+- `docs/dev-log.md`
+- `tools/docs_status.yaml`
+- `docs/index.html`
+
+**Nao alterado:**
+- `legance/`, `legacy/`, `external/saltcreep/`, `include/Eigen/`,
+  `external/saltcreep/include/Eigen/`, `tests/baselines/` e
+  `postprocess/scripts/` preservados.
+- `PknModel`, `PknRunner`, `LeakoffModel`, `ResultWriter`, `CaseParser`,
+  `src/lot/`, `include/lot/`, `src/io/` e `include/io/` sem alteracao.
+- Nenhum script Python novo, nenhum adapter real, nenhuma chamada ao saltcreep e
+  nenhum acoplamento LOT/sal implementado.
 
 ---
 

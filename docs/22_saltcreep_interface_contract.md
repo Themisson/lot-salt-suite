@@ -1,6 +1,6 @@
 # 22 — Contrato SaltCreepInterface
 
-**Status:** Implementado — Fases 7.0-7.1 | **Última atualização:** 2026-06-03
+**Status:** Implementado — Fases 7.0-7.2 | **Última atualização:** 2026-06-03
 
 ## Objetivo
 
@@ -17,11 +17,15 @@ FEM, não altera LOT/PKN, não altera APB e não muda nenhum modelo físico.
 - `include/salt/SaltCreepTypes.hpp` — tipos simples em SI.
 - `include/salt/SaltCreepInterface.hpp` — interface abstrata e implementação nula.
 - `src/salt/SaltCreepInterface.cpp` — validação de entrada e resposta neutra.
+- `include/salt/SaltCreepSaltcreepAdapter.hpp` — adapter experimental isolado.
+- `src/salt/SaltCreepSaltcreepAdapter.cpp` — validação e resposta neutra
+  enquanto o backend real nao esta conectado.
 - `tests/cpp/test_salt_creep_interface.cpp` — testes Catch2 do contrato.
+- `tests/cpp/test_salt_creep_saltcreep_adapter.cpp` — testes Catch2 do adapter
+  experimental.
 
 ## O que não existe nesta fase
 
-- Não há `SaltCreepSaltcreepAdapter`.
 - Não há chamada para `external/saltcreep`.
 - Não há acoplamento LOT/sal.
 - Não há atualização de volume anular, APB ou dano.
@@ -90,6 +94,26 @@ valid = true para query válida
 conectado. `valid = true` significa que a query foi validada e que a resposta
 neutra foi calculada corretamente. Essa separação permite que testes e futuros
 orquestradores diferenciem “solver indisponível” de “entrada inválida”.
+
+## Adapter saltcreep experimental
+
+A Fase 7.2 adicionou `SaltCreepSaltcreepAdapter`. Nesta fase ele e
+intencionalmente equivalente a um adapter neutro documentado:
+
+```text
+SaltCreepSaltcreepAdapter::is_available() = false
+```
+
+Ele valida a query com as mesmas regras do contrato, retorna resposta neutra
+valida e testa explicitamente a regra:
+
+```text
+radial_closure_m = max(0, -radial_displacement_m)
+```
+
+O adapter ainda nao instancia malha, elemento, material, campo termico,
+geostatica, `WallPressureField` ou integrador do `external/saltcreep`.
+Detalhes em `docs/24_saltcreep_adapter_design.md`.
 
 ## Por que LOT/PKN ainda não foi acoplado
 

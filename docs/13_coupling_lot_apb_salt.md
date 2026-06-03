@@ -39,6 +39,10 @@ A Fase 7.1 fixou a convencao de sinais LOT-sal em
 `docs/23_lot_salt_sign_convention.md`: pressoes compressivas sao positivas,
 deslocamento radial positivo aponta para fora e fechamento radial e uma
 magnitude positiva separada.
+A Fase 7.2 criou `SaltCreepSaltcreepAdapter` como adapter C++ experimental e
+isolado. Ele valida queries e preserva a convencao de fechamento, mas ainda
+retorna resposta neutra com `is_available() = false`; portanto nao ha
+acoplamento LOT/sal nem chamada fisica ao `external/saltcreep`.
 
 Fluxo esperado:
 
@@ -136,6 +140,10 @@ resposta neutra. Para respostas reais futuras, `radial_displacement_m < 0`
 significa fechamento para dentro e `radial_closure_m = max(0,
 -radial_displacement_m)` deve ser usado por calculos que esperam magnitude
 positiva de fechamento.
+Na Fase 7.2, `SaltCreepSaltcreepAdapter` implementa a mesma interface, mas
+permanece neutro e indisponivel enquanto a configuracao completa do backend
+(malha, material, temperatura, geostatica, pressao de parede e integrador) nao
+for formalizada.
 
 ## Dependencia Eigen no acoplamento
 

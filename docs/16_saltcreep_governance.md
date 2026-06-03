@@ -115,3 +115,11 @@ Na Fase 7.0, o `lot-salt-suite` criou `SaltCreepInterface` e
 `src/salt/`. O `external/saltcreep/` permaneceu somente leitura; nenhum target
 do projeto passou a linkar o solver vendorizado. O contrato estabiliza tipos SI
 para futura integracao, mas ainda nao implementa adapter nem acoplamento fisico.
+
+Na Fase 7.2, o `lot-salt-suite` criou `SaltCreepSaltcreepAdapter` como adapter
+C++ experimental em `include/salt/` e `src/salt/`. O adapter ainda nao linka nem
+executa o backend real: `is_available() = false` e respostas validas sao
+neutras. A auditoria `docs/audits/saltcreep_radial_displacement_sign_audit.md`
+confirmou que, nos caminhos auditados do `external/saltcreep`, `u_r < 0`
+representa fechamento para dentro e fechamento positivo e calculado como
+`-u_r`. O `external/saltcreep/` permaneceu somente leitura nesta fase.
