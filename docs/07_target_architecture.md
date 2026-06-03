@@ -62,20 +62,36 @@ CSV/JSON → Python plot/report → PNG/HTML
 ### SaltCreepInterface
 
 ```cpp
+struct SaltCreepQuery {
+    double time_s;              // [s]
+    double wall_pressure_Pa;    // [Pa]
+    double temperature_K;       // [K]
+    double radial_position_m;   // [m]
+};
+
+struct SaltCreepResponse {
+    double radial_displacement_m;          // [m]
+    double radial_strain;                  // [-]
+    double effective_closure_pressure_Pa;  // [Pa]
+    bool valid;
+};
+
 class SaltCreepInterface {
 public:
-    struct Result {
-        double strain_rate;   // dε/dt [1/s] — taxa de deformação viscosa
-        double strain;        // ε — deformação acumulada
-    };
-    virtual Result evaluate(
-        double sigma_eff_Pa,  // tensão efetiva [Pa]
-        double T_K,           // temperatura [K]
-        double dt_s           // passo de tempo [s]
-    ) const = 0;
     virtual ~SaltCreepInterface() = default;
+
+    virtual bool is_available() const = 0;
+    virtual SaltCreepResponse evaluate_wall_response(
+        const SaltCreepQuery& query
+    ) const = 0;
 };
 ```
+
+A Fase 7.0 implementa apenas o contrato minimo e `NullSaltCreepInterface`.
+O comportamento nulo valida a query em SI e retorna resposta neutra
+(`u_r = 0`, `strain = 0`, `closure_pressure = 0`, `valid = true`), enquanto
+`is_available() = false` indica que nenhum solver real de sal esta conectado.
+Ver `docs/22_saltcreep_interface_contract.md`.
 
 ### Adapter para saltcreep
 
@@ -125,7 +141,7 @@ Subcomandos:
 7. loop temporal:
    a. atualizar T(z, t)
    b. calcular LOT: pressão de fratura, leakoff
-   c. chamar SaltCreepInterface: deformação → variação de volume
+   c. chamar SaltCreepInterface: deslocamento radial/fechamento → variação de volume
    d. calcular APB: nova pressão dos anulares
    e. verificar convergência
    f. salvar saída se (passo % output_every == 0)

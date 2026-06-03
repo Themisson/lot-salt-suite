@@ -189,6 +189,19 @@ entregar os dados ao solver.
 - Prova migrada: 126/126 testes Catch2, `closure=0.300817%` no APB, `LSS_SALTCREEP_EIGEN_MODE = lss`.
 - Decisao: `MIGRATION_COMPLETED`. Proximo passo: `SaltCreepInterface` / `SaltCreepSaltcreepAdapter`.
 
+**Fase 7.0 (SaltCreepInterface minima e nao acoplada):**
+- `include/salt/SaltCreepTypes.hpp` define `WallPressureSample`,
+  `SaltCreepQuery` e `SaltCreepResponse` em SI.
+- `include/salt/SaltCreepInterface.hpp` define a interface abstrata e
+  `NullSaltCreepInterface`.
+- `src/salt/SaltCreepInterface.cpp` valida query SI e retorna resposta neutra
+  quando a query e valida.
+- Testes Catch2 cobrem disponibilidade, resposta neutra e rejeicoes de
+  `NaN`, `Inf`, tempo negativo, pressao negativa, temperatura nao positiva e
+  posicao radial negativa.
+- Nao ha adapter real, chamada para `external/saltcreep` nem acoplamento com
+  `PknModel`.
+
 **Fase 6.10B (prova forcada do Eigen oficial):**
 - `external/saltcreep/CMakeLists.txt` recebeu a opcao `LSS_SALTCREEP_FORCE_LSS_EIGEN`.
 - Mecanismo: diretorio proxy no build dir com apenas `Eigen/` + `BEFORE PRIVATE`

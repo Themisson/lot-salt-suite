@@ -32,6 +32,9 @@ Python não deve atuar como intermediário runtime entre LOT e sal, nem montar
 condições de contorno para `external/saltcreep` no fluxo principal. A integração
 deve ocorrer por interfaces C++, como `SaltCreepInterface`,
 `SaltCreepSaltcreepAdapter` e futuros adapters específicos para LOT/sal.
+A Fase 7.0 criou apenas o contrato minimo `SaltCreepQuery` /
+`SaltCreepResponse` e `NullSaltCreepInterface`; ainda nao ha chamada para
+`external/saltcreep` nem acoplamento LOT/sal.
 
 Fluxo esperado:
 
@@ -56,8 +59,9 @@ Para cada passo de tempo dt:
      - Calcular leakoff: volume perdido Q_LOT(t)
   4. Calcular tensão na parede do poço:
      σ_wall = f(P_anular, P_poros, σ₀, geometria)
-  5. Chamar SaltCreepInterface::evaluate(σ_wall, T, dt):
-     - Retorna: taxa de deformação dε/dt e deformação acumulada ε
+  5. Chamar SaltCreepInterface::evaluate_wall_response(query):
+     - Entradas: tempo [s], pressao de parede [Pa], temperatura [K] e posicao radial [m]
+     - Retorna: deslocamento radial [m], deformacao radial e pressao efetiva de fechamento [Pa]
   6. Calcular variação de volume anular:
      δV_anular = f(ε, geometria do poço)
   7. Atualizar pressão APB:
@@ -118,6 +122,11 @@ sal. O fluxo esperado e:
 4. O retorno do sal atualiza fechamento radial, volume anular e diagnosticos de
    dano.
 5. `apb/` atualiza pressao anular a partir do volume e compressibilidade.
+
+Na Fase 7.0, somente o `NullSaltCreepInterface` existe. Ele valida entradas SI
+e retorna resposta neutra valida (`u_r = 0`, `strain = 0`,
+`effective_closure_pressure_Pa = 0`) com `is_available() = false`, para deixar
+claro que o solver real ainda nao esta conectado.
 
 ## Dependencia Eigen no acoplamento
 

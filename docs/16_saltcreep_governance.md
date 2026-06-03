@@ -109,3 +109,9 @@ Na Fase 6.11, o default foi migrado de `OFF` para auto-deteccao: dentro da arvor
 integrado sem flags manuais. O build standalone fora do projeto usa Eigen interno
 (`internal fallback`). Resultado: 126/126 Catch2, `closure=0.300817%` no APB,
 47/47 no lot-salt-suite. Decisao: `MIGRATION_COMPLETED`.
+
+Na Fase 7.0, o `lot-salt-suite` criou `SaltCreepInterface` e
+`NullSaltCreepInterface` como contrato C++ minimo em `include/salt/` e
+`src/salt/`. O `external/saltcreep/` permaneceu somente leitura; nenhum target
+do projeto passou a linkar o solver vendorizado. O contrato estabiliza tipos SI
+para futura integracao, mas ainda nao implementa adapter nem acoplamento fisico.

@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">8/15</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">47</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">9/16</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">56</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -1227,20 +1227,35 @@ não-runtime, mas não deve ser necessário para executar a simulação.</p>
 </ul>
 <h2 id="interfaces-plugaveis">Interfaces plugáveis</h2>
 <h3 id="saltcreepinterface">SaltCreepInterface</h3>
-<pre><code class="language-cpp">class SaltCreepInterface {
+<pre><code class="language-cpp">struct SaltCreepQuery {
+    double time_s;              // [s]
+    double wall_pressure_Pa;    // [Pa]
+    double temperature_K;       // [K]
+    double radial_position_m;   // [m]
+};
+
+struct SaltCreepResponse {
+    double radial_displacement_m;          // [m]
+    double radial_strain;                  // [-]
+    double effective_closure_pressure_Pa;  // [Pa]
+    bool valid;
+};
+
+class SaltCreepInterface {
 public:
-    struct Result {
-        double strain_rate;   // dε/dt [1/s] — taxa de deformação viscosa
-        double strain;        // ε — deformação acumulada
-    };
-    virtual Result evaluate(
-        double sigma_eff_Pa,  // tensão efetiva [Pa]
-        double T_K,           // temperatura [K]
-        double dt_s           // passo de tempo [s]
-    ) const = 0;
     virtual ~SaltCreepInterface() = default;
+
+    virtual bool is_available() const = 0;
+    virtual SaltCreepResponse evaluate_wall_response(
+        const SaltCreepQuery&amp; query
+    ) const = 0;
 };
 </code></pre>
+<p>A Fase 7.0 implementa apenas o contrato minimo e <code>NullSaltCreepInterface</code>.
+O comportamento nulo valida a query em SI e retorna resposta neutra
+(<code>u_r = 0</code>, <code>strain = 0</code>, <code>closure_pressure = 0</code>, <code>valid = true</code>), enquanto
+<code>is_available() = false</code> indica que nenhum solver real de sal esta conectado.
+Ver <code>docs/22_saltcreep_interface_contract.md</code>.</p>
 <h3 id="adapter-para-saltcreep">Adapter para saltcreep</h3>
 <pre><code class="language-cpp">class SaltCreepSaltcreepAdapter : public SaltCreepInterface {
     // Delega para modelo de external/saltcreep por interface
@@ -1277,7 +1292,7 @@ Subcomandos:
 7. loop temporal:
    a. atualizar T(z, t)
    b. calcular LOT: pressão de fratura, leakoff
-   c. chamar SaltCreepInterface: deformação → variação de volume
+   c. chamar SaltCreepInterface: deslocamento radial/fechamento → variação de volume
    d. calcular APB: nova pressão dos anulares
    e. verificar convergência
    f. salvar saída se (passo % output_every == 0)
@@ -2515,7 +2530,10 @@ ctest completo do build forcado.</p>
 <p>Python não deve atuar como intermediário runtime entre LOT e sal, nem montar
 condições de contorno para <code>external/saltcreep</code> no fluxo principal. A integração
 deve ocorrer por interfaces C++, como <code>SaltCreepInterface</code>,
-<code>SaltCreepSaltcreepAdapter</code> e futuros adapters específicos para LOT/sal.</p>
+<code>SaltCreepSaltcreepAdapter</code> e futuros adapters específicos para LOT/sal.
+A Fase 7.0 criou apenas o contrato minimo <code>SaltCreepQuery</code> /
+<code>SaltCreepResponse</code> e <code>NullSaltCreepInterface</code>; ainda nao ha chamada para
+<code>external/saltcreep</code> nem acoplamento LOT/sal.</p>
 <p>Fluxo esperado:</p>
 <pre><code class="language-text">YAML/JSON → C++ parser → C++ LOT/APB/salt coupling → C++ writer → CSV/JSON
 </code></pre>
@@ -2531,8 +2549,9 @@ deve ocorrer por interfaces C++, como <code>SaltCreepInterface</code>,
      - Calcular leakoff: volume perdido Q_LOT(t)
   4. Calcular tensão na parede do poço:
      σ_wall = f(P_anular, P_poros, σ₀, geometria)
-  5. Chamar SaltCreepInterface::evaluate(σ_wall, T, dt):
-     - Retorna: taxa de deformação dε/dt e deformação acumulada ε
+  5. Chamar SaltCreepInterface::evaluate_wall_response(query):
+     - Entradas: tempo [s], pressao de parede [Pa], temperatura [K] e posicao radial [m]
+     - Retorna: deslocamento radial [m], deformacao radial e pressao efetiva de fechamento [Pa]
   6. Calcular variação de volume anular:
      δV_anular = f(ε, geometria do poço)
   7. Atualizar pressão APB:
@@ -2620,6 +2639,10 @@ sal. O fluxo esperado e:</p>
    dano.</li>
 <li><code>apb/</code> atualiza pressao anular a partir do volume e compressibilidade.</li>
 </ol>
+<p>Na Fase 7.0, somente o <code>NullSaltCreepInterface</code> existe. Ele valida entradas SI
+e retorna resposta neutra valida (<code>u_r = 0</code>, <code>strain = 0</code>,
+<code>effective_closure_pressure_Pa = 0</code>) com <code>is_available() = false</code>, para deixar
+claro que o solver real ainda nao esta conectado.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser
@@ -2946,6 +2969,11 @@ Decisao: <code>PROVEN_SAFE_TO_MIGRATE</code>.</p>
 integrado sem flags manuais. O build standalone fora do projeto usa Eigen interno
 (<code>internal fallback</code>). Resultado: 126/126 Catch2, <code>closure=0.300817%</code> no APB,
 47/47 no lot-salt-suite. Decisao: <code>MIGRATION_COMPLETED</code>.</p>
+<p>Na Fase 7.0, o <code>lot-salt-suite</code> criou <code>SaltCreepInterface</code> e
+<code>NullSaltCreepInterface</code> como contrato C++ minimo em <code>include/salt/</code> e
+<code>src/salt/</code>. O <code>external/saltcreep/</code> permaneceu somente leitura; nenhum target
+do projeto passou a linkar o solver vendorizado. O contrato estabiliza tipos SI
+para futura integracao, mas ainda nao implementa adapter nem acoplamento fisico.</p>
 </div>
 </section>
 
@@ -3143,6 +3171,18 @@ entregar os dados ao solver.</p>
 - Build standalone fora da arvore usa Eigen interno sem quebra (fallback preservado).
 - Prova migrada: 126/126 testes Catch2, <code>closure=0.300817%</code> no APB, <code>LSS_SALTCREEP_EIGEN_MODE = lss</code>.
 - Decisao: <code>MIGRATION_COMPLETED</code>. Proximo passo: <code>SaltCreepInterface</code> / <code>SaltCreepSaltcreepAdapter</code>.</p>
+<p><strong>Fase 7.0 (SaltCreepInterface minima e nao acoplada):</strong>
+- <code>include/salt/SaltCreepTypes.hpp</code> define <code>WallPressureSample</code>,
+  <code>SaltCreepQuery</code> e <code>SaltCreepResponse</code> em SI.
+- <code>include/salt/SaltCreepInterface.hpp</code> define a interface abstrata e
+  <code>NullSaltCreepInterface</code>.
+- <code>src/salt/SaltCreepInterface.cpp</code> valida query SI e retorna resposta neutra
+  quando a query e valida.
+- Testes Catch2 cobrem disponibilidade, resposta neutra e rejeicoes de
+  <code>NaN</code>, <code>Inf</code>, tempo negativo, pressao negativa, temperatura nao positiva e
+  posicao radial negativa.
+- Nao ha adapter real, chamada para <code>external/saltcreep</code> nem acoplamento com
+  <code>PknModel</code>.</p>
 <p><strong>Fase 6.10B (prova forcada do Eigen oficial):</strong>
 - <code>external/saltcreep/CMakeLists.txt</code> recebeu a opcao <code>LSS_SALTCREEP_FORCE_LSS_EIGEN</code>.
 - Mecanismo: diretorio proxy no build dir com apenas <code>Eigen/</code> + <code>BEFORE PRIVATE</code>
