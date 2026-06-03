@@ -17,6 +17,14 @@ lss::salt::SaltCreepQuery valid_query() {
   };
 }
 
+lss::salt::SaltCreepAdapterConfig valid_config() {
+  auto config = lss::salt::make_default_salt_creep_adapter_config();
+  config.time.initial_time_s = 120.0;
+  config.time.total_time_s = 180.0;
+  config.wall_pressure.initial_wall_pressure_Pa = 12.0e6;
+  return config;
+}
+
 }  // namespace
 
 TEST_CASE("SaltCreepSaltcreepAdapter compiles as a SaltCreepInterface") {
@@ -30,6 +38,26 @@ TEST_CASE("SaltCreepSaltcreepAdapter documents unavailable backend") {
   const lss::salt::SaltCreepSaltcreepAdapter adapter;
 
   CHECK_FALSE(adapter.is_available());
+}
+
+TEST_CASE("SaltCreepSaltcreepAdapter accepts validated explicit config") {
+  const auto config = valid_config();
+  const lss::salt::SaltCreepSaltcreepAdapter adapter(config);
+
+  CHECK(adapter.config().time.initial_time_s == Catch::Approx(120.0));
+  CHECK(adapter.config().wall_pressure.initial_wall_pressure_Pa ==
+        Catch::Approx(12.0e6));
+  CHECK(adapter.state().initialized());
+  CHECK(adapter.state().current_time_s() == Catch::Approx(120.0));
+  CHECK(adapter.state().last_wall_pressure_Pa() == Catch::Approx(12.0e6));
+}
+
+TEST_CASE("SaltCreepSaltcreepAdapter rejects invalid config") {
+  auto config = valid_config();
+  config.material.elastic_modulus_Pa = 0.0;
+
+  CHECK_THROWS_AS(lss::salt::SaltCreepSaltcreepAdapter(config),
+                  std::invalid_argument);
 }
 
 TEST_CASE("SaltCreepSaltcreepAdapter returns neutral response while backend is disconnected") {

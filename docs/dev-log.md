@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 7.4 concluida (tempo/geostatica/termico neutro controlados no backend saltcreep)
+Fase ativa  : 7.5 concluida (configuracao e state machine do adapter saltcreep)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-03
-Testes C++  : 68/68 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
+Testes C++  : 82/82 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-03
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
@@ -54,6 +54,51 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-03] Fase 7.5 — Configuracao e state machine do adapter saltcreep — Codex
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Adicionar `SaltCreepAdapterConfig` e `SaltCreepAdapterState` para
+preparar o futuro adapter real do `external/saltcreep`, mantendo o backend
+desligado, `is_available() = false` e sem acoplar LOT/PKN/APB ao sal.
+
+**Mudanca implementada:**
+- Criados `include/salt/SaltCreepAdapterConfig.hpp` e
+  `src/salt/SaltCreepAdapterConfig.cpp`.
+- Criados `include/salt/SaltCreepAdapterState.hpp` e
+  `src/salt/SaltCreepAdapterState.cpp`.
+- `SaltCreepSaltcreepAdapter` agora aceita configuracao SI validada, inicializa
+  estado local e expoe `config()` / `state()`.
+- `evaluate_wall_response()` permanece neutro e nao chama o backend real.
+
+**Testes/builds executados:**
+- `Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue`
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build --config Debug -j`
+- `ctest --test-dir build -C Debug --output-on-failure`
+- Resultado: 82/82 Catch2 passaram no modo padrao
+  `LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON`.
+- `ctest --test-dir build -C Debug -R "SaltCreep|saltcreep|salt" --output-on-failure`
+  passou 29/29 testes de contrato/adapter de sal.
+- `ctest --test-dir build -C Debug -R "Saltcreep backend" --output-on-failure`
+  passou 4/4 testes controlados do backend.
+
+**Validacao manual CLI:**
+- `lot_pkn_minimal.yaml` retornou `OK`.
+- `lot_pkn_with_leakoff.yaml` retornou `OK`.
+- `buz67d_pkn.yaml` retornou `OK`.
+- `lot-sim run --mode lot-pkn` gerou `result.json` e `timeseries.csv` em
+  `results\lot_pkn_minimal_salt_adapter_config_state`.
+
+**Nao alterado:**
+- `legance/`, `legacy/`, `external/saltcreep/`, `include/Eigen/`,
+  `external/saltcreep/include/Eigen/`, `tests/baselines/` e
+  `postprocess/scripts/` preservados.
+- `PknModel`, `PknRunner`, `LeakoffModel`, `ResultWriter`, `CaseParser`,
+  `src/lot/`, `include/lot/`, APB e modelos fisicos sem alteracao.
+- Nenhum script Python novo e nenhum acoplamento LOT/sal implementado.
 
 ---
 

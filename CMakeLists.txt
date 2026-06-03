@@ -80,6 +80,8 @@ set(LSS_CORE_SOURCES
   src/lot/LeakoffModel.cpp
   src/lot/PknModel.cpp
   src/lot/PknRunner.cpp
+  src/salt/SaltCreepAdapterConfig.cpp
+  src/salt/SaltCreepAdapterState.cpp
   src/salt/SaltCreepInterface.cpp
   src/salt/SaltCreepSaltcreepAdapter.cpp
 )
@@ -110,6 +112,8 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_pkn_model_synthetic.cpp
     tests/cpp/test_pkn_runner.cpp
     tests/cpp/test_result_writer.cpp
+    tests/cpp/test_salt_creep_adapter_config.cpp
+    tests/cpp/test_salt_creep_adapter_state.cpp
     tests/cpp/test_salt_creep_interface.cpp
     tests/cpp/test_salt_creep_saltcreep_adapter.cpp
     ${LSS_CORE_SOURCES}

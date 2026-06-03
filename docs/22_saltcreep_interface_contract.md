@@ -1,6 +1,6 @@
 # 22 — Contrato SaltCreepInterface
 
-**Status:** Implementado — Fases 7.0-7.2 | **Última atualização:** 2026-06-03
+**Status:** Implementado — Fases 7.0-7.5 | **Última atualização:** 2026-06-03
 
 ## Objetivo
 
@@ -20,9 +20,17 @@ FEM, não altera LOT/PKN, não altera APB e não muda nenhum modelo físico.
 - `include/salt/SaltCreepSaltcreepAdapter.hpp` — adapter experimental isolado.
 - `src/salt/SaltCreepSaltcreepAdapter.cpp` — validação e resposta neutra
   enquanto o backend real nao esta conectado.
+- `include/salt/SaltCreepAdapterConfig.hpp` — configuracao SI do adapter real
+  futuro.
+- `include/salt/SaltCreepAdapterState.hpp` — estado temporal minimo do adapter.
+- `src/salt/SaltCreepAdapterConfig.cpp` e
+  `src/salt/SaltCreepAdapterState.cpp` — validacao de configuracao e estado.
 - `tests/cpp/test_salt_creep_interface.cpp` — testes Catch2 do contrato.
 - `tests/cpp/test_salt_creep_saltcreep_adapter.cpp` — testes Catch2 do adapter
   experimental.
+- `tests/cpp/test_salt_creep_adapter_config.cpp` e
+  `tests/cpp/test_salt_creep_adapter_state.cpp` — testes Catch2 da nova
+  configuracao/state machine.
 
 ## O que não existe nesta fase
 
@@ -113,7 +121,10 @@ radial_closure_m = max(0, -radial_displacement_m)
 
 O adapter ainda nao instancia malha, elemento, material, campo termico,
 geostatica, `WallPressureField` ou integrador do `external/saltcreep`.
-Detalhes em `docs/24_saltcreep_adapter_design.md`.
+Desde a Fase 7.5, ele aceita configuracao SI validada e inicializa um estado
+local, mas isso continua sendo estrutura de fronteira, nao execucao do backend.
+Detalhes em `docs/24_saltcreep_adapter_design.md` e
+`docs/25_saltcreep_adapter_config_state.md`.
 
 ## Por que LOT/PKN ainda não foi acoplado
 
@@ -128,7 +139,8 @@ permanecem sem alteração nesta fase.
 
 ## Próximos passos
 
-1. Criar `SaltCreepLotAdapter` ou `SaltCreepSaltcreepAdapter` em C++.
+1. Mapear `SaltCreepAdapterConfig` para objetos reais do backend em teste
+   isolado, mantendo `is_available() = false` ate a prova estar completa.
 2. Mapear pressão LOT/APB para campo de pressão de parede preservando
    `wall_pressure_Pa >= 0` como compressao positiva.
 3. Converter o deslocamento bruto do backend em `radial_displacement_m` e

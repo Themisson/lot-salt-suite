@@ -27,6 +27,7 @@ phases:
   phase_7_2_saltcreep_adapter: completed
   phase_7_3_saltcreep_backend_controlled_case: completed
   phase_7_4_saltcreep_time_geostatic_case: completed
+  phase_7_5_saltcreep_adapter_config_state: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -63,6 +64,7 @@ docs:
   saltcreep_interface_contract: implemented
   lot_salt_sign_convention: implemented
   saltcreep_adapter_design: implemented
+  saltcreep_adapter_config_state: implemented
   saltcreep_radial_displacement_sign_audit: implemented
   saltcreep_backend_controlled_case: implemented
   saltcreep_backend_time_geostatic_case: implemented
@@ -110,7 +112,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 68         # Catch2 lot-salt-suite — Fase 7.4 adicionou caso tempo/geostatica controlado do backend saltcreep
+  cpp_tests: 82         # Catch2 lot-salt-suite — Fase 7.5 adicionou config/state do adapter saltcreep
   saltcreep_tests: 126  # Catch2 saltcreep baseline — 126/126 passaram (2026-06-01)
   python_tests: 3       # unittest — verde; pytest indisponivel no ambiente local
   regression_baselines: 4
@@ -119,5 +121,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-03"
-updated_by: "codex (Fase 7.4)"
+updated_by: "codex (Fase 7.5)"
 project_version: "0.1.0"

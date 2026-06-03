@@ -137,3 +137,9 @@ Na Fase 7.4, outro target Catch2 separado passou a compilar `TimeIntegrator`,
 em um caso controlado sem outputs versionados. Classificacao:
 `TIME_THERMAL_GEOSTATIC_CONTROLLED_TEST_READY`. O `external/saltcreep/`
 permaneceu somente leitura e o adapter continuou neutro.
+
+Na Fase 7.5, `SaltCreepAdapterConfig` e `SaltCreepAdapterState` foram
+implementados no `lot-salt-suite` para formalizar configuracao SI e estado
+temporal do futuro adapter real. Nenhum arquivo em `external/saltcreep/` foi
+alterado; `SaltCreepSaltcreepAdapter::is_available()` permanece `false` e nao
+ha chamada ao backend real.

@@ -4,6 +4,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace lss::salt {
 namespace {
@@ -41,7 +42,26 @@ void validate_query(const SaltCreepQuery& query) {
 
 }  // namespace
 
+SaltCreepSaltcreepAdapter::SaltCreepSaltcreepAdapter()
+    : SaltCreepSaltcreepAdapter(make_default_salt_creep_adapter_config()) {}
+
+SaltCreepSaltcreepAdapter::SaltCreepSaltcreepAdapter(
+    SaltCreepAdapterConfig config)
+    : config_(std::move(config)) {
+  config_.validate();
+  state_.initialize(config_.time.initial_time_s,
+                    config_.wall_pressure.initial_wall_pressure_Pa);
+}
+
 bool SaltCreepSaltcreepAdapter::is_available() const { return false; }
+
+const SaltCreepAdapterConfig& SaltCreepSaltcreepAdapter::config() const {
+  return config_;
+}
+
+const SaltCreepAdapterState& SaltCreepSaltcreepAdapter::state() const {
+  return state_;
+}
 
 SaltCreepResponse SaltCreepSaltcreepAdapter::evaluate_wall_response(
     const SaltCreepQuery& query) const {

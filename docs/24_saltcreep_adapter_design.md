@@ -1,6 +1,6 @@
 # 24 — Design do SaltCreepSaltcreepAdapter
 
-**Status:** Experimental e isolado — Fases 7.2-7.4 | **Ultima atualizacao:** 2026-06-03
+**Status:** Experimental e isolado — Fases 7.2-7.5 | **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
 
@@ -28,6 +28,12 @@ Esse valor significa que a superficie C++ do adapter existe, mas nao ha
 execucao fisica do `saltcreep` por tras dela. A resposta para query valida e
 neutra e documentada.
 
+Desde a Fase 7.5, o adapter tambem aceita uma configuracao explicita
+`SaltCreepAdapterConfig`, inicializa um `SaltCreepAdapterState` local e expoe
+`config()` / `state()` para testes e futura integracao. Essa mudanca nao liga o
+backend real: `evaluate_wall_response()` continua neutro e `is_available()`
+continua `false`.
+
 ## Entrada
 
 O adapter recebe `SaltCreepQuery` em SI:
@@ -52,6 +58,10 @@ radial_strain = 0
 effective_closure_pressure_Pa = 0
 valid = true
 ```
+
+O estado interno inicializa tempo e pressao de parede a partir da configuracao,
+mas nao e avancado por `evaluate_wall_response()` nesta fase porque ainda nao
+ha execucao real do integrador.
 
 ## Convencao de sinais
 
@@ -118,6 +128,25 @@ Classificacao da API: `TIME_THERMAL_GEOSTATIC_CONTROLLED_TEST_READY`.
 Esse resultado prova uma superficie C++ controlada mais rica, mas ainda nao
 transforma `SaltCreepSaltcreepAdapter` em backend real.
 
+## Configuracao e state machine
+
+A Fase 7.5 adiciona `SaltCreepAdapterConfig` e `SaltCreepAdapterState`.
+Detalhes completos estao em
+`docs/25_saltcreep_adapter_config_state.md`.
+
+Resumo:
+
+- configuracao em SI para geometria, malha, material, termico, geostatica,
+  tempo e pressao inicial de parede;
+- validacao de finitude, dimensoes positivas, material valido, temperatura em K
+  positiva, tempo coerente e pressao nao negativa;
+- tensoes geostaticas permanecem assinadas para futura montagem do vetor do
+  backend;
+- estado registra inicializacao, tempo atual, ultima pressao, ultimo
+  deslocamento, ultimo fechamento e numero de passos.
+
+Essa estrutura prepara a ligacao futura com `TimeIntegrator`, mas nao a executa.
+
 ## Por que o backend real nao foi ligado
 
 Nao ha, ainda, uma API simples do tipo "avaliar resposta de parede" que aceite
@@ -150,8 +179,9 @@ classe e seus testes isolados, mantendo `is_available() = false`.
 ## Proximos passos
 
 1. Projetar configuracao explicita do adapter real: geometria, malha, material,
-   integrador e campo termico.
-2. Definir configuracao/state machine do adapter real para preservar estado
-   temporal entre chamadas.
+   integrador e campo termico. **Concluido na Fase 7.5 como contrato C++ ainda
+   neutro.**
+2. Conectar `SaltCreepAdapterConfig` aos objetos reais do backend em teste
+   isolado antes de ativar `is_available()`.
 3. Somente depois conectar o adapter a `coupling/`, ainda sem modificar
    `PknModel`.

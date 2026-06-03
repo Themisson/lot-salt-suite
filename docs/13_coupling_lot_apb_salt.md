@@ -157,6 +157,11 @@ Na Fase 7.4, `TimeIntegrator` tambem foi exercitado em target Catch2 separado
 com campo termico constante neutro, vetor geostatico simplificado e pressao de
 parede constante. Isso confirma uma rota controlada para tempo/geostatica, mas
 continua fora do `coupling/` e nao muda o status neutro do adapter.
+Na Fase 7.5, `SaltCreepAdapterConfig` e `SaltCreepAdapterState` foram
+adicionados como fronteira C++ testada para geometria, malha, material,
+termico, geostatica, tempo e pressao inicial de parede. O adapter continua sem
+chamar o backend real: `evaluate_wall_response()` permanece neutro e
+`is_available()` permanece `false`.
 
 ## Dependencia Eigen no acoplamento
 

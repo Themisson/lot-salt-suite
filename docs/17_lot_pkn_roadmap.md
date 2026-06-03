@@ -104,6 +104,10 @@ entregar os dados ao solver.
    campo termico neutro. Resultado: target Catch2 separado executa
    `TimeIntegrator::advance()` com `ProfileField`, `ConstantWallPressureField`
    e vetor geostatico explicito, ainda sem adapter real e sem acoplamento LOT.
+4.18. Fase 7.5: adicionar configuracao SI e state machine do
+   `SaltCreepSaltcreepAdapter`. Resultado: geometria, malha, material,
+   termico, geostatica, tempo e pressao inicial de parede ficam validados em
+   C++; o adapter continua neutro, indisponivel e sem acoplamento LOT/PKN/APB.
 5. Adicionar testes Catch2 com casos sinteticos e regressao dimensional.
 6. Conectar ao CLI apenas depois que o contrato numerico estiver testado e o
    caso YAML (passo 4.5) for reconhecido pelo parser sem erro.
@@ -257,6 +261,17 @@ entregar os dados ao solver.
 - `docs/audits/saltcreep_backend_time_geostatic_case.md` classifica a API como
   `TIME_THERMAL_GEOSTATIC_CONTROLLED_TEST_READY`.
 - Adapter, LOT/PKN, APB e `external/saltcreep/` permanecem sem alteracao.
+
+**Fase 7.5 (configuracao e estado do adapter):**
+- `SaltCreepAdapterConfig` define configuracao SI para geometria, malha,
+  material, termico, geostatica, tempo e pressao inicial de parede.
+- `SaltCreepAdapterState` registra inicializacao, tempo atual, ultima pressao,
+  ultimo deslocamento, ultimo fechamento e contador de passos.
+- `SaltCreepSaltcreepAdapter` aceita config validada e inicializa o estado, mas
+  `evaluate_wall_response()` continua retornando resposta neutra e
+  `is_available()` continua `false`.
+- LOT/PKN, APB, modelos fisicos e `external/saltcreep/` permanecem sem
+  alteracao.
 
 **Fase 6.10B (prova forcada do Eigen oficial):**
 - `external/saltcreep/CMakeLists.txt` recebeu a opcao `LSS_SALTCREEP_FORCE_LSS_EIGEN`.
