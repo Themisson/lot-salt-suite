@@ -57,6 +57,27 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-03] Revisão 7.1 — patch mínimo radial_closure_m — Claude Code
+
+**Status:** Patch aplicado e commitado.
+
+**Achado:** `NullSaltCreepInterface::evaluate_wall_response` em `src/salt/SaltCreepInterface.cpp`
+atribuía explicitamente `radial_displacement_m`, `radial_strain` e
+`effective_closure_pressure_Pa`, mas omitia `radial_closure_m`. O campo estava
+correto via default do struct, mas a omissão era inconsistente e potencialmente
+confusa para futuros leitores e adapters.
+
+**Patch:** adicionada linha `response.radial_closure_m = 0.0;` para tornar a
+implementação self-documenting, consistente com todos os outros campos.
+
+**Verificações:**
+- 57/57 Catch2 passaram após o patch.
+- 3 validates LOT/PKN: OK.
+- `external/saltcreep/`, `legance/`, `legacy/`, `PknModel`, `PknRunner`,
+  `LeakoffModel`, `ResultWriter`, `CaseParser` e baselines intocados.
+
+---
+
 ### [2026-06-03] Fase 7.1 — Convencao de sinais LOT-saltcreep — Codex
 **Status:** Concluido nesta sessao.
 

@@ -45,6 +45,7 @@ SaltCreepResponse NullSaltCreepInterface::evaluate_wall_response(
 
   SaltCreepResponse response;
   response.radial_displacement_m = 0.0;
+  response.radial_closure_m = 0.0;
   response.radial_strain = 0.0;
   response.effective_closure_pressure_Pa = 0.0;
   response.valid = true;
