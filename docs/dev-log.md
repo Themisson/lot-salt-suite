@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 9.6A documentacao/formulacao implementada, aguardando revisao/commit
+Fase ativa  : 9.7A documentacao/formulacao implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
@@ -54,6 +54,43 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 9.7A — limitacoes de inferencia de breakdown no PKN atual — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Documentar que o fluxo PKN moderno atual ainda nao fornece um
+evento fisico robusto de breakdown nem `p_net_at_breakdown`.
+
+**Conclusao documental:**
+- `breakdown_pressure_Pa` e parseado, validado e repassado para `PknInput`, mas
+  nao controla diretamente o inicio da fratura, a geracao das series PKN ou
+  `PknResult.net_pressure_series_Pa`.
+- `PknModel` gera uma resposta PKN ja iniciada/ativa, nao uma rampa
+  pre-breakdown ate ruptura.
+- `PknResult` ainda nao expoe `breakdown_step`, `breakdown_time_s`,
+  `p_net_at_breakdown` ou `fracture_initiation_step`.
+- `p_net_at_breakdown` nao deve ser inferido por primeiro `p_net > 0`, primeiro
+  `width`, `length` ou `volume` positivo, `breakdown_pressure_Pa` ou aplicacao
+  direta de `BreakdownDetector` sobre `net_pressure_series_Pa`.
+- `BreakdownDetector` continua adequado para curvas pressao-volume absolutas,
+  observadas ou estimadas, mas nao para a serie PKN isolada de pressao liquida.
+- `BreakdownReferencedPressure` permanece candidato futuro, nao implementado,
+  nao default runtime e bloqueado pela ausencia de `p_net_at_breakdown` /
+  `breakdown_step` robustos.
+
+**Caminho futuro registrado:**
+- Possivel `PknBreakdownDiagnostics` opt-in, separado do solver e marcado como
+  heuristico ate existir pressao absoluta, curva LOT validada, closure stress,
+  tensao minima horizontal, pressao de poros ou referencia externa robusta.
+
+**Limite deliberado:**
+- Nenhum codigo C++ foi alterado.
+- `CMakeLists.txt`, testes, YAMLs, parser, `CaseData`, `PknRunner`,
+  `PknModel`, `ResultWriter`, `apps/lot-sim.cpp`, `external/saltcreep/`,
+  `legacy/`, `legance/`, baselines e postprocess nao foram alterados.
 
 ---
 

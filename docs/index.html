@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">28/35</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">29/36</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">146</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -656,12 +656,31 @@ temporal de pressao absoluta do poco ou da sapata.</p>
 <p>No estado atual, <code>PknRunner</code> repassa esse valor para <code>PknInput.breakdown</code>, mas
 <code>PknModel</code> calcula a serie <code>PknResult.net_pressure_series_Pa</code> pela relacao
 <code>p_net = E' * w / h</code>, independente de <code>breakdown_pressure_Pa</code> na evolucao da
-serie. Tambem nao existem em <code>PknResult</code> campos como <code>p_net_at_breakdown</code>,
-<code>net_pressure_at_breakdown</code>, <code>breakdown_step</code>, <code>breakdown_time_s</code> ou
-<code>fracture_initiation_step</code>. Inferir esses valores diretamente da serie atual
-nao e robusto, porque a formulacao PKN moderna ja propaga a partir do tempo
-ativo e pode carregar largura minima/valores numericos que nao representam um
-evento fisico claro de breakdown.</p>
+serie. Esse valor tambem pode aparecer como <code>input.net_pressure_Pa</code>, mas nao
+controla diretamente:</p>
+<ul>
+<li>o inicio da fratura no <code>PknModel</code>;</li>
+<li>a geracao das series PKN;</li>
+<li><code>PknResult.net_pressure_series_Pa</code>;</li>
+<li><code>PknResult.fracture_length_series_m</code>;</li>
+<li><code>PknResult.fracture_width_series_m</code>.</li>
+</ul>
+<p>Assim, no fluxo moderno atual, <code>breakdown_pressure_Pa</code> deve ser entendido como
+parametro/threshold/metadado do contrato LOT/PKN, nao como evento dinamico
+resolvido na serie temporal.</p>
+<p>O <code>PknModel</code> gera uma resposta PKN ja iniciada/ativa, nao uma rampa
+pre-breakdown ate a ruptura. Tambem nao existem em <code>PknResult</code> campos como:</p>
+<ul>
+<li><code>breakdown_step</code>;</li>
+<li><code>breakdown_time_s</code>;</li>
+<li><code>p_net_at_breakdown</code>;</li>
+<li><code>fracture_initiation_step</code>;</li>
+<li><code>net_pressure_at_breakdown</code>.</li>
+</ul>
+<p>Inferir esses valores diretamente da serie atual nao e robusto, porque a
+formulacao PKN moderna ja propaga a partir do tempo ativo e pode carregar
+largura minima/valores numericos que nao representam um evento fisico claro de
+breakdown.</p>
 <p>Campos principais:</p>
 <table>
 <thead>
@@ -3170,6 +3189,72 @@ pressao fisica de breakdown.</p>
 metodos mais adequados continuam sendo candidatos baseados em pressao anular
 absoluta por tempo e profundidade, como <code>AnnularPressureHistory</code>,
 <code>AbsoluteAnnularWallPressure</code> ou <code>AbsoluteWellborePressure</code>.</p>
+<h2 id="limitacoes-de-inferencia-de-breakdown-no-pkn-atual-fase-97a">Limitacoes de inferencia de breakdown no PKN atual (Fase 9.7A)</h2>
+<p>A Fase 9.7 auditou se o fluxo PKN moderno ja permite definir um evento fisico
+robusto de breakdown para alimentar metodos referenciados a ruptura. A
+conclusao e negativa: o <code>PknModel</code> atual nao produz uma rampa pre-breakdown ate
+a ruptura nem registra um evento dinamico de iniciacao.</p>
+<p>Hoje, <code>breakdown_pressure_Pa</code> e parseado de
+<code>lot.fracture.breakdown.pressure</code>, armazenado em <code>CaseData.lot</code> e repassado
+para <code>PknInput.breakdown.pressure_Pa</code>. Esse valor tambem pode aparecer como
+<code>input.net_pressure_Pa</code>, mas <code>PknModel</code> nao o usa para iniciar a fratura,
+detectar ruptura ou calibrar <code>PknResult.net_pressure_series_Pa</code>.</p>
+<p>Portanto, <code>p_net_at_breakdown</code> nao deve ser inferido automaticamente por:</p>
+<ul>
+<li>primeiro <code>p_net &gt; 0</code>;</li>
+<li>primeiro <code>width &gt; tolerancia</code>;</li>
+<li>primeiro <code>length &gt; tolerancia</code>;</li>
+<li>primeiro <code>volume &gt; tolerancia</code>;</li>
+<li><code>breakdown_pressure_Pa</code>;</li>
+<li>aplicacao direta de <code>BreakdownDetector</code> sobre
+  <code>PknResult.net_pressure_series_Pa</code>.</li>
+</ul>
+<p>Esses criterios sao marcadores numericos ou heuristicos no modelo atual, nao
+eventos fisicos robustos de breakdown. Em particular, pequenos valores positivos
+de largura ou pressao liquida podem vir de minimos numericos, tempo ativo ou
+hipoteses de propagacao ja iniciada, sem corresponder ao instante de ruptura da
+formacao.</p>
+<p>O <code>BreakdownDetector</code> existente continua adequado para curvas pressao-volume
+absolutas, observadas ou estimadas, quando a pressao representa a pressao
+fisica do poco/sapata. Ele nao deve ser aplicado diretamente a
+<code>PknResult.net_pressure_series_Pa</code> isolado, porque essa serie e pressao liquida
+PKN (<code>p_net = E' * w / h</code>), nao pressao absoluta de poco.</p>
+<p>Status reforcado para o metodo futuro:</p>
+<pre><code class="language-text">BreakdownReferencedPressure:
+  status: candidate future method
+  implementation: not implemented
+  runtime default: no
+  physical validation: pending
+  blocked by: missing p_net_at_breakdown / breakdown_step
+</code></pre>
+<p>Um caminho futuro conservador seria criar um diagnostico opt-in, separado do
+solver e marcado como heuristico enquanto nao houver pressao absoluta ou curva
+LOT validada:</p>
+<pre><code class="language-cpp">struct PknBreakdownDiagnostics {
+  bool found = false;
+  std::size_t step_index = 0;
+  double time_s = 0.0;
+  double net_pressure_Pa = 0.0;
+  std::string method;
+  std::string caveat;
+};
+
+PknBreakdownDiagnostics diagnose_pkn_breakdown(
+    const PknResult&amp; result,
+    const PknBreakdownDiagnosticConfig&amp; config);
+</code></pre>
+<p>Um diagnostico fisico mais rigoroso exigiria pelo menos uma das referencias
+seguintes, idealmente combinadas em contrato explicito:</p>
+<ul>
+<li>pressao absoluta de poco por tempo;</li>
+<li>curva pressao-volume de LOT;</li>
+<li><code>closure stress</code>;</li>
+<li>tensao horizontal minima;</li>
+<li>pressao de poros;</li>
+<li>referencia externa validada para o evento de ruptura.</li>
+</ul>
+<p>Enquanto essas referencias nao existirem, futuras rotas de acoplamento nao
+devem tratar marcadores numericos do PKN como evento fisico de breakdown.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

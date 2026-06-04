@@ -121,12 +121,32 @@ temporal de pressao absoluta do poco ou da sapata.
 No estado atual, `PknRunner` repassa esse valor para `PknInput.breakdown`, mas
 `PknModel` calcula a serie `PknResult.net_pressure_series_Pa` pela relacao
 `p_net = E' * w / h`, independente de `breakdown_pressure_Pa` na evolucao da
-serie. Tambem nao existem em `PknResult` campos como `p_net_at_breakdown`,
-`net_pressure_at_breakdown`, `breakdown_step`, `breakdown_time_s` ou
-`fracture_initiation_step`. Inferir esses valores diretamente da serie atual
-nao e robusto, porque a formulacao PKN moderna ja propaga a partir do tempo
-ativo e pode carregar largura minima/valores numericos que nao representam um
-evento fisico claro de breakdown.
+serie. Esse valor tambem pode aparecer como `input.net_pressure_Pa`, mas nao
+controla diretamente:
+
+- o inicio da fratura no `PknModel`;
+- a geracao das series PKN;
+- `PknResult.net_pressure_series_Pa`;
+- `PknResult.fracture_length_series_m`;
+- `PknResult.fracture_width_series_m`.
+
+Assim, no fluxo moderno atual, `breakdown_pressure_Pa` deve ser entendido como
+parametro/threshold/metadado do contrato LOT/PKN, nao como evento dinamico
+resolvido na serie temporal.
+
+O `PknModel` gera uma resposta PKN ja iniciada/ativa, nao uma rampa
+pre-breakdown ate a ruptura. Tambem nao existem em `PknResult` campos como:
+
+- `breakdown_step`;
+- `breakdown_time_s`;
+- `p_net_at_breakdown`;
+- `fracture_initiation_step`;
+- `net_pressure_at_breakdown`.
+
+Inferir esses valores diretamente da serie atual nao e robusto, porque a
+formulacao PKN moderna ja propaga a partir do tempo ativo e pode carregar
+largura minima/valores numericos que nao representam um evento fisico claro de
+breakdown.
 
 Campos principais:
 

@@ -577,6 +577,84 @@ metodos mais adequados continuam sendo candidatos baseados em pressao anular
 absoluta por tempo e profundidade, como `AnnularPressureHistory`,
 `AbsoluteAnnularWallPressure` ou `AbsoluteWellborePressure`.
 
+## Limitacoes de inferencia de breakdown no PKN atual (Fase 9.7A)
+
+A Fase 9.7 auditou se o fluxo PKN moderno ja permite definir um evento fisico
+robusto de breakdown para alimentar metodos referenciados a ruptura. A
+conclusao e negativa: o `PknModel` atual nao produz uma rampa pre-breakdown ate
+a ruptura nem registra um evento dinamico de iniciacao.
+
+Hoje, `breakdown_pressure_Pa` e parseado de
+`lot.fracture.breakdown.pressure`, armazenado em `CaseData.lot` e repassado
+para `PknInput.breakdown.pressure_Pa`. Esse valor tambem pode aparecer como
+`input.net_pressure_Pa`, mas `PknModel` nao o usa para iniciar a fratura,
+detectar ruptura ou calibrar `PknResult.net_pressure_series_Pa`.
+
+Portanto, `p_net_at_breakdown` nao deve ser inferido automaticamente por:
+
+- primeiro `p_net > 0`;
+- primeiro `width > tolerancia`;
+- primeiro `length > tolerancia`;
+- primeiro `volume > tolerancia`;
+- `breakdown_pressure_Pa`;
+- aplicacao direta de `BreakdownDetector` sobre
+  `PknResult.net_pressure_series_Pa`.
+
+Esses criterios sao marcadores numericos ou heuristicos no modelo atual, nao
+eventos fisicos robustos de breakdown. Em particular, pequenos valores positivos
+de largura ou pressao liquida podem vir de minimos numericos, tempo ativo ou
+hipoteses de propagacao ja iniciada, sem corresponder ao instante de ruptura da
+formacao.
+
+O `BreakdownDetector` existente continua adequado para curvas pressao-volume
+absolutas, observadas ou estimadas, quando a pressao representa a pressao
+fisica do poco/sapata. Ele nao deve ser aplicado diretamente a
+`PknResult.net_pressure_series_Pa` isolado, porque essa serie e pressao liquida
+PKN (`p_net = E' * w / h`), nao pressao absoluta de poco.
+
+Status reforcado para o metodo futuro:
+
+```text
+BreakdownReferencedPressure:
+  status: candidate future method
+  implementation: not implemented
+  runtime default: no
+  physical validation: pending
+  blocked by: missing p_net_at_breakdown / breakdown_step
+```
+
+Um caminho futuro conservador seria criar um diagnostico opt-in, separado do
+solver e marcado como heuristico enquanto nao houver pressao absoluta ou curva
+LOT validada:
+
+```cpp
+struct PknBreakdownDiagnostics {
+  bool found = false;
+  std::size_t step_index = 0;
+  double time_s = 0.0;
+  double net_pressure_Pa = 0.0;
+  std::string method;
+  std::string caveat;
+};
+
+PknBreakdownDiagnostics diagnose_pkn_breakdown(
+    const PknResult& result,
+    const PknBreakdownDiagnosticConfig& config);
+```
+
+Um diagnostico fisico mais rigoroso exigiria pelo menos uma das referencias
+seguintes, idealmente combinadas em contrato explicito:
+
+- pressao absoluta de poco por tempo;
+- curva pressao-volume de LOT;
+- `closure stress`;
+- tensao horizontal minima;
+- pressao de poros;
+- referencia externa validada para o evento de ruptura.
+
+Enquanto essas referencias nao existirem, futuras rotas de acoplamento nao
+devem tratar marcadores numericos do PKN como evento fisico de breakdown.
+
 ## Interface proposta para coupling/
 
 ```cpp
