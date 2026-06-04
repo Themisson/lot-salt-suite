@@ -43,6 +43,7 @@ phases:
   phase_9_5a_hydrostatic_plus_net_pressure_formulation: completed
   phase_9_6a_breakdown_referenced_pressure_formulation: completed
   phase_9_7a_pkn_breakdown_inference_formulation: completed
+  phase_9_8_sigma_theta_breakdown_diagnostic: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -132,7 +133,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 146        # Catch2 lot-salt-suite — Fase 9.4B adicionou LotSaltCouplingConfigBuilder
+  cpp_tests: 153        # Catch2 lot-salt-suite — Fase 9.8 adicionou LotSaltSigmaThetaBreakdown
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
   python_tests: 31      # unittest saltcreep — 31/31 passaram, com 7 skips esperados (2026-06-04)
   regression_baselines: 4
@@ -141,5 +142,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-04"
-updated_by: "codex (Fase 9.7A PKN breakdown inference formulation)"
+updated_by: "codex (Fase 9.8 SigmaTheta breakdown diagnostic)"
 project_version: "0.1.0"

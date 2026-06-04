@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 9.7A documentacao/formulacao implementada, aguardando revisao/commit
+Fase ativa  : 9.8 implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 146/146 Catch2 lot-salt-suite em 2026-06-04 apos Fase 9.4B
+Testes C++  : 153/153 Catch2 lot-salt-suite em 2026-06-04 apos Fase 9.8
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,52 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 9.8 — diagnostico experimental por `sigma_theta` — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Criar `LotSaltSigmaThetaBreakdown` como diagnostico puro em
+`coupling/` para comparar uma pressao de parede contra
+`sigma_theta_compression_positive_Pa` por camada/altura de influencia.
+
+**Criterio implementado:**
+
+```text
+margin_Pa = pressure_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa > 0
+```
+
+Igualdade nao indica abertura. A funcao de serie retorna pontos em ordem
+deterministica tempo externo/camada interna.
+
+**Convencao de sinal:**
+- A API recebe `sigma_theta_compression_positive_Pa` ja convertido.
+- Para reproduzir o legado quando `getSigmaTheta()` retornar compressao
+  negativa, o chamador deve usar `sigma_theta_compression_positive_Pa =
+  -getSigmaTheta()`.
+- Nenhuma conversao automatica de sinal foi implementada.
+
+**Limites deliberados:**
+- O diagnostico nao chama `SaltCreepInterface`.
+- `getDeviatoricStress()` foi mantido como candidato futuro e nao foi
+  implementado.
+- `LotSaltPressureMap`, `LotSaltCouplingStep`, `LotSaltHydrostaticContext`,
+  `LotSaltCouplingConfigBuilder`, `PknRunner`, `PknModel`, parser,
+  `CaseData`, CLI, YAMLs, LOT/APB, sal externo, baselines e postprocess nao
+  foram alterados.
+- `lot-sim run --mode lot-pkn` permanece desacoplado.
+
+**Verificacao executada:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure` passou com 153/153.
+- Filtro `sigma_theta|SigmaTheta|breakdown|Breakdown|coupling|Coupling`
+  passou com 14/14.
+- Filtro `LOT PKN.*identical` passou com 2/2.
+- `lot-sim validate` e `lot-sim run --mode lot-pkn` passaram para os casos
+  `lot_pkn_minimal.yaml`, `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
 
 ---
 

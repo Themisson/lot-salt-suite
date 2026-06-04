@@ -115,6 +115,7 @@ set(LSS_CORE_SOURCES
   src/coupling/LotSaltCouplingConfigBuilder.cpp
   src/coupling/LotSaltHydrostaticContext.cpp
   src/coupling/LotSaltPressureMap.cpp
+  src/coupling/LotSaltSigmaThetaBreakdown.cpp
   src/salt/SaltCreepAdapterConfig.cpp
   src/salt/SaltCreepAdapterState.cpp
   src/salt/SaltCreepInterface.cpp
@@ -165,6 +166,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_lot_salt_coupling_config_builder.cpp
     tests/cpp/test_lot_salt_hydrostatic_context.cpp
     tests/cpp/test_lot_salt_pressure_map.cpp
+    tests/cpp/test_lot_salt_sigma_theta_breakdown.cpp
     tests/cpp/test_lot_pkn_salt_coupling_step.cpp
     tests/cpp/test_result_writer.cpp
     tests/cpp/test_salt_creep_adapter_config.cpp

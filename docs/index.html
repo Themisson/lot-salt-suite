@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">29/36</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">146</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">30/37</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">153</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -3255,6 +3255,38 @@ seguintes, idealmente combinadas em contrato explicito:</p>
 </ul>
 <p>Enquanto essas referencias nao existirem, futuras rotas de acoplamento nao
 devem tratar marcadores numericos do PKN como evento fisico de breakdown.</p>
+<h2 id="diagnostico-experimental-por-sigma_theta-em-sal-fase-98">Diagnostico experimental por <code>sigma_theta</code> em sal (Fase 9.8)</h2>
+<p>A Fase 9.8 adiciona um diagnostico experimental puro em <code>coupling/</code> inspirado
+na logica observada no legado <code>LOT_Tese</code> para camadas salinas. O objetivo e
+comparar uma pressao aplicada contra uma tensao tangencial de referencia ja
+convertida para a convencao de compressao positiva:</p>
+<pre><code class="language-text">opened = pressure_Pa &gt; sigma_theta_compression_positive_Pa
+margin_Pa = pressure_Pa - sigma_theta_compression_positive_Pa
+</code></pre>
+<p>Se <code>margin_Pa &gt; 0</code>, o diagnostico indica abertura/quebra experimental naquela
+camada ou altura de influencia. Igualdade (<code>margin_Pa = 0</code>) nao indica
+abertura.</p>
+<p>A API recebe explicitamente <code>sigma_theta_compression_positive_Pa</code>; ela nao faz
+conversao automatica de sinal. Para reproduzir a convencao observada no legado,
+quando <code>getSigmaTheta()</code> retornar compressao negativa, o chamador deve fornecer:</p>
+<pre><code class="language-text">sigma_theta_compression_positive_Pa = -getSigmaTheta()
+</code></pre>
+<p>Essa fase implementa apenas o criterio baseado em <code>sigma_theta</code>. O valor
+<code>getDeviatoricStress()</code> observado no legado permanece candidato futuro para uma
+auditoria propria; dano, fluencia terciaria e criterios constitutivos avancados
+nao entram nesta implementacao.</p>
+<p>O modulo <code>LotSaltSigmaThetaBreakdown</code> nao chama <code>SaltCreepInterface</code>, nao chama
+<code>LotSaltPressureMap</code>, nao altera <code>LotSaltCouplingStep</code> e nao e conectado ao
+CLI. Ele trabalha somente com pressoes e tensoes de referencia ja fornecidas,
+em SI, e retorna pontos ordenados por tempo externo e camada interna:</p>
+<pre><code class="language-text">para cada tempo:
+  para cada camada:
+    avaliar pressure_Pa &gt; sigma_theta_compression_positive_Pa
+</code></pre>
+<p>Esse diagnostico nao e acoplamento fisico validado. Ele existe para estudos
+controlados, comparacao futura com o legado e preparacao de criterios mais
+rigorosos quando <code>sigma_theta</code>, historicos absolutos de pressao e referencias
+geomecanicas forem disponibilizados por rotas validadas.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

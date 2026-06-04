@@ -655,6 +655,51 @@ seguintes, idealmente combinadas em contrato explicito:
 Enquanto essas referencias nao existirem, futuras rotas de acoplamento nao
 devem tratar marcadores numericos do PKN como evento fisico de breakdown.
 
+## Diagnostico experimental por `sigma_theta` em sal (Fase 9.8)
+
+A Fase 9.8 adiciona um diagnostico experimental puro em `coupling/` inspirado
+na logica observada no legado `LOT_Tese` para camadas salinas. O objetivo e
+comparar uma pressao aplicada contra uma tensao tangencial de referencia ja
+convertida para a convencao de compressao positiva:
+
+```text
+opened = pressure_Pa > sigma_theta_compression_positive_Pa
+margin_Pa = pressure_Pa - sigma_theta_compression_positive_Pa
+```
+
+Se `margin_Pa > 0`, o diagnostico indica abertura/quebra experimental naquela
+camada ou altura de influencia. Igualdade (`margin_Pa = 0`) nao indica
+abertura.
+
+A API recebe explicitamente `sigma_theta_compression_positive_Pa`; ela nao faz
+conversao automatica de sinal. Para reproduzir a convencao observada no legado,
+quando `getSigmaTheta()` retornar compressao negativa, o chamador deve fornecer:
+
+```text
+sigma_theta_compression_positive_Pa = -getSigmaTheta()
+```
+
+Essa fase implementa apenas o criterio baseado em `sigma_theta`. O valor
+`getDeviatoricStress()` observado no legado permanece candidato futuro para uma
+auditoria propria; dano, fluencia terciaria e criterios constitutivos avancados
+nao entram nesta implementacao.
+
+O modulo `LotSaltSigmaThetaBreakdown` nao chama `SaltCreepInterface`, nao chama
+`LotSaltPressureMap`, nao altera `LotSaltCouplingStep` e nao e conectado ao
+CLI. Ele trabalha somente com pressoes e tensoes de referencia ja fornecidas,
+em SI, e retorna pontos ordenados por tempo externo e camada interna:
+
+```text
+para cada tempo:
+  para cada camada:
+    avaliar pressure_Pa > sigma_theta_compression_positive_Pa
+```
+
+Esse diagnostico nao e acoplamento fisico validado. Ele existe para estudos
+controlados, comparacao futura com o legado e preparacao de criterios mais
+rigorosos quando `sigma_theta`, historicos absolutos de pressao e referencias
+geomecanicas forem disponibilizados por rotas validadas.
+
 ## Interface proposta para coupling/
 
 ```cpp
