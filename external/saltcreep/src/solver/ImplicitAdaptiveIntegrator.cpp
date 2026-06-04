@@ -11,6 +11,7 @@
 #include <iostream>
 #include <limits>
 #include <stdexcept>
+#include <utility>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -345,7 +346,8 @@ Strain ImplicitAdaptiveIntegrator::thermal_strain_at(int e, int g, double time_s
 void ImplicitAdaptiveIntegrator::run(double dt_s, double t_end_s, int output_every,
                                       const fs::path& out_dir,
                                       VtuOutputOptions vtu_options,
-                                      const DamageTrackingOptions& damage_options) {
+                                      const DamageTrackingOptions& damage_options,
+                                      StressDiagnosticsOptions stress_options) {
     fs::create_directories(out_dir);
     ConstantWallPressureField fallback_pressure(0.0);
     const WallPressureField& pressure =
@@ -354,6 +356,7 @@ void ImplicitAdaptiveIntegrator::run(double dt_s, double t_end_s, int output_eve
     std::ofstream profile_csv(out_dir / "displacements_profile.csv");
     std::ofstream wall_csv(out_dir / "wall_profile.csv");
     std::ofstream pressure_csv(out_dir / "wall_pressure_profile.csv");
+    StressDiagnosticsWriter stress_writer(out_dir, std::move(stress_options));
     time_output::write_closure_header(csv);
     time_output::write_displacement_profile_header(profile_csv);
     time_output::write_wall_profile_header(wall_csv);
@@ -372,6 +375,7 @@ void ImplicitAdaptiveIntegrator::run(double dt_s, double t_end_s, int output_eve
     time_output::write_wall_pressure_profile_record(
         pressure_csv, mesh_, pressure, thermal_, 0.0, 0.0,
         vtu_options.depth_origin_m);
+    stress_writer.write(mesh_, element_, state_, 0.0);
 
     double t = 0.0;
     int step = 0;
@@ -416,6 +420,7 @@ void ImplicitAdaptiveIntegrator::run(double dt_s, double t_end_s, int output_eve
             time_output::write_wall_pressure_profile_record(
                 pressure_csv, mesh_, pressure, thermal_, t_h, t,
                 vtu_options.depth_origin_m);
+            stress_writer.write(mesh_, element_, state_, t_h);
         }
         write_vtu(t, false);
     }
@@ -429,6 +434,7 @@ void ImplicitAdaptiveIntegrator::run(double dt_s, double t_end_s, int output_eve
     time_output::write_wall_pressure_profile_record(
         pressure_csv, mesh_, pressure, thermal_, t / 3600.0, t,
         vtu_options.depth_origin_m);
+    stress_writer.write(mesh_, element_, state_, t / 3600.0);
     write_vtu(t, true);
     if (vtu_options.enabled)
         VtuWriter::write_pvd(out_dir / (vtu_case + ".pvd"), vtu_frames);
@@ -439,7 +445,8 @@ void ImplicitAdaptiveIntegrator::run_schedule(const std::vector<TimeSegment>& sc
                                                double t_end_s, int output_every,
                                                const fs::path& out_dir,
                                                VtuOutputOptions vtu_options,
-                                               const DamageTrackingOptions& damage_options) {
+                                               const DamageTrackingOptions& damage_options,
+                                               StressDiagnosticsOptions stress_options) {
     if (schedule.empty())
         throw std::runtime_error("ImplicitAdaptiveIntegrator::run_schedule: empty schedule");
 
@@ -451,6 +458,7 @@ void ImplicitAdaptiveIntegrator::run_schedule(const std::vector<TimeSegment>& sc
     std::ofstream profile_csv(out_dir / "displacements_profile.csv");
     std::ofstream wall_csv(out_dir / "wall_profile.csv");
     std::ofstream pressure_csv(out_dir / "wall_pressure_profile.csv");
+    StressDiagnosticsWriter stress_writer(out_dir, std::move(stress_options));
     time_output::write_closure_header(csv);
     time_output::write_displacement_profile_header(profile_csv);
     time_output::write_wall_profile_header(wall_csv);
@@ -469,6 +477,7 @@ void ImplicitAdaptiveIntegrator::run_schedule(const std::vector<TimeSegment>& sc
     time_output::write_wall_pressure_profile_record(
         pressure_csv, mesh_, pressure, thermal_, 0.0, 0.0,
         vtu_options.depth_origin_m);
+    stress_writer.write(mesh_, element_, state_, 0.0);
 
     double t = 0.0;
     int step = 0;
@@ -526,6 +535,7 @@ void ImplicitAdaptiveIntegrator::run_schedule(const std::vector<TimeSegment>& sc
             time_output::write_wall_pressure_profile_record(
                 pressure_csv, mesh_, pressure, thermal_, t_h, t,
                 vtu_options.depth_origin_m);
+            stress_writer.write(mesh_, element_, state_, t_h);
         }
         write_vtu(t, false);
     }
@@ -539,6 +549,7 @@ void ImplicitAdaptiveIntegrator::run_schedule(const std::vector<TimeSegment>& sc
     time_output::write_wall_pressure_profile_record(
         pressure_csv, mesh_, pressure, thermal_, t / 3600.0, t,
         vtu_options.depth_origin_m);
+    stress_writer.write(mesh_, element_, state_, t / 3600.0);
     write_vtu(t, true);
     if (vtu_options.enabled)
         VtuWriter::write_pvd(out_dir / (vtu_case + ".pvd"), vtu_frames);

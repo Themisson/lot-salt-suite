@@ -24,6 +24,9 @@ from .plots import (
     plot_wall_displacement,
     plot_wall_profile,
     plot_phase_space,
+    plot_wall_pressure_map,
+    plot_wall_pressure_profile,
+    plot_wall_pressure_time,
     write_comparison_outputs,
 )
 from .report import generate_dashboard
@@ -46,7 +49,9 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["all", "closure", "displacement", "radial_profile",
                  "wall_profile", "field_map", "damage", "creep_rate",
                  "damage_comparison", "phase_space", "diameter_profile",
-                 "diameter_time", "lithology_column", "axisym_3d"],
+                 "diameter_time", "lithology_column", "axisym_3d",
+                 "wall_pressure_profile", "wall_pressure_time",
+                 "wall_pressure_map"],
         default="all",
         help="Tipo de grafico a gerar.",
     )
@@ -131,6 +136,15 @@ def main(argv: list[str] | None = None) -> int:
     if args.plot in {"field_map"}:
         for result in results:
             plot_field_map(result, out_dir, args.time)
+    if args.plot in {"all", "wall_pressure_profile"}:
+        for result in results:
+            plot_wall_pressure_profile(result, out_dir, args.time)
+    if args.plot in {"all", "wall_pressure_time"}:
+        for result in results:
+            plot_wall_pressure_time(result, out_dir)
+    if args.plot in {"all", "wall_pressure_map"}:
+        for result in results:
+            plot_wall_pressure_map(result, out_dir)
     if args.plot in {"diameter_profile"}:
         plot_wellbore_diameter_profile(results, out_dir, args.time, group_by)
     if args.plot in {"diameter_time"}:

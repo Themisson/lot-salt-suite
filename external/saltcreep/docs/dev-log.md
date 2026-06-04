@@ -376,5 +376,63 @@ Formato: data, agente, resumo do que foi feito, contagem de testes.
 - Manual, `docs/input-spec.md`, `docs/post-processing.md`, `docs/architecture.md` e `AGENTS.md` atualizados
 - **125/125 C++ verdes + 26/26 Python verdes**
 
+## 2026-06-01 — Codex — Saltpost: gráficos de pressão na parede
+- `CaseResult` agora carrega `wall_pressure_profile.csv` quando disponível
+- CLI ganhou `--plot wall_pressure_profile`, `--plot wall_pressure_time` e `--plot wall_pressure_map`
+- Os plots geram perfis `p_wall(z)`, séries `p_wall(t)` em profundidades selecionadas e mapa `p_wall(z,t)`, com escala automática Pa/kPa/MPa
+- Manual e `docs/post-processing.md` atualizados com os comandos de visualização da pressão de lama
+- Adicionado teste Python sintético para validar geração dos três gráficos
+- **125/125 C++ verdes + 27/27 Python verdes**
+
+## 2026-06-01 — Codex — Acoplamento APB por CSV externo
+- Criado `TimeDepthTable` para ler grades CSV completas `t,z,valor` com interpolação linear e clamp nas bordas
+- Criado `CsvWallPressureField` para `fluid.mode: csv_time_depth_profile`, avaliando `p_wall(t,z)` nos pontos de Gauss da parede
+- Criado `CsvWallTemperatureField` para `thermal.mode: csv_wall_temperature`, entregando `T_wall_K(t,z)` aos modelos constitutivos e à pseudo-força térmica fraca
+- Parser e `main.cpp` aceitam caminhos CSV relativos ao YAML, colunas configuráveis e registram `fluid_csv`/`thermal_csv` no `metadata.json`
+- Manual, `docs/input-spec.md`, `docs/architecture.md`, `docs/thermal-coupling.md` e `AGENTS.md` atualizados
+- Adicionados testes C++ para interpolação, campos CSV e parser dos novos modos
+- **128/128 C++ verdes + 27/27 Python verdes**
+
+## 2026-06-01 — Codex — Casos APB operacionais com histórico de lama
+- Criado `data/apb/mud_schedule_example.csv` com grade `t_h,z_m,p_wall_Pa,T_wall_K`
+- Criados `cases/apb/apb_1d_constant_mud.yaml`, `apb_1d_schedule_mud_temperature.yaml` e `apb_2d_layered_schedule_Q8.yaml`
+- Os casos 1D usam halita com fluência ativa (DM+EDMT) e integrador implícito adaptativo; o caso agendado lê pressão e temperatura do CSV
+- O caso 2D Q8 usa o mesmo histórico operacional, camadas litológicas visuais e `geostatic_mode: depth_profile`; roda com `implicit_adaptive` para evitar instabilidade explícita
+- Teste Python novo roda os casos operacionais 1D/2D, exige fechamento finito positivo e confere valores de `p_wall_Pa`/`T_wall_K`
+- Manual e `docs/post-processing.md` atualizados com comandos dos casos APB
+- **128/128 C++ verdes + 28/28 Python verdes**
+
+## 2026-06-01 — Codex — Benchmark de custo da pressão na parede
+- Criado `post/benchmark_wall_pressure.py` para gerar YAMLs temporários Q8 2D e comparar `fluid.mode: constant`, `hydrostatic_depth_profile` e `csv_time_depth_profile`
+- O script aceita presets `smoke|standard|full`, lista de threads OpenMP, `--dry-run`, limite de execuções e timeout por caso
+- Saídas consolidadas em `results/benchmark_wall_pressure/`: JSON bruto, CSV plano, relatório Markdown e gráficos tempo × GDL, sobrecusto × GDL e breakdown montagem/solve/constitutivo
+- Adicionados testes Python para matriz do benchmark, geração de relatório/gráficos e execução real mínima de um caso hidrostático Q8
+- Manual e `docs/post-processing.md` atualizados com comandos do benchmark dedicado APB
+- **128/128 C++ verdes + 31/31 Python verdes**
+
+## 2026-06-04 — Codex — Diagnóstico de tensão APB na parede
+- Criado `physics/stress_utils.hpp` para centralizar `sigma_theta`, tensão média, desviador, `J2` e `sigma_ef`
+- Criado `StressSampler`/`StressDiagnosticsWriter` para gravar `wall_stress.csv` e, com escopo `all_gauss`, `stress_profile.csv`
+- Parser aceita `output.stress_diagnostics` e `output.stress_diagnostics_scope: wall|all_gauss`; o default preserva todos os casos existentes
+- Integradores explícito e implícito, inclusive schedules, escrevem tensões a partir de `TimeState::sigma_gp` sem alterar física, cargas, K ou constitutivos
+- `metadata.json` registra se o diagnóstico de tensão estava ativo e o escopo usado
+- Adicionados testes C++ para convenção APB `sigma_theta_comp_Pa = -sigma_theta`, tensão desviadora/von Mises, amostragem 1D e perfil 2D de parede
+- Verificado caso real temporário `results/_tmp_stress_diagnostics_1d.yaml`, gerando `results/_tmp_stress_diagnostics_1d/wall_stress.csv`
+- **132/132 C++ verdes** (rodado em dois blocos por timeout do comando global: 1–111 e 112–132). Testes Python não rodaram nesta sessão porque `pytest` não está instalado no Python do sistema nem no runtime empacotado.
+
+---
+## 2026-06-04 — Codex — Auditoria de sincronizacao vendorizada no lot-salt-suite
+- Revisadas as atualizacoes locais trazidas para `external/saltcreep`: entrada CSV `t,z` para pressao/temperatura de parede, casos APB operacionais, benchmark de pressao de parede, `StressSampler` e diagnosticos `wall_stress.csv`/`stress_profile.csv`
+- Restaurada a integracao CMake com o Eigen oficial do `lot-salt-suite` por `LSS_SALTCREEP_FORCE_LSS_EIGEN`, proxy `lss_eigen_proxy/Eigen`, macro `LSS_SALTCREEP_EIGEN_MODE` e teste `tests/test_eigen_source.cpp`
+- Adicionado `/FS` no MSVC para evitar disputa de escrita de PDB em build paralelo
+- Build baseline com Eigen interno: `cmake --build external\saltcreep\build_baseline --config Debug -j` verde
+- Build LSS Eigen: `cmake --build external\saltcreep\build_lss_eigen --config Debug -j` verde
+- `ctest --test-dir external\saltcreep\build_baseline -C Debug --output-on-failure -j 4`: 133/133 verdes
+- `ctest --test-dir external\saltcreep\build_lss_eigen -C Debug --output-on-failure -j 4`: 133/133 verdes
+- `python -m unittest discover -s external\saltcreep\tests\python -p "test_*.py"`: 31/31 verdes, com 7 skips esperados
+- Casos APB `apb_1d_constant_mud.yaml`, `apb_1d_schedule_mud_temperature.yaml` e `apb_2d_layered_schedule_Q8.yaml` executados no binario baseline com fechamento final finito
+- No repositório integrador, o `CMakeLists.txt` raiz passou a compilar as novas fontes vendorizadas `TimeDepthTable.cpp` e `StressSampler.cpp`; 112/112 Catch2 do `lot-salt-suite` permaneceram verdes
+- **133/133 C++ verdes em baseline + 133/133 C++ verdes com LSS Eigen + 31/31 Python verdes**
+
 ---
 *Próxima entrada: o agente que iniciar a próxima etapa registra aqui.*

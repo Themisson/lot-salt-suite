@@ -25,6 +25,21 @@ int req_int(const YAML::Node& n, const std::string& key,
     return n[key].as<int>();
 }
 
+std::string req_string(const YAML::Node& n, const std::string& key,
+                       const std::string& ctx = "") {
+    if (!n[key])
+        throw std::runtime_error("Missing field: " +
+                                 (ctx.empty() ? key : ctx + "." + key));
+    return n[key].as<std::string>();
+}
+
+fs::path resolve_case_path(const fs::path& yaml_path, const std::string& raw_path) {
+    fs::path p(raw_path);
+    if (p.is_absolute())
+        return p;
+    return fs::absolute(yaml_path).parent_path() / p;
+}
+
 struct LitologiaData { DMParams dm; EdmtParams edmt; };
 
 LithologyLayer make_lithology_layer(double z_top_m,
@@ -232,9 +247,22 @@ CaseData parse_case(const fs::path& yaml_path, const fs::path& data_dir_hint) {
     cd.fluid.mode = fluid["mode"] ? fluid["mode"].as<std::string>() : "constant";
     cd.fluid.surface_pressure_Pa =
         fluid["surface_pressure_Pa"] ? fluid["surface_pressure_Pa"].as<double>() : 0.0;
+    cd.fluid.pressure_column =
+        fluid["pressure_column"] ? fluid["pressure_column"].as<std::string>() : "p_wall_Pa";
+    cd.fluid.time_column =
+        fluid["time_column"] ? fluid["time_column"].as<std::string>() : "t_h";
+    cd.fluid.z_column =
+        fluid["z_column"] ? fluid["z_column"].as<std::string>() : "z_m";
+    cd.fluid.interpolation =
+        fluid["interpolation"] ? fluid["interpolation"].as<std::string>() : "linear";
     const double depth_origin =
         cd.depths.burial_m + cd.depths.water_depth_m + cd.depths.salt_above_m;
-    if (fluid["pressure_Pa"]) {
+    if (cd.fluid.mode == "csv_time_depth_profile") {
+        cd.fluid.csv_path = resolve_case_path(
+            yaml_path, req_string(fluid, "csv", "fluid")).string();
+        cd.fluid_Pa = 0.0;
+        cd.fluid.pressure_Pa = 0.0;
+    } else if (fluid["pressure_Pa"]) {
         cd.fluid_Pa = fluid["pressure_Pa"].as<double>();
         cd.fluid.pressure_Pa = cd.fluid_Pa;
     } else {
@@ -243,10 +271,15 @@ CaseData parse_case(const fs::path& yaml_path, const fs::path& data_dir_hint) {
         cd.fluid_Pa = cd.fluid.surface_pressure_Pa + ppg * 119.826 * 9.80665 * depth_origin;
         cd.fluid.pressure_Pa = cd.fluid_Pa;
     }
-    if (cd.fluid.mode != "constant" && cd.fluid.mode != "hydrostatic_depth_profile")
-        throw std::runtime_error("fluid.mode must be constant or hydrostatic_depth_profile");
+    if (cd.fluid.mode != "constant" &&
+        cd.fluid.mode != "hydrostatic_depth_profile" &&
+        cd.fluid.mode != "csv_time_depth_profile")
+        throw std::runtime_error(
+            "fluid.mode must be constant, hydrostatic_depth_profile, or csv_time_depth_profile");
     if (cd.fluid.mode == "hydrostatic_depth_profile" && cd.fluid.weight_lb_per_gal <= 0.0)
         throw std::runtime_error("fluid.mode hydrostatic_depth_profile requires fluid.weight_lb_per_gal");
+    if (cd.fluid.interpolation != "linear")
+        throw std::runtime_error("fluid.interpolation currently supports only linear");
 
     // stress
     auto stress = root["stress"];
@@ -320,6 +353,14 @@ CaseData parse_case(const fs::path& yaml_path, const fs::path& data_dir_hint) {
     } else {
         cd.thermal.mode = "constant";
     }
+    cd.thermal.temperature_column =
+        (therm && therm["temperature_column"]) ? therm["temperature_column"].as<std::string>() : "T_wall_K";
+    cd.thermal.time_column =
+        (therm && therm["time_column"]) ? therm["time_column"].as<std::string>() : "t_h";
+    cd.thermal.z_column =
+        (therm && therm["z_column"]) ? therm["z_column"].as<std::string>() : "z_m";
+    cd.thermal.interpolation =
+        (therm && therm["interpolation"]) ? therm["interpolation"].as<std::string>() : "linear";
     if (cd.thermal.mode == "constant") {
         cd.thermal.T_K = (therm && therm["T_K"]) ? therm["T_K"].as<double>() : 370.88;
     } else if (cd.thermal.mode == "profile") {
@@ -337,9 +378,16 @@ CaseData parse_case(const fs::path& yaml_path, const fs::path& data_dir_hint) {
                           cd.thermal.grad_C_per_m * depth_total) + 273.15;
     } else if (cd.thermal.mode == "conduction_1d" || cd.thermal.mode == "conduction_2d") {
         cd.thermal.T_K = (therm && therm["T_K"]) ? therm["T_K"].as<double>() : 370.88;
+    } else if (cd.thermal.mode == "csv_wall_temperature") {
+        cd.thermal.csv_path = resolve_case_path(
+            yaml_path, req_string(therm, "csv", "thermal")).string();
+        cd.thermal.T_K = (therm && therm["T_K"]) ? therm["T_K"].as<double>() : 370.88;
     } else {
-        throw std::runtime_error("thermal.mode must be constant, profile, conduction_1d, or conduction_2d");
+        throw std::runtime_error(
+            "thermal.mode must be constant, profile, conduction_1d, conduction_2d, or csv_wall_temperature");
     }
+    if (cd.thermal.interpolation != "linear")
+        throw std::runtime_error("thermal.interpolation currently supports only linear");
     cd.thermal.alpha_thermal =
         (therm && therm["alpha_thermal"]) ? therm["alpha_thermal"].as<double>() : 0.0;
     cd.thermal.T_reference_K =
@@ -555,6 +603,11 @@ CaseData parse_case(const fs::path& yaml_path, const fs::path& data_dir_hint) {
             output["vtu_every_n_steps"] ? output["vtu_every_n_steps"].as<int>() : 10;
         cd.output.revolve_3d =
             output["revolve_3d"] && output["revolve_3d"].as<bool>();
+        cd.output.stress_diagnostics =
+            output["stress_diagnostics"] && output["stress_diagnostics"].as<bool>();
+        cd.output.stress_diagnostics_scope =
+            output["stress_diagnostics_scope"]
+                ? output["stress_diagnostics_scope"].as<std::string>() : "wall";
         cd.output.damage_tracking =
             output["damage_tracking"] && output["damage_tracking"].as<bool>();
         if (output["damage_thresholds"]) {
@@ -574,6 +627,9 @@ CaseData parse_case(const fs::path& yaml_path, const fs::path& data_dir_hint) {
         throw std::runtime_error("output.every_n_steps must be positive");
     if (cd.output.vtu_every_n_steps <= 0)
         throw std::runtime_error("output.vtu_every_n_steps must be positive");
+    if (cd.output.stress_diagnostics_scope != "wall" &&
+        cd.output.stress_diagnostics_scope != "all_gauss")
+        throw std::runtime_error("output.stress_diagnostics_scope must be wall or all_gauss");
     if (cd.output.failure_D_critical <= 0.0 || cd.output.failure_D_critical >= 1.0)
         throw std::runtime_error("output.failure_D_critical must be in (0,1)");
     if (cd.output.creep_rate_multiplier_threshold <= 0.0)

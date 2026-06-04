@@ -3,6 +3,7 @@ project(saltcreep CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 option(ENABLE_SANITIZERS "Build saltcreep targets with available sanitizer flags" OFF)
 option(ENABLE_WERROR "Treat compiler warnings as errors for saltcreep targets" OFF)
@@ -59,7 +60,7 @@ endif()
 
 # MSVC vs GCC/Clang warning flags
 if(MSVC)
-    add_compile_options(/W4 /wd4100)  # /wd4100: unused parameter (common in virtual stubs)
+    add_compile_options(/W4 /wd4100 /FS)  # /FS serializes PDB writes in parallel builds.
 else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
@@ -195,6 +196,8 @@ add_executable(tests_unit
     tests/cpp/test_damage_diagnostics.cpp
     tests/cpp/test_mesh_adaptation.cpp
     tests/cpp/test_wall_pressure_field.cpp
+    tests/cpp/test_stress_diagnostics.cpp
+    tests/cpp/test_csv_time_depth_fields.cpp
     tests/cpp/test_edge_cases.cpp
     tests/test_eigen_source.cpp
     ${SALT_SOURCES})

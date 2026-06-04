@@ -31,8 +31,8 @@ verificador independente do SESTSAL (legado) e motor modernizado com primária +
 terciária + dano + acoplamento termomecânico fraco + múltiplos tipos de elemento.
 
 ## Estado atual do projeto (manter atualizado aqui)
-**Última atualização:** 2026-06-01
-**Testes:** 125/125 C++ verdes + 26/26 Python saltpost/VTU/deslocamento/dano/viewer/benchmark/edge/dashboard/diâmetro/pressão verdes
+**Última atualização:** 2026-06-04
+**Testes:** 133/133 C++ verdes + 31/31 Python saltpost/VTU/deslocamento/dano/viewer/benchmark/edge/dashboard/diâmetro/pressão verdes
 **Etapas concluídas:**
 - [x] Etapa 0: fundação elástica 1D axissimétrica + teste Lamé (8 testes)
 - [x] Etapa 1: mecanismo duplo (DM, fluência secundária) + loop temporal explícito +
@@ -72,6 +72,11 @@ terciária + dano + acoplamento termomecânico fraco + múltiplos tipos de eleme
 - [x] Pós-processamento avançado: estudos declarativos, exportação paper, dashboard HTML e animações
 - [x] Pós-processamento: gráficos de diâmetro do poço, coluna litológica e setor 3D axissimétrico
 - [x] Limpeza Fase 1: remover artefatos de build e referências pesadas do versionamento
+- [x] Pós-processamento: gráficos específicos de pressão na parede `p_wall(z,t)`
+- [x] Acoplamento APB: pressão e temperatura de parede por CSV externo (`t,z`)
+- [x] Casos APB operacionais 1D/2D com histórico de lama e temperatura
+- [x] Benchmark APB: custo de pressão constante vs hidrostática vs CSV em malhas Q8 2D
+- [x] Diagnóstico de tensão APB: `wall_stress.csv`, `stress_profile.csv`, `StressSampler` e utilitários de tensão
 
 **Próximas etapas (em ordem):**
 - [ ] Próxima etapa a definir
@@ -143,6 +148,8 @@ Implementações existentes:
 - `ProfileField` — T(z) analítico.
 - `Conduction1DField` — condução transiente radial com Fourier + Crank-Nicolson.
 - `Conduction2DField` — condução transiente 2D (r,z) com propriedades por camada.
+- `CsvWallTemperatureField` — temperatura de parede por CSV operacional interpolado em `t,z`.
+- `WallPressureField` — pressão constante, hidrostática por peso de lama ou CSV operacional.
 - `ErrorEstimator` — Zienkiewicz-Zhu em norma de energia para marcar erro de tensão/dano.
 - `MeshRefiner` — subdivisão h Q4→4 e T3→3 com transferência de campos.
 

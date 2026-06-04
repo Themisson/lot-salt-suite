@@ -1,0 +1,85 @@
+name: apb_2d_layered_schedule_Q8
+
+geometry:
+  well_radius_m: 0.155575
+  outer_radius_factor: 100
+  layer_thickness_m: 1000
+
+depths:
+  water_depth_m: 1600
+  burial_m: 2500
+  salt_above_m: 0
+
+lithology:
+  primary: halita
+  layers:
+    - z_top_m: 0
+      z_bottom_m: 350
+      material: halita
+      label: Halita superior
+    - z_top_m: 350
+      z_bottom_m: 430
+      material: carnalita
+      label: Carnalita
+    - z_top_m: 430
+      z_bottom_m: 760
+      material: halita
+      label: Halita media
+    - z_top_m: 760
+      z_bottom_m: 840
+      material: taquidrita
+      label: Taquidrita
+    - z_top_m: 840
+      z_bottom_m: 1000
+      material: halita
+      label: Halita inferior
+
+fluid:
+  mode: csv_time_depth_profile
+  csv: ../../data/apb/mud_schedule_example.csv
+  pressure_column: p_wall_Pa
+  time_column: t_h
+  z_column: z_m
+
+stress:
+  k0: 1.0
+  geostatic_mode: depth_profile
+
+element:
+  type: axisym_2d_Q8
+
+mesh:
+  n_elements_radial: 6
+  n_elements_axial: 4
+  ratio: 50
+
+creep:
+  elastic_only: false
+  secondary: true
+  primary: true
+  tertiary: false
+  damage: false
+  primary_model: EDMT
+
+thermal:
+  enabled: true
+  mode: csv_wall_temperature
+  csv: ../../data/apb/mud_schedule_example.csv
+  temperature_column: T_wall_K
+  time_column: t_h
+  z_column: z_m
+  alpha_thermal: 0.0
+  T_reference_C: 25
+
+time:
+  scheme: implicit_adaptive
+  total_h: 6
+  dt_h: 0.5
+  dt_min_h: 1.0e-9
+  dt_max_h: 1.0
+  tol_global: 1.0e-4
+
+output:
+  every_n_steps: 4
+  vtu: true
+  vtu_every_n_steps: 8

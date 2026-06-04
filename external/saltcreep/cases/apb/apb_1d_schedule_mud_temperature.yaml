@@ -1,0 +1,63 @@
+name: apb_1d_schedule_mud_temperature
+
+geometry:
+  well_radius_m: 0.155575
+  outer_radius_factor: 100
+  layer_thickness_m: 1.0
+
+depths:
+  water_depth_m: 1600
+  burial_m: 2500
+  salt_above_m: 0
+
+lithology:
+  primary: halita
+
+fluid:
+  mode: csv_time_depth_profile
+  csv: ../../data/apb/mud_schedule_example.csv
+  pressure_column: p_wall_Pa
+  time_column: t_h
+  z_column: z_m
+
+stress:
+  k0: 1.0
+  geostatic_mode: constant
+
+element:
+  type: axisym_1d_L3
+
+mesh:
+  n_elements_radial: 24
+  ratio: 100
+  n_elements_axial: 1
+
+creep:
+  elastic_only: false
+  secondary: true
+  primary: true
+  tertiary: false
+  damage: false
+  primary_model: EDMT
+
+thermal:
+  enabled: true
+  mode: csv_wall_temperature
+  csv: ../../data/apb/mud_schedule_example.csv
+  temperature_column: T_wall_K
+  time_column: t_h
+  z_column: z_m
+  alpha_thermal: 0.0
+  T_reference_C: 25
+
+time:
+  scheme: implicit_adaptive
+  total_h: 24
+  dt_h: 1
+  dt_min_h: 1.0e-9
+  dt_max_h: 2
+  tol_global: 1.0e-4
+
+output:
+  every_n_steps: 4
+  vtu: false

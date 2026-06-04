@@ -9,14 +9,14 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 8.1 concluida (substitutibilidade LOT/PKN com adapter saltcreep ocioso)
+Fase ativa  : auditoria/sync external/saltcreep concluida (APB CSV + diagnostico de tensao)
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
-Último push : 2026-06-03
+Último push : 2026-06-04
 Testes C++  : 112/112 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-04
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
-Saltcreep   : 126/126 testes Catch2 migrado (auto-detect ON, sem flag manual)
+Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
 CMake 4     : SUPORTADO (CMAKE_POLICY_VERSION_MINIMUM 3.5, sem flag manual)
 VS generator: SUPORTADO (LSS_LOT_SIM_EXECUTABLE via $<TARGET_FILE:lot-sim>)
@@ -54,6 +54,69 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Auditoria/sync `external/saltcreep` — APB CSV e diagnostico de tensao — Codex
+
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Revisar as atualizacoes feitas em `external/saltcreep/`, restaurar
+a compatibilidade do build integrado com `include/Eigen`, validar os builds
+`build_baseline` e `build_lss_eigen`, e confirmar que o `lot-salt-suite`
+continua funcional com as novas fontes vendorizadas.
+
+**Mudanca de integracao aplicada:**
+- `external/saltcreep/CMakeLists.txt` preserva novamente a opcao
+  `LSS_SALTCREEP_FORCE_LSS_EIGEN`, o proxy `lss_eigen_proxy/Eigen`, a macro
+  `LSS_SALTCREEP_EIGEN_MODE` e o teste diagnostico `tests/test_eigen_source.cpp`.
+- O build MSVC do saltcreep recebeu `/FS` para evitar disputa de escrita de PDB
+  durante builds paralelos.
+- O `CMakeLists.txt` raiz passou a compilar as novas dependencias vendorizadas
+  `TimeDepthTable.cpp` e `StressSampler.cpp`, necessarias para os campos CSV e
+  diagnosticos de tensao do `external/saltcreep`.
+
+**Atualizacoes detectadas no saltcreep:**
+- Pressao e temperatura de parede por CSV operacional `t,z`.
+- Casos APB 1D/2D com historico de lama e temperatura.
+- `StressSampler` e saidas `wall_stress.csv`/`stress_profile.csv`.
+- Pos-processamento e benchmark dedicados a pressao de parede.
+- Diretorio `external/saltcreep/legacy/` adicionado como referencia interna do
+  subprojeto vendorizado.
+
+**Testes/builds executados:**
+- `cmake -S external\saltcreep -B external\saltcreep\build_baseline -DCMAKE_BUILD_TYPE=Debug -DLSS_SALTCREEP_FORCE_LSS_EIGEN=OFF`
+- `cmake --build external\saltcreep\build_baseline --config Debug -j`
+- `ctest --test-dir external\saltcreep\build_baseline -C Debug --output-on-failure -j 4`
+  passou 133/133 testes.
+- `cmake -S external\saltcreep -B external\saltcreep\build_lss_eigen -DCMAKE_BUILD_TYPE=Debug -DLSS_SALTCREEP_FORCE_LSS_EIGEN=ON`
+- `cmake --build external\saltcreep\build_lss_eigen --config Debug -j`
+- `ctest --test-dir external\saltcreep\build_lss_eigen -C Debug --output-on-failure -j 4`
+  passou 133/133 testes.
+- `python -m unittest discover -s external\saltcreep\tests\python -p "test_*.py"`
+  passou 31/31 testes, com 7 skips esperados.
+- `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
+- `cmake --build build --config Debug -j`
+- `ctest --test-dir build -C Debug --output-on-failure`
+  passou 112/112 testes.
+- `ctest --test-dir build -C Debug --output-on-failure -R "SaltCreep|saltcreep|salt|bridge"`
+  passou 59/59 testes.
+- `ctest --test-dir build -C Debug --output-on-failure -R "Saltcreep backend"`
+  passou 4/4 testes controlados do backend.
+
+**Validacao manual CLI:**
+- `cases/validation/lot_pkn_minimal.yaml` retornou `OK` em `validate` e `run`.
+- `cases/validation/lot_pkn_with_leakoff.yaml` retornou `OK` em `validate` e `run`.
+- `cases/lot_tese_migrated/buz67d_pkn.yaml` retornou `OK` em `validate` e `run`.
+- Os casos saltcreep `apb_1d_constant_mud.yaml`,
+  `apb_1d_schedule_mud_temperature.yaml` e `apb_2d_layered_schedule_Q8.yaml`
+  executaram com fechamento final finito.
+
+**Escopo preservado:**
+- Nenhum arquivo em `legance/`, `legacy/` raiz, `tests/baselines/`,
+  modelos LOT/PKN/APB, parser/writer raiz ou modelos fisicos raiz foi alterado.
+- As mudancas em `external/saltcreep/` foram tratadas como dependencia
+  vendorizada ativa, com build/testes proprios e registro documental.
 
 ---
 

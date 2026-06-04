@@ -53,16 +53,21 @@ struct DepthParams {
 };
 
 struct FluidParams {
-    std::string mode = "constant"; // constant | hydrostatic_depth_profile
+    std::string mode = "constant"; // constant | hydrostatic_depth_profile | csv_time_depth_profile
     double pressure_Pa = 0.0;
     double weight_lb_per_gal = 0.0;
     double surface_pressure_Pa = 0.0;
+    std::string csv_path;
+    std::string pressure_column = "p_wall_Pa";
+    std::string time_column = "t_h";
+    std::string z_column = "z_m";
+    std::string interpolation = "linear";
 };
 
 // ── Thermal parameters ───────────────────────────────────────────────────────
 struct ThermalParams {
     bool enabled = false;          // enables thermal strain coupling in Etapa 5c
-    std::string mode;          // "constant" | "profile" | "conduction_1d" | "conduction_2d"
+    std::string mode;          // "constant" | "profile" | "conduction_1d" | "conduction_2d" | "csv_wall_temperature"
     double T_K;                // used for mode=constant
     double seabed_temp_C;      // used for mode=profile
     double grad_C_per_m;       // single thermal gradient (°C/m) for profile mode
@@ -82,6 +87,11 @@ struct ThermalParams {
     double dt_thermal_s = -1.0; // negative => default to mechanical dt_h after parsing time
     double beta = 0.5;
     std::vector<ThermalLayer> layers;
+    std::string csv_path;
+    std::string temperature_column = "T_wall_K";
+    std::string time_column = "t_h";
+    std::string z_column = "z_m";
+    std::string interpolation = "linear";
 };
 
 // ── Time integration ─────────────────────────────────────────────────────────
@@ -197,6 +207,8 @@ struct OutputParams {
     bool vtu = false;
     int vtu_every_n_steps = 10;
     bool revolve_3d = false;
+    bool stress_diagnostics = false;
+    std::string stress_diagnostics_scope = "wall";
     bool damage_tracking = false;
     std::vector<double> damage_thresholds;
     double failure_D_critical = 0.5;

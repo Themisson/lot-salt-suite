@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <sstream>
 #include <chrono>
+#include <utility>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -260,7 +261,8 @@ Strain TimeIntegrator::thermal_strain_at(int e, int g, double time_s) const {
 void TimeIntegrator::run(double dt_s, double t_end_s, int output_every,
                           const fs::path& out_dir,
                           VtuOutputOptions vtu_options,
-                          const DamageTrackingOptions& damage_options) {
+                          const DamageTrackingOptions& damage_options,
+                          StressDiagnosticsOptions stress_options) {
     fs::create_directories(out_dir);
     ConstantWallPressureField fallback_pressure(0.0);
     const WallPressureField& pressure =
@@ -269,6 +271,7 @@ void TimeIntegrator::run(double dt_s, double t_end_s, int output_every,
     std::ofstream profile_csv(out_dir / "displacements_profile.csv");
     std::ofstream wall_csv(out_dir / "wall_profile.csv");
     std::ofstream pressure_csv(out_dir / "wall_pressure_profile.csv");
+    StressDiagnosticsWriter stress_writer(out_dir, std::move(stress_options));
     time_output::write_closure_header(csv);
     time_output::write_displacement_profile_header(profile_csv);
     time_output::write_wall_profile_header(wall_csv);
@@ -311,6 +314,7 @@ void TimeIntegrator::run(double dt_s, double t_end_s, int output_every,
     time_output::write_wall_pressure_profile_record(
         pressure_csv, mesh_, pressure, thermal_, 0.0, 0.0,
         vtu_options.depth_origin_m);
+    stress_writer.write(mesh_, element_, state_, 0.0);
     write_vtu(0.0, true);
     DamageDiagnostics damage(out_dir, mesh_, element_, thermal_, damage_options);
     damage.initialize(state_, model_, 0.0);
@@ -334,6 +338,7 @@ void TimeIntegrator::run(double dt_s, double t_end_s, int output_every,
             time_output::write_wall_pressure_profile_record(
                 pressure_csv, mesh_, pressure, thermal_, t_h, t,
                 vtu_options.depth_origin_m);
+            stress_writer.write(mesh_, element_, state_, t_h);
         }
         write_vtu(t, false);
     }
@@ -348,6 +353,7 @@ void TimeIntegrator::run(double dt_s, double t_end_s, int output_every,
     time_output::write_wall_pressure_profile_record(
         pressure_csv, mesh_, pressure, thermal_, t / 3600.0, t,
         vtu_options.depth_origin_m);
+    stress_writer.write(mesh_, element_, state_, t / 3600.0);
     write_vtu(t, true);
     if (vtu_options.enabled)
         VtuWriter::write_pvd(out_dir / (vtu_case + ".pvd"), vtu_frames);
@@ -359,7 +365,8 @@ void TimeIntegrator::run_schedule(const std::vector<TimeSegment>& schedule,
                                    double t_end_s, int output_every,
                                    const fs::path& out_dir,
                                    VtuOutputOptions vtu_options,
-                                   const DamageTrackingOptions& damage_options) {
+                                   const DamageTrackingOptions& damage_options,
+                                   StressDiagnosticsOptions stress_options) {
     if (schedule.empty()) {
         throw std::runtime_error("TimeIntegrator::run_schedule: empty schedule");
     }
@@ -371,6 +378,7 @@ void TimeIntegrator::run_schedule(const std::vector<TimeSegment>& schedule,
     std::ofstream profile_csv(out_dir / "displacements_profile.csv");
     std::ofstream wall_csv(out_dir / "wall_profile.csv");
     std::ofstream pressure_csv(out_dir / "wall_pressure_profile.csv");
+    StressDiagnosticsWriter stress_writer(out_dir, std::move(stress_options));
     time_output::write_closure_header(csv);
     time_output::write_displacement_profile_header(profile_csv);
     time_output::write_wall_profile_header(wall_csv);
@@ -389,6 +397,7 @@ void TimeIntegrator::run_schedule(const std::vector<TimeSegment>& schedule,
     time_output::write_wall_pressure_profile_record(
         pressure_csv, mesh_, pressure, thermal_, 0.0, 0.0,
         vtu_options.depth_origin_m);
+    stress_writer.write(mesh_, element_, state_, 0.0);
 
     double t    = 0.0;
     int    step = 0;
@@ -444,6 +453,7 @@ void TimeIntegrator::run_schedule(const std::vector<TimeSegment>& schedule,
             time_output::write_wall_pressure_profile_record(
                 pressure_csv, mesh_, pressure, thermal_, t_h, t,
                 vtu_options.depth_origin_m);
+            stress_writer.write(mesh_, element_, state_, t_h);
         }
         write_vtu(t, false);
     }
@@ -458,6 +468,7 @@ void TimeIntegrator::run_schedule(const std::vector<TimeSegment>& schedule,
     time_output::write_wall_pressure_profile_record(
         pressure_csv, mesh_, pressure, thermal_, t / 3600.0, t,
         vtu_options.depth_origin_m);
+    stress_writer.write(mesh_, element_, state_, t / 3600.0);
     write_vtu(t, true);
     if (vtu_options.enabled)
         VtuWriter::write_pvd(out_dir / (vtu_case + ".pvd"), vtu_frames);

@@ -181,3 +181,14 @@ chamado enquanto `PknRunner` nao possuir ponto explicito de integracao com sal.
 Isso preserva a governanca: `external/saltcreep/` permanece somente leitura e
 qualquer acoplamento futuro deve entrar por fase propria, com interface
 explicita e testes dedicados.
+
+Em 2026-06-04, as atualizacoes locais em `external/saltcreep/` foram auditadas
+e integradas como evolucao da dependencia vendorizada ativa. O escopo observado
+incluiu pressao/temperatura de parede por CSV operacional, casos APB 1D/2D,
+benchmark de pressao de parede e diagnosticos de tensao (`wall_stress.csv` e
+`stress_profile.csv`). A compatibilidade Eigen integrada foi preservada via
+`LSS_SALTCREEP_FORCE_LSS_EIGEN`, e o `lot-salt-suite` passou a compilar as
+novas fontes vendorizadas exigidas por `TimeIntegrator`. Validacao executada:
+133/133 Catch2 no `build_baseline`, 133/133 Catch2 no `build_lss_eigen`,
+31/31 testes Python do saltcreep, 112/112 Catch2 do `lot-salt-suite` e
+validacoes manuais `lot-sim validate/run`.

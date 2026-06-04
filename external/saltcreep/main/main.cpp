@@ -21,12 +21,14 @@
 #include "thermal/profile_field.hpp"
 #include "thermal/conduction_1d_field.hpp"
 #include "thermal/conduction_2d_field.hpp"
+#include "thermal/csv_wall_temperature_field.hpp"
 #include "solver/Assembler.hpp"
 #include "solver/DamageDiagnostics.hpp"
 #include "solver/ElasticSolver.hpp"
 #include "solver/TimeIntegrator.hpp"
 #include "solver/ImplicitAdaptiveIntegrator.hpp"
 #include "solver/PerformanceStats.hpp"
+#include "solver/StressSampler.hpp"
 #include "solver/WallPressureField.hpp"
 #include "io/VtuWriter.hpp"
 #include "mesh/error_estimator.hpp"
@@ -217,6 +219,15 @@ static DamageTrackingOptions make_damage_options(const CaseData& cd) {
     return options;
 }
 
+static StressDiagnosticsOptions make_stress_options(const CaseData& cd) {
+    StressDiagnosticsOptions options;
+    options.enabled = cd.output.stress_diagnostics;
+    options.scope = cd.output.stress_diagnostics_scope;
+    options.depth_origin_m =
+        cd.depths.burial_m + cd.depths.water_depth_m + cd.depths.salt_above_m;
+    return options;
+}
+
 static std::shared_ptr<const WallPressureField> make_wall_pressure_field(
     const CaseData& cd,
     double depth_origin_m) {
@@ -225,6 +236,13 @@ static std::shared_ptr<const WallPressureField> make_wall_pressure_field(
             cd.fluid.weight_lb_per_gal,
             depth_origin_m,
             cd.fluid.surface_pressure_Pa);
+    }
+    if (cd.fluid.mode == "csv_time_depth_profile") {
+        return std::make_shared<CsvWallPressureField>(
+            cd.fluid.csv_path,
+            cd.fluid.pressure_column,
+            cd.fluid.time_column,
+            cd.fluid.z_column);
     }
     return std::make_shared<ConstantWallPressureField>(cd.fluid_Pa);
 }
@@ -355,6 +373,7 @@ static void write_metadata_json(const fs::path& out_dir,
     json << "  \"fluid_pressure_Pa\": " << cd.fluid_Pa << ",\n";
     json << "  \"fluid_weight_lb_per_gal\": " << cd.fluid.weight_lb_per_gal << ",\n";
     json << "  \"fluid_surface_pressure_Pa\": " << cd.fluid.surface_pressure_Pa << ",\n";
+    json << "  \"fluid_csv\": \"" << escape_json(cd.fluid.csv_path) << "\",\n";
     json << "  \"geostatic_mode\": \"" << escape_json(cd.geostatic_mode) << "\",\n";
     json << "  \"n_elements_radial\": " << cd.mesh.n_radial << ",\n";
     json << "  \"n_elements_axial\": " << cd.mesh.n_axial << ",\n";
@@ -389,7 +408,10 @@ static void write_metadata_json(const fs::path& out_dir,
     json << "  },\n";
     json << "  \"thermal_enabled\": " << (cd.thermal.enabled ? "true" : "false") << ",\n";
     json << "  \"thermal_mode\": \"" << escape_json(cd.thermal.mode) << "\",\n";
+    json << "  \"thermal_csv\": \"" << escape_json(cd.thermal.csv_path) << "\",\n";
     json << "  \"damage_tracking\": " << (cd.output.damage_tracking ? "true" : "false") << ",\n";
+    json << "  \"stress_diagnostics\": " << (cd.output.stress_diagnostics ? "true" : "false") << ",\n";
+    json << "  \"stress_diagnostics_scope\": \"" << escape_json(cd.output.stress_diagnostics_scope) << "\",\n";
     json << "  \"damage_thresholds\": [";
     for (size_t i = 0; i < cd.output.damage_thresholds.size(); ++i) {
         if (i > 0) json << ", ";
@@ -542,6 +564,14 @@ int main(int argc, char* argv[]) {
             });
         }
         thermal = std::make_unique<Conduction2DField>(mesh_2d, *elem, thermal_options);
+    } else if (cd.thermal.mode == "csv_wall_temperature") {
+        thermal = std::make_unique<CsvWallTemperatureField>(
+            cd.thermal.csv_path,
+            cd.thermal.temperature_column,
+            cd.thermal.time_column,
+            cd.thermal.z_column,
+            cd.thermal.alpha_thermal,
+            cd.thermal.T_reference_K);
     } else {
         thermal = std::make_unique<ProfileField>(
             ProfileField::make_constant(cd.thermal.T_K,
@@ -574,9 +604,18 @@ int main(int argc, char* argv[]) {
         initial_stats.time_solve_s += std::chrono::duration<double>(
             solve_end - solve_start).count();
         write_elastic_csv(out_dir, mesh, *elem, result.u, model->D_elastic());
-        if (cd.output.vtu) {
-            const auto sigma_gp = compute_elastic_sigma_gp(
+        std::vector<Stress> sigma_gp;
+        if (cd.output.stress_diagnostics || cd.output.vtu)
+            sigma_gp = compute_elastic_sigma_gp(
                 mesh, *elem, result.u, model->D_elastic());
+        if (cd.output.stress_diagnostics) {
+            TimeState state;
+            state.u_total = result.u;
+            state.sigma_gp = sigma_gp;
+            StressDiagnosticsWriter stress_writer(out_dir, make_stress_options(cd));
+            stress_writer.write(mesh, *elem, state, 0.0);
+        }
+        if (cd.output.vtu) {
             const int total_gp = mesh.n_elements *
                 static_cast<int>(elem->gauss_points().size());
             const std::vector<Strain> eps_v_gp(total_gp, Strain::Zero());
@@ -609,6 +648,7 @@ int main(int argc, char* argv[]) {
         output_every = std::stoi(outp);
     VtuOutputOptions vtu_options = make_vtu_options(cd);
     DamageTrackingOptions damage_options = make_damage_options(cd);
+    StressDiagnosticsOptions stress_options = make_stress_options(cd);
 
     if (cd.time.scheme == "implicit_adaptive") {
         ImplicitAdaptiveOptions options;
@@ -621,10 +661,10 @@ int main(int argc, char* argv[]) {
                                               options, initial_stats, wall_pressure);
         if (!cd.time.steps.empty())
             integrator.run_schedule(cd.time.steps, cd.time.total_s, output_every, out_dir,
-                                    vtu_options, damage_options);
+                                    vtu_options, damage_options, stress_options);
         else
             integrator.run(cd.time.dt_s, cd.time.total_s, output_every, out_dir,
-                           vtu_options, damage_options);
+                           vtu_options, damage_options, stress_options);
         const auto end = std::chrono::steady_clock::now();
         const double wall_time_s = std::chrono::duration<double>(
             end - simulation_start).count();
@@ -636,10 +676,10 @@ int main(int argc, char* argv[]) {
                                   initial_stats, wall_pressure);
         if (!cd.time.steps.empty())
             integrator.run_schedule(cd.time.steps, cd.time.total_s, output_every, out_dir,
-                                    vtu_options, damage_options);
+                                    vtu_options, damage_options, stress_options);
         else
             integrator.run(cd.time.dt_s, cd.time.total_s, output_every, out_dir,
-                           vtu_options, damage_options);
+                           vtu_options, damage_options, stress_options);
         const auto end = std::chrono::steady_clock::now();
         const double wall_time_s = std::chrono::duration<double>(
             end - simulation_start).count();

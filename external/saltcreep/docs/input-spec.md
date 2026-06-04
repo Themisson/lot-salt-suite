@@ -34,10 +34,15 @@ lithology:
       position: center
 
 fluid:
-  mode: constant               # constant | hydrostatic_depth_profile
+  mode: constant               # constant | hydrostatic_depth_profile | csv_time_depth_profile
   weight_lb_per_gal: 10        # peso do fluido de perfuração; usado se pressure_Pa ausente
   # pressure_Pa: 35.0e6        # opcional; se informado, bypassa o cálculo por peso da lama
   surface_pressure_Pa: 0       # usado no modo hydrostatic_depth_profile
+  csv: data/apb/mud_schedule.csv # usado se mode=csv_time_depth_profile
+  pressure_column: p_wall_Pa   # coluna de pressão do CSV
+  time_column: t_h             # t_h ou t_s
+  z_column: z_m                # coordenada local z da parede
+  interpolation: linear        # linear, com clamp fora da faixa da tabela
 
 stress:
   k0: 1.0                      # coeficiente de empuxo horizontal
@@ -116,7 +121,7 @@ creep:
 # --- acoplamento termomecânico FRACO (Vasconcelos 2019) ---
 thermal:
   enabled: false               # liga/desliga o acoplamento fraco
-  mode: profile                # profile (analítico T(z)) | conduction_1d | conduction_2d
+  mode: profile                # profile | conduction_1d | conduction_2d | csv_wall_temperature
   seabed_temp_C: 4
   geothermal_gradient_C_per_m: 0.03 # alias preferido para profile
   grad_C_per_m: 0.03          # alias legado ainda aceito pelo parser
@@ -146,6 +151,11 @@ thermal:
       cp_J_per_kgK: 920
   dt_thermal_h: null           # passo térmico (Crank-Nicolson); null → mesmo do mecânico
   beta: 0.5                    # 0.5 = Crank-Nicolson (padrão); 1 = Euler implícito; 0 = explícito
+  csv: data/apb/mud_schedule.csv # usado se mode=csv_wall_temperature
+  temperature_column: T_wall_K # coluna em Kelvin no CSV
+  time_column: t_h             # t_h ou t_s
+  z_column: z_m                # coordenada local z
+  interpolation: linear        # linear, com clamp fora da faixa da tabela
 
 time:
   total_h: 480                 # tempo total de simulação
@@ -163,6 +173,8 @@ output:
   vtu: false                    # true → escreve VTU para ParaView/PyVista
   vtu_every_n_steps: 10         # frequência da série VTU; passo final sempre é escrito
   revolve_3d: false             # reservado; hoje exporta o setor axissimétrico (r,z)
+  stress_diagnostics: false     # true → wall_stress.csv com σθθ e desviador na parede
+  stress_diagnostics_scope: wall # wall | all_gauss; all_gauss também gera stress_profile.csv
   damage_tracking: false        # true + creep.damage:true → damage_events.csv e damage_wall.csv
   damage_thresholds: [0.1, 0.3, 0.5, 0.8]
   failure_D_critical: 0.5       # critério operacional de falha da rocha
@@ -183,6 +195,9 @@ output:
   Em 1D, `fluid.mode: hydrostatic_depth_profile` dá o mesmo valor na altura do caso; em 2D, a
   pressão é avaliada em cada ponto de Gauss da parede interna como
   `p(z) = surface_pressure_Pa + weight_lb_per_gal * 119.826 * g * (depth_origin + z)`.
+- `fluid.mode: csv_time_depth_profile` lê um CSV operacional com colunas de tempo, z local e
+  pressão. A interpolação é linear em `t,z`; fora da faixa do CSV, o solver mantém o primeiro/último
+  valor disponível. O formato recomendado é `t_h,z_m,p_wall_Pa,T_wall_K`.
 - `stress.geostatic_mode: depth_profile` é opcional para casos 2D profundos e calcula a tensão
   geostática no ponto de Gauss usando `depth_origin + z`; o default `constant` preserva todas as
   regressões antigas.
@@ -198,6 +213,11 @@ output:
 - `mesh.damage_refinement_threshold` é opcional. Valores negativos desativam marcação por dano;
   valores entre 0 e 0.99 marcam elementos cujo `InternalState::damage_D` máximo ultrapassa o limiar;
   valores acima de 0.99 são inválidos.
+- `output.stress_diagnostics:true` gera `wall_stress.csv` com tensões no ponto de Gauss mais
+  próximo da parede interna. A ordem Voigt é `[σrr, σθθ, σzz, σrz]`; como a convenção interna é
+  tensão positiva/compressão negativa, a coluna `sigma_theta_comp_Pa = -σθθ` reproduz a comparação
+  APB legada `-getSigmaTheta()`. Com `stress_diagnostics_scope: all_gauss`, o solver também gera
+  `stress_profile.csv` com todos os pontos de Gauss.
 - Combinação `secondary:false` com `primary:true` é permitida (estudo da primária isolada) mas emite
   aviso: fisicamente a primária satura na secundária; útil só para análise.
 - `scheme: explicit` com litologia taquidrita ou k0 > 1: emitir aviso de possível instabilidade
@@ -207,6 +227,9 @@ output:
 - `thermal.mode: conduction_2d` exige elemento 2D e aceita `outer_bc`, `top_bc` e `bottom_bc`
   como `prescribed` ou `flux_zero`; `layers` é opcional e, se omitido, usa `k_W_m_K`,
   `rho_kg_m3` e `cp_J_kg_K` uniformes.
+- `thermal.mode: csv_wall_temperature` lê temperatura de parede de um CSV em Kelvin e interpola
+  em `t,z`. O campo é aplicado como `ThermalField` fraco, constante em `r`; portanto afeta
+  Arrhenius e, se `alpha_thermal > 0`, a pseudo-força térmica.
 - A temperatura entregue aos modelos constitutivos é sempre Kelvin. Campos YAML com sufixo `_C`
   são convertidos no parser; campos `T_K`/`T0` já devem ser fornecidos em Kelvin.
 - `tertiary_model: wang_2004` exige `tertiary:true` e `damage:true`; não usa `dilatancy_envelope`.

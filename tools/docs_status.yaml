@@ -124,13 +124,13 @@ validation:
 # ============================================================
 test_counts:
   cpp_tests: 112        # Catch2 lot-salt-suite — Fase 8.1 provou substitutibilidade LOT/PKN com adapter ocioso
-  saltcreep_tests: 126  # Catch2 saltcreep baseline — 126/126 passaram (2026-06-01)
-  python_tests: 3       # unittest — verde; pytest indisponivel no ambiente local
+  saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
+  python_tests: 31      # unittest saltcreep — 31/31 passaram, com 7 skips esperados (2026-06-04)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-04"
-updated_by: "claude-code (auditoria pos-commit Fases 8.0-8.1)"
+updated_by: "codex (auditoria/sync external/saltcreep)"
 project_version: "0.1.0"

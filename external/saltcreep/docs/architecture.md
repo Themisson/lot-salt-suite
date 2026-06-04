@@ -175,6 +175,31 @@ No 1D, `z=0` e a pressão é avaliada na profundidade do caso. No 2D, `Assembler
 um perfil hidrostático ao longo da profundidade. Durante a marcha no tempo, os integradores
 somam apenas o incremento `f_p(t+dt)-f_p(t)` ao lado direito, preservando a fatoração única de K.
 
+O modo `CsvWallPressureField` lê históricos operacionais externos em CSV (`t_h`/`t_s`, `z_m`,
+`p_wall_Pa`) e interpola linearmente em tempo e profundidade local. É o caminho de acoplamento
+leve com códigos APB/operacionais: outro simulador pode escrever o histórico de lama, e o
+SaltCreep consome a pressão em cada passo sem alterar o contrato mecânico.
+
+## Diagnóstico de tensão na parede
+
+As tensões calculadas pelos integradores vivem em `TimeState::sigma_gp`, um vetor por ponto de
+Gauss na ordem Voigt:
+
+```text
+[sigma_rr, sigma_theta, sigma_zz, sigma_rz]
+```
+
+`stress_utils` centraliza operações antes duplicadas nos modelos constitutivos: tensão média,
+desviador, `J2`, tensão efetiva de von Mises e extração de `sigma_theta`. A convenção interna
+do solver é tensão positiva/compressão negativa; para comparação com códigos APB legados, a
+função `sigma_theta_compression_positive()` retorna `-sigma_theta`.
+
+`StressSampler` seleciona o ponto de Gauss mais próximo da parede interna e escreve
+`wall_stress.csv` quando `output.stress_diagnostics:true`. Em 2D, todos os GPs com o menor raio
+interpolado são gravados, formando um perfil por profundidade. Com
+`output.stress_diagnostics_scope: all_gauss`, o solver também grava `stress_profile.csv` para
+auditoria espacial completa.
+
 ## Como adicionar um elemento 2D na Etapa 3b
 
 Para cada novo elemento:

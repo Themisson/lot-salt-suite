@@ -17,6 +17,7 @@ class CaseResult:
     displacements: pd.DataFrame | None = None
     displacement_profile: pd.DataFrame | None = None
     wall_profile: pd.DataFrame | None = None
+    wall_pressure_profile: pd.DataFrame | None = None
     damage_wall: pd.DataFrame | None = None
     damage_events: pd.DataFrame | None = None
 
@@ -121,11 +122,13 @@ def load_result(result_dir: str | Path) -> CaseResult:
     displacements = load_csv_if_exists(path / "displacements.csv")
     displacement_profile = load_csv_if_exists(path / "displacements_profile.csv")
     wall_profile = load_csv_if_exists(path / "wall_profile.csv")
+    wall_pressure_profile = load_csv_if_exists(path / "wall_pressure_profile.csv")
     damage_wall = load_csv_if_exists(path / "damage_wall.csv")
     damage_events = load_csv_if_exists(path / "damage_events.csv")
     return CaseResult(path=path, metadata=metadata, closure=closure,
                       displacements=displacements,
                       displacement_profile=displacement_profile,
                       wall_profile=wall_profile,
+                      wall_pressure_profile=wall_pressure_profile,
                       damage_wall=damage_wall,
                       damage_events=damage_events)

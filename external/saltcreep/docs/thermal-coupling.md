@@ -109,11 +109,14 @@ fixo — fatore uma vez também.
   (padrão; validação estacionária com perfil logarítmico) ou `flux_zero`.
 - `conduction_2d`: resolve (r,z) com propriedades por camada; use quando contraste de condutividade
   ao longo de z importar.
+- `csv_wall_temperature`: lê um histórico operacional externo (`t_h`/`t_s`, `z_m`, `T_wall_K`)
+  e interpola linearmente em tempo e profundidade. O campo é constante em `r`, adequado para
+  acoplamento fraco com um código APB ou hidráulico que fornece a temperatura do fluido na parede.
 
 ## Interface
 `ThermalField::temperature_at(x, t) -> T`. Implementações: `ProfileField`, `Conduction1DField`,
-`Conduction2DField`. A lei de creep recebe T pela assinatura de `evaluate(...)` — ela não sabe de
-onde T veio.
+`Conduction2DField` e `CsvWallTemperatureField`. A lei de creep recebe T pela assinatura de
+`evaluate(...)` — ela não sabe de onde T veio.
 
 ## Verificação (parte do `verifier`)
 1. `profile` reproduz exatamente o T(z) do TCC (Equação 3 do TCC) para os casos A–F.

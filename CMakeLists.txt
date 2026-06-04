@@ -76,6 +76,7 @@ endif()
 set(LSS_SALTCREEP_MINIMUM_BACKEND_SOURCES
   external/saltcreep/src/constitutive/elastic_isotropic.cpp
   external/saltcreep/src/elements/axisym_1d_L3.cpp
+  external/saltcreep/src/io/TimeDepthTable.cpp
   external/saltcreep/src/solver/Assembler.cpp
   external/saltcreep/src/solver/ElasticSolver.cpp
   external/saltcreep/src/solver/WallPressureField.cpp
@@ -98,6 +99,7 @@ set(LSS_SALTCREEP_TIME_GEOSTATIC_SOURCES
   external/saltcreep/src/constitutive/double_mechanism.cpp
   external/saltcreep/src/io/VtuWriter.cpp
   external/saltcreep/src/solver/DamageDiagnostics.cpp
+  external/saltcreep/src/solver/StressSampler.cpp
   external/saltcreep/src/solver/TimeIntegrator.cpp
   external/saltcreep/src/solver/TimeOutput.cpp
   external/saltcreep/src/thermal/profile_field.cpp

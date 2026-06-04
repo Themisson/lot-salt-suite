@@ -1,6 +1,9 @@
 #include "solver/WallPressureField.hpp"
 
+#include "io/TimeDepthTable.hpp"
+
 #include <stdexcept>
+#include <utility>
 
 namespace {
 constexpr double kLbPerGalToKgPerM3 = 119.826;
@@ -34,4 +37,19 @@ double HydrostaticMudPressureField::mud_density_kg_m3() const {
 
 double HydrostaticMudPressureField::pressure_gradient_Pa_m() const {
     return mud_density_kg_m3() * kGravity;
+}
+
+CsvWallPressureField::CsvWallPressureField(const std::filesystem::path& csv_path,
+                                           std::string pressure_column,
+                                           std::string time_column,
+                                           std::string z_column)
+    : table_(std::make_unique<TimeDepthTable>(csv_path,
+                                              std::move(pressure_column),
+                                              std::move(time_column),
+                                              std::move(z_column))) {}
+
+CsvWallPressureField::~CsvWallPressureField() = default;
+
+double CsvWallPressureField::pressure_at(const Eigen::Vector2d& x, double t_s) const {
+    return table_->value_at(t_s, x[1]);
 }

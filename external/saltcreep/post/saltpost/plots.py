@@ -129,10 +129,36 @@ def _time_label(t_h: float) -> str:
     return f"{t_h:.4g} h"
 
 
+def _pressure_unit(max_p_pa: float) -> tuple[float, str]:
+    if max_p_pa >= 1.0e6:
+        return 1.0e-6, "MPa"
+    if max_p_pa >= 1.0e3:
+        return 1.0e-3, "kPa"
+    return 1.0, "Pa"
+
+
 def _profile_for_time(df: pd.DataFrame, t_h: float) -> pd.DataFrame:
     times = df["t_h"].to_numpy(dtype=float)
     actual = float(df.iloc[np.argmin(np.abs(times - t_h))]["t_h"])
     return df[np.isclose(df["t_h"], actual)].copy()
+
+
+def _pressure_depth_column(df: pd.DataFrame) -> str:
+    return "depth_m" if "depth_m" in df.columns else "z_m"
+
+
+def _selected_depths(df: pd.DataFrame) -> list[float]:
+    depth_col = _pressure_depth_column(df)
+    depths = sorted(float(z) for z in df[depth_col].dropna().unique())
+    if len(depths) <= 3:
+        return depths
+    targets = [depths[0], depths[len(depths) // 2], depths[-1]]
+    selected: list[float] = []
+    for target in targets:
+        closest = min(depths, key=lambda z: abs(z - target))
+        if closest not in selected:
+            selected.append(closest)
+    return selected
 
 
 def plot_wall_displacement(results: list[CaseResult], out_dir: Path,
@@ -264,6 +290,111 @@ def plot_field_map(result: CaseResult, out_dir: Path,
     ax.set_ylabel("Profundidade local z [m]")
     ax.set_title(f"Mapa u_r - {result.case_name} - {_time_label(float(frame['t_h'].iloc[0]))}")
     save_figure(fig, out_dir, f"{result.case_name}_mapa_ur")
+
+
+def plot_wall_pressure_profile(result: CaseResult, out_dir: Path,
+                               target_h: float | None = None) -> None:
+    df = result.wall_pressure_profile
+    if df is None or df.empty or "p_wall_Pa" not in df:
+        return
+
+    selected = _selected_times(df, target_h)
+    if not selected:
+        return
+
+    depth_col = _pressure_depth_column(df)
+    max_p = float(df["p_wall_Pa"].abs().max())
+    scale, unit = _pressure_unit(max_p)
+
+    apply_style()
+    fig, ax = plt.subplots(figsize=FIGSIZE)
+    for idx, t_h in enumerate(selected):
+        frame = _profile_for_time(df, t_h).sort_values(depth_col)
+        ax.plot(
+            frame["p_wall_Pa"] * scale,
+            frame[depth_col],
+            label=_time_label(float(frame["t_h"].iloc[0])),
+            color=color_for(None, idx),
+            marker=marker_for(None, idx),
+            markevery=max(len(frame) // 8, 1),
+        )
+    ax.set_xlabel(f"Pressão na parede [{unit}]")
+    ax.set_ylabel("Profundidade [m]" if depth_col == "depth_m" else "z local [m]")
+    ax.set_title(f"Perfil de pressão na parede - {result.case_name}")
+    ax.invert_yaxis()
+    ax.grid(True, alpha=0.3)
+    ax.legend(title="Tempo")
+    save_figure(fig, out_dir, f"{result.case_name}_perfil_pressao_parede")
+
+
+def plot_wall_pressure_time(result: CaseResult, out_dir: Path) -> None:
+    df = result.wall_pressure_profile
+    if df is None or df.empty or "p_wall_Pa" not in df:
+        return
+
+    depth_col = _pressure_depth_column(df)
+    depths = _selected_depths(df)
+    if not depths:
+        return
+
+    max_p = float(df["p_wall_Pa"].abs().max())
+    scale, unit = _pressure_unit(max_p)
+
+    apply_style()
+    fig, ax = plt.subplots(figsize=FIGSIZE)
+    for idx, depth in enumerate(depths):
+        depth_values = df[depth_col].to_numpy(dtype=float)
+        actual = float(depth_values[np.argmin(np.abs(depth_values - depth))])
+        series = df[np.isclose(df[depth_col], actual)].sort_values("t_h")
+        ax.plot(
+            series["t_h"],
+            series["p_wall_Pa"] * scale,
+            label=f"{depth_col}={actual:.4g} m",
+            color=color_for(None, idx),
+            marker=marker_for(None, idx),
+            markevery=max(len(series) // 8, 1),
+        )
+    ax.set_xlabel("Tempo [h]")
+    ax.set_ylabel(f"Pressão na parede [{unit}]")
+    ax.set_title(f"Pressão na parede vs tempo - {result.case_name}")
+    ax.grid(True, alpha=0.3)
+    ax.legend(title="Profundidade")
+    save_figure(fig, out_dir, f"{result.case_name}_pressao_parede_vs_tempo")
+
+
+def plot_wall_pressure_map(result: CaseResult, out_dir: Path) -> None:
+    df = result.wall_pressure_profile
+    if df is None or df.empty or "p_wall_Pa" not in df:
+        return
+
+    depth_col = _pressure_depth_column(df)
+    if df["t_h"].nunique() < 2 or df[depth_col].nunique() < 2:
+        return
+
+    grouped = (
+        df.groupby(["t_h", depth_col], as_index=False)["p_wall_Pa"]
+        .mean()
+        .sort_values(["t_h", depth_col])
+    )
+    pivot = grouped.pivot(index=depth_col, columns="t_h", values="p_wall_Pa")
+    max_p = float(grouped["p_wall_Pa"].abs().max())
+    scale, unit = _pressure_unit(max_p)
+
+    apply_style()
+    fig, ax = plt.subplots(figsize=FIGSIZE)
+    mesh = ax.pcolormesh(
+        pivot.columns.to_numpy(dtype=float),
+        pivot.index.to_numpy(dtype=float),
+        pivot.to_numpy(dtype=float) * scale,
+        shading="auto",
+        cmap="viridis",
+    )
+    fig.colorbar(mesh, ax=ax, label=f"Pressão na parede [{unit}]")
+    ax.set_xlabel("Tempo [h]")
+    ax.set_ylabel("Profundidade [m]" if depth_col == "depth_m" else "z local [m]")
+    ax.set_title(f"Mapa p_wall(z,t) - {result.case_name}")
+    ax.invert_yaxis()
+    save_figure(fig, out_dir, f"{result.case_name}_mapa_pressao_parede")
 
 
 def _add_lithology_bands(ax, result: CaseResult) -> None:

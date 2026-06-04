@@ -13,6 +13,7 @@
 #include "solver/Assembler.hpp"
 #include "solver/DamageDiagnostics.hpp"
 #include "solver/PerformanceStats.hpp"
+#include "solver/StressSampler.hpp"
 #include "solver/TimeState.hpp"
 #include "io/CaseParser.hpp"
 #include "io/VtuWriter.hpp"
@@ -54,7 +55,8 @@ public:
     void run(double dt_s, double t_end_s, int output_every,
              const std::filesystem::path& out_dir,
              VtuOutputOptions vtu_options = {},
-             const DamageTrackingOptions& damage_options = {});
+             const DamageTrackingOptions& damage_options = {},
+             StressDiagnosticsOptions stress_options = {});
 
     // Run with variable dt schedule: list of (until_s, dt_s) segments.
     // Switches to the next segment's dt when t passes segment.until_s.
@@ -62,7 +64,8 @@ public:
                       double t_end_s, int output_every,
                       const std::filesystem::path& out_dir,
                       VtuOutputOptions vtu_options = {},
-                      const DamageTrackingOptions& damage_options = {});
+                      const DamageTrackingOptions& damage_options = {},
+                      StressDiagnosticsOptions stress_options = {});
 
     // Wall closure as positive percentage: -u_total[0] / Ri * 100
     double wall_closure_pct() const;

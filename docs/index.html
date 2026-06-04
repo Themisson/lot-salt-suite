@@ -267,7 +267,7 @@
     <div class="stat-row">
       <div class="stat"><div class="n coppc">20/27</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">112</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">3</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -3107,6 +3107,16 @@ chamado enquanto <code>PknRunner</code> nao possuir ponto explicito de integraca
 Isso preserva a governanca: <code>external/saltcreep/</code> permanece somente leitura e
 qualquer acoplamento futuro deve entrar por fase propria, com interface
 explicita e testes dedicados.</p>
+<p>Em 2026-06-04, as atualizacoes locais em <code>external/saltcreep/</code> foram auditadas
+e integradas como evolucao da dependencia vendorizada ativa. O escopo observado
+incluiu pressao/temperatura de parede por CSV operacional, casos APB 1D/2D,
+benchmark de pressao de parede e diagnosticos de tensao (<code>wall_stress.csv</code> e
+<code>stress_profile.csv</code>). A compatibilidade Eigen integrada foi preservada via
+<code>LSS_SALTCREEP_FORCE_LSS_EIGEN</code>, e o <code>lot-salt-suite</code> passou a compilar as
+novas fontes vendorizadas exigidas por <code>TimeIntegrator</code>. Validacao executada:
+133/133 Catch2 no <code>build_baseline</code>, 133/133 Catch2 no <code>build_lss_eigen</code>,
+31/31 testes Python do saltcreep, 112/112 Catch2 do <code>lot-salt-suite</code> e
+validacoes manuais <code>lot-sim validate/run</code>.</p>
 </div>
 </section>
 

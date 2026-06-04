@@ -12,6 +12,7 @@
 #include "solver/Assembler.hpp"
 #include "solver/DamageDiagnostics.hpp"
 #include "solver/PerformanceStats.hpp"
+#include "solver/StressSampler.hpp"
 #include "solver/TimeState.hpp"
 #include "thermal/ThermalField.hpp"
 
@@ -46,13 +47,15 @@ public:
     void run(double dt_s, double t_end_s, int output_every,
              const std::filesystem::path& out_dir,
              VtuOutputOptions vtu_options = {},
-             const DamageTrackingOptions& damage_options = {});
+             const DamageTrackingOptions& damage_options = {},
+             StressDiagnosticsOptions stress_options = {});
 
     void run_schedule(const std::vector<TimeSegment>& schedule,
                       double t_end_s, int output_every,
                       const std::filesystem::path& out_dir,
                       VtuOutputOptions vtu_options = {},
-                      const DamageTrackingOptions& damage_options = {});
+                      const DamageTrackingOptions& damage_options = {},
+                      StressDiagnosticsOptions stress_options = {});
 
     double wall_closure_pct() const;
     double wall_displacement_m() const { return state_.u_total[0]; }

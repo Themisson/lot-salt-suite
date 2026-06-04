@@ -377,7 +377,7 @@
   <div class="brand">
     <h1>SaltCreep<span class="dot">.</span></h1>
     <div class="sub">Solver FEM de fluência em rocha salina</div>
-    <span class="ver">v1.0 · 125 testes C++ · 26 testes Py</span>
+    <span class="ver">v1.0 · 132 testes C++ · 31 testes Py</span>
   </div>
   <div class="search-wrap">
     <input type="text" id="navSearch" placeholder="buscar na navegação…" autocomplete="off">
@@ -431,7 +431,7 @@
       <div class="stat"><div class="n tealc">7</div><div class="l">tipos de elemento</div></div>
       <div class="stat"><div class="n coppc">6</div><div class="l">leis de fluência</div></div>
       <div class="stat"><div class="n tealc">2</div><div class="l">integradores temporais</div></div>
-      <div class="stat"><div class="n coppc">151</div><div class="l">testes verdes</div></div>
+      <div class="stat"><div class="n coppc">163</div><div class="l">testes verdes</div></div>
     </div>
   </div>
 
@@ -503,7 +503,7 @@
       <tr><th>Interface</th><th>Responsabilidade</th><th>Implementações</th></tr>
       <tr><td><code>Element</code></td><td>Geometria do elemento finito: funções de forma, matriz B, Jacobiano</td><td>L3, Q4, T3, Q8, Q9, T6</td></tr>
       <tr><td><code>ConstitutiveModel</code></td><td>Lei de fluência: taxa viscosa, tangente, dano</td><td>DoubleMechanism, EDMT, ISVSHDMunson, MottaV1, Wang2004, AubertinISVSHD</td></tr>
-      <tr><td><code>ThermalField</code></td><td>Campo de temperatura T(r,z,t) consumido pelo Arrhenius e pela deformação térmica</td><td>ProfileField, Conduction1DField, Conduction2DField</td></tr>
+      <tr><td><code>ThermalField</code></td><td>Campo de temperatura T(r,z,t) consumido pelo Arrhenius e pela deformação térmica</td><td>ProfileField, Conduction1DField, Conduction2DField, CsvWallTemperatureField</td></tr>
     </table>
 
     <h4>Otimização central: K constante</h4>
@@ -655,7 +655,7 @@
   <span class="tok-k">virtual</span> <span class="tok-k">double</span> <span class="tok-f">alpha_thermal</span>() <span class="tok-k">const</span> = <span class="tok-n">0</span>;  <span class="tok-c">// coef. expansão</span>
   <span class="tok-k">virtual</span> <span class="tok-k">double</span> <span class="tok-f">T_reference</span>() <span class="tok-k">const</span> = <span class="tok-n">0</span>;    <span class="tok-c">// T de referência</span>
 };</code></pre>
-        <p>Implementações: <code class="ic">ProfileField</code> (perfil T(z) analítico, estacionário), <code class="ic">Conduction1DField</code> (calor radial transiente) e <code class="ic">Conduction2DField</code> (calor em r,z com camadas).</p>
+        <p>Implementações: <code class="ic">ProfileField</code> (perfil T(z) analítico, estacionário), <code class="ic">Conduction1DField</code> (calor radial transiente), <code class="ic">Conduction2DField</code> (calor em r,z com camadas) e <code class="ic">CsvWallTemperatureField</code> (histórico operacional externo interpolado em t,z).</p>
       </div>
     </div>
   </section>
@@ -921,6 +921,17 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
       </div>
     </div>
 
+    <div class="card" data-name="CsvWallTemperatureField CSV temperatura parede APB histórico operacional">
+      <div class="card-head">
+        <span class="ctag therm">térmico</span><span class="cname">CsvWallTemperatureField</span>
+        <span class="file">thermal/csv_wall_temperature_field</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Lê um CSV operacional com colunas como <code class="ic">t_h,z_m,T_wall_K</code> e interpola linearmente em tempo e profundidade. O campo é constante no raio, adequado para acoplamento fraco com um código APB/hidráulico que fornece a temperatura do fluido na parede. A temperatura segue em Kelvin para o Arrhenius e para a pseudo-força térmica quando <code class="ic">alpha_thermal &gt; 0</code>.</p>
+      </div>
+    </div>
+
   </section>
 
   <!-- ============ SOLVER ============ -->
@@ -965,7 +976,17 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
       </div>
       <div class="card-body">
         <p class="role">Implementação</p>
-        <p>Representa a pressão aplicada na parede interna. <code class="ic">ConstantWallPressureField</code> preserva o carregamento antigo. <code class="ic">HydrostaticMudPressureField</code> calcula <code class="ic">p(z)=p_surface+MW·119.826·g·(depth_origin+z)</code>. No 1D, z=0; no 2D, o Assembler avalia a pressão nos pontos de Gauss da aresta interna, permitindo peso de lama variável com profundidade.</p>
+        <p>Representa a pressão aplicada na parede interna. <code class="ic">ConstantWallPressureField</code> preserva o carregamento antigo. <code class="ic">HydrostaticMudPressureField</code> calcula <code class="ic">p(z)=p_surface+MW·119.826·g·(depth_origin+z)</code>. <code class="ic">CsvWallPressureField</code> lê <code class="ic">p_wall(t,z)</code> de um CSV operacional. No 1D, z=0; no 2D, o Assembler avalia a pressão nos pontos de Gauss da aresta interna.</p>
+      </div>
+    </div>
+    <div class="card" data-name="StressSampler stress_utils sigma theta desviador APB wall_stress">
+      <div class="card-head">
+        <span class="ctag solver">solver</span><span class="cname">StressSampler / stress_utils</span>
+        <span class="file">solver/StressSampler + physics/stress_utils</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Centraliza o pós-cálculo de tensões em pontos de Gauss: tensão média, desviador, <code class="ic">J2</code>, tensão efetiva de von Mises e <code class="ic">σθθ</code>. A convenção interna é tensão positiva/compressão negativa; para acoplamento APB, <code class="ic">sigma_theta_comp_Pa</code> grava <code class="ic">-σθθ</code>, equivalente ao uso legado <code class="ic">-getSigmaTheta()</code>. Com <code class="ic">output.stress_diagnostics:true</code>, o solver escreve <code class="ic">wall_stress.csv</code>; com escopo <code class="ic">all_gauss</code>, também escreve <code class="ic">stress_profile.csv</code>.</p>
       </div>
     </div>
     <div class="card" data-name="ExplicitIntegrator TimeIntegrator Euler explícito marcha tempo">
@@ -1001,6 +1022,16 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
       <div class="card-body">
         <p class="role">Implementação</p>
         <p>Lê o arquivo YAML de caso (via yaml-cpp), valida os campos e monta a struct de configuração. Resolve paths relativos para absolutos antes de carregar dados de litologia. Aplica defaults (ex.: <code class="ic">element.type</code> ausente → axisym_1d_L3; <code class="ic">thermal.beta</code> → 0.5). Emite avisos para combinações fisicamente questionáveis (explícito + taquidrita; primária sem secundária). <strong>Toda conversão de unidades acontece aqui</strong> — internamente o solver é 100% SI.</p>
+      </div>
+    </div>
+    <div class="card" data-name="TimeDepthTable CSV interpolação tempo profundidade APB">
+      <div class="card-head">
+        <span class="ctag io">i/o</span><span class="cname">TimeDepthTable</span>
+        <span class="file">io/TimeDepthTable</span><span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <p class="role">Implementação</p>
+        <p>Leitor leve de CSV para grades completas <code class="ic">t,z,valor</code>. Aceita colunas configuráveis (<code class="ic">t_h</code> ou <code class="ic">t_s</code>, <code class="ic">z_m</code> e coluna de valor), interpola linearmente em tempo/profundidade e mantém os valores de borda fora da faixa. É reutilizado por <code class="ic">CsvWallPressureField</code> e <code class="ic">CsvWallTemperatureField</code>.</p>
       </div>
     </div>
     <div class="card" data-name="saltpost pós-processamento Python comparação plots métricas">
@@ -1058,9 +1089,13 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
       <span class="tok-k">material</span>: <span class="tok-s">halita</span>
 
 <span class="tok-k">fluid</span>:
-  <span class="tok-k">mode</span>: <span class="tok-s">constant</span>             <span class="tok-c"># constant | hydrostatic_depth_profile</span>
+  <span class="tok-k">mode</span>: <span class="tok-s">constant</span>             <span class="tok-c"># constant | hydrostatic_depth_profile | csv_time_depth_profile</span>
   <span class="tok-k">weight_lb_per_gal</span>: <span class="tok-n">9.6</span>       <span class="tok-c"># usado se pressure_Pa ausente</span>
   <span class="tok-k">surface_pressure_Pa</span>: <span class="tok-n">0.0</span>    <span class="tok-c"># usado no perfil hidrostático</span>
+  <span class="tok-k">csv</span>: <span class="tok-s">data/apb/mud_schedule.csv</span> <span class="tok-c"># usado no modo csv_time_depth_profile</span>
+  <span class="tok-k">pressure_column</span>: <span class="tok-s">p_wall_Pa</span>
+  <span class="tok-k">time_column</span>: <span class="tok-s">t_h</span>
+  <span class="tok-k">z_column</span>: <span class="tok-s">z_m</span>
 
 <span class="tok-k">stress</span>:
   <span class="tok-k">k0</span>: <span class="tok-n">1.0</span>                     <span class="tok-c"># razão de tensão horizontal/vertical</span>
@@ -1130,11 +1165,13 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
 
 <span class="tok-k">thermal</span>:
   <span class="tok-k">enabled</span>: <span class="tok-k">false</span>             <span class="tok-c"># acoplamento térmico ligado?</span>
-  <span class="tok-k">mode</span>: <span class="tok-s">profile</span>              <span class="tok-c"># profile | conduction_1d | conduction_2d</span>
+  <span class="tok-k">mode</span>: <span class="tok-s">profile</span>              <span class="tok-c"># profile | conduction_1d | conduction_2d | csv_wall_temperature</span>
   <span class="tok-k">seabed_temp_C</span>: <span class="tok-n">4.0</span>
   <span class="tok-k">geothermal_gradient_C_per_m</span>: <span class="tok-n">0.03</span>
   <span class="tok-k">alpha_thermal</span>: <span class="tok-n">3.5e-5</span>        <span class="tok-c"># coef. expansão térmica</span>
   <span class="tok-k">T_reference_C</span>: <span class="tok-n">25.0</span>
+  <span class="tok-k">csv</span>: <span class="tok-s">data/apb/mud_schedule.csv</span> <span class="tok-c"># usado no modo csv_wall_temperature</span>
+  <span class="tok-k">temperature_column</span>: <span class="tok-s">T_wall_K</span>
   <span class="tok-k">outer_bc</span>: <span class="tok-s">prescribed</span>        <span class="tok-c"># conduction_*: prescribed | flux_zero</span>
   <span class="tok-k">top_bc</span>: <span class="tok-s">flux_zero</span>           <span class="tok-c"># conduction_2d</span>
   <span class="tok-k">bottom_bc</span>: <span class="tok-s">flux_zero</span>        <span class="tok-c"># conduction_2d</span>
@@ -1156,6 +1193,8 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
   <span class="tok-k">vtu</span>: <span class="tok-k">true</span>                 <span class="tok-c"># escreve .vtu para ParaView/PyVista</span>
   <span class="tok-k">vtu_every_n_steps</span>: <span class="tok-n">10</span>    <span class="tok-c"># frequência; passo final sempre é escrito</span>
   <span class="tok-k">revolve_3d</span>: <span class="tok-k">false</span>          <span class="tok-c"># reservado; hoje exporta setor (r,z)</span>
+  <span class="tok-k">stress_diagnostics</span>: <span class="tok-k">false</span> <span class="tok-c"># wall_stress.csv com σθθ, desviador, J2 e σef</span>
+  <span class="tok-k">stress_diagnostics_scope</span>: <span class="tok-s">wall</span> <span class="tok-c"># wall | all_gauss</span>
   <span class="tok-k">damage_tracking</span>: <span class="tok-k">false</span>     <span class="tok-c"># CSVs de dano se creep.damage também estiver ligado</span>
   <span class="tok-k">damage_thresholds</span>: [<span class="tok-n">0.1</span>, <span class="tok-n">0.3</span>, <span class="tok-n">0.5</span>, <span class="tok-n">0.8</span>]
   <span class="tok-k">failure_D_critical</span>: <span class="tok-n">0.5</span>
@@ -1211,6 +1250,10 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
             </div>
             <div class="fg"><label>Peso do fluido (lb/gal)</label><input type="text" id="b_mud" value="9.6"></div>
           </div>
+          <div class="fg">
+            <label>Modo de pressão</label>
+            <select id="b_fluid_mode"><option>constant</option><option>hydrostatic_depth_profile</option><option>csv_time_depth_profile</option></select>
+          </div>
           <div class="fg-row">
             <div class="fg"><label>k0 <span class="hint">(tensão H/V)</span></label><input type="text" id="b_k0" value="1.0"></div>
             <div class="fg">
@@ -1240,9 +1283,14 @@ dD/dt = A_d · σ_ef^m_d · (1−D)^p_d · g(ε_v)</code></pre>
           </div>
           <div class="fg"><label>Térmico</label>
             <div class="chk"><input type="checkbox" id="b_therm"><label for="b_therm" style="margin:0">Acoplamento térmico ligado</label></div>
+            <div class="fg" style="margin-top:8px">
+              <label>Modo térmico</label>
+              <select id="b_thermal_mode"><option>profile</option><option>csv_wall_temperature</option><option>conduction_1d</option><option>conduction_2d</option></select>
+            </div>
           </div>
           <div class="fg"><label>Visualização</label>
             <div class="chk"><input type="checkbox" id="b_vtu" checked><label for="b_vtu" style="margin:0">Exportar VTU/PVD</label></div>
+            <div class="chk"><input type="checkbox" id="b_stress_diag"><label for="b_stress_diag" style="margin:0">Diagnóstico de tensão na parede</label></div>
             <div class="chk"><input type="checkbox" id="b_damage_tracking"><label for="b_damage_tracking" style="margin:0">Rastrear dano/falha</label></div>
           </div>
           <div class="fg-row">
@@ -1336,7 +1384,12 @@ cmake --build build -j
 <span class="tok-c"># 2. Plotar o resultado de um caso</span>
 python post/plot_case.py results/meu_poco
 
-<span class="tok-c"># 3. Rodar o mesmo caso físico com vários elementos (estudo)</span>
+<span class="tok-c"># 3. Rodar casos APB operacionais com histórico de lama/temperatura</span>
+./build/saltcreep cases/apb/apb_1d_constant_mud.yaml
+./build/saltcreep cases/apb/apb_1d_schedule_mud_temperature.yaml
+./build/saltcreep cases/apb/apb_2d_layered_schedule_Q8.yaml
+
+<span class="tok-c"># 4. Rodar o mesmo caso físico com vários elementos (estudo)</span>
 ./build/saltcreep cases/tcc/modelo_A_L3.yaml
 ./build/saltcreep cases/tcc/modelo_A_Q8.yaml
 ./build/saltcreep cases/tcc/modelo_A_T6.yaml</code></pre>
@@ -1348,7 +1401,9 @@ python post/plot_case.py results/meu_poco
       <tr><td><code>displacements.csv</code></td><td>campo de deslocamento radial nodal para o caminho elástico</td></tr>
       <tr><td><code>displacements_profile.csv</code></td><td>perfil temporal nodal: <code>t_h</code>, <code>r_m</code>, <code>z_m</code>, <code>u_r_m</code>, <code>u_z_m</code></td></tr>
       <tr><td><code>wall_profile.csv</code></td><td>perfil temporal na parede interna: <code>u_r(z)</code>, <code>depth_m</code>, <code>diameter_m</code>, <code>diameter_in</code> e diâmetro original</td></tr>
-      <tr><td><code>wall_pressure_profile.csv</code></td><td>perfil temporal na parede interna: <code>p_wall_Pa</code> e <code>T_wall_K</code> por profundidade. Em <code>fluid.mode: hydrostatic_depth_profile</code>, a pressão 2D é avaliada com <code>depth_origin + z</code>.</td></tr>
+      <tr><td><code>wall_pressure_profile.csv</code></td><td>perfil temporal na parede interna: <code>p_wall_Pa</code> e <code>T_wall_K</code> por profundidade. Em <code>hydrostatic_depth_profile</code>, a pressão usa <code>depth_origin + z</code>; em <code>csv_time_depth_profile</code>/<code>csv_wall_temperature</code>, os valores vêm do CSV operacional interpolado.</td></tr>
+      <tr><td><code>wall_stress.csv</code></td><td>quando <code>output.stress_diagnostics:true</code>: tensões no GP mais próximo da parede, incluindo <code>sigma_theta_Pa</code>, <code>sigma_theta_comp_Pa</code>, desviador, <code>J2</code> e <code>sigma_ef</code></td></tr>
+      <tr><td><code>stress_profile.csv</code></td><td>quando <code>stress_diagnostics_scope: all_gauss</code>: mesmos campos de tensão para todos os pontos de Gauss</td></tr>
       <tr><td><code>damage_wall.csv</code></td><td>quando habilitado: evolução de <code>D</code>, <code>eps_dot</code> e <code>sigma_ef</code> no ponto mais danificado da parede</td></tr>
       <tr><td><code>damage_events.csv</code></td><td>quando habilitado: eventos de limiar de dano, taxa acelerada e inflexão da fluência</td></tr>
       <tr><td><code>metadata.json</code></td><td>elemento, malha, GDLs, geometria do poço, profundidade de referência, litologias visuais, esquema, flags, <code>omp_threads</code> e timers granulares</td></tr>
@@ -1358,10 +1413,14 @@ python post/plot_case.py results/meu_poco
     <p>O <code class="ic">metadata.json</code> é o que permite ao saltpost agrupar e comparar resultados automaticamente.</p>
 
     <h4>Pressão de lama por profundidade</h4>
-    <p>Para usar o peso da lama como perfil hidrostático em 2D, defina <code class="ic">fluid.mode: hydrostatic_depth_profile</code>. O 1D calcula a pressão na profundidade do caso; o 2D avalia a pressão no ponto de integração da parede interna usando <code class="ic">depth_origin + z</code>.</p>
+    <p>Para usar o peso da lama como perfil hidrostático em 2D, defina <code class="ic">fluid.mode: hydrostatic_depth_profile</code>. Para acoplar com outro código APB/operacional, use <code class="ic">fluid.mode: csv_time_depth_profile</code> e, opcionalmente, <code class="ic">thermal.mode: csv_wall_temperature</code>; o solver interpola linearmente em <code class="ic">t,z</code>.</p>
+    <h4>Diagnóstico de tensão para APB</h4>
+    <p>Para gravar o equivalente aos getters legados <code class="ic">getSigmaTheta()</code> e <code class="ic">getDeviatoricStress()</code>, ative <code class="ic">output.stress_diagnostics:true</code>. O arquivo <code class="ic">wall_stress.csv</code> registra a tensão circunferencial interna <code class="ic">sigma_theta_Pa</code>, a versão em compressão positiva <code class="ic">sigma_theta_comp_Pa = -σθθ</code>, o tensor desviador, <code class="ic">J2</code> e <code class="ic">sigma_ef</code>. Use <code class="ic">stress_diagnostics_scope: all_gauss</code> para auditar todos os pontos de Gauss.</p>
     <div class="code-head"><span>casos de verificação APB</span><button class="copy-btn">copiar</button></div>
     <pre><code>./build/saltcreep cases/apb/mud_gradient_1d_8p5ppg.yaml
 ./build/saltcreep cases/apb/mud_gradient_2d_Q8_8p5ppg.yaml
+./build/saltcreep cases/apb/apb_1d_schedule_mud_temperature.yaml
+./build/saltcreep cases/apb/apb_2d_layered_schedule_Q8.yaml
 
 <span class="tok-c"># verificar a pressão aplicada na parede</span>
 python - <<'PY'
@@ -1407,7 +1466,12 @@ python post/compare_cases.py results/modelo_A_Q8 --animate all --animation-forma
 python post/compare_cases.py results/modelo_A_Q8 --plot diameter_profile --time <span class="tok-n">360</span>
 python post/compare_cases.py results/modelo_A_Q8 --plot diameter_time --depth <span class="tok-n">4100</span>
 python post/compare_cases.py results/modelo_A_Q8 --plot lithology_column
-python post/compare_cases.py results/modelo_A_Q8 --plot axisym_3d --time <span class="tok-n">360</span></code></pre>
+python post/compare_cases.py results/modelo_A_Q8 --plot axisym_3d --time <span class="tok-n">360</span>
+
+<span class="tok-c"># Pressão aplicada na parede p_wall(z,t)</span>
+python post/compare_cases.py results/mud_gradient_2d_Q8_8p5ppg --plot wall_pressure_profile
+python post/compare_cases.py results/mud_gradient_2d_Q8_8p5ppg --plot wall_pressure_time
+python post/compare_cases.py results/mud_gradient_2d_Q8_8p5ppg --plot wall_pressure_map</code></pre>
 
     <h4>Saídas geradas</h4>
     <ul class="clean">
@@ -1420,6 +1484,7 @@ python post/compare_cases.py results/modelo_A_Q8 --plot axisym_3d --time <span c
       <li><strong>*_anim_*.gif/mp4</strong> — animações de fechamento, deslocamento radial, dano e temperatura.</li>
       <li><strong>diametro_*.png/pdf</strong> — diâmetro do poço × profundidade ou × tempo, com linha de diâmetro original.</li>
       <li><strong>*_axisym_3d.png</strong> — setor 3D por revolução da parede original/deformada.</li>
+      <li><strong>*pressao_parede*.png/pdf</strong> — perfis <code class="ic">p_wall(z)</code>, séries <code class="ic">p_wall(t)</code> e mapas <code class="ic">p_wall(z,t)</code>.</li>
     </ul>
     <p>Para campos espaciais, use <code class="ic">output.vtu: true</code>. O módulo <code class="ic">post/saltpost/vtk.py</code> fornece <code class="ic">load_vtu()</code> quando PyVista estiver instalado, permitindo inspecionar tensões, dano e temperatura em 2D. O guia completo está em <a href="post-processing.md"><code class="ic">docs/post-processing.md</code></a>.</p>
 
@@ -1479,6 +1544,11 @@ python post/compare_cases.py results/modelo_A_Q8 --plot diameter_time --depth <s
 <span class="tok-c"># Coluna litológica e setor 3D axissimétrico da parede</span>
 python post/compare_cases.py results/modelo_A_Q8 --plot lithology_column
 python post/compare_cases.py results/modelo_A_Q8 --plot axisym_3d --time <span class="tok-n">360</span>
+
+<span class="tok-c"># Pressão da lama na parede: perfil, evolução temporal e mapa z×t</span>
+python post/compare_cases.py results/mud_gradient_2d_Q8_8p5ppg --plot wall_pressure_profile
+python post/compare_cases.py results/mud_gradient_2d_Q8_8p5ppg --plot wall_pressure_time
+python post/compare_cases.py results/mud_gradient_2d_Q8_8p5ppg --plot wall_pressure_map
 
 <span class="tok-c"># D(t) na parede com limiares de falha</span>
 python post/compare_cases.py results/modelo_A_with_damage --plot damage
@@ -1594,6 +1664,22 @@ python post/benchmark_suite.py --preset full --dry-run
 python post/benchmark_suite.py --preset full --max-runs <span class="tok-n">50</span></code></pre>
     <p>As saídas principais são <code class="ic">results/benchmark/benchmark_suite.json</code>, <code class="ic">benchmark_report.md</code> e <code class="ic">benchmark_time_vs_dofs.png/pdf</code>. O relatório inclui tempo total por elemento, tempo por modelo, breakdown montagem/solve/constitutivo, speedup OpenMP e GDLs finais por elemento.</p>
 
+    <h4>Benchmark da pressão na parede</h4>
+    <p>O script <code class="ic">post/benchmark_wall_pressure.py</code> isola o custo de avaliar <code class="ic">p_wall(z,t)</code> em malhas Q8 2D. Ele compara pressão constante, perfil hidrostático por peso de lama e pressão lida de CSV operacional.</p>
+    <div class="code-head"><span>benchmark p_wall(z,t)</span><button class="copy-btn">copiar</button></div>
+    <pre><code><span class="tok-c"># Smoke rápido: 3 casos pequenos</span>
+python post/benchmark_wall_pressure.py --preset smoke
+
+<span class="tok-c"># Campanha recomendada: small/medium/large com 1 thread</span>
+python post/benchmark_wall_pressure.py --preset standard --threads <span class="tok-n">1</span>
+
+<span class="tok-c"># Campanha completa com OpenMP</span>
+python post/benchmark_wall_pressure.py --preset full --threads <span class="tok-n">1</span>,<span class="tok-n">2</span>,<span class="tok-n">4</span>
+
+<span class="tok-c"># Conferir a matriz sem rodar</span>
+python post/benchmark_wall_pressure.py --preset full --threads <span class="tok-n">1</span>,<span class="tok-n">2</span>,<span class="tok-n">4</span> --dry-run</code></pre>
+    <p>As saídas ficam em <code class="ic">results/benchmark_wall_pressure/</code>: <code class="ic">benchmark_wall_pressure.json</code>, <code class="ic">benchmark_wall_pressure.csv</code>, <code class="ic">benchmark_wall_pressure.md</code>, <code class="ic">wall_pressure_time_vs_dofs.png/pdf</code>, <code class="ic">wall_pressure_overhead_vs_dofs.png/pdf</code> e <code class="ic">wall_pressure_breakdown.png/pdf</code>.</p>
+
     <h4>Comparação de estágios de fluência</h4>
     <p>Para isolar a contribuição física de cada estágio, rode o mesmo caso mudando apenas as flags de <code class="ic">creep</code> e o nome do caso. Uma sequência típica é:</p>
     <ul class="clean">
@@ -1653,10 +1739,10 @@ python post/benchmark_suite.py --preset full --max-runs <span class="tok-n">50</
     <p class="lead">O protocolo de verificação roda em ordem; a construção para no primeiro teste que regredir. Tolerâncias nunca são relaxadas para um teste passar.</p>
 
     <div class="code-head"><span>rodar a bateria de testes</span><button class="copy-btn">copiar</button></div>
-    <pre><code><span class="tok-c"># Testes C++ (Catch2) — 125 testes</span>
+    <pre><code><span class="tok-c"># Testes C++ (Catch2) — 132 testes</span>
 ctest --test-dir build --output-on-failure
 
-<span class="tok-c"># Testes Python (saltpost/VTU/deslocamento/dano/viewer/benchmark/edge/dashboard/diâmetro/pressão) — 26 testes</span>
+<span class="tok-c"># Testes Python (saltpost/VTU/deslocamento/dano/viewer/benchmark/edge/dashboard/diâmetro/pressão) — 31 testes</span>
 python -m unittest discover tests/python -v</code></pre>
 
     <h4>Protocolo (ordem de verificação)</h4>
@@ -1671,7 +1757,7 @@ python -m unittest discover tests/python -v</code></pre>
     </ol>
     <div class="note">
       <span class="nt">Estado atual</span>
-      <strong>125 testes C++ + 26 testes Python — todos verdes.</strong> Todas as etapas do roadmap original (0 a 5) concluídas e a Fase 2 inclui saída VTU/PVD, visualização espacial, gráficos físicos de deslocamento e diâmetro, pressão hidrostática por peso de lama em 1D/2D, viewer interativo de parede, dashboard HTML, exportação paper, estudos declarativos, animações, diagnóstico de falha por dano, condução térmica 2D com camadas, paralelismo OpenMP opcional, benchmark de desempenho, benchmark suite integral, refinamento adaptativo h e testes de edge case: elástico, secundária, primária EDMT/ISV, terciária com dano Motta/Wang/Aubertin, envoltórias Spier/Ratigan/DeVries/Hunsche, 7 elementos, integrador implícito, acoplamento térmico fraco e pós-processamento.
+      <strong>132 testes C++ + 31 testes Python — todos verdes.</strong> Todas as etapas do roadmap original (0 a 5) concluídas e a Fase 2 inclui saída VTU/PVD, visualização espacial, gráficos físicos de deslocamento e diâmetro, pressão hidrostática por peso de lama em 1D/2D, pressão/temperatura de parede por CSV externo, diagnóstico de tensão APB na parede, casos APB operacionais, plots p_wall(z,t), benchmark dedicado de pressão na parede, viewer interativo de parede, dashboard HTML, exportação paper, estudos declarativos, animações, diagnóstico de falha por dano, condução térmica 2D com camadas, paralelismo OpenMP opcional, benchmark de desempenho, benchmark suite integral, refinamento adaptativo h e testes de edge case: elástico, secundária, primária EDMT/ISV, terciária com dano Motta/Wang/Aubertin, envoltórias Spier/Ratigan/DeVries/Hunsche, 7 elementos, integrador implícito, acoplamento térmico fraco e pós-processamento.
     </div>
   </section>
 
@@ -1680,7 +1766,7 @@ python -m unittest discover tests/python -v</code></pre>
 
 <footer>
   <p><strong>SaltCreep</strong> — solver FEM de fluência em rocha salina · C++20 / Python · Documentação técnica v1.0</p>
-  <p style="margin-top:6px">Verificador independente do SESTSAL · Construído incrementalmente com verificação em cada etapa · <span class="mono">125 testes C++ · 26 testes Python</span></p>
+  <p style="margin-top:6px">Verificador independente do SESTSAL · Construído incrementalmente com verificação em cada etapa · <span class="mono">132 testes C++ · 31 testes Python</span></p>
 </footer>
 
 <script>
@@ -1759,7 +1845,7 @@ python -m unittest discover tests/python -v</code></pre>
   });
 
   // ---------- interactive YAML builder ----------
-  const ids=['b_name','b_ri','b_re','b_thick','b_wd','b_bur','b_lith','b_mud','b_k0','b_elem','b_nr','b_ratio','b_adapt','b_adapt_thr','b_adapt_levels','b_sec','b_pri','b_ter','b_env','b_therm','b_vtu','b_damage_tracking','b_scheme','b_time'];
+  const ids=['b_name','b_ri','b_re','b_thick','b_wd','b_bur','b_lith','b_mud','b_fluid_mode','b_k0','b_elem','b_nr','b_ratio','b_adapt','b_adapt_thr','b_adapt_levels','b_sec','b_pri','b_ter','b_env','b_therm','b_thermal_mode','b_vtu','b_stress_diag','b_damage_tracking','b_scheme','b_time'];
   function v(id){const el=document.getElementById(id);return el.type==='checkbox'?el.checked:el.value;}
   function outerFactor(){
     const ri=Number(v('b_ri')); const re=Number(v('b_re'));
@@ -1786,8 +1872,12 @@ lithology:
   primary: ${v('b_lith')}
 
 fluid:
-  mode: constant
-  weight_lb_per_gal: ${v('b_mud')}
+  mode: ${v('b_fluid_mode')}
+  weight_lb_per_gal: ${v('b_mud')}${v('b_fluid_mode')==='csv_time_depth_profile'?`
+  csv: data/apb/mud_schedule.csv
+  pressure_column: p_wall_Pa
+  time_column: t_h
+  z_column: z_m`:''}
 
 stress:
   k0: ${v('b_k0')}
@@ -1831,11 +1921,15 @@ creep:
 
 thermal:
   enabled: ${therm}${therm?`
-  mode: profile
+  mode: ${v('b_thermal_mode')}
   seabed_temp_C: 4.0
   geothermal_gradient_C_per_m: 0.03
   alpha_thermal: 3.5e-5
-  T_reference_C: 25.0`:''}
+  T_reference_C: 25.0${v('b_thermal_mode')==='csv_wall_temperature'?`
+  csv: data/apb/mud_schedule.csv
+  temperature_column: T_wall_K
+  time_column: t_h
+  z_column: z_m`:''}`:''}
 
 time:
   scheme: ${v('b_scheme')}
@@ -1848,6 +1942,8 @@ output:
   vtu: ${v('b_vtu')}
   vtu_every_n_steps: 10
   revolve_3d: false
+  stress_diagnostics: ${v('b_stress_diag')}
+  stress_diagnostics_scope: wall
   damage_tracking: ${v('b_damage_tracking')}
   damage_thresholds: [0.1, 0.3, 0.5, 0.8]
   failure_D_critical: 0.5

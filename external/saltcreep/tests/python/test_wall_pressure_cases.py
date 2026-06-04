@@ -68,6 +68,42 @@ class WallPressureCaseTests(unittest.TestCase):
         )
         self.assertTrue((initial["T_wall_K"] == 370.88).all())
 
+    def test_operational_csv_cases_run_with_finite_closure(self) -> None:
+        result_1d = self.run_existing_case(
+            "cases/apb/apb_1d_schedule_mud_temperature.yaml",
+            "apb_1d_schedule_mud_temperature",
+        )
+        result_2d = self.run_existing_case(
+            "cases/apb/apb_2d_layered_schedule_Q8.yaml",
+            "apb_2d_layered_schedule_Q8",
+        )
+
+        closure_1d = pd.read_csv(result_1d / "closure.csv")
+        closure_2d = pd.read_csv(result_2d / "closure.csv")
+        self.assertTrue(closure_1d["closure_pct"].notna().all())
+        self.assertTrue(closure_2d["closure_pct"].notna().all())
+        self.assertGreater(float(closure_1d["closure_pct"].iloc[-1]), 0.0)
+        self.assertGreater(float(closure_2d["closure_pct"].iloc[-1]), 0.0)
+
+        pressure_1d = pd.read_csv(result_1d / "wall_pressure_profile.csv")
+        self.assertAlmostEqual(float(pressure_1d["p_wall_Pa"].iloc[0]), 48178757.3589, delta=1.0e-3)
+        self.assertAlmostEqual(float(pressure_1d["T_wall_K"].iloc[0]), 365.0)
+        self.assertAlmostEqual(float(pressure_1d["p_wall_Pa"].iloc[-1]), 44324456.7702, delta=1.0e-3)
+        self.assertAlmostEqual(float(pressure_1d["T_wall_K"].iloc[-1]), 370.0)
+
+        pressure_2d = pd.read_csv(result_2d / "wall_pressure_profile.csv")
+        initial_2d = pressure_2d[pressure_2d["t_h"] == 0.0]
+        self.assertGreater(initial_2d["z_m"].nunique(), 2)
+        self.assertAlmostEqual(
+            float(initial_2d.loc[initial_2d["z_m"].idxmin(), "p_wall_Pa"]),
+            48178757.3589,
+            delta=1.0e-3,
+        )
+        self.assertAlmostEqual(
+            float(initial_2d.loc[initial_2d["z_m"].idxmax(), "T_wall_K"]),
+            375.0,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
