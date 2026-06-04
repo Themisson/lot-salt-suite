@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "salt/SaltWallStressDiagnostics.hpp"
+
 namespace lss::salt {
 
 struct SaltCreepTimeBridgeConfig {
@@ -49,6 +51,7 @@ class SaltCreepTimeBridge {
   [[nodiscard]] bool is_available() const;
   [[nodiscard]] const SaltCreepTimeBridgeConfig& config() const;
   [[nodiscard]] SaltCreepTimeBridgeResult result() const;
+  [[nodiscard]] SaltWallStressDiagnostics wall_stress_diagnostics() const;
 
   [[nodiscard]] SaltCreepTimeBridgeResult advance_by(double dt_s);
   [[nodiscard]] SaltCreepTimeBridgeResult advance_by(double dt_s,

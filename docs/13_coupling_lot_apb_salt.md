@@ -700,6 +700,60 @@ controlados, comparacao futura com o legado e preparacao de criterios mais
 rigorosos quando `sigma_theta`, historicos absolutos de pressao e referencias
 geomecanicas forem disponibilizados por rotas validadas.
 
+## Diagnostico opt-in de tensao de parede do sal (Fase 9.9B)
+
+A Fase 9.9B cria `SaltWallStressDiagnostics` como DTO publico do
+`lot-salt-suite` e adiciona ao `SaltCreepTimeBridge` um metodo opt-in para
+expor diagnosticos de tensao na parede:
+
+```text
+SaltCreepTimeBridge::wall_stress_diagnostics()
+```
+
+Esse metodo usa internamente o estado atual do `TimeIntegrator` do
+`external/saltcreep`, em particular `TimeState::sigma_gp`, e amostra os pontos
+de Gauss mais proximos da parede interna por meio de `stress_sampler`. Os
+headers publicos do `lot-salt-suite` nao expõem `TimeIntegrator`, `TimeState`,
+`StressSampler`, `stress_utils`, `types.hpp` ou Eigen.
+
+O diagnostico retorna, para cada amostra de parede:
+
+- identificadores de ponto de Gauss, elemento e ponto local;
+- coordenadas `r_m`, `z_m` e `depth_m`;
+- `sigma_rr_Pa`, `sigma_theta_Pa`, `sigma_zz_Pa` e `sigma_rz_Pa`;
+- `sigma_theta_compression_positive_Pa`;
+- `mean_stress_Pa`;
+- `j2_Pa2`;
+- `von_mises_effective_stress_Pa`.
+
+A conversao de sinal e explicita:
+
+```text
+sigma_theta_compression_positive_Pa = -sigma_theta_Pa
+```
+
+Isso preserva a fronteira entre a convencao interna do `saltcreep`, onde
+compressao no vetor `Stress` aparece negativa nessa rota, e a convencao do LSS
+para diagnosticos de abertura por compressao positiva.
+
+Limites deliberados:
+
+- a amostra de "parede" e o ponto de Gauss mais proximo da parede interna, nao
+  uma extrapolacao exata para `r = Ri`;
+- o diagnostico nao altera `SaltCreepInterface`;
+- o diagnostico nao altera `SaltCreepResponse`;
+- o diagnostico nao altera `LotSaltSigmaThetaBreakdown`;
+- o diagnostico nao e conectado automaticamente ao CLI nem ao fluxo
+  `lot-sim run --mode lot-pkn`;
+- `deviatoric`, `J2` e von Mises sao expostos como diagnostico, mas nao entram
+  no criterio experimental da Fase 9.8.
+
+Essa ponte prepara uma fase futura em que
+`sigma_theta_compression_positive_Pa` podera alimentar explicitamente
+`LotSaltSigmaThetaBreakdown`, mantendo o criterio `pressure_Pa >
+sigma_theta_compression_positive_Pa` opt-in e nao validado como criterio fisico
+de fratura.
+
 ## Interface proposta para coupling/
 
 ```cpp

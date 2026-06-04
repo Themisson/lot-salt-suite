@@ -120,6 +120,7 @@ set(LSS_CORE_SOURCES
   src/salt/SaltCreepAdapterState.cpp
   src/salt/SaltCreepInterface.cpp
   src/salt/SaltCreepSaltcreepAdapter.cpp
+  src/salt/SaltWallStressDiagnostics.cpp
   src/coupling/LotSaltCouplingStep.cpp
 )
 
@@ -176,6 +177,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_salt_creep_saltcreep_adapter_time_bridge.cpp
     tests/cpp/test_salt_creep_saltcreep_adapter_temporal_state.cpp
     tests/cpp/test_salt_creep_saltcreep_adapter.cpp
+    tests/cpp/test_salt_wall_stress_diagnostics.cpp
     ${LSS_CORE_SOURCES}
   )
   target_include_directories(lot_sim_tests PRIVATE

@@ -10,7 +10,9 @@
 
 #include "constitutive/elastic_isotropic.hpp"
 #include "elements/axisym_1d_L3.hpp"
+#include "physics/stress_utils.hpp"
 #include "solver/Assembler.hpp"
+#include "solver/StressSampler.hpp"
 #include "solver/TimeIntegrator.hpp"
 #include "solver/WallPressureField.hpp"
 #include "thermal/profile_field.hpp"
@@ -112,6 +114,27 @@ double positive_closure(double wall_displacement_m) {
   return std::max(0.0, -wall_displacement_m);
 }
 
+SaltWallStressSample convert_wall_stress_sample(
+    const StressSample& sample) {
+  SaltWallStressSample out;
+  out.gp_id = sample.gp_id;
+  out.element_id = sample.element_id;
+  out.local_gp_id = sample.local_gp_id;
+  out.r_m = sample.r_m;
+  out.z_m = sample.z_m;
+  out.depth_m = sample.depth_m;
+  out.sigma_rr_Pa = sample.sigma[0];
+  out.sigma_theta_Pa = sample.sigma[1];
+  out.sigma_theta_compression_positive_Pa =
+      stress_utils::sigma_theta_compression_positive(sample.sigma);
+  out.sigma_zz_Pa = sample.sigma[2];
+  out.sigma_rz_Pa = sample.sigma[3];
+  out.mean_stress_Pa = sample.mean_stress_Pa;
+  out.j2_Pa2 = sample.J2_Pa2;
+  out.von_mises_effective_stress_Pa = sample.sigma_ef_Pa;
+  return out;
+}
+
 class StepWallPressureField final : public WallPressureField {
  public:
   explicit StepWallPressureField(double initial_pressure_Pa)
@@ -188,6 +211,18 @@ struct SaltCreepTimeBridge::Impl {
     };
   }
 
+  [[nodiscard]] SaltWallStressDiagnostics wall_stress_diagnostics() const {
+    SaltWallStressDiagnostics diagnostics;
+    const auto samples = stress_sampler::sample_wall_gauss_points(
+        mesh, element, integrator->state(), 0.0);
+    diagnostics.wall_samples.reserve(samples.size());
+    for (const auto& sample : samples) {
+      diagnostics.wall_samples.push_back(convert_wall_stress_sample(sample));
+    }
+    diagnostics.valid = !diagnostics.wall_samples.empty();
+    return diagnostics;
+  }
+
   SaltCreepTimeBridgeResult advance_by(double dt_s) {
     return advance_by(dt_s, config.wall_pressure_Pa);
   }
@@ -250,6 +285,11 @@ const SaltCreepTimeBridgeConfig& SaltCreepTimeBridge::config() const {
 
 SaltCreepTimeBridgeResult SaltCreepTimeBridge::result() const {
   return impl_->result();
+}
+
+SaltWallStressDiagnostics SaltCreepTimeBridge::wall_stress_diagnostics()
+    const {
+  return impl_->wall_stress_diagnostics();
 }
 
 SaltCreepTimeBridgeResult SaltCreepTimeBridge::advance_by(double dt_s) {

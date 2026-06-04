@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 9.8 implementada, aguardando revisao/commit
+Fase ativa  : 9.9B implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 153/153 Catch2 lot-salt-suite em 2026-06-04 apos Fase 9.8
+Testes C++  : 158/158 Catch2 lot-salt-suite em 2026-06-04 apos Fase 9.9B
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,52 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 9.9B — `SaltWallStressDiagnostics` opt-in — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Expor diagnostico opt-in de tensao de parede a partir de
+`SaltCreepTimeBridge`, usando DTOs publicos do LSS e sem expor headers de
+`external/saltcreep/` na API publica.
+
+**Pre-verificacao do saltcreep:**
+- `StressSampler` usa namespace real `stress_sampler`.
+- A assinatura real usada e
+  `stress_sampler::sample_wall_gauss_points(const Mesh&, const Element&,
+  const TimeState&, double depth_origin_m)`.
+- O tipo real `StressSample` carrega `gp_id`, `element_id`, `local_gp_id`,
+  `r_m`, `z_m`, `depth_m`, `sigma`, `deviatoric`, `mean_stress_Pa`,
+  `J2_Pa2` e `sigma_ef_Pa`.
+- `TimeIntegrator::state()` retorna `const TimeState&`.
+- O `SaltCreepTimeBridge::Impl` ja possui `mesh`, `element` e `integrator`.
+
+**Implementacao:**
+- Criado `SaltWallStressDiagnostics` com amostras de tensao de parede em tipos
+  LSS puros.
+- `SaltCreepTimeBridge::wall_stress_diagnostics()` converte internamente os
+  `StressSample` do saltcreep para DTOs LSS.
+- `sigma_theta_compression_positive_Pa` e obtido por
+  `stress_utils::sigma_theta_compression_positive(sample.sigma)`.
+- A amostra de parede e o ponto de Gauss mais proximo da parede interna, sem
+  extrapolacao para `r = Ri`.
+
+**Limites deliberados:**
+- `SaltCreepInterface` e `SaltCreepResponse` nao foram alterados.
+- `LotSaltSigmaThetaBreakdown` nao foi alterado.
+- O diagnostico nao e chamado pelo CLI e nao altera `lot-sim run --mode
+  lot-pkn`.
+- `deviatoric`, `J2` e von Mises sao expostos como diagnostico, mas nao viram
+  criterio fisico validado de fratura.
+
+**Verificacao executada:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure` passou com 158/158.
+- Filtro `wall_stress|WallStress|stress_diagnostics|StressDiagnostics|
+  sigma_theta|SigmaTheta|bridge|Bridge|coupling|Coupling` passou com 37/37.
+- Filtro `LOT PKN.*identical` passou com 2/2.
 
 ---
 

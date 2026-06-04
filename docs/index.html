@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">30/37</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">153</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">31/38</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">158</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -3287,6 +3287,50 @@ em SI, e retorna pontos ordenados por tempo externo e camada interna:</p>
 controlados, comparacao futura com o legado e preparacao de criterios mais
 rigorosos quando <code>sigma_theta</code>, historicos absolutos de pressao e referencias
 geomecanicas forem disponibilizados por rotas validadas.</p>
+<h2 id="diagnostico-opt-in-de-tensao-de-parede-do-sal-fase-99b">Diagnostico opt-in de tensao de parede do sal (Fase 9.9B)</h2>
+<p>A Fase 9.9B cria <code>SaltWallStressDiagnostics</code> como DTO publico do
+<code>lot-salt-suite</code> e adiciona ao <code>SaltCreepTimeBridge</code> um metodo opt-in para
+expor diagnosticos de tensao na parede:</p>
+<pre><code class="language-text">SaltCreepTimeBridge::wall_stress_diagnostics()
+</code></pre>
+<p>Esse metodo usa internamente o estado atual do <code>TimeIntegrator</code> do
+<code>external/saltcreep</code>, em particular <code>TimeState::sigma_gp</code>, e amostra os pontos
+de Gauss mais proximos da parede interna por meio de <code>stress_sampler</code>. Os
+headers publicos do <code>lot-salt-suite</code> nao expõem <code>TimeIntegrator</code>, <code>TimeState</code>,
+<code>StressSampler</code>, <code>stress_utils</code>, <code>types.hpp</code> ou Eigen.</p>
+<p>O diagnostico retorna, para cada amostra de parede:</p>
+<ul>
+<li>identificadores de ponto de Gauss, elemento e ponto local;</li>
+<li>coordenadas <code>r_m</code>, <code>z_m</code> e <code>depth_m</code>;</li>
+<li><code>sigma_rr_Pa</code>, <code>sigma_theta_Pa</code>, <code>sigma_zz_Pa</code> e <code>sigma_rz_Pa</code>;</li>
+<li><code>sigma_theta_compression_positive_Pa</code>;</li>
+<li><code>mean_stress_Pa</code>;</li>
+<li><code>j2_Pa2</code>;</li>
+<li><code>von_mises_effective_stress_Pa</code>.</li>
+</ul>
+<p>A conversao de sinal e explicita:</p>
+<pre><code class="language-text">sigma_theta_compression_positive_Pa = -sigma_theta_Pa
+</code></pre>
+<p>Isso preserva a fronteira entre a convencao interna do <code>saltcreep</code>, onde
+compressao no vetor <code>Stress</code> aparece negativa nessa rota, e a convencao do LSS
+para diagnosticos de abertura por compressao positiva.</p>
+<p>Limites deliberados:</p>
+<ul>
+<li>a amostra de "parede" e o ponto de Gauss mais proximo da parede interna, nao
+  uma extrapolacao exata para <code>r = Ri</code>;</li>
+<li>o diagnostico nao altera <code>SaltCreepInterface</code>;</li>
+<li>o diagnostico nao altera <code>SaltCreepResponse</code>;</li>
+<li>o diagnostico nao altera <code>LotSaltSigmaThetaBreakdown</code>;</li>
+<li>o diagnostico nao e conectado automaticamente ao CLI nem ao fluxo
+  <code>lot-sim run --mode lot-pkn</code>;</li>
+<li><code>deviatoric</code>, <code>J2</code> e von Mises sao expostos como diagnostico, mas nao entram
+  no criterio experimental da Fase 9.8.</li>
+</ul>
+<p>Essa ponte prepara uma fase futura em que
+<code>sigma_theta_compression_positive_Pa</code> podera alimentar explicitamente
+<code>LotSaltSigmaThetaBreakdown</code>, mantendo o criterio <code>pressure_Pa &gt;
+sigma_theta_compression_positive_Pa</code> opt-in e nao validado como criterio fisico
+de fratura.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {
