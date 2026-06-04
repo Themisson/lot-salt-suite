@@ -484,6 +484,99 @@ Checklist minima antes de qualquer wiring runtime acoplado:
 - comparacao com legado ou referencia externa quando aplicavel;
 - documentacao atualizada antes de tornar qualquer rota default.
 
+## `BreakdownReferencedPressure` candidato futuro (Fase 9.6A)
+
+A Fase 9.6 auditou um metodo futuro para mapear LOT/PKN para a pressao de parede
+do sal usando a pressao de breakdown como referencia:
+
+```text
+p_wall = p_breakdown + (p_net_current - p_net_at_breakdown)
+```
+
+Classificacao operacional:
+
+```text
+BreakdownReferencedPressure:
+  status: candidate future method
+  implementation: not implemented
+  runtime default: no
+  physical validation: pending
+  required data: breakdown_pressure_Pa valid, p_net_at_breakdown or breakdown_step
+```
+
+A interpretacao pretendida e:
+
+- `p_breakdown` seria uma referencia absoluta de pressao no evento de abertura
+  ou fratura;
+- `p_net_current - p_net_at_breakdown` seria o incremento de pressao liquida PKN
+  apos a referencia de breakdown;
+- a formula preservaria uma referencia LOT mais direta que a soma
+  `p_hydrostatic + p_net`, desde que os dados de breakdown sejam fisicamente
+  confiaveis.
+
+O metodo ainda nao deve ser implementado como rota runtime porque os dados
+necessarios nao existem de forma robusta no projeto atual. Hoje,
+`LotConfig.breakdown_pressure_Pa` e parseado de:
+
+```text
+lot.fracture.breakdown.pressure
+```
+
+e funciona como parametro/threshold de breakdown do contrato de entrada. Ele
+nao e uma serie temporal de pressao absoluta do poco/sapata. Alem disso, no
+estado atual o PKN moderno calcula:
+
+```text
+p_net = E' * w / h
+```
+
+independentemente de `breakdown_pressure_Pa` na evolucao de
+`PknResult.net_pressure_series_Pa`.
+
+Tambem ainda nao existem em `PknResult`:
+
+- `p_net_at_breakdown`;
+- `net_pressure_at_breakdown`;
+- `breakdown_step`;
+- `breakdown_time_s`;
+- `fracture_initiation_step`.
+
+Inferir `p_net_at_breakdown` diretamente da serie atual nao e robusto. A
+formulacao PKN moderna ja propaga a partir do tempo ativo e pode usar largura
+minima ou pequenos valores numericos que nao correspondem a um evento fisico
+claro de breakdown. Uma fase futura precisa definir uma regra testavel para
+breakdown antes de usar essa referencia em mapeamento para o sal.
+
+Comparacao com o metodo hidrostatico provisiorio:
+
+| Metodo | Formula | Status | Vantagem | Fraqueza |
+|--------|---------|--------|----------|----------|
+| `HydrostaticPlusNetPressure` | `p_wall = p_hydrostatic + p_net` | `provisional approximation / opt-in only` | Usa coluna hidrostatica ja derivavel de `CaseData`. | A referencia de `p_net` e ambigua. |
+| `BreakdownReferencedPressure` | `p_wall = p_breakdown + (p_net - p_net_at_breakdown)` | Candidate future method | Usa uma referencia LOT de abertura/fratura. | Faltam `p_net_at_breakdown` e evento robusto de breakdown. |
+
+Condicao especial do BUZ67D: `cases/lot_tese_migrated/buz67d_pkn.yaml` nao deve
+ser usado como baseline fisico para `BreakdownReferencedPressure` enquanto
+mantiver `breakdown_pressure_Pa = 1 Pa` e marcacoes `R09_PENDING_REVIEW`. Esse
+valor e placeholder de contrato sintatico e invalida o caso para validar
+pressao fisica de breakdown.
+
+Opcoes futuras:
+
+- Fase futura C -- criar helper de evento de breakdown para identificar
+  `breakdown_step`, `breakdown_time_s` e `p_net_at_breakdown`, caso a serie PKN
+  possa representar esse evento de forma robusta.
+- Fase futura D -- adicionar campos explicitos ao `LotSaltPressureMapInput`,
+  como `breakdown_pressure_Pa` e `net_pressure_at_breakdown_Pa`, e implementar
+  `BreakdownReferencedPressure` apenas como metodo opt-in.
+- Fase futura com closure stress -- adiar metodo fisico rigoroso ate existirem
+  `sigma_closure`, tensao minima horizontal, pressao de poros e pressao absoluta
+  de poco.
+
+`BreakdownReferencedPressure` e especifico para LOT/PKN. Para APB futuro, os
+metodos mais adequados continuam sendo candidatos baseados em pressao anular
+absoluta por tempo e profundidade, como `AnnularPressureHistory`,
+`AbsoluteAnnularWallPressure` ou `AbsoluteWellborePressure`.
+
 ## Interface proposta para coupling/
 
 ```cpp

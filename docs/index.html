@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">27/34</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">28/35</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">146</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -648,7 +648,20 @@ area, coeficientes, taxas e acumulados negativos ou nao finitos.</p>
 <h2 id="contrato-lotpkn-sintetico-fase-62">Contrato LOT/PKN sintético (Fase 6.2)</h2>
 <p>O caminho moderno inicial usa <code>simulation.mode: lot-pkn</code>, <code>lot.model: pkn</code> e
 <code>lot.fracture.geometry: pkn</code>. O parser converte taxa de injecao, tempos,
-comprimentos e pressao de breakdown para SI antes de preencher <code>CaseData</code>.</p>
+comprimentos e pressao de breakdown para SI antes de preencher <code>CaseData</code>.
+Atualmente <code>LotConfig.breakdown_pressure_Pa</code> vem de
+<code>lot.fracture.breakdown.pressure</code> e deve ser tratado como parametro/threshold
+de breakdown do contrato de entrada. Ele nao constitui, por si so, uma serie
+temporal de pressao absoluta do poco ou da sapata.</p>
+<p>No estado atual, <code>PknRunner</code> repassa esse valor para <code>PknInput.breakdown</code>, mas
+<code>PknModel</code> calcula a serie <code>PknResult.net_pressure_series_Pa</code> pela relacao
+<code>p_net = E' * w / h</code>, independente de <code>breakdown_pressure_Pa</code> na evolucao da
+serie. Tambem nao existem em <code>PknResult</code> campos como <code>p_net_at_breakdown</code>,
+<code>net_pressure_at_breakdown</code>, <code>breakdown_step</code>, <code>breakdown_time_s</code> ou
+<code>fracture_initiation_step</code>. Inferir esses valores diretamente da serie atual
+nao e robusto, porque a formulacao PKN moderna ja propaga a partir do tempo
+ativo e pode carregar largura minima/valores numericos que nao representam um
+evento fisico claro de breakdown.</p>
 <p>Campos principais:</p>
 <table>
 <thead>
@@ -3060,6 +3073,103 @@ nomeado e testado, nao como uso implicito de <code>HydrostaticPlusNetPressure</c
 <li>comparacao com legado ou referencia externa quando aplicavel;</li>
 <li>documentacao atualizada antes de tornar qualquer rota default.</li>
 </ul>
+<h2 id="breakdownreferencedpressure-candidato-futuro-fase-96a"><code>BreakdownReferencedPressure</code> candidato futuro (Fase 9.6A)</h2>
+<p>A Fase 9.6 auditou um metodo futuro para mapear LOT/PKN para a pressao de parede
+do sal usando a pressao de breakdown como referencia:</p>
+<pre><code class="language-text">p_wall = p_breakdown + (p_net_current - p_net_at_breakdown)
+</code></pre>
+<p>Classificacao operacional:</p>
+<pre><code class="language-text">BreakdownReferencedPressure:
+  status: candidate future method
+  implementation: not implemented
+  runtime default: no
+  physical validation: pending
+  required data: breakdown_pressure_Pa valid, p_net_at_breakdown or breakdown_step
+</code></pre>
+<p>A interpretacao pretendida e:</p>
+<ul>
+<li><code>p_breakdown</code> seria uma referencia absoluta de pressao no evento de abertura
+  ou fratura;</li>
+<li><code>p_net_current - p_net_at_breakdown</code> seria o incremento de pressao liquida PKN
+  apos a referencia de breakdown;</li>
+<li>a formula preservaria uma referencia LOT mais direta que a soma
+  <code>p_hydrostatic + p_net</code>, desde que os dados de breakdown sejam fisicamente
+  confiaveis.</li>
+</ul>
+<p>O metodo ainda nao deve ser implementado como rota runtime porque os dados
+necessarios nao existem de forma robusta no projeto atual. Hoje,
+<code>LotConfig.breakdown_pressure_Pa</code> e parseado de:</p>
+<pre><code class="language-text">lot.fracture.breakdown.pressure
+</code></pre>
+<p>e funciona como parametro/threshold de breakdown do contrato de entrada. Ele
+nao e uma serie temporal de pressao absoluta do poco/sapata. Alem disso, no
+estado atual o PKN moderno calcula:</p>
+<pre><code class="language-text">p_net = E' * w / h
+</code></pre>
+<p>independentemente de <code>breakdown_pressure_Pa</code> na evolucao de
+<code>PknResult.net_pressure_series_Pa</code>.</p>
+<p>Tambem ainda nao existem em <code>PknResult</code>:</p>
+<ul>
+<li><code>p_net_at_breakdown</code>;</li>
+<li><code>net_pressure_at_breakdown</code>;</li>
+<li><code>breakdown_step</code>;</li>
+<li><code>breakdown_time_s</code>;</li>
+<li><code>fracture_initiation_step</code>.</li>
+</ul>
+<p>Inferir <code>p_net_at_breakdown</code> diretamente da serie atual nao e robusto. A
+formulacao PKN moderna ja propaga a partir do tempo ativo e pode usar largura
+minima ou pequenos valores numericos que nao correspondem a um evento fisico
+claro de breakdown. Uma fase futura precisa definir uma regra testavel para
+breakdown antes de usar essa referencia em mapeamento para o sal.</p>
+<p>Comparacao com o metodo hidrostatico provisiorio:</p>
+<table>
+<thead>
+<tr>
+<th>Metodo</th>
+<th>Formula</th>
+<th>Status</th>
+<th>Vantagem</th>
+<th>Fraqueza</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HydrostaticPlusNetPressure</code></td>
+<td><code>p_wall = p_hydrostatic + p_net</code></td>
+<td><code>provisional approximation / opt-in only</code></td>
+<td>Usa coluna hidrostatica ja derivavel de <code>CaseData</code>.</td>
+<td>A referencia de <code>p_net</code> e ambigua.</td>
+</tr>
+<tr>
+<td><code>BreakdownReferencedPressure</code></td>
+<td><code>p_wall = p_breakdown + (p_net - p_net_at_breakdown)</code></td>
+<td>Candidate future method</td>
+<td>Usa uma referencia LOT de abertura/fratura.</td>
+<td>Faltam <code>p_net_at_breakdown</code> e evento robusto de breakdown.</td>
+</tr>
+</tbody>
+</table>
+<p>Condicao especial do BUZ67D: <code>cases/lot_tese_migrated/buz67d_pkn.yaml</code> nao deve
+ser usado como baseline fisico para <code>BreakdownReferencedPressure</code> enquanto
+mantiver <code>breakdown_pressure_Pa = 1 Pa</code> e marcacoes <code>R09_PENDING_REVIEW</code>. Esse
+valor e placeholder de contrato sintatico e invalida o caso para validar
+pressao fisica de breakdown.</p>
+<p>Opcoes futuras:</p>
+<ul>
+<li>Fase futura C -- criar helper de evento de breakdown para identificar
+  <code>breakdown_step</code>, <code>breakdown_time_s</code> e <code>p_net_at_breakdown</code>, caso a serie PKN
+  possa representar esse evento de forma robusta.</li>
+<li>Fase futura D -- adicionar campos explicitos ao <code>LotSaltPressureMapInput</code>,
+  como <code>breakdown_pressure_Pa</code> e <code>net_pressure_at_breakdown_Pa</code>, e implementar
+  <code>BreakdownReferencedPressure</code> apenas como metodo opt-in.</li>
+<li>Fase futura com closure stress -- adiar metodo fisico rigoroso ate existirem
+  <code>sigma_closure</code>, tensao minima horizontal, pressao de poros e pressao absoluta
+  de poco.</li>
+</ul>
+<p><code>BreakdownReferencedPressure</code> e especifico para LOT/PKN. Para APB futuro, os
+metodos mais adequados continuam sendo candidatos baseados em pressao anular
+absoluta por tempo e profundidade, como <code>AnnularPressureHistory</code>,
+<code>AbsoluteAnnularWallPressure</code> ou <code>AbsoluteWellborePressure</code>.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

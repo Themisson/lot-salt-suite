@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 9.5A documentacao fisica implementada, aguardando revisao/commit
+Fase ativa  : 9.6A documentacao/formulacao implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
@@ -54,6 +54,57 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 9.6A — `BreakdownReferencedPressure` candidato futuro — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Documentar `BreakdownReferencedPressure` como metodo candidato
+futuro para mapeamento LOT/PKN -> sal, sem implementar codigo runtime.
+
+**Formula conceitual registrada:**
+
+```text
+p_wall = p_breakdown + (p_net_current - p_net_at_breakdown)
+```
+
+**Classificacao documental:**
+- `status: candidate future method`;
+- `implementation: not implemented`;
+- `runtime default: no`;
+- `physical validation: pending`;
+- requer `breakdown_pressure_Pa` fisicamente valido e `p_net_at_breakdown` ou
+  `breakdown_step` robusto.
+
+**Motivo para nao implementar ainda:**
+- `LotConfig.breakdown_pressure_Pa` e parseado de
+  `lot.fracture.breakdown.pressure` e hoje funciona como parametro/threshold
+  do contrato, nao como serie temporal de pressao absoluta do poco.
+- `PknModel` calcula `PknResult.net_pressure_series_Pa` por
+  `p_net = E' * w / h`, independente de `breakdown_pressure_Pa` na evolucao da
+  serie.
+- `PknResult` ainda nao expoe `p_net_at_breakdown`,
+  `net_pressure_at_breakdown`, `breakdown_step`, `breakdown_time_s` ou
+  `fracture_initiation_step`.
+- `cases/lot_tese_migrated/buz67d_pkn.yaml` contem
+  `breakdown_pressure_Pa = 1 Pa` como placeholder/R09_PENDING_REVIEW e nao pode
+  validar fisicamente esse metodo.
+
+**Documentacao atualizada:**
+- `docs/13_coupling_lot_apb_salt.md` recebeu a secao do candidato
+  `BreakdownReferencedPressure`, comparacao com `HydrostaticPlusNetPressure`,
+  condicao especial do BUZ67D, opcoes futuras e separacao conceitual de APB.
+- `docs/02_lot_formulation.md` registra o status atual de
+  `breakdown_pressure_Pa` e a ausencia de campos de breakdown em `PknResult`.
+- `tools/docs_status.yaml` registra a Fase 9.6A como concluida.
+
+**Limite deliberado:**
+- Nenhum codigo C++ foi alterado.
+- `CMakeLists.txt`, testes, YAMLs, parser, `CaseData`, `PknRunner`,
+  `PknModel`, `ResultWriter`, `apps/lot-sim.cpp`, `external/saltcreep/`,
+  `legacy/`, `legance/`, baselines e postprocess nao foram alterados.
 
 ---
 

@@ -113,6 +113,20 @@ Campos ainda fora desta fase:
 O caminho moderno inicial usa `simulation.mode: lot-pkn`, `lot.model: pkn` e
 `lot.fracture.geometry: pkn`. O parser converte taxa de injecao, tempos,
 comprimentos e pressao de breakdown para SI antes de preencher `CaseData`.
+Atualmente `LotConfig.breakdown_pressure_Pa` vem de
+`lot.fracture.breakdown.pressure` e deve ser tratado como parametro/threshold
+de breakdown do contrato de entrada. Ele nao constitui, por si so, uma serie
+temporal de pressao absoluta do poco ou da sapata.
+
+No estado atual, `PknRunner` repassa esse valor para `PknInput.breakdown`, mas
+`PknModel` calcula a serie `PknResult.net_pressure_series_Pa` pela relacao
+`p_net = E' * w / h`, independente de `breakdown_pressure_Pa` na evolucao da
+serie. Tambem nao existem em `PknResult` campos como `p_net_at_breakdown`,
+`net_pressure_at_breakdown`, `breakdown_step`, `breakdown_time_s` ou
+`fracture_initiation_step`. Inferir esses valores diretamente da serie atual
+nao e robusto, porque a formulacao PKN moderna ja propaga a partir do tempo
+ativo e pode carregar largura minima/valores numericos que nao representam um
+evento fisico claro de breakdown.
 
 Campos principais:
 
