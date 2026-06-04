@@ -1048,6 +1048,70 @@ LotSaltBridgeConfigOptions.geostatic_*:
 O fluxo `lot-sim run --mode lot-pkn` permanece desacoplado. A Fase 10.4 nao
 implementa acoplamento temporal nem acoplamento fisico validado.
 
+## Contexto litostatico opt-in para geostatica do bridge (Fase 10.6B)
+
+A Fase 10.6B cria `LotSaltLithostaticContext` como helper experimental opt-in
+em `coupling/` para derivar uma primeira estimativa litostatica isotropica a
+partir de `CaseData` ja parseado:
+
+```text
+depth_m = data.lot.shoe_depth_m
+layer = unica LayerData tal que top_m <= depth_m <= base_m
+rock = RockData referenciada por layer.rock_id
+lithostatic_pressure_Pa = rock.density_kg_m3 * g * depth_m
+geostatic_stress_Pa = -lithostatic_pressure_Pa
+```
+
+O sinal negativo em `geostatic_stress_Pa` segue a convencao da rota atual do
+`saltcreep`, na qual compressao geostatica aparece como tensao negativa nos
+campos geostaticos do bridge.
+
+O helper tambem fornece:
+
+```text
+with_lithostatic_geostatic(options, data)
+```
+
+Essa funcao retorna uma copia de `LotSaltBridgeConfigOptions` com:
+
+```text
+geostatic_enabled = true
+geostatic_radial_stress_Pa = geostatic_stress_Pa
+geostatic_hoop_stress_Pa = geostatic_stress_Pa
+geostatic_vertical_stress_Pa = geostatic_stress_Pa
+```
+
+Isso nao altera `LotSaltBridgeConfigBuilder` automaticamente e nao muda o
+default global. A geostatica litostatica so entra se o chamador invocar
+explicitamente o helper e passar as options resultantes para
+`make_lot_salt_bridge_config()`.
+
+Caveats fisicos:
+
+- a aproximacao e isotropica;
+- nao representa tensor in situ real;
+- nao inclui tectonica;
+- nao inclui pressao de poros;
+- nao e closure stress validado;
+- nao e criterio fisico final;
+- nao identifica automaticamente se a rocha e sal.
+
+Classificacao operacional:
+
+```text
+LotSaltLithostaticContext:
+  status: experimental / opt-in only
+  source: CaseData layer at lot.shoe_depth_m + RockData.density_kg_m3
+  formula: rho_rock * g * depth
+  geostatic convention: negative compression for saltcreep bridge fields
+  runtime default: no
+  CLI wiring: none
+```
+
+O fluxo `lot-sim run --mode lot-pkn` permanece desacoplado. A Fase 10.6B nao
+implementa acoplamento temporal, nao deriva geostatica automaticamente em
+runtime e nao valida fisicamente o estado de tensoes do sal.
+
 ## Interface proposta para coupling/
 
 ```cpp

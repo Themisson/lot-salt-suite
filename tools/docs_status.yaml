@@ -51,6 +51,7 @@ phases:
   phase_10_4a_bridge_config_geostatic_options: completed
   phase_10_4b_builder_bridge_driver_integration_test: completed
   phase_10_5b_sigma_theta_hoop_state: completed
+  phase_10_6b_lot_salt_lithostatic_context: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -140,7 +141,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 186        # Catch2 lot-salt-suite — Fase 10.5B passou com 186/186 em 2026-06-04
+  cpp_tests: 194        # Catch2 lot-salt-suite — 194/194 passaram na Fase 10.6B (2026-06-04)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
   python_tests: 31      # unittest saltcreep — 31/31 passaram, com 7 skips esperados (2026-06-04)
   regression_baselines: 4
@@ -149,5 +150,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-04"
-updated_by: "codex (Fase 10.5B sigma theta hoop state)"
+updated_by: "codex (Fase 10.6B contexto litostatico opt-in)"
 project_version: "0.1.0"

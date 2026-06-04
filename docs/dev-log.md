@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.5B implementada, aguardando revisao/commit
+Fase ativa  : 10.6B implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 186/186 Catch2 lot-salt-suite em 2026-06-04 apos Fase 10.5B
+Testes C++  : 194/194 passaram em 2026-06-04
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,48 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 10.6B — contexto litostatico opt-in para geostatica — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Criar um helper experimental opt-in em `coupling/` para derivar
+uma geostatica litostatica isotropica simples a partir de `CaseData`, sem
+alterar parser, `CaseData`, builder principal automaticamente ou runtime LOT.
+
+**Implementacao:**
+- Criado `include/coupling/LotSaltLithostaticContext.hpp`.
+- Criado `src/coupling/LotSaltLithostaticContext.cpp`.
+- Criado `tests/cpp/test_lot_salt_lithostatic_context.cpp`.
+- `make_lot_salt_lithostatic_context(data)` seleciona a layer que contem
+  `lot.shoe_depth_m`, resolve a rocha por `layer.rock_id`, valida
+  `rock.density_kg_m3 > 0` e calcula `rho_rock * g * depth`.
+- `with_lithostatic_geostatic(options, data)` retorna options com
+  `geostatic_enabled=true` e as tres tensoes geostaticas iguais a
+  `-lithostatic_pressure_Pa`.
+
+**Limites deliberados:**
+- A aproximacao e isotropica e nao representa tensor in situ real.
+- Nao inclui tectonica, pressao de poros, anisotropia ou closure stress.
+- Nao identifica automaticamente se a rocha e sal.
+- CLI, parser, `CaseData`, `PknRunner`, `PknModel`, `ResultWriter`,
+  `SaltCreepTimeBridge`, diagnosticos sigma-theta, pressure map, coupling
+  config builder, hydrostatic context, YAMLs, schemas, LOT/APB, sal,
+  `external/saltcreep/`, legados, baselines e postprocess nao foram alterados.
+- `lot-sim run --mode lot-pkn` permanece desacoplado.
+
+**Verificacao:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure`: 194/194 passaram.
+- Filtro `lithostatic|Lithostatic|bridge_config|BridgeConfig|sigma_theta|SigmaTheta|driver|Driver|coupling|Coupling`: 51/51 passaram.
+- Filtro `LOT PKN.*identical`: 2/2 passaram.
+- `lot-sim validate` passou para `lot_pkn_minimal.yaml`,
+  `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
+- `lot-sim run --mode lot-pkn` passou para os tres casos, gerando
+  `results/phase10_6b_minimal`, `results/phase10_6b_leakoff` e
+  `results/phase10_6b_buz67d`.
 
 ---
 

@@ -115,6 +115,7 @@ set(LSS_CORE_SOURCES
   src/coupling/LotSaltBridgeConfigBuilder.cpp
   src/coupling/LotSaltCouplingConfigBuilder.cpp
   src/coupling/LotSaltHydrostaticContext.cpp
+  src/coupling/LotSaltLithostaticContext.cpp
   src/coupling/LotSaltPressureMap.cpp
   src/coupling/LotSaltSigmaThetaBreakdown.cpp
   src/coupling/LotSaltSigmaThetaDiagnostic.cpp
@@ -170,6 +171,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_lot_salt_bridge_config_builder.cpp
     tests/cpp/test_lot_salt_coupling_config_builder.cpp
     tests/cpp/test_lot_salt_hydrostatic_context.cpp
+    tests/cpp/test_lot_salt_lithostatic_context.cpp
     tests/cpp/test_lot_salt_pressure_map.cpp
     tests/cpp/test_lot_salt_sigma_theta_breakdown.cpp
     tests/cpp/test_lot_salt_sigma_theta_diagnostic.cpp

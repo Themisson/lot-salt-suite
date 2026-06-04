@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">37/44</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">186</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">38/45</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">194</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -3558,6 +3558,54 @@ algebra legada experimental.</p>
 </code></pre>
 <p>O fluxo <code>lot-sim run --mode lot-pkn</code> permanece desacoplado. A Fase 10.4 nao
 implementa acoplamento temporal nem acoplamento fisico validado.</p>
+<h2 id="contexto-litostatico-opt-in-para-geostatica-do-bridge-fase-106b">Contexto litostatico opt-in para geostatica do bridge (Fase 10.6B)</h2>
+<p>A Fase 10.6B cria <code>LotSaltLithostaticContext</code> como helper experimental opt-in
+em <code>coupling/</code> para derivar uma primeira estimativa litostatica isotropica a
+partir de <code>CaseData</code> ja parseado:</p>
+<pre><code class="language-text">depth_m = data.lot.shoe_depth_m
+layer = unica LayerData tal que top_m &lt;= depth_m &lt;= base_m
+rock = RockData referenciada por layer.rock_id
+lithostatic_pressure_Pa = rock.density_kg_m3 * g * depth_m
+geostatic_stress_Pa = -lithostatic_pressure_Pa
+</code></pre>
+<p>O sinal negativo em <code>geostatic_stress_Pa</code> segue a convencao da rota atual do
+<code>saltcreep</code>, na qual compressao geostatica aparece como tensao negativa nos
+campos geostaticos do bridge.</p>
+<p>O helper tambem fornece:</p>
+<pre><code class="language-text">with_lithostatic_geostatic(options, data)
+</code></pre>
+<p>Essa funcao retorna uma copia de <code>LotSaltBridgeConfigOptions</code> com:</p>
+<pre><code class="language-text">geostatic_enabled = true
+geostatic_radial_stress_Pa = geostatic_stress_Pa
+geostatic_hoop_stress_Pa = geostatic_stress_Pa
+geostatic_vertical_stress_Pa = geostatic_stress_Pa
+</code></pre>
+<p>Isso nao altera <code>LotSaltBridgeConfigBuilder</code> automaticamente e nao muda o
+default global. A geostatica litostatica so entra se o chamador invocar
+explicitamente o helper e passar as options resultantes para
+<code>make_lot_salt_bridge_config()</code>.</p>
+<p>Caveats fisicos:</p>
+<ul>
+<li>a aproximacao e isotropica;</li>
+<li>nao representa tensor in situ real;</li>
+<li>nao inclui tectonica;</li>
+<li>nao inclui pressao de poros;</li>
+<li>nao e closure stress validado;</li>
+<li>nao e criterio fisico final;</li>
+<li>nao identifica automaticamente se a rocha e sal.</li>
+</ul>
+<p>Classificacao operacional:</p>
+<pre><code class="language-text">LotSaltLithostaticContext:
+  status: experimental / opt-in only
+  source: CaseData layer at lot.shoe_depth_m + RockData.density_kg_m3
+  formula: rho_rock * g * depth
+  geostatic convention: negative compression for saltcreep bridge fields
+  runtime default: no
+  CLI wiring: none
+</code></pre>
+<p>O fluxo <code>lot-sim run --mode lot-pkn</code> permanece desacoplado. A Fase 10.6B nao
+implementa acoplamento temporal, nao deriva geostatica automaticamente em
+runtime e nao valida fisicamente o estado de tensoes do sal.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {
