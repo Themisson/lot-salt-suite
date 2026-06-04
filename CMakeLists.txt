@@ -119,6 +119,7 @@ set(LSS_CORE_SOURCES
   src/coupling/LotSaltPressureMap.cpp
   src/coupling/LotSaltSigmaThetaBreakdown.cpp
   src/coupling/LotSaltSigmaThetaDiagnostic.cpp
+  src/coupling/LotSaltSigmaThetaDiagnosticWriter.cpp
   src/coupling/LotSaltSigmaThetaDriver.cpp
   src/salt/SaltCreepAdapterConfig.cpp
   src/salt/SaltCreepAdapterState.cpp
@@ -175,6 +176,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_lot_salt_pressure_map.cpp
     tests/cpp/test_lot_salt_sigma_theta_breakdown.cpp
     tests/cpp/test_lot_salt_sigma_theta_diagnostic.cpp
+    tests/cpp/test_lot_salt_sigma_theta_diagnostic_writer.cpp
     tests/cpp/test_lot_salt_sigma_theta_driver.cpp
     tests/cpp/test_lot_pkn_salt_coupling_step.cpp
     tests/cpp/test_result_writer.cpp

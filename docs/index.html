@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">40/47</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">196</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">41/48</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">202</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -3684,6 +3684,56 @@ geostatica litostatica: 21 pontos Compressive
 </code></pre>
 <p>Esses resultados sao uma caracterizacao do backend/teste atual, nao validacao
 fisica de fratura. O fluxo <code>lot-sim run --mode lot-pkn</code> permanece desacoplado.</p>
+<h2 id="writer-experimental-csvjson-sigma-theta-fase-109b">Writer experimental CSV/JSON sigma-theta (Fase 10.9B)</h2>
+<p>A Fase 10.9B adiciona um writer experimental opt-in para materializar resultados
+do <code>LotSaltSigmaThetaDriverResult</code> em arquivos tabulares rastreaveis. O writer
+vive em <code>coupling/</code> e consome resultados ja calculados pelo driver; ele nao
+chama o driver, nao avanca o bridge, nao executa <code>lot-sim</code> e nao se conecta ao
+<code>ResultWriter</code> oficial do simulador.</p>
+<p>A API escreve tres arquivos no diretorio escolhido pelo chamador:</p>
+<pre><code class="language-text">points.csv
+summary.csv
+metadata.json
+</code></pre>
+<p><code>points.csv</code> e granular por ponto diagnostico, preservando a ordem
+time-major usada pelo diagnostico sigma-theta:</p>
+<pre><code class="language-text">step_index = point_index / n_wall_samples
+sample_index = point_index % n_wall_samples
+</code></pre>
+<p>As colunas incluem identificacao do caso e cenario, indices de passo/amostra,
+metadados do ponto de Gauss, fontes de pressao e tensao, metodo de
+<code>LotSaltPressureMap</code>, pressao de parede, pressao liquida PKN, termos de
+hidrostatica/superficie/poco absoluto presentes na config, estado hoop,
+<code>sigma_theta_compression_positive_Pa</code>, margem, flags de abertura e invariantes
+de tensao (<code>mean_stress_Pa</code>, <code>j2_Pa2</code>, <code>von_mises_effective_stress_Pa</code>).</p>
+<p><code>summary.csv</code> agrega cada cenario com:</p>
+<pre><code class="language-text">n_points
+n_compressive
+n_neutral
+n_tensile
+min/max sigma_theta_compression_positive_Pa
+min/max margin_Pa
+any_opened
+any_legacy_algebra_opened
+first_open_time_s
+first_open_pressure_Pa
+first_open_layer_id
+</code></pre>
+<p><code>metadata.json</code> registra a origem experimental do artefato, <code>case_id</code>,
+<code>input_case</code>, arquivos gerados, cenarios exportados, contagens de passos/amostras
+e caveats fornecidos pelo chamador.</p>
+<p>O writer valida que:</p>
+<ul>
+<li><code>case_id</code>, <code>scenario_id</code> e <code>scenario_label</code> nao estao vazios;</li>
+<li>cada cenario tem <code>result.valid</code>, <code>diagnostic.valid</code> e <code>wall_stress.valid</code>;</li>
+<li>as series PKN de tempo e pressao liquida existem e tem o mesmo tamanho;</li>
+<li>existe pelo menos uma amostra de tensao de parede;</li>
+<li><code>diagnostic.points.size() == n_steps * n_wall_samples</code>.</li>
+</ul>
+<p>Esta saida e somente um artefato experimental de diagnostico interno. Ela nao e
+saida oficial do <code>lot-sim</code>, nao compara com <code>LOT_Tese</code>, nao cria HTML ou
+pos-processamento Python, nao valida fratura fisica e nao altera o fluxo
+<code>lot-sim run --mode lot-pkn</code>, que permanece desacoplado.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

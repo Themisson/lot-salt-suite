@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.8B implementada, aguardando revisao/commit
+Fase ativa  : 10.9B implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 196/196 passaram em 2026-06-04
+Testes C++  : 202/202 passaram em 2026-06-04
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,48 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 10.9B — writer experimental CSV/JSON sigma-theta — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Criar um writer experimental opt-in para exportar resultados de
+`LotSaltSigmaThetaDriverResult` em `points.csv`, `summary.csv` e
+`metadata.json`, sem conectar ao CLI, sem alterar `ResultWriter` e sem tornar a
+saida oficial do simulador.
+
+**Implementacao:**
+- Criada API `LotSaltSigmaThetaDiagnosticWriter` em `coupling/`.
+- O writer consome cenarios ja calculados pelo driver sigma-theta e escreve:
+  - `points.csv`, granular por ponto diagnostico em ordem time-major;
+  - `summary.csv`, agregado por cenario;
+  - `metadata.json`, com origem experimental, arquivos e caveats.
+- A validacao exige `case_id`, `scenario_id`, `scenario_label`, resultado,
+  diagnostico e tensao de parede validos, series PKN compatíveis e quantidade
+  de pontos igual a `n_steps * n_wall_samples`.
+- A fase nao altera `LotSaltSigmaThetaDriver`, `LotSaltSigmaThetaDiagnostic`,
+  `LotSaltSigmaThetaBreakdown`, `SaltCreepTimeBridge`, `ResultWriter`,
+  `apps/lot-sim.cpp`, parser, `CaseData`, YAMLs, LOT/APB, saltcreep, legados,
+  baselines ou postprocess.
+
+**Testes executados:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure`: 202/202 passaram.
+- Filtro `writer|Writer|sigma_theta|SigmaTheta|diagnostic|Diagnostic|driver|Driver|coupling|Coupling`: 46/46 passaram.
+- Filtro `LOT PKN.*identical`: 2/2 passaram.
+- `python tools/generate_docs_index.py` executado.
+- Validacoes manuais `validate` passaram para:
+  - `cases/validation/lot_pkn_minimal.yaml`
+  - `cases/validation/lot_pkn_with_leakoff.yaml`
+  - `cases/lot_tese_migrated/buz67d_pkn.yaml`
+- `run --mode lot-pkn` passou para os tres casos, com saidas em:
+  - `results/phase10_9b_minimal`
+  - `results/phase10_9b_leakoff`
+  - `results/phase10_9b_buz67d`
+
+**Resultado:** Implementado e validado localmente, aguardando revisao/commit.
 
 ---
 

@@ -1217,6 +1217,70 @@ geostatica litostatica: 21 pontos Compressive
 Esses resultados sao uma caracterizacao do backend/teste atual, nao validacao
 fisica de fratura. O fluxo `lot-sim run --mode lot-pkn` permanece desacoplado.
 
+## Writer experimental CSV/JSON sigma-theta (Fase 10.9B)
+
+A Fase 10.9B adiciona um writer experimental opt-in para materializar resultados
+do `LotSaltSigmaThetaDriverResult` em arquivos tabulares rastreaveis. O writer
+vive em `coupling/` e consome resultados ja calculados pelo driver; ele nao
+chama o driver, nao avanca o bridge, nao executa `lot-sim` e nao se conecta ao
+`ResultWriter` oficial do simulador.
+
+A API escreve tres arquivos no diretorio escolhido pelo chamador:
+
+```text
+points.csv
+summary.csv
+metadata.json
+```
+
+`points.csv` e granular por ponto diagnostico, preservando a ordem
+time-major usada pelo diagnostico sigma-theta:
+
+```text
+step_index = point_index / n_wall_samples
+sample_index = point_index % n_wall_samples
+```
+
+As colunas incluem identificacao do caso e cenario, indices de passo/amostra,
+metadados do ponto de Gauss, fontes de pressao e tensao, metodo de
+`LotSaltPressureMap`, pressao de parede, pressao liquida PKN, termos de
+hidrostatica/superficie/poco absoluto presentes na config, estado hoop,
+`sigma_theta_compression_positive_Pa`, margem, flags de abertura e invariantes
+de tensao (`mean_stress_Pa`, `j2_Pa2`, `von_mises_effective_stress_Pa`).
+
+`summary.csv` agrega cada cenario com:
+
+```text
+n_points
+n_compressive
+n_neutral
+n_tensile
+min/max sigma_theta_compression_positive_Pa
+min/max margin_Pa
+any_opened
+any_legacy_algebra_opened
+first_open_time_s
+first_open_pressure_Pa
+first_open_layer_id
+```
+
+`metadata.json` registra a origem experimental do artefato, `case_id`,
+`input_case`, arquivos gerados, cenarios exportados, contagens de passos/amostras
+e caveats fornecidos pelo chamador.
+
+O writer valida que:
+
+- `case_id`, `scenario_id` e `scenario_label` nao estao vazios;
+- cada cenario tem `result.valid`, `diagnostic.valid` e `wall_stress.valid`;
+- as series PKN de tempo e pressao liquida existem e tem o mesmo tamanho;
+- existe pelo menos uma amostra de tensao de parede;
+- `diagnostic.points.size() == n_steps * n_wall_samples`.
+
+Esta saida e somente um artefato experimental de diagnostico interno. Ela nao e
+saida oficial do `lot-sim`, nao compara com `LOT_Tese`, nao cria HTML ou
+pos-processamento Python, nao valida fratura fisica e nao altera o fluxo
+`lot-sim run --mode lot-pkn`, que permanece desacoplado.
+
 ## Interface proposta para coupling/
 
 ```cpp
