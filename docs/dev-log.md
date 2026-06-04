@@ -57,6 +57,16 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-04 07:06] `aedace9` — Themisson
+**Commit:** `docs(audit): record post-commit audit findings for Fases 8.0-8.1`
+**Testes C++:** 19 arquivos | **Testes Python:** 1 arquivos
+**Último resultado ctest:** All tests passed (176 assertions in 1 test case)
+**Arquivos alterados:**
+- `docs/index.html`
+- `tools/docs_status.yaml`
+
+---
+
 ### [2026-06-04] Fase 8.1 — Substitutibilidade LOT/PKN com adapter saltcreep ocioso — Codex
 
 **Status:** Concluido nesta sessao.
