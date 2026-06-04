@@ -57,6 +57,22 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-04 09:21] `c6c5867` — Themisson
+**Commit:** `feat(coupling): add experimental salt injection point for LOT/PKN (Fase 9.0)`
+**Testes C++:** 20 arquivos | **Testes Python:** 1 arquivos
+**Último resultado ctest:** All tests passed (6 assertions in 1 test case)
+**Arquivos alterados:**
+- `CMakeLists.txt`
+- `docs/13_coupling_lot_apb_salt.md`
+- `docs/16_saltcreep_governance.md`
+- `docs/index.html`
+- `include/coupling/LotSaltCouplingStep.hpp`
+- `src/coupling/LotSaltCouplingStep.cpp`
+- `tests/cpp/test_lot_pkn_salt_coupling_step.cpp`
+- `tools/docs_status.yaml`
+
+---
+
 ### [2026-06-04] Fase 9.0 — Ponto experimental de injecao em coupling/ — Claude Code
 
 **Status:** Concluido nesta sessao.
