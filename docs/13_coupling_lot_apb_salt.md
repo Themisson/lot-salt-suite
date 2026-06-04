@@ -324,6 +324,38 @@ inalterado. Uma fase futura deve decidir se `hydrostatic_pressure_Pa` sera
 derivada de `CaseData`, `FluidData`, `LotConfig.shoe_depth_m` ou de um contexto
 especifico do `coupling/`.
 
+## Contexto hidrostatico derivado de `CaseData` (Fase 9.3B)
+
+A Fase 9.3B cria `LotSaltHydrostaticContext` em `coupling/` como helper puro
+para derivar uma primeira pressao hidrostatica a partir de `CaseData` ja
+parseado. A regra implementada e deliberadamente conservadora:
+
+```text
+depth_m = CaseData.lot.shoe_depth_m
+annular = unico AnnularData tal que top_m <= depth_m <= base_m
+fluid = FluidData referenciado por annular.fluid_id
+hydrostatic_pressure_Pa =
+    units::hydrostatic_pressure_Pa(fluid.density_kg_m3, depth_m)
+```
+
+O helper rejeita sapata nao positiva, ausencia de anular contendo a sapata,
+mais de um anular contendo a sapata, fluido referenciado ausente e densidade
+invalida. O resultado carrega `depth_m`, `density_kg_m3`,
+`hydrostatic_pressure_Pa`, `annular_index`, `fluid_id` e uma string `source`
+descrevendo a origem dos dados.
+
+Esta fase ainda nao usa o bloco `wellbore`, porque ele existe no YAML/schema,
+mas ainda nao e persistido em `CaseData`. Tambem nao usa `surface_pressure_Pa`,
+`weight_lb_per_gal` nem `hydrostatic_depth_profile`; esses campos exigem uma
+fase propria de politica hidraulica. O helper nao esta conectado
+automaticamente ao `LotSaltPressureMap`, nao altera `evaluate_lot_salt_step()`,
+nao calcula APB e nao cria acoplamento iterativo.
+
+O caminho `lot-sim run --mode lot-pkn` permanece desacoplado do sal e
+inalterado. Uma fase futura pode usar esse contexto para preencher
+explicitamente `LotSaltCouplingConfig.hydrostatic_pressure_Pa` em uma rota de
+coupling opt-in, mantendo o runner LOT/PKN padrao preservado.
+
 ## Interface proposta para coupling/
 
 ```cpp

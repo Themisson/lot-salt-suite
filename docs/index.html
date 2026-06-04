@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">24/31</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">131</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">25/32</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">139</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2900,6 +2900,31 @@ automaticamente, e <code>CaseData</code> continua sem persistir o bloco <code>we
 inalterado. Uma fase futura deve decidir se <code>hydrostatic_pressure_Pa</code> sera
 derivada de <code>CaseData</code>, <code>FluidData</code>, <code>LotConfig.shoe_depth_m</code> ou de um contexto
 especifico do <code>coupling/</code>.</p>
+<h2 id="contexto-hidrostatico-derivado-de-casedata-fase-93b">Contexto hidrostatico derivado de <code>CaseData</code> (Fase 9.3B)</h2>
+<p>A Fase 9.3B cria <code>LotSaltHydrostaticContext</code> em <code>coupling/</code> como helper puro
+para derivar uma primeira pressao hidrostatica a partir de <code>CaseData</code> ja
+parseado. A regra implementada e deliberadamente conservadora:</p>
+<pre><code class="language-text">depth_m = CaseData.lot.shoe_depth_m
+annular = unico AnnularData tal que top_m &lt;= depth_m &lt;= base_m
+fluid = FluidData referenciado por annular.fluid_id
+hydrostatic_pressure_Pa =
+    units::hydrostatic_pressure_Pa(fluid.density_kg_m3, depth_m)
+</code></pre>
+<p>O helper rejeita sapata nao positiva, ausencia de anular contendo a sapata,
+mais de um anular contendo a sapata, fluido referenciado ausente e densidade
+invalida. O resultado carrega <code>depth_m</code>, <code>density_kg_m3</code>,
+<code>hydrostatic_pressure_Pa</code>, <code>annular_index</code>, <code>fluid_id</code> e uma string <code>source</code>
+descrevendo a origem dos dados.</p>
+<p>Esta fase ainda nao usa o bloco <code>wellbore</code>, porque ele existe no YAML/schema,
+mas ainda nao e persistido em <code>CaseData</code>. Tambem nao usa <code>surface_pressure_Pa</code>,
+<code>weight_lb_per_gal</code> nem <code>hydrostatic_depth_profile</code>; esses campos exigem uma
+fase propria de politica hidraulica. O helper nao esta conectado
+automaticamente ao <code>LotSaltPressureMap</code>, nao altera <code>evaluate_lot_salt_step()</code>,
+nao calcula APB e nao cria acoplamento iterativo.</p>
+<p>O caminho <code>lot-sim run --mode lot-pkn</code> permanece desacoplado do sal e
+inalterado. Uma fase futura pode usar esse contexto para preencher
+explicitamente <code>LotSaltCouplingConfig.hydrostatic_pressure_Pa</code> em uma rota de
+coupling opt-in, mantendo o runner LOT/PKN padrao preservado.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

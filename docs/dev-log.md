@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 9.2B implementada, aguardando revisao/commit
+Fase ativa  : 9.3B implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 131/131 Catch2 lot-salt-suite em 2026-06-04 apos Fase 9.2B
+Testes C++  : 139/139 Catch2 lot-salt-suite em 2026-06-04 apos Fase 9.3B
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,51 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 9.3B — `LotSaltHydrostaticContext` em `coupling/` — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Criar um helper puro em `coupling/` para derivar
+`hydrostatic_pressure_Pa` a partir de `CaseData` ja parseado, sem alterar parser,
+runner, YAMLs ou fluxo `lot-sim run --mode lot-pkn`.
+
+**Mudanca implementada:**
+- Criado `include/coupling/LotSaltHydrostaticContext.hpp`.
+- Criado `src/coupling/LotSaltHydrostaticContext.cpp`.
+- Criado `tests/cpp/test_lot_salt_hydrostatic_context.cpp`.
+- `CMakeLists.txt` passou a incluir o novo source e o novo teste no target
+  existente.
+
+**Regra implementada:**
+- Usa `CaseData.lot.shoe_depth_m` como profundidade.
+- Seleciona exatamente um `AnnularData` que contem a sapata.
+- Seleciona `FluidData` pelo `annular.fluid_id`.
+- Calcula `hydrostatic_pressure_Pa` com
+  `units::hydrostatic_pressure_Pa(fluid.density_kg_m3, shoe_depth_m)`.
+
+**Limite deliberado:**
+- `LotSaltPressureMap` nao foi alterado.
+- `LotSaltCouplingStep` nao foi alterado.
+- `CaseParser`, `CaseData`, `PknRunner`, `PknModel`, `ResultWriter` e
+  `apps/lot-sim.cpp` nao foram alterados.
+- O helper nao usa `wellbore`, `surface_pressure_Pa`, `weight_lb_per_gal` ou
+  `hydrostatic_depth_profile` nesta fase.
+- O helper ainda nao esta conectado automaticamente ao coupling step.
+- `lot-sim run --mode lot-pkn` segue desacoplado do sal.
+
+**Testes/builds executados:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure` passou: 139/139.
+- `ctest --test-dir build -C Debug --output-on-failure -R "hydrostatic|Hydrostatic|pressure_map|lot_salt|coupling|Coupling|units"` passou: 23/23.
+- `ctest --test-dir build -C Debug --output-on-failure -R "LOT PKN.*identical"` passou: 2/2.
+- `lot-sim validate` passou para `lot_pkn_minimal.yaml`,
+  `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
+- `lot-sim run --mode lot-pkn` passou para os tres casos, gerando saidas em
+  `results/phase9_3b_minimal`, `results/phase9_3b_leakoff` e
+  `results/phase9_3b_buz67d`.
 
 ---
 
