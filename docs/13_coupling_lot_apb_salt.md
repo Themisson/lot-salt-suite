@@ -267,6 +267,36 @@ LotSaltPressureMapResult map_lot_pkn_to_salt_wall_pressure(
 `LotSaltPressureMapResult.wall_pressure_Pa`, nao
 `PknResult.net_pressure_series_Pa` diretamente.
 
+## `LotSaltPressureMap` implementado (Fase 9.1B)
+
+A Fase 9.1B implementa `LotSaltPressureMap` como camada explicita entre
+`PknResult` e `SaltCreepQuery.wall_pressure_Pa`. A funcao
+`evaluate_lot_salt_step()` nao escreve mais `net_pressure_series_Pa`
+diretamente em `query.wall_pressure_Pa`; ela monta um
+`LotSaltPressureMapInput`, chama `map_lot_pkn_to_salt_wall_pressure()` e usa
+`LotSaltPressureMapResult.wall_pressure_Pa`.
+
+Metodos implementados:
+
+| Metodo | Formula | `physically_absolute` | Uso |
+|--------|---------|-----------------------|-----|
+| `ExperimentalNetPressureProxy` | `wall_pressure_Pa = net_pressure_Pa` | `false` | Default temporario para compatibilidade com a Fase 9.0. |
+| `AbsoluteWellborePressure` | `wall_pressure_Pa = absolute_wellbore_pressure_Pa` | `true` | Preferivel quando a pressao absoluta de poco/anular estiver disponivel. |
+| `HydrostaticPlusNetPressure` | `wall_pressure_Pa = surface_pressure_Pa + hydrostatic_pressure_Pa + net_pressure_Pa` | `true` | Aproximacao intermediaria; exige interpretacao fisica de `p_net` como incremento sobre a coluna. |
+
+O default permanece `ExperimentalNetPressureProxy` apenas para manter o
+comportamento numerico da Fase 9.0 e os testes de transicao. Ele nao deve ser
+usado como interpretacao fisica de pressao anular.
+
+`HydrostaticPlusNetPressure` recebe `hydrostatic_pressure_Pa` ja calculada. A
+Fase 9.1B nao integra ainda o calculo `rho * g * depth` a partir de fluido,
+profundidade ou estado de poco dentro do `coupling/`. Esse passo depende de
+dados hidraulicos e geomecanicos que ainda nao estao no contrato runtime.
+
+O caminho `lot-sim run --mode lot-pkn` segue desacoplado do sal: a nova camada
+apenas organiza o ponto experimental em `coupling/` e nao retroalimenta PKN, nao
+conecta APB e nao altera o runner do LOT.
+
 ## Interface proposta para coupling/
 
 ```cpp

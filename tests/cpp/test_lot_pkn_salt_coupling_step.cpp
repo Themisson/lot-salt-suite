@@ -87,8 +87,69 @@ TEST_CASE("evaluate_lot_salt_step populates query from PknResult time series") {
         pkn_run.result.time_series_s[kStep]);
   CHECK(step_result.query.wall_pressure_Pa ==
         pkn_run.result.net_pressure_series_Pa[kStep]);
+  CHECK(step_result.pressure_map.method ==
+        lss::coupling::LotSaltPressureMapMethod::ExperimentalNetPressureProxy);
+  CHECK(step_result.pressure_map.wall_pressure_Pa ==
+        pkn_run.result.net_pressure_series_Pa[kStep]);
+  CHECK(step_result.pressure_map.physically_absolute == false);
   CHECK(step_result.query.temperature_K == config.temperature_K);
   CHECK(step_result.query.radial_position_m == config.radial_position_m);
+}
+
+// ---------------------------------------------------------------------------
+// Test 3b — absolute wellbore pressure mapping ignores PKN net pressure
+// ---------------------------------------------------------------------------
+TEST_CASE("evaluate_lot_salt_step supports absolute wellbore pressure mapping") {
+  const auto data = lss::io::parse_yaml(kPknMinimalCasePath);
+  const auto pkn_run = lss::lot::run_pkn_case(data);
+  REQUIRE_FALSE(pkn_run.result.time_series_s.empty());
+
+  SpySaltCreepInterface spy;
+  lss::coupling::LotSaltCouplingConfig config;
+  config.pressure_map_method =
+      lss::coupling::LotSaltPressureMapMethod::AbsoluteWellborePressure;
+  config.absolute_wellbore_pressure_Pa = 41.0e6;
+
+  const auto step_result =
+      lss::coupling::evaluate_lot_salt_step(pkn_run.result, 0, config, spy);
+
+  CHECK(spy.call_count() == 1);
+  CHECK(step_result.query.wall_pressure_Pa == 41.0e6);
+  CHECK(step_result.pressure_map.method ==
+        lss::coupling::LotSaltPressureMapMethod::AbsoluteWellborePressure);
+  CHECK(step_result.pressure_map.wall_pressure_Pa == 41.0e6);
+  CHECK(step_result.pressure_map.physically_absolute == true);
+}
+
+// ---------------------------------------------------------------------------
+// Test 3c — hydrostatic plus net pressure mapping composes explicit terms
+// ---------------------------------------------------------------------------
+TEST_CASE("evaluate_lot_salt_step supports hydrostatic plus net pressure mapping") {
+  const auto data = lss::io::parse_yaml(kPknMinimalCasePath);
+  const auto pkn_run = lss::lot::run_pkn_case(data);
+  REQUIRE_FALSE(pkn_run.result.time_series_s.empty());
+
+  SpySaltCreepInterface spy;
+  lss::coupling::LotSaltCouplingConfig config;
+  config.pressure_map_method =
+      lss::coupling::LotSaltPressureMapMethod::HydrostaticPlusNetPressure;
+  config.surface_pressure_Pa = 2.0e6;
+  config.hydrostatic_pressure_Pa = 28.0e6;
+
+  constexpr std::size_t kStep = 0;
+  const double expected_pressure_Pa =
+      config.surface_pressure_Pa + config.hydrostatic_pressure_Pa +
+      pkn_run.result.net_pressure_series_Pa[kStep];
+
+  const auto step_result =
+      lss::coupling::evaluate_lot_salt_step(pkn_run.result, kStep, config, spy);
+
+  CHECK(spy.call_count() == 1);
+  CHECK(step_result.query.wall_pressure_Pa == expected_pressure_Pa);
+  CHECK(step_result.pressure_map.method ==
+        lss::coupling::LotSaltPressureMapMethod::HydrostaticPlusNetPressure);
+  CHECK(step_result.pressure_map.wall_pressure_Pa == expected_pressure_Pa);
+  CHECK(step_result.pressure_map.physically_absolute == true);
 }
 
 // ---------------------------------------------------------------------------

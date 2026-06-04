@@ -112,6 +112,7 @@ set(LSS_CORE_SOURCES
   src/lot/LeakoffModel.cpp
   src/lot/PknModel.cpp
   src/lot/PknRunner.cpp
+  src/coupling/LotSaltPressureMap.cpp
   src/salt/SaltCreepAdapterConfig.cpp
   src/salt/SaltCreepAdapterState.cpp
   src/salt/SaltCreepInterface.cpp
@@ -159,6 +160,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_pkn_model_synthetic.cpp
     tests/cpp/test_pkn_runner.cpp
     tests/cpp/test_lot_pkn_salt_adapter_substitutability.cpp
+    tests/cpp/test_lot_salt_pressure_map.cpp
     tests/cpp/test_lot_pkn_salt_coupling_step.cpp
     tests/cpp/test_result_writer.cpp
     tests/cpp/test_salt_creep_adapter_config.cpp

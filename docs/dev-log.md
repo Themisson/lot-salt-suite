@@ -57,6 +57,62 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-04] Fase 9.1B — `LotSaltPressureMap` explicito para LOT/PKN -> sal — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Remover o uso direto de `PknResult.net_pressure_series_Pa` como
+`SaltCreepQuery.wall_pressure_Pa` dentro de `evaluate_lot_salt_step()`,
+mantendo o comportamento default da Fase 9.0 por compatibilidade.
+
+**Mudanca implementada:**
+- Criado `include/coupling/LotSaltPressureMap.hpp`.
+- Criado `src/coupling/LotSaltPressureMap.cpp`.
+- Criado `tests/cpp/test_lot_salt_pressure_map.cpp`.
+- `LotSaltCouplingConfig` recebeu `pressure_map_method`,
+  `absolute_wellbore_pressure_Pa`, `hydrostatic_pressure_Pa`,
+  `surface_pressure_Pa` e `depth_m`.
+- `LotSaltCouplingStepResult` passou a expor `pressure_map`.
+- `evaluate_lot_salt_step()` monta `LotSaltPressureMapInput`, chama
+  `map_lot_pkn_to_salt_wall_pressure()` e usa
+  `LotSaltPressureMapResult.wall_pressure_Pa` na query do sal.
+
+**Metodos implementados:**
+- `ExperimentalNetPressureProxy`: `wall_pressure_Pa = net_pressure_Pa`,
+  `physically_absolute = false`. Default temporario para compatibilidade com
+  a Fase 9.0.
+- `AbsoluteWellborePressure`: usa `absolute_wellbore_pressure_Pa` e ignora
+  `net_pressure_Pa`, com `physically_absolute = true`.
+- `HydrostaticPlusNetPressure`: soma `surface_pressure_Pa`,
+  `hydrostatic_pressure_Pa` e `net_pressure_Pa`, com
+  `physically_absolute = true`. O calculo `rho*g*depth` ainda nao foi integrado
+  ao `coupling/`.
+
+**Escopo preservado:**
+- Nenhum arquivo em `external/saltcreep/`, `legacy/`, `legance/`,
+  `tests/baselines/`, `postprocess/`, `src/lot/`, `include/lot/`,
+  `src/apb/`, `include/apb/`, `src/io/`, `include/io/`,
+  `PknRunner`, `PknModel`, `CaseParser`, `ResultWriter` ou
+  `apps/lot-sim.cpp` foi alterado.
+- `lot-sim run --mode lot-pkn` segue desacoplado do sal.
+
+**Testes/builds executados:**
+- `cmake --build build --config Debug -j`: OK.
+- `ctest --test-dir build -C Debug --output-on-failure`: 127/127 passaram.
+- `ctest --test-dir build -C Debug --output-on-failure -R "pressure_map|lot_salt|coupling|Coupling"`:
+  8/8 passaram.
+- `ctest --test-dir build -C Debug --output-on-failure -R "PressureMap|pressure_map|lot_salt|coupling|Coupling"`:
+  12/12 passaram.
+- `ctest --test-dir build -C Debug --output-on-failure -R "LOT PKN result is identical"`:
+  1/1 passou; filtro ampliado `LOT PKN.*identical` passou 2/2.
+- `lot-sim validate` passou para `lot_pkn_minimal.yaml`,
+  `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
+- `lot-sim run --mode lot-pkn` passou para os tres casos, gerando saidas em
+  `results\phase9_1b_minimal`, `results\phase9_1b_leakoff` e
+  `results\phase9_1b_buz67d`.
+
+---
+
 ### [2026-06-04] Fase 9.1A — Formalizacao documental da pressao de parede LOT/PKN/sal — Codex
 
 **Status:** Concluido nesta sessao como fase documental/formulacional.

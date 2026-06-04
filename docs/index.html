@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">22/29</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">118</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">23/30</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">127</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2832,6 +2832,54 @@ LotSaltPressureMapResult map_lot_pkn_to_salt_wall_pressure(
 <p><code>evaluate_lot_salt_step()</code> deve ser adaptada futuramente para consumir
 <code>LotSaltPressureMapResult.wall_pressure_Pa</code>, nao
 <code>PknResult.net_pressure_series_Pa</code> diretamente.</p>
+<h2 id="lotsaltpressuremap-implementado-fase-91b"><code>LotSaltPressureMap</code> implementado (Fase 9.1B)</h2>
+<p>A Fase 9.1B implementa <code>LotSaltPressureMap</code> como camada explicita entre
+<code>PknResult</code> e <code>SaltCreepQuery.wall_pressure_Pa</code>. A funcao
+<code>evaluate_lot_salt_step()</code> nao escreve mais <code>net_pressure_series_Pa</code>
+diretamente em <code>query.wall_pressure_Pa</code>; ela monta um
+<code>LotSaltPressureMapInput</code>, chama <code>map_lot_pkn_to_salt_wall_pressure()</code> e usa
+<code>LotSaltPressureMapResult.wall_pressure_Pa</code>.</p>
+<p>Metodos implementados:</p>
+<table>
+<thead>
+<tr>
+<th>Metodo</th>
+<th>Formula</th>
+<th><code>physically_absolute</code></th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ExperimentalNetPressureProxy</code></td>
+<td><code>wall_pressure_Pa = net_pressure_Pa</code></td>
+<td><code>false</code></td>
+<td>Default temporario para compatibilidade com a Fase 9.0.</td>
+</tr>
+<tr>
+<td><code>AbsoluteWellborePressure</code></td>
+<td><code>wall_pressure_Pa = absolute_wellbore_pressure_Pa</code></td>
+<td><code>true</code></td>
+<td>Preferivel quando a pressao absoluta de poco/anular estiver disponivel.</td>
+</tr>
+<tr>
+<td><code>HydrostaticPlusNetPressure</code></td>
+<td><code>wall_pressure_Pa = surface_pressure_Pa + hydrostatic_pressure_Pa + net_pressure_Pa</code></td>
+<td><code>true</code></td>
+<td>Aproximacao intermediaria; exige interpretacao fisica de <code>p_net</code> como incremento sobre a coluna.</td>
+</tr>
+</tbody>
+</table>
+<p>O default permanece <code>ExperimentalNetPressureProxy</code> apenas para manter o
+comportamento numerico da Fase 9.0 e os testes de transicao. Ele nao deve ser
+usado como interpretacao fisica de pressao anular.</p>
+<p><code>HydrostaticPlusNetPressure</code> recebe <code>hydrostatic_pressure_Pa</code> ja calculada. A
+Fase 9.1B nao integra ainda o calculo <code>rho * g * depth</code> a partir de fluido,
+profundidade ou estado de poco dentro do <code>coupling/</code>. Esse passo depende de
+dados hidraulicos e geomecanicos que ainda nao estao no contrato runtime.</p>
+<p>O caminho <code>lot-sim run --mode lot-pkn</code> segue desacoplado do sal: a nova camada
+apenas organiza o ponto experimental em <code>coupling/</code> e nao retroalimenta PKN, nao
+conecta APB e nao altera o runner do LOT.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {
