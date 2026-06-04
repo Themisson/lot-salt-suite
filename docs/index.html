@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">25/32</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">139</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">26/33</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">146</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2925,6 +2925,33 @@ nao calcula APB e nao cria acoplamento iterativo.</p>
 inalterado. Uma fase futura pode usar esse contexto para preencher
 explicitamente <code>LotSaltCouplingConfig.hydrostatic_pressure_Pa</code> em uma rota de
 coupling opt-in, mantendo o runner LOT/PKN padrao preservado.</p>
+<h2 id="builder-opt-in-de-configuracao-hidrostatica-fase-94b">Builder opt-in de configuracao hidrostatica (Fase 9.4B)</h2>
+<p>A Fase 9.4B cria <code>LotSaltCouplingConfigBuilder</code> como helper opt-in para montar
+<code>LotSaltCouplingConfig</code> a partir de <code>LotSaltHydrostaticContext</code>, ou diretamente
+de <code>CaseData</code> via <code>make_lot_salt_hydrostatic_context(data)</code>.</p>
+<p>O builder preenche:</p>
+<pre><code class="language-text">config.hydrostatic_pressure_Pa = context.hydrostatic_pressure_Pa
+config.depth_m = context.depth_m
+config.surface_pressure_Pa = options.surface_pressure_Pa
+config.temperature_K = options.temperature_K
+config.radial_position_m = options.radial_position_m
+config.pressure_map_method = options.method
+</code></pre>
+<p>O default local do builder e
+<code>LotSaltPressureMapMethod::HydrostaticPlusNetPressure</code>, porque o helper existe
+para a rota hidrostatica opt-in. Isso nao altera o default global de
+<code>LotSaltCouplingConfig</code>, que continua
+<code>LotSaltPressureMapMethod::ExperimentalNetPressureProxy</code> para preservar o
+comportamento numerico experimental da Fase 9.0.</p>
+<p>O builder nao e chamado por <code>lot-sim</code>, nao e chamado por <code>PknRunner</code>, nao altera
+<code>CaseParser</code> nem <code>CaseData</code> e nao muda <code>evaluate_lot_salt_step()</code>. Ele apenas
+habilita um encadeamento explicito e testavel:</p>
+<pre><code class="language-text">CaseData -&gt; LotSaltHydrostaticContext -&gt; LotSaltCouplingConfig
+         -&gt; LotSaltPressureMap -&gt; evaluate_lot_salt_step()
+</code></pre>
+<p>Essa rota ainda nao e acoplamento fisico validado. <code>HydrostaticPlusNetPressure</code>
+continua exigindo a interpretacao explicita de <code>p_net</code> como incremento sobre a
+coluna hidrostatica, e nao deve virar default global sem validacao fisica.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

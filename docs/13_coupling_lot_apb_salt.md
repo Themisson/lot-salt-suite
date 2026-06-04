@@ -356,6 +356,43 @@ inalterado. Uma fase futura pode usar esse contexto para preencher
 explicitamente `LotSaltCouplingConfig.hydrostatic_pressure_Pa` em uma rota de
 coupling opt-in, mantendo o runner LOT/PKN padrao preservado.
 
+## Builder opt-in de configuracao hidrostatica (Fase 9.4B)
+
+A Fase 9.4B cria `LotSaltCouplingConfigBuilder` como helper opt-in para montar
+`LotSaltCouplingConfig` a partir de `LotSaltHydrostaticContext`, ou diretamente
+de `CaseData` via `make_lot_salt_hydrostatic_context(data)`.
+
+O builder preenche:
+
+```text
+config.hydrostatic_pressure_Pa = context.hydrostatic_pressure_Pa
+config.depth_m = context.depth_m
+config.surface_pressure_Pa = options.surface_pressure_Pa
+config.temperature_K = options.temperature_K
+config.radial_position_m = options.radial_position_m
+config.pressure_map_method = options.method
+```
+
+O default local do builder e
+`LotSaltPressureMapMethod::HydrostaticPlusNetPressure`, porque o helper existe
+para a rota hidrostatica opt-in. Isso nao altera o default global de
+`LotSaltCouplingConfig`, que continua
+`LotSaltPressureMapMethod::ExperimentalNetPressureProxy` para preservar o
+comportamento numerico experimental da Fase 9.0.
+
+O builder nao e chamado por `lot-sim`, nao e chamado por `PknRunner`, nao altera
+`CaseParser` nem `CaseData` e nao muda `evaluate_lot_salt_step()`. Ele apenas
+habilita um encadeamento explicito e testavel:
+
+```text
+CaseData -> LotSaltHydrostaticContext -> LotSaltCouplingConfig
+         -> LotSaltPressureMap -> evaluate_lot_salt_step()
+```
+
+Essa rota ainda nao e acoplamento fisico validado. `HydrostaticPlusNetPressure`
+continua exigindo a interpretacao explicita de `p_net` como incremento sobre a
+coluna hidrostatica, e nao deve virar default global sem validacao fisica.
+
 ## Interface proposta para coupling/
 
 ```cpp
