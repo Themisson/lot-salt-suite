@@ -131,6 +131,6 @@ test_counts:
 # ============================================================
 # Metadados
 # ============================================================
-last_updated: "2026-06-03"
-updated_by: "codex (Fase 8.1)"
+last_updated: "2026-06-04"
+updated_by: "claude-code (auditoria pos-commit Fases 8.0-8.1)"
 project_version: "0.1.0"

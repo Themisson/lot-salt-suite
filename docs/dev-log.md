@@ -99,13 +99,63 @@ sal.
   passou 4/4 testes controlados do backend.
 
 **Validacao manual CLI:**
-- `lot_pkn_minimal.yaml` retornou `OK` em `validate` e `run`.
-- `lot_pkn_with_leakoff.yaml` retornou `OK` em `validate` e `run`.
-- `buz67d_pkn.yaml` retornou `OK` em `validate` e `run`.
+- `cases/validation/lot_pkn_minimal.yaml` retornou `OK` em `validate` e `run`.
+- `cases/validation/lot_pkn_with_leakoff.yaml` retornou `OK` em `validate` e `run`.
+- `cases/lot_tese_migrated/buz67d_pkn.yaml` retornou `OK` em `validate` e `run`.
 - Saidas manuais geradas em:
   `results\lot_pkn_minimal_substitutability_review`,
   `results\lot_pkn_with_leakoff_substitutability_review` e
   `results\buz67d_pkn_substitutability_review`.
+
+---
+
+### [2026-06-04] Auditoria pos-commit — Fases 8.0 e 8.1 — Claude Code
+
+**Status:** Aprovado com ressalva. Correcoes documentais aplicadas.
+
+**HEAD auditado:** `fada793` (test(salt): prove structural LOT PKN isolation with idle adapter)
+**Fase 8.0:** `cb61159` (feat(salt): accept dynamic wall pressure in bridge and adapter)
+
+**Estado verificado:**
+- Working tree limpo e sincronizado com `origin/main`.
+- 112/112 Catch2 passaram. Tres casos LOT/PKN validaram e rodaram.
+- Escopo protegido preservado (sem toque em `external/saltcreep/`, `legance/`, `legacy/`,
+  `tests/baselines/`, `postprocess/`, `src/lot`, `include/lot`, `src/apb`, `include/apb`,
+  `src/io`, `include/io`).
+
+**Filtro ctest correto para os testes da Fase 8.1:**
+
+```bash
+ctest --test-dir build -C Debug --output-on-failure -R "LOT PKN result is identical"
+```
+
+O filtro `-R "substitutab"` nao encontra os testes porque os nomes dos test cases
+comecam com "LOT PKN result is identical with null salt or idle saltcreep adapter".
+
+**Ressalva — commit intermediario `cb61159` nao compila isoladamente:**
+
+O `CMakeLists.txt` do commit `cb61159` (Fase 8.0) referencia:
+
+```text
+tests/cpp/test_lot_pkn_salt_adapter_substitutability.cpp
+```
+
+antes desse arquivo existir no repositorio. O arquivo foi criado apenas no commit
+seguinte, `fada793` (Fase 8.1). Qualquer checkout ou `git bisect` que landing em
+exatamente `cb61159` resultaria em falha de build por arquivo ausente.
+
+Nao e possivel corrigir sem reescrever historico publicado (proibido pela politica
+do projeto). Mitigacao para `git bisect`:
+
+```bash
+git bisect skip cb61159
+```
+
+**Correcoes documentais aplicadas nesta entrada:**
+- Caminho de `buz67d_pkn.yaml` corrigido para `cases/lot_tese_migrated/buz67d_pkn.yaml`
+  na entrada da Fase 8.1.
+- `tools/docs_status.yaml`: `last_updated` atualizado para `2026-06-04`.
+- `docs/index.html` regenerado.
 
 ---
 
