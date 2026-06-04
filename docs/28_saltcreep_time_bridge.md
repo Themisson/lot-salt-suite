@@ -1,6 +1,6 @@
 # 28 — Bridge temporal para o TimeIntegrator do saltcreep
 
-**Status:** Implementado e consumido pelo adapter — Fases 7.8-7.9
+**Status:** Implementado e consumido pelo adapter — Fases 7.8-8.0
 **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
@@ -20,8 +20,8 @@ camada intermediaria isolada. Nao significa acoplamento LOT/PKN/APB e nao
 substitui ainda o backend minimo do `SaltCreepSaltcreepAdapter`.
 
 Na Fase 7.9, o bridge passou a ser consumido pelo
-`SaltCreepSaltcreepAdapter`. O bridge continua isolado do LOT/PKN/APB e a
-politica de pressao ainda e constante.
+`SaltCreepSaltcreepAdapter`. Na Fase 8.0, o bridge passou a aceitar pressao de
+parede dinamica por passo temporal. O bridge continua isolado do LOT/PKN/APB.
 
 ## Problema resolvido
 
@@ -102,24 +102,42 @@ Os testes cobrem:
 - avanço de tempo;
 - rejeicao de tempo decrescente;
 - configuracao SI invalida;
-- ausencia de dependencia de tipos LOT/PKN.
+- ausencia de dependencia de tipos LOT/PKN;
+- pressao de parede dinamica por passo;
+- preservacao da resposta elastica de Lame no caso degenerado de pressao
+  constante;
+- rejeicao de pressao dinamica negativa ou nao finita.
 
-## Limites da Fase 7.8
+## Pressao dinamica
 
-O bridge usa campo termico constante neutro, pressao de parede constante,
-material elastico e geostatica opcional. Como o material usado na prova e
-`ElasticIsotropic`, o `advance()` confirma a rota temporal e a manutencao do
-estado do integrador, mas nao introduz fluencia real nem dano.
+As sobrecargas:
 
-Na Fase 7.9, o `SaltCreepSaltcreepAdapter` passou a usar o bridge temporal no
-seu cache opaco. A conexao ainda usa material elastico, campo termico neutro e
-pressao de parede constante; portanto nao introduz fluencia real nem dano.
+```cpp
+advance_by(dt_s, wall_pressure_Pa)
+advance_to(target_time_s, wall_pressure_Pa)
+```
+
+atualizam a pressao de parede aplicada ao proximo incremento temporal. A
+implementacao usa um campo de pressao por degrau interno para que o
+`TimeIntegrator` veja a diferenca entre a pressao no inicio e no fim do passo.
+
+As sobrecargas antigas sem pressao continuam disponiveis e preservam a pressao
+configurada inicialmente. Portanto, pressao constante continua sendo o
+comportamento padrao e permanece coberta pelos testes de Lame.
+
+## Limites atuais
+
+O bridge usa campo termico constante neutro, material elastico e geostatica
+opcional. Como o material usado na prova e `ElasticIsotropic`, o `advance()`
+confirma a rota temporal, a manutencao do estado do integrador e a troca
+controlada de pressao, mas nao introduz fluencia real nem dano.
+
+Na Fase 8.0, o `SaltCreepSaltcreepAdapter` passa a encaminhar
+`query.wall_pressure_Pa` para o bridge. Isso aceita historico variavel vindo de
+queries manuais, mas ainda nao conecta LOT/PKN/APB ao sal.
 
 ## Proximos passos
 
-1. Mapear `SaltCreepAdapterConfig` para `SaltCreepTimeBridgeConfig`.
-2. Definir politica de pressao temporal alem de pressao constante.
-3. Decidir como expor deformacao e fechamento vindos do estado temporal.
-4. Conectar o bridge ao adapter principal atras de testes, mantendo LOT/PKN/APB
-   desacoplados.
-5. Somente depois avaliar modelos constitutivos de fluencia e dano.
+1. Decidir como expor deformacao e fechamento vindos do estado temporal.
+2. Conectar futuramente LOT/APB ao adapter por uma camada `coupling/` explicita.
+3. Somente depois avaliar modelos constitutivos de fluencia e dano.

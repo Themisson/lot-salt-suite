@@ -51,7 +51,11 @@ class SaltCreepTimeBridge {
   [[nodiscard]] SaltCreepTimeBridgeResult result() const;
 
   [[nodiscard]] SaltCreepTimeBridgeResult advance_by(double dt_s);
+  [[nodiscard]] SaltCreepTimeBridgeResult advance_by(double dt_s,
+                                                     double wall_pressure_Pa);
   [[nodiscard]] SaltCreepTimeBridgeResult advance_to(double target_time_s);
+  [[nodiscard]] SaltCreepTimeBridgeResult advance_to(double target_time_s,
+                                                     double wall_pressure_Pa);
 
  private:
   struct Impl;

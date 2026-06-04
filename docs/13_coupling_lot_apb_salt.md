@@ -178,6 +178,17 @@ bridge ao adapter principal nem ao fluxo LOT/PKN/APB.
 Na Fase 7.9, o `SaltCreepSaltcreepAdapter` passou a consumir esse bridge
 temporal internamente. Ainda assim, `lot-sim run --mode lot-pkn`, `PknModel`,
 `PknRunner`, APB e `coupling/` continuam sem instanciar o adapter de sal.
+Na Fase 8.0, o bridge e o adapter passaram a aceitar pressao de parede dinamica
+por query temporal. Isso remove a restricao artificial de pressao constante no
+adapter, mas nao implementa acoplamento LOT/APB/sal: nenhuma pressao PKN ou APB
+e encaminhada automaticamente para o sal, e `coupling/` continua planejado.
+Na Fase 8.1, foi adicionada uma prova automatizada de substitutibilidade:
+executar LOT/PKN com `NullSaltCreepInterface` presente ou com
+`SaltCreepSaltcreepAdapter` real construido, mas ocioso, gera resultados
+identicos. A comparacao cobre `PknResult`, `result.json` e `timeseries.csv` com
+igualdade exata para os casos LOT/PKN minimo e com leakoff. O adapter permanece
+sem chamadas (`backend_build_count() == 0`), confirmando que a presenca do sal
+no binario nao altera o caminho LOT/PKN nesta fase.
 
 ## Dependencia Eigen no acoplamento
 

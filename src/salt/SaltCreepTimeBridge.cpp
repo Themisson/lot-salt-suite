@@ -25,6 +25,14 @@ void require_finite(double value, const std::string& field) {
   }
 }
 
+void validate_wall_pressure(double wall_pressure_Pa) {
+  require_finite(wall_pressure_Pa, "wall_pressure_Pa");
+  if (wall_pressure_Pa < 0.0) {
+    throw std::invalid_argument(
+        "SaltCreepTimeBridge: wall_pressure_Pa must be non-negative");
+  }
+}
+
 SaltCreepTimeBridgeConfig validate_config(
     SaltCreepTimeBridgeConfig config) {
   require_finite(config.inner_radius_m, "inner_radius_m");
@@ -71,10 +79,7 @@ SaltCreepTimeBridgeConfig validate_config(
     throw std::invalid_argument(
         "SaltCreepTimeBridge: temperatures must be positive Kelvin values");
   }
-  if (config.wall_pressure_Pa < 0.0) {
-    throw std::invalid_argument(
-        "SaltCreepTimeBridge: wall_pressure_Pa must be non-negative");
-  }
+  validate_wall_pressure(config.wall_pressure_Pa);
   return config;
 }
 
@@ -107,6 +112,34 @@ double positive_closure(double wall_displacement_m) {
   return std::max(0.0, -wall_displacement_m);
 }
 
+class StepWallPressureField final : public WallPressureField {
+ public:
+  explicit StepWallPressureField(double initial_pressure_Pa)
+      : previous_pressure_Pa_(initial_pressure_Pa),
+        active_pressure_Pa_(initial_pressure_Pa) {}
+
+  void prepare_step(double switch_time_s, double next_pressure_Pa) {
+    validate_wall_pressure(next_pressure_Pa);
+    previous_pressure_Pa_ = active_pressure_Pa_;
+    active_pressure_Pa_ = next_pressure_Pa;
+    switch_time_s_ = switch_time_s;
+  }
+
+  void commit_step() {
+    previous_pressure_Pa_ = active_pressure_Pa_;
+  }
+
+  double pressure_at(const Eigen::Vector2d&, double time_s) const override {
+    return time_s <= switch_time_s_ ? previous_pressure_Pa_
+                                    : active_pressure_Pa_;
+  }
+
+ private:
+  double previous_pressure_Pa_ = 0.0;
+  double active_pressure_Pa_ = 0.0;
+  double switch_time_s_ = 0.0;
+};
+
 }  // namespace
 
 struct SaltCreepTimeBridge::Impl {
@@ -121,7 +154,7 @@ struct SaltCreepTimeBridge::Impl {
                                             config.alpha_thermal_1_K,
                                             config.reference_temperature_K)),
         wall_pressure(
-            std::make_shared<ConstantWallPressureField>(config.wall_pressure_Pa)),
+            std::make_shared<StepWallPressureField>(config.wall_pressure_Pa)),
         fixed_dofs(build_fixed_dofs(mesh, config)),
         integrator(make_integrator()) {}
 
@@ -156,17 +189,28 @@ struct SaltCreepTimeBridge::Impl {
   }
 
   SaltCreepTimeBridgeResult advance_by(double dt_s) {
+    return advance_by(dt_s, config.wall_pressure_Pa);
+  }
+
+  SaltCreepTimeBridgeResult advance_by(double dt_s, double wall_pressure_Pa) {
     require_finite(dt_s, "dt_s");
+    validate_wall_pressure(wall_pressure_Pa);
     if (dt_s < 0.0) {
       throw std::invalid_argument(
           "SaltCreepTimeBridge: dt_s must be non-negative");
     }
     if (dt_s == 0.0) {
+      wall_pressure->prepare_step(current_time_s, wall_pressure_Pa);
+      wall_pressure->commit_step();
+      config.wall_pressure_Pa = wall_pressure_Pa;
       return result();
     }
+    wall_pressure->prepare_step(current_time_s, wall_pressure_Pa);
     integrator->advance(dt_s);
     current_time_s += dt_s;
     ++step_count;
+    wall_pressure->commit_step();
+    config.wall_pressure_Pa = wall_pressure_Pa;
     return result();
   }
 
@@ -175,7 +219,7 @@ struct SaltCreepTimeBridge::Impl {
   ElasticIsotropic model;
   Mesh1D mesh;
   ProfileField thermal;
-  std::shared_ptr<ConstantWallPressureField> wall_pressure;
+  std::shared_ptr<StepWallPressureField> wall_pressure;
   std::vector<int> fixed_dofs;
   double current_time_s = 0.0;
   int step_count = 0;
@@ -212,6 +256,12 @@ SaltCreepTimeBridgeResult SaltCreepTimeBridge::advance_by(double dt_s) {
   return impl_->advance_by(dt_s);
 }
 
+SaltCreepTimeBridgeResult SaltCreepTimeBridge::advance_by(
+    double dt_s,
+    double wall_pressure_Pa) {
+  return impl_->advance_by(dt_s, wall_pressure_Pa);
+}
+
 SaltCreepTimeBridgeResult SaltCreepTimeBridge::advance_to(
     double target_time_s) {
   require_finite(target_time_s, "target_time_s");
@@ -220,6 +270,19 @@ SaltCreepTimeBridgeResult SaltCreepTimeBridge::advance_to(
         "SaltCreepTimeBridge: target_time_s must be nondecreasing");
   }
   return impl_->advance_by(target_time_s - impl_->current_time_s);
+}
+
+SaltCreepTimeBridgeResult SaltCreepTimeBridge::advance_to(
+    double target_time_s,
+    double wall_pressure_Pa) {
+  require_finite(target_time_s, "target_time_s");
+  validate_wall_pressure(wall_pressure_Pa);
+  if (target_time_s < impl_->current_time_s) {
+    throw std::invalid_argument(
+        "SaltCreepTimeBridge: target_time_s must be nondecreasing");
+  }
+  return impl_->advance_by(target_time_s - impl_->current_time_s,
+                           wall_pressure_Pa);
 }
 
 }  // namespace lss::salt

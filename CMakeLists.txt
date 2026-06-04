@@ -155,6 +155,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_leakoff_model.cpp
     tests/cpp/test_pkn_model_synthetic.cpp
     tests/cpp/test_pkn_runner.cpp
+    tests/cpp/test_lot_pkn_salt_adapter_substitutability.cpp
     tests/cpp/test_result_writer.cpp
     tests/cpp/test_salt_creep_adapter_config.cpp
     tests/cpp/test_salt_creep_adapter_state.cpp
@@ -235,6 +236,7 @@ if(LSS_BUILD_TESTS)
 
   add_executable(saltcreep_time_bridge_tests
     tests/cpp/test_salt_creep_time_bridge.cpp
+    tests/cpp/test_salt_creep_time_bridge_dynamic_pressure.cpp
   )
   target_include_directories(saltcreep_time_bridge_tests PRIVATE
     ${LSS_INCLUDE_DIR}

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <stdexcept>
 
 #include <catch2/catch_approx.hpp>
@@ -40,6 +41,12 @@ lss::salt::SaltCreepQuery bridge_query(double time_s) {
       350.0,
       kRi,
   };
+}
+
+lss::salt::SaltCreepQuery bridge_query(double time_s, double wall_pressure_Pa) {
+  auto query = bridge_query(time_s);
+  query.wall_pressure_Pa = wall_pressure_Pa;
+  return query;
 }
 
 double lame_A(double Ri, double Re, double p_inner, double p_outer) {
@@ -107,11 +114,45 @@ TEST_CASE("SaltCreepSaltcreepAdapter rejects unsupported bridge mapping config")
                   std::logic_error);
 }
 
-TEST_CASE("SaltCreepSaltcreepAdapter time bridge rejects dynamic pressure policy") {
+TEST_CASE("SaltCreepSaltcreepAdapter time bridge accepts dynamic pressure policy") {
   const lss::salt::SaltCreepSaltcreepAdapter adapter(bridge_adapter_config());
-  auto query = bridge_query(60.0);
-  query.wall_pressure_Pa = 1.1 * kPressure;
+  const auto response = adapter.evaluate_wall_response(
+      bridge_query(60.0, 1.1 * kPressure));
 
-  CHECK_THROWS_AS(adapter.evaluate_wall_response(query), std::invalid_argument);
+  CHECK(response.valid);
+  CHECK(std::isfinite(response.radial_displacement_m));
+  CHECK(adapter.backend_build_count() == 1);
+  CHECK(adapter.state().step_count() == 1);
+  CHECK(adapter.state().current_time_s() == Catch::Approx(60.0));
+  CHECK(adapter.state().last_wall_pressure_Pa() ==
+        Catch::Approx(1.1 * kPressure));
+}
+
+TEST_CASE("SaltCreepSaltcreepAdapter time bridge starts from configured initial time") {
+  auto config = bridge_adapter_config();
+  config.time.initial_time_s = 120.0;
+  config.time.total_time_s = 300.0;
+  const lss::salt::SaltCreepSaltcreepAdapter adapter(config);
+
+  CHECK(adapter.state().current_time_s() == Catch::Approx(120.0));
+  CHECK(adapter.backend_build_count() == 0);
+
+  const auto response = adapter.evaluate_wall_response(bridge_query(180.0));
+
+  CHECK(response.valid);
+  CHECK(std::isfinite(response.radial_displacement_m));
+  CHECK(adapter.backend_build_count() == 1);
+  CHECK(adapter.state().step_count() == 1);
+  CHECK(adapter.state().current_time_s() == Catch::Approx(180.0));
+}
+
+TEST_CASE("SaltCreepSaltcreepAdapter time bridge rejects invalid dynamic pressure") {
+  const lss::salt::SaltCreepSaltcreepAdapter adapter(bridge_adapter_config());
+
+  CHECK_THROWS_AS(adapter.evaluate_wall_response(bridge_query(60.0, -1.0)),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(adapter.evaluate_wall_response(
+                      bridge_query(60.0, std::numeric_limits<double>::quiet_NaN())),
+                  std::invalid_argument);
   CHECK(adapter.backend_build_count() == 0);
 }

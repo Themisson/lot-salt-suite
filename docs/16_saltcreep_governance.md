@@ -167,3 +167,17 @@ Na Fase 7.9, `SaltCreepSaltcreepAdapter` passou a usar
 `SaltCreepTimeBridge` como backend interno persistente. A integracao continua
 dentro de `src/salt/` e `include/salt/`; nenhum arquivo em
 `external/saltcreep/` foi alterado e LOT/PKN/APB permanecem desacoplados.
+
+Na Fase 8.0, `SaltCreepTimeBridge` e `SaltCreepSaltcreepAdapter` passaram a
+aceitar pressao de parede dinamica por passo/query temporal, mantendo a
+integracao dentro de `src/salt/` e `include/salt/`. Nenhum arquivo em
+`external/saltcreep/` foi alterado e nenhum modelo fisico, LOT/PKN, APB,
+parser, writer ou baseline foi modificado.
+
+Na Fase 8.1, a presenca do adapter real foi testada como substituivel por
+`NullSaltCreepInterface` no caminho LOT/PKN atual. O teste constroi
+`SaltCreepSaltcreepAdapter`, mas confirma que o backend nao e construido nem
+chamado enquanto `PknRunner` nao possuir ponto explicito de integracao com sal.
+Isso preserva a governanca: `external/saltcreep/` permanece somente leitura e
+qualquer acoplamento futuro deve entrar por fase propria, com interface
+explicita e testes dedicados.

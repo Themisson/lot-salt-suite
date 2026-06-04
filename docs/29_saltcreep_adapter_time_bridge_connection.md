@@ -1,6 +1,6 @@
 # 29 — Conexao do SaltCreepSaltcreepAdapter ao SaltCreepTimeBridge
 
-**Status:** Implementado e isolado — Fase 7.9
+**Status:** Implementado e isolado — Fases 7.9-8.0
 **Ultima atualizacao:** 2026-06-03
 
 ## Objetivo
@@ -64,19 +64,19 @@ do cache para alinhar o estado temporal interno ao estado inicial do adapter.
 
 ## Politica de pressao temporal
 
-O bridge da Fase 7.8 usa `ConstantWallPressureField` e ainda nao troca a
-pressao dinamicamente entre passos. Por isso, a Fase 7.9 adota uma politica
-deliberadamente restrita:
+Na Fase 7.9, a pressao de parede era deliberadamente constante. Na Fase 8.0, o
+adapter passou a encaminhar a pressao da query para o bridge:
 
-```text
-query.wall_pressure_Pa deve ser igual a
-config.wall_pressure.initial_wall_pressure_Pa
+```cpp
+backend().bridge.advance_to(query.time_s, query.wall_pressure_Pa)
 ```
 
-Se a query trouxer pressao diferente, `evaluate_wall_response()` lanca
-`std::invalid_argument` antes de construir o bridge. Uma fase futura deve
-introduzir campo de pressao temporal ou reconstrucao controlada antes de aceitar
-historico variavel de pressao.
+`query.wall_pressure_Pa` pode variar entre chamadas, desde que seja finito e
+nao negativo. O estado do adapter registra a ultima pressao aceita em
+`SaltCreepAdapterState`.
+
+O caso de pressao constante continua suportado: basta enviar a mesma pressao da
+configuracao inicial em todas as queries.
 
 ## Estado e resposta
 
@@ -84,9 +84,8 @@ historico variavel de pressao.
 
 1. valida a query SI;
 2. verifica suporte da configuracao;
-3. aplica a politica de pressao constante;
-4. constroi ou reutiliza o bridge;
-5. avanca o bridge ate `query.time_s`;
+3. constroi ou reutiliza o bridge;
+4. avanca o bridge ate `query.time_s` usando `query.wall_pressure_Pa`;
 6. converte o resultado para `SaltCreepResponse`;
 7. registra a resposta em `SaltCreepAdapterState`.
 
@@ -111,11 +110,37 @@ Esta fase nao altera `PknModel`, `PknRunner`, `LeakoffModel`, `ResultWriter`,
 `lot-sim run --mode lot-pkn` continua executando o caminho LOT/PKN moderno sem
 instanciar `SaltCreepSaltcreepAdapter`.
 
+## Prova de substitutibilidade LOT/PKN
+
+A Fase 8.1 adicionou
+`tests/cpp/test_lot_pkn_salt_adapter_substitutability.cpp` para provar que a
+presenca do adapter real nao altera LOT/PKN enquanto nao houver chamada fisica
+ao sal.
+
+O teste executa os casos `lot_pkn_minimal.yaml` e
+`lot_pkn_with_leakoff.yaml` em duas condicoes:
+
+1. referencia com `NullSaltCreepInterface` presente;
+2. `SaltCreepSaltcreepAdapter` real construido e disponivel, mas nao chamado.
+
+A comparacao e exata:
+
+- campos escalares de `PknResult`;
+- series de tempo, volume injetado, comprimento, largura, volume de fratura,
+  leakoff e pressao liquida;
+- `result.json` byte a byte;
+- `timeseries.csv` byte a byte.
+
+O teste tambem confirma que `backend_build_count() == 0` e
+`state().step_count() == 0` no adapter. Portanto, a fase documenta isolamento e
+substitutibilidade, nao acoplamento fisico.
+
 ## Proximos passos
 
-1. Adicionar suporte explicito a pressao de parede variavel no bridge.
-2. Revisar a semantica de `radial_strain` quando o estado temporal expuser
+1. Revisar a semantica de `radial_strain` quando o estado temporal expuser
    campo de deformacao adequado.
+2. Criar ponto explicito de integracao experimental no futuro `coupling/`, com
+   spy/contador de chamadas como requisito de teste.
 3. Mapear configs de fluencia real e dano apenas com testes dedicados.
 4. Depois disso, avaliar conexao opcional do adapter ao futuro `coupling/`,
    ainda sem tocar no caminho LOT/PKN existente.

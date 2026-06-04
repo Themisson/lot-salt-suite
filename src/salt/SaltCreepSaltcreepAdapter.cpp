@@ -75,22 +75,6 @@ SaltCreepTimeBridgeConfig make_bridge_config(
   return bridge_config;
 }
 
-bool nearly_equal(double lhs, double rhs) {
-  const double scale = std::max({1.0, std::abs(lhs), std::abs(rhs)});
-  return std::abs(lhs - rhs) <= 1.0e-12 * scale;
-}
-
-void require_constant_wall_pressure_policy(const SaltCreepAdapterConfig& config,
-                                           const SaltCreepQuery& query) {
-  if (!nearly_equal(query.wall_pressure_Pa,
-                    config.wall_pressure.initial_wall_pressure_Pa)) {
-    throw std::invalid_argument(
-        "SaltCreepSaltcreepAdapter: dynamic wall pressure is not supported by "
-        "the time bridge in this phase; query.wall_pressure_Pa must match "
-        "config.wall_pressure.initial_wall_pressure_Pa");
-  }
-}
-
 }  // namespace
 
 struct SaltCreepSaltcreepAdapter::BackendCache {
@@ -155,9 +139,8 @@ SaltCreepResponse SaltCreepSaltcreepAdapter::evaluate_wall_response(
     throw std::logic_error(
         "SaltCreepSaltcreepAdapter: time bridge is unavailable for config");
   }
-  require_constant_wall_pressure_policy(config_, query);
-
-  const auto bridge_result = backend().bridge.advance_to(query.time_s);
+  const auto bridge_result =
+      backend().bridge.advance_to(query.time_s, query.wall_pressure_Pa);
 
   SaltCreepResponse response;
   response.radial_displacement_m = bridge_result.wall_displacement_m;
