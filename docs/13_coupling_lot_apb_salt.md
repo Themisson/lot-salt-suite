@@ -1112,6 +1112,50 @@ O fluxo `lot-sim run --mode lot-pkn` permanece desacoplado. A Fase 10.6B nao
 implementa acoplamento temporal, nao deriva geostatica automaticamente em
 runtime e nao valida fisicamente o estado de tensoes do sal.
 
+## Teste integrado opt-in com geostatica litostatica (Fase 10.7)
+
+A Fase 10.7 adiciona um teste integrado end-to-end para a rota experimental
+opt-in de geostatica litostatica:
+
+```text
+CaseData
+-> with_lithostatic_geostatic(...)
+-> make_lot_salt_bridge_config(...)
+-> SaltCreepTimeBridge
+-> run_lot_salt_sigma_theta_experimental(...)
+-> LotSaltSigmaThetaDriverResult
+```
+
+O teste usa `cases/validation/lot_pkn_minimal.yaml`, aplica
+`with_lithostatic_geostatic()` sobre `LotSaltBridgeConfigOptions`, constroi o
+bridge e executa o driver sigma-theta experimental. A geostatica usada na
+configuracao do bridge segue:
+
+```text
+sigma_lithostatic = rho_rock * g * depth
+geostatic_stress = -sigma_lithostatic
+```
+
+Para o caso minimo, a verificacao esperada usa `rho_rock = 2160 kg/m3` e
+`depth = 3000 m`, resultando em aproximadamente `63.547092 MPa` de pressao
+litostatica e `-63.547092 MPa` nos tres campos geostaticos do bridge. O teste
+tambem verifica `fix_outer_wall = true`.
+
+O teste confirma que:
+
+- o resultado do driver e valido;
+- a amostragem de tensao de parede e valida;
+- o diagnostico sigma-theta e valido;
+- ha pontos diagnosticos com estado hoop rastreavel;
+- o bridge nao e avancado pelo driver (`step_count` permanece constante);
+- o `caveat` experimental permanece presente.
+
+Essa cobertura continua sendo apenas um teste de encadeamento opt-in. O driver
+ainda usa um snapshot unico de tensao, nao chama `bridge.advance_to()` ou
+`bridge.advance_by()`, nao sincroniza temporalmente LOT/PKN e sal, nao valida
+fratura fisica e nao e chamado por `lot-sim`. O fluxo
+`lot-sim run --mode lot-pkn` permanece desacoplado.
+
 ## Interface proposta para coupling/
 
 ```cpp

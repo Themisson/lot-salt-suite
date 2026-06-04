@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">38/45</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">194</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">39/46</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">195</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -3606,6 +3606,41 @@ explicitamente o helper e passar as options resultantes para
 <p>O fluxo <code>lot-sim run --mode lot-pkn</code> permanece desacoplado. A Fase 10.6B nao
 implementa acoplamento temporal, nao deriva geostatica automaticamente em
 runtime e nao valida fisicamente o estado de tensoes do sal.</p>
+<h2 id="teste-integrado-opt-in-com-geostatica-litostatica-fase-107">Teste integrado opt-in com geostatica litostatica (Fase 10.7)</h2>
+<p>A Fase 10.7 adiciona um teste integrado end-to-end para a rota experimental
+opt-in de geostatica litostatica:</p>
+<pre><code class="language-text">CaseData
+-&gt; with_lithostatic_geostatic(...)
+-&gt; make_lot_salt_bridge_config(...)
+-&gt; SaltCreepTimeBridge
+-&gt; run_lot_salt_sigma_theta_experimental(...)
+-&gt; LotSaltSigmaThetaDriverResult
+</code></pre>
+<p>O teste usa <code>cases/validation/lot_pkn_minimal.yaml</code>, aplica
+<code>with_lithostatic_geostatic()</code> sobre <code>LotSaltBridgeConfigOptions</code>, constroi o
+bridge e executa o driver sigma-theta experimental. A geostatica usada na
+configuracao do bridge segue:</p>
+<pre><code class="language-text">sigma_lithostatic = rho_rock * g * depth
+geostatic_stress = -sigma_lithostatic
+</code></pre>
+<p>Para o caso minimo, a verificacao esperada usa <code>rho_rock = 2160 kg/m3</code> e
+<code>depth = 3000 m</code>, resultando em aproximadamente <code>63.547092 MPa</code> de pressao
+litostatica e <code>-63.547092 MPa</code> nos tres campos geostaticos do bridge. O teste
+tambem verifica <code>fix_outer_wall = true</code>.</p>
+<p>O teste confirma que:</p>
+<ul>
+<li>o resultado do driver e valido;</li>
+<li>a amostragem de tensao de parede e valida;</li>
+<li>o diagnostico sigma-theta e valido;</li>
+<li>ha pontos diagnosticos com estado hoop rastreavel;</li>
+<li>o bridge nao e avancado pelo driver (<code>step_count</code> permanece constante);</li>
+<li>o <code>caveat</code> experimental permanece presente.</li>
+</ul>
+<p>Essa cobertura continua sendo apenas um teste de encadeamento opt-in. O driver
+ainda usa um snapshot unico de tensao, nao chama <code>bridge.advance_to()</code> ou
+<code>bridge.advance_by()</code>, nao sincroniza temporalmente LOT/PKN e sal, nao valida
+fratura fisica e nao e chamado por <code>lot-sim</code>. O fluxo
+<code>lot-sim run --mode lot-pkn</code> permanece desacoplado.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

@@ -4,6 +4,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "coupling/LotSaltBridgeConfigBuilder.hpp"
+#include "coupling/LotSaltLithostaticContext.hpp"
 #include "coupling/LotSaltSigmaThetaDriver.hpp"
 #include "io/CaseParser.hpp"
 #include "salt/SaltCreepTimeBridge.hpp"
@@ -203,4 +204,66 @@ TEST_CASE("LotSaltSigmaThetaDriver runs after bridge config builder with explici
         lss::coupling::classify_sigma_theta_hoop_state(
             result.wall_stress.wall_samples.front()
                 .sigma_theta_compression_positive_Pa));
+}
+
+TEST_CASE("LotSaltSigmaThetaDriver runs full chain with lithostatic geostatic options") {
+  const auto data =
+      lss::io::parse_yaml("cases/validation/lot_pkn_minimal.yaml");
+  lss::coupling::LotSaltBridgeConfigOptions bridge_options;
+  bridge_options.radial_elements = 12;
+  bridge_options =
+      lss::coupling::with_lithostatic_geostatic(bridge_options, data);
+
+  const auto bridge_config =
+      lss::coupling::make_lot_salt_bridge_config(data, bridge_options);
+  lss::salt::SaltCreepTimeBridge bridge(bridge_config);
+  const int step_count_before = bridge.result().step_count;
+
+  const auto result =
+      lss::coupling::run_lot_salt_sigma_theta_experimental(data, bridge);
+
+  const double expected_lithostatic_pressure_Pa =
+      2160.0 * units::kStandardGravity * 3000.0;
+  const double expected_geostatic_stress_Pa =
+      -expected_lithostatic_pressure_Pa;
+
+  CHECK(bridge_config.geostatic_enabled == true);
+  CHECK(bridge_config.geostatic_radial_stress_Pa ==
+        Catch::Approx(expected_geostatic_stress_Pa));
+  CHECK(bridge_config.geostatic_hoop_stress_Pa ==
+        Catch::Approx(expected_geostatic_stress_Pa));
+  CHECK(bridge_config.geostatic_vertical_stress_Pa ==
+        Catch::Approx(expected_geostatic_stress_Pa));
+  CHECK(bridge_config.geostatic_radial_stress_Pa < 0.0);
+  CHECK(bridge_config.geostatic_hoop_stress_Pa < 0.0);
+  CHECK(bridge_config.geostatic_vertical_stress_Pa < 0.0);
+  CHECK(bridge_config.fix_outer_wall == true);
+
+  CHECK(result.valid == true);
+  CHECK(result.wall_stress.valid == true);
+  CHECK(result.diagnostic.valid == true);
+  CHECK_FALSE(result.diagnostic.points.empty());
+  CHECK(bridge.result().step_count == step_count_before);
+  CHECK_FALSE(result.caveat.empty());
+
+  bool has_traceable_hoop_state = false;
+  bool has_compressive_hoop_state = false;
+  for (const auto& point : result.diagnostic.points) {
+    switch (point.breakdown.hoop_state) {
+      case lss::coupling::SigmaThetaHoopState::Compressive:
+        has_traceable_hoop_state = true;
+        has_compressive_hoop_state = true;
+        break;
+      case lss::coupling::SigmaThetaHoopState::Neutral:
+      case lss::coupling::SigmaThetaHoopState::Tensile:
+        has_traceable_hoop_state = true;
+        break;
+    }
+  }
+
+  CHECK(has_traceable_hoop_state);
+  if (!has_compressive_hoop_state) {
+    WARN("Lithostatic geostatic options produced no compressive hoop state in "
+         "this backend snapshot.");
+  }
 }

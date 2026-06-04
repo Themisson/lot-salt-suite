@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.6B implementada, aguardando revisao/commit
+Fase ativa  : 10.7 implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 194/194 passaram em 2026-06-04
+Testes C++  : 195/195 passaram em 2026-06-04
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,53 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 10.7 — teste integrado com geostatica litostatica — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Adicionar um teste integrado end-to-end para a rota opt-in:
+`CaseData -> with_lithostatic_geostatic -> make_lot_salt_bridge_config ->
+SaltCreepTimeBridge -> run_lot_salt_sigma_theta_experimental`.
+
+**Implementacao:**
+- Adicionado test case em `tests/cpp/test_lot_salt_sigma_theta_driver.cpp`.
+- O teste usa `cases/validation/lot_pkn_minimal.yaml` via parser real.
+- `with_lithostatic_geostatic()` preenche a geostatica litostatica em
+  `LotSaltBridgeConfigOptions`.
+- `make_lot_salt_bridge_config()` produz config com
+  `geostatic_enabled=true`, tensoes geostaticas negativas e
+  `fix_outer_wall=true`.
+- O driver sigma-theta experimental roda sobre o bridge sem avancar o estado
+  temporal (`step_count` preservado).
+- O teste verifica resultado valido, tensao de parede valida, diagnostico
+  valido, pontos diagnosticos nao vazios e estado hoop rastreavel.
+
+**Limites deliberados:**
+- Nenhuma nova API foi criada.
+- `LotSaltLithostaticContext`, `LotSaltBridgeConfigBuilder`,
+  `SaltCreepTimeBridge`, driver/diagnosticos sigma-theta, parser, `CaseData`,
+  CLI, LOT/APB, YAMLs, schemas, `external/saltcreep/`, legados, baselines e
+  postprocess nao foram alterados.
+- O teste permanece experimental/opt-in e nao representa validacao fisica de
+  fratura ou acoplamento temporal.
+- `lot-sim run --mode lot-pkn` permanece desacoplado.
+
+**Verificacao:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure`: 195/195 passaram.
+- Filtro `lithostatic|Lithostatic|driver|Driver|sigma_theta|SigmaTheta|bridge_config|BridgeConfig|coupling|Coupling`: 52/52 passaram.
+- Filtro `LOT PKN.*identical`: 2/2 passaram.
+- Teste isolado da Fase 10.7 confirmou `geostatic_* = -63547092 Pa`,
+  `fix_outer_wall=true`, `step_count` preservado em 0 e estado hoop
+  rastreavel; houve ao menos um estado `Compressive` no snapshot observado.
+- `lot-sim validate` passou para `lot_pkn_minimal.yaml`,
+  `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
+- `lot-sim run --mode lot-pkn` passou para os tres casos, gerando
+  `results/phase10_7_minimal`, `results/phase10_7_leakoff` e
+  `results/phase10_7_buz67d`.
 
 ---
 
