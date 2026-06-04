@@ -754,6 +754,81 @@ Essa ponte prepara uma fase futura em que
 sigma_theta_compression_positive_Pa` opt-in e nao validado como criterio fisico
 de fratura.
 
+## Diagnostico end-to-end `sigma_theta` opt-in (Fase 10.1)
+
+A Fase 10.1 cria `LotSaltSigmaThetaDiagnostic` como helper puro em
+`coupling/` para conectar, de forma experimental e opcional, os blocos ja
+existentes:
+
+```text
+PknResult
+  -> LotSaltPressureMap
+  -> SaltWallStressDiagnostics
+  -> LotSaltSigmaThetaBreakdown
+  -> diagnostico experimental por sigma_theta
+```
+
+O helper recebe explicitamente:
+
+- `PknResult`;
+- `LotSaltCouplingConfig`;
+- `SaltWallStressDiagnostics`.
+
+Para cada passo PKN, ele monta um `LotSaltPressureMapInput`, chama
+`map_lot_pkn_to_salt_wall_pressure()` e usa
+`LotSaltPressureMapResult.wall_pressure_Pa` como pressao no criterio
+experimental. Para cada amostra de parede, ele cria uma
+`SigmaThetaInfluenceLayer` com:
+
+```text
+layer_id = wall_gp_<indice>
+influence_depth_m = sample.depth_m
+sigma_theta_compression_positive_Pa =
+    sample.sigma_theta_compression_positive_Pa
+```
+
+Em seguida chama `evaluate_sigma_theta_breakdown_point()`. O resultado preserva
+metadados do mapeamento de pressao e da amostra de tensao: identificadores de
+ponto de Gauss, elemento, ponto local, coordenadas, profundidade, tensao media,
+`J2` e tensao efetiva de von Mises.
+
+Limites deliberados:
+
+- o helper nao chama `SaltCreepInterface`;
+- o helper nao chama `SaltCreepTimeBridge`;
+- o helper nao chama `SaltCreepSaltcreepAdapter`;
+- o helper nao inclui headers de `external/saltcreep/`;
+- o helper nao altera `LotSaltCouplingStep`;
+- o helper nao e chamado por `lot-sim`;
+- o fluxo `lot-sim run --mode lot-pkn` permanece desacoplado do sal.
+
+`SaltWallStressDiagnostics` e tratado como snapshot fornecido pelo chamador. A
+Fase 10.1 nao garante que esse snapshot esteja sincronizado temporalmente com
+cada passo de `PknResult`; essa sincronizacao fica sob responsabilidade do
+chamador ou de uma fase futura. Usar o mesmo snapshot para toda a serie PKN e
+uma simplificacao experimental, adequada para teste de cadeia e auditoria, mas
+nao para validacao fisica.
+
+Classificacao operacional:
+
+```text
+LotSaltSigmaThetaDiagnostic:
+  status: experimental / opt-in only
+  physical validation: not validated
+  runtime default: no
+  CLI wiring: none
+```
+
+Esse diagnostico nao e criterio fisico validado de fratura no sal. Ele apenas
+torna rastreavel a comparacao experimental:
+
+```text
+wall_pressure_Pa > sigma_theta_compression_positive_Pa
+```
+
+com a pressao vindo de `LotSaltPressureMap` e a tensao tangencial vindo do DTO
+publico de tensao de parede.
+
 ## Interface proposta para coupling/
 
 ```cpp

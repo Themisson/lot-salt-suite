@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">31/38</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">158</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">32/39</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">164</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -3331,6 +3331,65 @@ para diagnosticos de abertura por compressao positiva.</p>
 <code>LotSaltSigmaThetaBreakdown</code>, mantendo o criterio <code>pressure_Pa &gt;
 sigma_theta_compression_positive_Pa</code> opt-in e nao validado como criterio fisico
 de fratura.</p>
+<h2 id="diagnostico-end-to-end-sigma_theta-opt-in-fase-101">Diagnostico end-to-end <code>sigma_theta</code> opt-in (Fase 10.1)</h2>
+<p>A Fase 10.1 cria <code>LotSaltSigmaThetaDiagnostic</code> como helper puro em
+<code>coupling/</code> para conectar, de forma experimental e opcional, os blocos ja
+existentes:</p>
+<pre><code class="language-text">PknResult
+  -&gt; LotSaltPressureMap
+  -&gt; SaltWallStressDiagnostics
+  -&gt; LotSaltSigmaThetaBreakdown
+  -&gt; diagnostico experimental por sigma_theta
+</code></pre>
+<p>O helper recebe explicitamente:</p>
+<ul>
+<li><code>PknResult</code>;</li>
+<li><code>LotSaltCouplingConfig</code>;</li>
+<li><code>SaltWallStressDiagnostics</code>.</li>
+</ul>
+<p>Para cada passo PKN, ele monta um <code>LotSaltPressureMapInput</code>, chama
+<code>map_lot_pkn_to_salt_wall_pressure()</code> e usa
+<code>LotSaltPressureMapResult.wall_pressure_Pa</code> como pressao no criterio
+experimental. Para cada amostra de parede, ele cria uma
+<code>SigmaThetaInfluenceLayer</code> com:</p>
+<pre><code class="language-text">layer_id = wall_gp_&lt;indice&gt;
+influence_depth_m = sample.depth_m
+sigma_theta_compression_positive_Pa =
+    sample.sigma_theta_compression_positive_Pa
+</code></pre>
+<p>Em seguida chama <code>evaluate_sigma_theta_breakdown_point()</code>. O resultado preserva
+metadados do mapeamento de pressao e da amostra de tensao: identificadores de
+ponto de Gauss, elemento, ponto local, coordenadas, profundidade, tensao media,
+<code>J2</code> e tensao efetiva de von Mises.</p>
+<p>Limites deliberados:</p>
+<ul>
+<li>o helper nao chama <code>SaltCreepInterface</code>;</li>
+<li>o helper nao chama <code>SaltCreepTimeBridge</code>;</li>
+<li>o helper nao chama <code>SaltCreepSaltcreepAdapter</code>;</li>
+<li>o helper nao inclui headers de <code>external/saltcreep/</code>;</li>
+<li>o helper nao altera <code>LotSaltCouplingStep</code>;</li>
+<li>o helper nao e chamado por <code>lot-sim</code>;</li>
+<li>o fluxo <code>lot-sim run --mode lot-pkn</code> permanece desacoplado do sal.</li>
+</ul>
+<p><code>SaltWallStressDiagnostics</code> e tratado como snapshot fornecido pelo chamador. A
+Fase 10.1 nao garante que esse snapshot esteja sincronizado temporalmente com
+cada passo de <code>PknResult</code>; essa sincronizacao fica sob responsabilidade do
+chamador ou de uma fase futura. Usar o mesmo snapshot para toda a serie PKN e
+uma simplificacao experimental, adequada para teste de cadeia e auditoria, mas
+nao para validacao fisica.</p>
+<p>Classificacao operacional:</p>
+<pre><code class="language-text">LotSaltSigmaThetaDiagnostic:
+  status: experimental / opt-in only
+  physical validation: not validated
+  runtime default: no
+  CLI wiring: none
+</code></pre>
+<p>Esse diagnostico nao e criterio fisico validado de fratura no sal. Ele apenas
+torna rastreavel a comparacao experimental:</p>
+<pre><code class="language-text">wall_pressure_Pa &gt; sigma_theta_compression_positive_Pa
+</code></pre>
+<p>com a pressao vindo de <code>LotSaltPressureMap</code> e a tensao tangencial vindo do DTO
+publico de tensao de parede.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

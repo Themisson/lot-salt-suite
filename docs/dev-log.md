@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 9.9B implementada, aguardando revisao/commit
+Fase ativa  : 10.1 implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 158/158 Catch2 lot-salt-suite em 2026-06-04 apos Fase 9.9B
+Testes C++  : 164/164 Catch2 lot-salt-suite em 2026-06-04 apos Fase 10.1
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,52 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 10.1 — `LotSaltSigmaThetaDiagnostic` opt-in — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Criar um helper puro em `coupling/` para diagnostico experimental
+end-to-end por `sigma_theta`, recebendo `PknResult`, `LotSaltCouplingConfig` e
+`SaltWallStressDiagnostics`.
+
+**Implementacao:**
+- Criado `include/coupling/LotSaltSigmaThetaDiagnostic.hpp`.
+- Criado `src/coupling/LotSaltSigmaThetaDiagnostic.cpp`.
+- Criado `tests/cpp/test_lot_salt_sigma_theta_diagnostic.cpp`.
+- O helper monta `LotSaltPressureMapInput`, chama
+  `map_lot_pkn_to_salt_wall_pressure()` e usa
+  `LotSaltPressureMapResult.wall_pressure_Pa` no criterio experimental.
+- Cada `SaltWallStressSample` vira uma `SigmaThetaInfluenceLayer` deterministica
+  `wall_gp_<indice>`, preservando metadados de ponto de Gauss, elemento,
+  coordenadas, profundidade, tensao media, `J2` e von Mises no resultado.
+
+**Limites deliberados:**
+- O helper nao chama `SaltCreepInterface`.
+- O helper nao chama `SaltCreepTimeBridge`.
+- O helper nao chama `SaltCreepSaltcreepAdapter`.
+- `LotSaltCouplingStep`, `LotSaltPressureMap`,
+  `LotSaltSigmaThetaBreakdown`, `LotSaltHydrostaticContext`,
+  `LotSaltCouplingConfigBuilder`, parser, `CaseData`, LOT/APB, CLI, YAMLs,
+  `external/saltcreep/`, legados, baselines e postprocess nao foram alterados.
+- `SaltWallStressDiagnostics` e snapshot fornecido pelo chamador; a fase nao
+  garante sincronizacao temporal com cada passo PKN.
+- O diagnostico permanece experimental, opt-in e nao validado como criterio
+  fisico de fratura.
+
+**Verificacao executada:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure` passou com 164/164.
+- Filtro `sigma_theta|SigmaTheta|diagnostic|Diagnostic|wall_stress|WallStress|
+  coupling|Coupling` passou com 25/25.
+- Filtro `LOT PKN.*identical` passou com 2/2.
+- `lot-sim validate` passou para `lot_pkn_minimal.yaml`,
+  `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
+- `lot-sim run --mode lot-pkn` passou para os tres casos, gerando saidas em
+  `results/phase10_1_minimal`, `results/phase10_1_leakoff` e
+  `results/phase10_1_buz67d`.
 
 ---
 
