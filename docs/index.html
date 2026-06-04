@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">41/48</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">202</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">42/49</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -3734,6 +3734,41 @@ e caveats fornecidos pelo chamador.</p>
 saida oficial do <code>lot-sim</code>, nao compara com <code>LOT_Tese</code>, nao cria HTML ou
 pos-processamento Python, nao valida fratura fisica e nao altera o fluxo
 <code>lot-sim run --mode lot-pkn</code>, que permanece desacoplado.</p>
+<h2 id="exportacao-da-matriz-sigma-theta-de-tres-cenarios-fase-1010">Exportacao da matriz sigma-theta de tres cenarios (Fase 10.10)</h2>
+<p>A Fase 10.10 adiciona um teste integrado/exportador controlado que usa o writer
+experimental da Fase 10.9B para materializar a matriz de tres cenarios criada
+na Fase 10.8B. O teste executa a cadeia opt-in:</p>
+<pre><code class="language-text">CaseData
+-&gt; LotSaltBridgeConfigOptions
+-&gt; make_lot_salt_bridge_config(...)
+-&gt; SaltCreepTimeBridge
+-&gt; run_lot_salt_sigma_theta_experimental(...)
+-&gt; write_lot_salt_sigma_theta_diagnostics(...)
+</code></pre>
+<p>Os tres cenarios exportados sao:</p>
+<pre><code class="language-text">1. sem geostatica
+2. geostatica sintetica explicita (-2 MPa)
+3. geostatica litostatica derivada por with_lithostatic_geostatic(...)
+</code></pre>
+<p>O teste usa <code>cases/validation/lot_pkn_minimal.yaml</code>, gera arquivos apenas em
+diretorio temporario do teste e verifica:</p>
+<pre><code class="language-text">points.csv
+summary.csv
+metadata.json
+</code></pre>
+<p><code>points.csv</code> deve conter os tres <code>scenario_id</code> e estados hoop rastreaveis.
+<code>summary.csv</code> deve conter uma linha por cenario e as colunas agregadas de
+contagem (<code>n_compressive</code>, <code>n_neutral</code>, <code>n_tensile</code>). <code>metadata.json</code> registra
+<code>case_id</code>, <code>input_case</code>, arquivos gerados, cenarios exportados e caveats como:</p>
+<pre><code class="language-text">experimental opt-in
+single wall-stress snapshot
+not physically validated fracture criterion
+not LOT_Tese comparison
+</code></pre>
+<p>Essa exportacao continua sendo apenas preparacao para comparacao futura com a
+tese. Ela nao compara com <code>LOT_Tese</code>, nao cria pos-processamento Python, nao
+cria HTML, nao altera o formato do writer, nao usa <code>results/</code> de producao e nao
+conecta nada ao CLI. O fluxo <code>lot-sim run --mode lot-pkn</code> segue desacoplado.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.9B implementada, aguardando revisao/commit
+Fase ativa  : 10.10 implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 202/202 passaram em 2026-06-04
+Testes C++  : 203/203 passaram em 2026-06-04
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,55 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 10.10 — exportacao da matriz sigma-theta — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Provar que o writer experimental `LotSaltSigmaThetaDiagnosticWriter`
+consegue exportar a matriz de tres cenarios sigma-theta criada na Fase 10.8B.
+
+**Implementacao:**
+- Adicionado teste integrado em
+  `tests/cpp/test_lot_salt_sigma_theta_diagnostic_writer.cpp`.
+- O teste usa `cases/validation/lot_pkn_minimal.yaml` e constrói tres cenarios:
+  - sem geostatica;
+  - geostatica sintetica explicita com `-2 MPa`;
+  - geostatica litostatica via `with_lithostatic_geostatic(...)`.
+- Cada cenario executa `run_lot_salt_sigma_theta_experimental(...)`.
+- A matriz e exportada com `write_lot_salt_sigma_theta_diagnostics(...)` para
+  diretorio temporario do teste, gerando `points.csv`, `summary.csv` e
+  `metadata.json`.
+- O teste verifica que os tres cenarios aparecem nos tres artefatos e que a
+  contagem de linhas de `points.csv` corresponde a soma dos pontos diagnosticos
+  dos tres resultados.
+
+**Escopo preservado:**
+- Nao altera writer, driver, diagnostico, breakdown, bridge, CLI, parser,
+  `CaseData`, `ResultWriter`, LOT/APB, YAMLs, schemas, saltcreep, legados,
+  baselines ou postprocess.
+- Nao usa `results/` de producao.
+- Nao compara com `LOT_Tese`, nao cria HTML e nao chama pos-processamento
+  Python.
+
+**Testes executados:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure`: 203/203 passaram.
+- Filtro `writer|Writer|scenario|Scenario|sigma_theta|SigmaTheta|diagnostic|Diagnostic|coupling|Coupling`: 47/47 passaram.
+- Filtro `LOT PKN.*identical`: 2/2 passaram.
+- `python tools/generate_docs_index.py` executado.
+- Validacoes manuais `validate` passaram para:
+  - `cases/validation/lot_pkn_minimal.yaml`
+  - `cases/validation/lot_pkn_with_leakoff.yaml`
+  - `cases/lot_tese_migrated/buz67d_pkn.yaml`
+- `run --mode lot-pkn` passou para os tres casos, com saidas em:
+  - `results/phase10_10_minimal`
+  - `results/phase10_10_leakoff`
+  - `results/phase10_10_buz67d`
+
+**Resultado:** Implementado e validado localmente, aguardando revisao/commit.
 
 ---
 

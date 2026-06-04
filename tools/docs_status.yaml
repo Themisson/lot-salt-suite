@@ -55,6 +55,7 @@ phases:
   phase_10_7_lithostatic_geostatic_driver_integration_test: completed
   phase_10_8b_sigma_theta_internal_scenario_matrix: completed
   phase_10_9b_sigma_theta_diagnostic_writer: completed
+  phase_10_10_sigma_theta_scenario_matrix_export: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -144,7 +145,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 202        # Catch2 lot-salt-suite — 202/202 passaram na Fase 10.9B (2026-06-04)
+  cpp_tests: 203        # Catch2 lot-salt-suite — 203/203 passaram na Fase 10.10 (2026-06-04)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
   python_tests: 31      # unittest saltcreep — 31/31 passaram, com 7 skips esperados (2026-06-04)
   regression_baselines: 4
@@ -153,5 +154,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-04"
-updated_by: "codex (Fase 10.9B writer experimental sigma-theta)"
+updated_by: "codex (Fase 10.10 exportacao matriz sigma-theta)"
 project_version: "0.1.0"

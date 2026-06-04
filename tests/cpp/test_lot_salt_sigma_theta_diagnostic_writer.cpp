@@ -10,7 +10,12 @@
 #include <utility>
 #include <vector>
 
+#include "coupling/LotSaltBridgeConfigBuilder.hpp"
+#include "coupling/LotSaltLithostaticContext.hpp"
+#include "coupling/LotSaltSigmaThetaDriver.hpp"
 #include "coupling/LotSaltSigmaThetaDiagnosticWriter.hpp"
+#include "io/CaseParser.hpp"
+#include "salt/SaltCreepTimeBridge.hpp"
 
 namespace {
 
@@ -129,6 +134,15 @@ lss::coupling::LotSaltSigmaThetaExportScenario make_scenario(
   scenario.scenario_label = std::move(label);
   scenario.result = make_driver_result();
   return scenario;
+}
+
+lss::coupling::LotSaltSigmaThetaDriverResult run_driver_scenario(
+    const lss::core::CaseData& data,
+    const lss::coupling::LotSaltBridgeConfigOptions& bridge_options) {
+  const auto bridge_config =
+      lss::coupling::make_lot_salt_bridge_config(data, bridge_options);
+  lss::salt::SaltCreepTimeBridge bridge(bridge_config);
+  return lss::coupling::run_lot_salt_sigma_theta_experimental(data, bridge);
 }
 
 }  // namespace
@@ -250,6 +264,133 @@ TEST_CASE("LotSaltSigmaThetaDiagnosticWriter supports multiple scenarios",
   CHECK(points.find("\"lithostatic\"") != std::string::npos);
   CHECK(metadata.find("\"id\": \"no_geostatic\"") != std::string::npos);
   CHECK(metadata.find("\"id\": \"lithostatic\"") != std::string::npos);
+}
+
+TEST_CASE("LotSaltSigmaThetaDiagnosticWriter exports confinement scenario matrix",
+          "[coupling][sigma_theta][writer][scenario]") {
+  const auto data =
+      lss::io::parse_yaml("cases/validation/lot_pkn_minimal.yaml");
+
+  lss::coupling::LotSaltBridgeConfigOptions no_geostatic_options;
+  no_geostatic_options.radial_elements = 12;
+  no_geostatic_options.geostatic_enabled = false;
+  const auto no_geostatic_result =
+      run_driver_scenario(data, no_geostatic_options);
+
+  lss::coupling::LotSaltBridgeConfigOptions synthetic_options;
+  synthetic_options.radial_elements = 12;
+  synthetic_options.geostatic_enabled = true;
+  synthetic_options.geostatic_radial_stress_Pa = -2.0e6;
+  synthetic_options.geostatic_hoop_stress_Pa = -2.0e6;
+  synthetic_options.geostatic_vertical_stress_Pa = -2.0e6;
+  const auto synthetic_result = run_driver_scenario(data, synthetic_options);
+
+  lss::coupling::LotSaltBridgeConfigOptions lithostatic_options;
+  lithostatic_options.radial_elements = 12;
+  lithostatic_options =
+      lss::coupling::with_lithostatic_geostatic(lithostatic_options, data);
+  const auto lithostatic_result =
+      run_driver_scenario(data, lithostatic_options);
+
+  REQUIRE(no_geostatic_result.valid);
+  REQUIRE(synthetic_result.valid);
+  REQUIRE(lithostatic_result.valid);
+
+  lss::coupling::LotSaltSigmaThetaExportOptions export_options;
+  export_options.case_id = "lot_pkn_minimal";
+  export_options.input_case = "cases/validation/lot_pkn_minimal.yaml";
+  export_options.output_dir = temp_output_dir("scenario_matrix");
+  export_options.caveats = {
+      "experimental opt-in",
+      "single wall-stress snapshot",
+      "not physically validated fracture criterion",
+      "not LOT_Tese comparison",
+  };
+
+  const std::vector<lss::coupling::LotSaltSigmaThetaExportScenario> scenarios =
+      {
+          {"no_geostatic", "Sem geostatica", no_geostatic_result},
+          {"synthetic_geostatic", "Geostatica sintetica -2 MPa",
+           synthetic_result},
+          {"lithostatic_geostatic", "Geostatica litostatica derivada",
+           lithostatic_result},
+      };
+
+  const auto exported =
+      lss::coupling::write_lot_salt_sigma_theta_diagnostics(export_options,
+                                                            scenarios);
+
+  CHECK(exported.valid);
+  CHECK(std::filesystem::exists(exported.points_csv));
+  CHECK(std::filesystem::exists(exported.summary_csv));
+  CHECK(std::filesystem::exists(exported.metadata_json));
+
+  const std::string points = read_file(exported.points_csv);
+  const std::string summary = read_file(exported.summary_csv);
+  const std::string metadata = read_file(exported.metadata_json);
+
+  const std::size_t expected_points =
+      no_geostatic_result.diagnostic.points.size() +
+      synthetic_result.diagnostic.points.size() +
+      lithostatic_result.diagnostic.points.size();
+  CHECK(line_count(points) == expected_points + 1);
+
+  CHECK(points.find("\"no_geostatic\"") != std::string::npos);
+  CHECK(points.find("\"synthetic_geostatic\"") != std::string::npos);
+  CHECK(points.find("\"lithostatic_geostatic\"") != std::string::npos);
+  CHECK(points.find("\"compressive\"") != std::string::npos);
+  CHECK(points.find("\"tensile\"") != std::string::npos);
+
+  CHECK(line_count(summary) == scenarios.size() + 1);
+  CHECK(summary.find("\"no_geostatic\"") != std::string::npos);
+  CHECK(summary.find("\"synthetic_geostatic\"") != std::string::npos);
+  CHECK(summary.find("\"lithostatic_geostatic\"") != std::string::npos);
+  CHECK(summary.find("n_compressive,n_neutral,n_tensile") !=
+        std::string::npos);
+
+  if(summary.find("\"no_geostatic\"") != std::string::npos &&
+     summary.find("\"lithostatic_geostatic\"") != std::string::npos) {
+    CHECK(no_geostatic_result.diagnostic.points.size() > 0);
+    CHECK(lithostatic_result.diagnostic.points.size() > 0);
+  }
+
+  bool no_geostatic_has_tensile = false;
+  for(const auto& point : no_geostatic_result.diagnostic.points) {
+    no_geostatic_has_tensile =
+        no_geostatic_has_tensile ||
+        point.breakdown.hoop_state ==
+            lss::coupling::SigmaThetaHoopState::Tensile;
+  }
+  bool lithostatic_has_compressive = false;
+  for(const auto& point : lithostatic_result.diagnostic.points) {
+    lithostatic_has_compressive =
+        lithostatic_has_compressive ||
+        point.breakdown.hoop_state ==
+            lss::coupling::SigmaThetaHoopState::Compressive;
+  }
+  if(!no_geostatic_has_tensile) {
+    WARN("No-geostatic sigma-theta snapshot produced no tensile points.");
+  }
+  if(!lithostatic_has_compressive) {
+    WARN("Lithostatic sigma-theta snapshot produced no compressive points.");
+  }
+
+  CHECK(metadata.find("\"case_id\": \"lot_pkn_minimal\"") !=
+        std::string::npos);
+  CHECK(metadata.find("\"input_case\": "
+                      "\"cases/validation/lot_pkn_minimal.yaml\"") !=
+        std::string::npos);
+  CHECK(metadata.find("\"points_csv\": \"points.csv\"") !=
+        std::string::npos);
+  CHECK(metadata.find("\"summary_csv\": \"summary.csv\"") !=
+        std::string::npos);
+  CHECK(metadata.find("\"id\": \"no_geostatic\"") != std::string::npos);
+  CHECK(metadata.find("\"id\": \"synthetic_geostatic\"") !=
+        std::string::npos);
+  CHECK(metadata.find("\"id\": \"lithostatic_geostatic\"") !=
+        std::string::npos);
+  CHECK(metadata.find("\"experimental opt-in\"") != std::string::npos);
+  CHECK(metadata.find("\"not LOT_Tese comparison\"") != std::string::npos);
 }
 
 TEST_CASE("LotSaltSigmaThetaDiagnosticWriter rejects invalid inputs",

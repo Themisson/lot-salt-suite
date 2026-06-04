@@ -1281,6 +1281,55 @@ saida oficial do `lot-sim`, nao compara com `LOT_Tese`, nao cria HTML ou
 pos-processamento Python, nao valida fratura fisica e nao altera o fluxo
 `lot-sim run --mode lot-pkn`, que permanece desacoplado.
 
+## Exportacao da matriz sigma-theta de tres cenarios (Fase 10.10)
+
+A Fase 10.10 adiciona um teste integrado/exportador controlado que usa o writer
+experimental da Fase 10.9B para materializar a matriz de tres cenarios criada
+na Fase 10.8B. O teste executa a cadeia opt-in:
+
+```text
+CaseData
+-> LotSaltBridgeConfigOptions
+-> make_lot_salt_bridge_config(...)
+-> SaltCreepTimeBridge
+-> run_lot_salt_sigma_theta_experimental(...)
+-> write_lot_salt_sigma_theta_diagnostics(...)
+```
+
+Os tres cenarios exportados sao:
+
+```text
+1. sem geostatica
+2. geostatica sintetica explicita (-2 MPa)
+3. geostatica litostatica derivada por with_lithostatic_geostatic(...)
+```
+
+O teste usa `cases/validation/lot_pkn_minimal.yaml`, gera arquivos apenas em
+diretorio temporario do teste e verifica:
+
+```text
+points.csv
+summary.csv
+metadata.json
+```
+
+`points.csv` deve conter os tres `scenario_id` e estados hoop rastreaveis.
+`summary.csv` deve conter uma linha por cenario e as colunas agregadas de
+contagem (`n_compressive`, `n_neutral`, `n_tensile`). `metadata.json` registra
+`case_id`, `input_case`, arquivos gerados, cenarios exportados e caveats como:
+
+```text
+experimental opt-in
+single wall-stress snapshot
+not physically validated fracture criterion
+not LOT_Tese comparison
+```
+
+Essa exportacao continua sendo apenas preparacao para comparacao futura com a
+tese. Ela nao compara com `LOT_Tese`, nao cria pos-processamento Python, nao
+cria HTML, nao altera o formato do writer, nao usa `results/` de producao e nao
+conecta nada ao CLI. O fluxo `lot-sim run --mode lot-pkn` segue desacoplado.
+
 ## Interface proposta para coupling/
 
 ```cpp
