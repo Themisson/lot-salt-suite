@@ -1156,6 +1156,67 @@ ainda usa um snapshot unico de tensao, nao chama `bridge.advance_to()` ou
 fratura fisica e nao e chamado por `lot-sim`. O fluxo
 `lot-sim run --mode lot-pkn` permanece desacoplado.
 
+## Matriz interna de cenarios sigma-theta (Fase 10.8B)
+
+A Fase 10.8B adiciona uma matriz interna de teste para comparar, no mesmo
+`CaseData`, tres cenarios experimentais de confinamento usados pelo diagnostico
+sigma-theta:
+
+```text
+1. sem geostatica
+2. geostatica sintetica explicita
+3. geostatica litostatica derivada
+```
+
+A matriz usa `cases/validation/lot_pkn_minimal.yaml` e executa a mesma cadeia
+experimental opt-in de driver em cada cenario:
+
+```text
+CaseData
+-> LotSaltBridgeConfigOptions
+-> make_lot_salt_bridge_config(...)
+-> SaltCreepTimeBridge
+-> run_lot_salt_sigma_theta_experimental(...)
+```
+
+No cenario sem geostatica, `geostatic_enabled=false`. No cenario sintetico, os
+tres campos geostaticos sao definidos explicitamente como `-2 MPa`. No cenario
+litostatico, `with_lithostatic_geostatic(...)` calcula a tensao geostatica a
+partir de:
+
+```text
+geostatic_stress = -rho_rock * g * depth
+```
+
+Para cada cenario, a matriz calcula apenas metricas locais ao teste:
+
+```text
+compressive_count
+neutral_count
+tensile_count
+min/max sigma_theta_compression_positive_Pa
+min/max margin_Pa
+any_opened
+any_legacy_algebra_opened
+```
+
+O objetivo e comparar comportamento diagnostico interno, nao produzir saida de
+analise. A Fase 10.8B nao cria exportador CSV/JSON, nao cria pos-processamento,
+nao compara com `LOT_Tese`, nao altera o driver, nao avanca o bridge e nao
+implementa acoplamento temporal. O diagnostico continua usando snapshot unico
+de tensao de parede.
+
+No snapshot atual do backend para o caso minimo, a matriz observou:
+
+```text
+sem geostatica: 21 pontos Tensile
+geostatica sintetica -2 MPa: sem pontos Compressive
+geostatica litostatica: 21 pontos Compressive
+```
+
+Esses resultados sao uma caracterizacao do backend/teste atual, nao validacao
+fisica de fratura. O fluxo `lot-sim run --mode lot-pkn` permanece desacoplado.
+
 ## Interface proposta para coupling/
 
 ```cpp

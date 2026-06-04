@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">39/46</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">195</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">40/47</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">196</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -3641,6 +3641,49 @@ ainda usa um snapshot unico de tensao, nao chama <code>bridge.advance_to()</code
 <code>bridge.advance_by()</code>, nao sincroniza temporalmente LOT/PKN e sal, nao valida
 fratura fisica e nao e chamado por <code>lot-sim</code>. O fluxo
 <code>lot-sim run --mode lot-pkn</code> permanece desacoplado.</p>
+<h2 id="matriz-interna-de-cenarios-sigma-theta-fase-108b">Matriz interna de cenarios sigma-theta (Fase 10.8B)</h2>
+<p>A Fase 10.8B adiciona uma matriz interna de teste para comparar, no mesmo
+<code>CaseData</code>, tres cenarios experimentais de confinamento usados pelo diagnostico
+sigma-theta:</p>
+<pre><code class="language-text">1. sem geostatica
+2. geostatica sintetica explicita
+3. geostatica litostatica derivada
+</code></pre>
+<p>A matriz usa <code>cases/validation/lot_pkn_minimal.yaml</code> e executa a mesma cadeia
+experimental opt-in de driver em cada cenario:</p>
+<pre><code class="language-text">CaseData
+-&gt; LotSaltBridgeConfigOptions
+-&gt; make_lot_salt_bridge_config(...)
+-&gt; SaltCreepTimeBridge
+-&gt; run_lot_salt_sigma_theta_experimental(...)
+</code></pre>
+<p>No cenario sem geostatica, <code>geostatic_enabled=false</code>. No cenario sintetico, os
+tres campos geostaticos sao definidos explicitamente como <code>-2 MPa</code>. No cenario
+litostatico, <code>with_lithostatic_geostatic(...)</code> calcula a tensao geostatica a
+partir de:</p>
+<pre><code class="language-text">geostatic_stress = -rho_rock * g * depth
+</code></pre>
+<p>Para cada cenario, a matriz calcula apenas metricas locais ao teste:</p>
+<pre><code class="language-text">compressive_count
+neutral_count
+tensile_count
+min/max sigma_theta_compression_positive_Pa
+min/max margin_Pa
+any_opened
+any_legacy_algebra_opened
+</code></pre>
+<p>O objetivo e comparar comportamento diagnostico interno, nao produzir saida de
+analise. A Fase 10.8B nao cria exportador CSV/JSON, nao cria pos-processamento,
+nao compara com <code>LOT_Tese</code>, nao altera o driver, nao avanca o bridge e nao
+implementa acoplamento temporal. O diagnostico continua usando snapshot unico
+de tensao de parede.</p>
+<p>No snapshot atual do backend para o caso minimo, a matriz observou:</p>
+<pre><code class="language-text">sem geostatica: 21 pontos Tensile
+geostatica sintetica -2 MPa: sem pontos Compressive
+geostatica litostatica: 21 pontos Compressive
+</code></pre>
+<p>Esses resultados sao uma caracterizacao do backend/teste atual, nao validacao
+fisica de fratura. O fluxo <code>lot-sim run --mode lot-pkn</code> permanece desacoplado.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

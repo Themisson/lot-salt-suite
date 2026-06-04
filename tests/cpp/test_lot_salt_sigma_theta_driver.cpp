@@ -1,3 +1,5 @@
+#include <cmath>
+#include <limits>
 #include <string>
 
 #include <catch2/catch_approx.hpp>
@@ -84,6 +86,80 @@ lss::salt::SaltCreepTimeBridge make_bridge() {
   config.geostatic_hoop_stress_Pa = -2.0e6;
   config.geostatic_vertical_stress_Pa = -2.0e6;
   return lss::salt::SaltCreepTimeBridge(config);
+}
+
+struct ScenarioSummary {
+  std::size_t compressive_count = 0;
+  std::size_t neutral_count = 0;
+  std::size_t tensile_count = 0;
+
+  double min_sigma_theta_compression_positive_Pa =
+      std::numeric_limits<double>::infinity();
+  double max_sigma_theta_compression_positive_Pa =
+      -std::numeric_limits<double>::infinity();
+
+  double min_margin_Pa = std::numeric_limits<double>::infinity();
+  double max_margin_Pa = -std::numeric_limits<double>::infinity();
+
+  bool any_opened = false;
+  bool any_legacy_algebra_opened = false;
+};
+
+ScenarioSummary summarize_sigma_theta_scenario(
+    const lss::coupling::LotSaltSigmaThetaDriverResult& result) {
+  ScenarioSummary summary;
+  summary.any_opened = result.diagnostic.any_opened;
+
+  for (const auto& point : result.diagnostic.points) {
+    switch (point.breakdown.hoop_state) {
+      case lss::coupling::SigmaThetaHoopState::Compressive:
+        ++summary.compressive_count;
+        break;
+      case lss::coupling::SigmaThetaHoopState::Neutral:
+        ++summary.neutral_count;
+        break;
+      case lss::coupling::SigmaThetaHoopState::Tensile:
+        ++summary.tensile_count;
+        break;
+    }
+
+    summary.min_sigma_theta_compression_positive_Pa =
+        std::min(summary.min_sigma_theta_compression_positive_Pa,
+                 point.breakdown.sigma_theta_compression_positive_Pa);
+    summary.max_sigma_theta_compression_positive_Pa =
+        std::max(summary.max_sigma_theta_compression_positive_Pa,
+                 point.breakdown.sigma_theta_compression_positive_Pa);
+    summary.min_margin_Pa =
+        std::min(summary.min_margin_Pa, point.breakdown.margin_Pa);
+    summary.max_margin_Pa =
+        std::max(summary.max_margin_Pa, point.breakdown.margin_Pa);
+    summary.any_legacy_algebra_opened =
+        summary.any_legacy_algebra_opened ||
+        point.breakdown.legacy_algebra_opened;
+  }
+
+  return summary;
+}
+
+void check_valid_scenario_result(
+    const lss::coupling::LotSaltSigmaThetaDriverResult& result,
+    const ScenarioSummary& summary,
+    int step_count_before,
+    const lss::salt::SaltCreepTimeBridge& bridge) {
+  CHECK(result.valid == true);
+  CHECK(result.wall_stress.valid == true);
+  CHECK(result.diagnostic.valid == true);
+  REQUIRE_FALSE(result.diagnostic.points.empty());
+  CHECK(bridge.result().step_count == step_count_before);
+
+  const auto state_count = summary.compressive_count + summary.neutral_count +
+                           summary.tensile_count;
+  CHECK(state_count == result.diagnostic.points.size());
+  CHECK(std::isfinite(summary.min_sigma_theta_compression_positive_Pa));
+  CHECK(std::isfinite(summary.max_sigma_theta_compression_positive_Pa));
+  CHECK(std::isfinite(summary.min_margin_Pa));
+  CHECK(std::isfinite(summary.max_margin_Pa));
+  CHECK(summary.any_opened == result.diagnostic.any_opened);
 }
 
 }  // namespace
@@ -266,4 +342,75 @@ TEST_CASE("LotSaltSigmaThetaDriver runs full chain with lithostatic geostatic op
     WARN("Lithostatic geostatic options produced no compressive hoop state in "
          "this backend snapshot.");
   }
+}
+
+TEST_CASE("LotSaltSigmaThetaDriver compares sigma theta confinement scenarios") {
+  const auto data =
+      lss::io::parse_yaml("cases/validation/lot_pkn_minimal.yaml");
+
+  lss::coupling::LotSaltBridgeConfigOptions no_geostatic_options;
+  no_geostatic_options.radial_elements = 12;
+  no_geostatic_options.geostatic_enabled = false;
+  const auto no_geostatic_config =
+      lss::coupling::make_lot_salt_bridge_config(data, no_geostatic_options);
+  lss::salt::SaltCreepTimeBridge no_geostatic_bridge(no_geostatic_config);
+  const int no_geostatic_step_count =
+      no_geostatic_bridge.result().step_count;
+  const auto no_geostatic_result =
+      lss::coupling::run_lot_salt_sigma_theta_experimental(
+          data, no_geostatic_bridge);
+  const auto no_geostatic_summary =
+      summarize_sigma_theta_scenario(no_geostatic_result);
+
+  lss::coupling::LotSaltBridgeConfigOptions synthetic_options;
+  synthetic_options.radial_elements = 12;
+  synthetic_options.geostatic_enabled = true;
+  synthetic_options.geostatic_radial_stress_Pa = -2.0e6;
+  synthetic_options.geostatic_hoop_stress_Pa = -2.0e6;
+  synthetic_options.geostatic_vertical_stress_Pa = -2.0e6;
+  const auto synthetic_config =
+      lss::coupling::make_lot_salt_bridge_config(data, synthetic_options);
+  lss::salt::SaltCreepTimeBridge synthetic_bridge(synthetic_config);
+  const int synthetic_step_count = synthetic_bridge.result().step_count;
+  const auto synthetic_result =
+      lss::coupling::run_lot_salt_sigma_theta_experimental(
+          data, synthetic_bridge);
+  const auto synthetic_summary =
+      summarize_sigma_theta_scenario(synthetic_result);
+
+  lss::coupling::LotSaltBridgeConfigOptions lithostatic_options;
+  lithostatic_options.radial_elements = 12;
+  lithostatic_options =
+      lss::coupling::with_lithostatic_geostatic(lithostatic_options, data);
+  const auto lithostatic_config =
+      lss::coupling::make_lot_salt_bridge_config(data, lithostatic_options);
+  lss::salt::SaltCreepTimeBridge lithostatic_bridge(lithostatic_config);
+  const int lithostatic_step_count = lithostatic_bridge.result().step_count;
+  const auto lithostatic_result =
+      lss::coupling::run_lot_salt_sigma_theta_experimental(
+          data, lithostatic_bridge);
+  const auto lithostatic_summary =
+      summarize_sigma_theta_scenario(lithostatic_result);
+
+  check_valid_scenario_result(no_geostatic_result, no_geostatic_summary,
+                              no_geostatic_step_count, no_geostatic_bridge);
+  check_valid_scenario_result(synthetic_result, synthetic_summary,
+                              synthetic_step_count, synthetic_bridge);
+  check_valid_scenario_result(lithostatic_result, lithostatic_summary,
+                              lithostatic_step_count, lithostatic_bridge);
+
+  CHECK(no_geostatic_config.geostatic_enabled == false);
+  CHECK(no_geostatic_config.fix_outer_wall == false);
+  CHECK(synthetic_config.geostatic_enabled == true);
+  CHECK(synthetic_config.geostatic_hoop_stress_Pa == Catch::Approx(-2.0e6));
+  CHECK(synthetic_config.fix_outer_wall == true);
+  CHECK(lithostatic_config.geostatic_enabled == true);
+  CHECK(lithostatic_config.geostatic_hoop_stress_Pa < 0.0);
+  CHECK(lithostatic_config.fix_outer_wall == true);
+
+  CHECK(no_geostatic_summary.tensile_count > 0);
+  CHECK(lithostatic_summary.compressive_count > 0);
+  CHECK(lithostatic_summary.compressive_count >=
+        synthetic_summary.compressive_count);
+  CHECK(no_geostatic_summary.tensile_count != lithostatic_summary.tensile_count);
 }

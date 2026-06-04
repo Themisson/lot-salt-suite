@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.7 implementada, aguardando revisao/commit
+Fase ativa  : 10.8B implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 195/195 passaram em 2026-06-04
+Testes C++  : 196/196 passaram em 2026-06-04
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -57,9 +57,66 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
-### [2026-06-04] Fase 10.7 — teste integrado com geostatica litostatica — Codex
+### [2026-06-04] Fase 10.8B — matriz interna de cenarios sigma-theta — Codex
 
 **Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Criar uma matriz interna controlada para comparar o diagnostico
+sigma-theta em tres cenarios de confinamento, sem envolver `LOT_Tese`, sem
+exportador CSV/JSON e sem alterar runtime.
+
+**Implementacao:**
+- Adicionado test case em `tests/cpp/test_lot_salt_sigma_theta_driver.cpp`.
+- A matriz usa `cases/validation/lot_pkn_minimal.yaml` via parser real.
+- Os tres cenarios comparados sao:
+  - sem geostatica;
+  - geostatica sintetica explicita com `geostatic_* = -2 MPa`;
+  - geostatica litostatica via `with_lithostatic_geostatic(...)`.
+- Helpers locais ao teste calculam `compressive_count`, `neutral_count`,
+  `tensile_count`, min/max de
+  `sigma_theta_compression_positive_Pa`, min/max de `margin_Pa`,
+  `any_opened` e `any_legacy_algebra_opened`.
+- Cada cenario verifica resultado valido, tensao de parede valida,
+  diagnostico valido, pontos nao vazios, summary finito e `step_count`
+  preservado.
+
+**Observacao do snapshot atual:**
+- Sem geostatica: 21 pontos `Tensile`.
+- Geostatica sintetica `-2 MPa`: sem pontos `Compressive`.
+- Geostatica litostatica: 21 pontos `Compressive`.
+
+**Limites deliberados:**
+- Nenhuma API publica foi criada.
+- Nao houve alteracao em `LotSaltSigmaThetaDriver`,
+  `LotSaltSigmaThetaDiagnostic`, `LotSaltSigmaThetaBreakdown`,
+  `LotSaltBridgeConfigBuilder`, `LotSaltLithostaticContext`,
+  `SaltCreepTimeBridge`, parser, `CaseData`, CLI, LOT/APB, YAMLs, schemas,
+  `external/saltcreep/`, legados, baselines ou postprocess.
+- A matriz permanece experimental/opt-in, usa snapshot unico e nao e
+  validacao fisica de fratura.
+- `lot-sim run --mode lot-pkn` permanece desacoplado.
+
+**Verificacao:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure`: 196/196 passaram.
+- Filtro `scenario|Scenario|lithostatic|Lithostatic|driver|Driver|sigma_theta|SigmaTheta|coupling|Coupling`: 42/42 passaram.
+- Filtro `LOT PKN.*identical`: 2/2 passaram.
+- Teste isolado da matriz confirmou:
+  - sem geostatica: 21 pontos `Tensile`;
+  - geostatica sintetica `-2 MPa`: 0 pontos `Compressive`;
+  - geostatica litostatica: 21 pontos `Compressive`;
+  - todos os cenarios preservaram `step_count = 0`.
+- `lot-sim validate` passou para `lot_pkn_minimal.yaml`,
+  `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
+- `lot-sim run --mode lot-pkn` passou para os tres casos, gerando
+  `results/phase10_8b_minimal`, `results/phase10_8b_leakoff` e
+  `results/phase10_8b_buz67d`.
+
+---
+
+### [2026-06-04] Fase 10.7 — teste integrado com geostatica litostatica — Codex
+
+**Status:** Concluido e publicado em `bff4f14`.
 
 **Objetivo:** Adicionar um teste integrado end-to-end para a rota opt-in:
 `CaseData -> with_lithostatic_geostatic -> make_lot_salt_bridge_config ->
