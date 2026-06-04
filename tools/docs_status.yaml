@@ -47,6 +47,7 @@ phases:
   phase_9_9b_salt_wall_stress_diagnostics: completed
   phase_10_1_lot_salt_sigma_theta_diagnostic: completed
   phase_10_2b_lot_salt_sigma_theta_driver: completed
+  phase_10_3_lot_salt_bridge_config_builder: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -136,7 +137,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 167        # Catch2 lot-salt-suite — Fase 10.2B adicionou LotSaltSigmaThetaDriver
+  cpp_tests: 175        # Catch2 lot-salt-suite — Fase 10.3 adicionou LotSaltBridgeConfigBuilder
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
   python_tests: 31      # unittest saltcreep — 31/31 passaram, com 7 skips esperados (2026-06-04)
   regression_baselines: 4
@@ -145,5 +146,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-04"
-updated_by: "codex (Fase 10.2B LotSaltSigmaThetaDriver)"
+updated_by: "codex (Fase 10.3 LotSaltBridgeConfigBuilder)"
 project_version: "0.1.0"

@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">33/40</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">167</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">34/41</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">175</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -3439,6 +3439,49 @@ validado, dano, fluencia terciaria ou criterio constitutivo avancado.</p>
   runtime default: no
   CLI wiring: none
 </code></pre>
+<h2 id="builder-experimental-de-config-do-bridge-fase-103">Builder experimental de config do bridge (Fase 10.3)</h2>
+<p>A Fase 10.3 cria <code>LotSaltBridgeConfigBuilder</code> como helper experimental opt-in
+para montar um <code>SaltCreepTimeBridgeConfig</code> a partir de <code>CaseData</code> e de opcoes
+explicitas do chamador:</p>
+<pre><code class="language-text">CaseData + LotSaltBridgeConfigOptions -&gt; SaltCreepTimeBridgeConfig
+</code></pre>
+<p>O helper nao constroi <code>SaltCreepTimeBridge</code> e nao avanca o bridge. Ele apenas
+prepara uma configuracao rastreavel para testes e fases futuras.</p>
+<p>Regras implementadas:</p>
+<ul>
+<li>a profundidade de referencia e <code>data.lot.shoe_depth_m</code>;</li>
+<li>a layer usada e a unica que contem a sapata;</li>
+<li>a rocha vem de <code>layer.rock_id</code>;</li>
+<li><code>elastic_modulus_Pa</code> e <code>poisson_ratio</code> vêm da rocha selecionada;</li>
+<li><code>inner_radius_m</code>, <code>outer_radius_m</code> e <code>radial_elements</code> vêm de
+  <code>LotSaltBridgeConfigOptions</code>;</li>
+<li><code>height_m = data.lot.fracture_height_m</code>;</li>
+<li><code>wall_pressure_Pa</code> inicial vem de <code>LotSaltHydrostaticContext</code>;</li>
+<li><code>temperature_K</code> vem de options;</li>
+<li>geostatica nao e inferida de <code>CaseData</code>.</li>
+</ul>
+<p><code>height_m = lot.fracture_height_m</code> e uma aproximacao experimental: altura PKN
+ou altura de fratura nao e necessariamente a altura fisica do dominio salino.
+A escolha foi feita apenas para remover hardcode dos testes e preparar uma
+ponte rastreavel para a proxima fase.</p>
+<p>Se <code>geostatic_enabled=true</code> for solicitado nas options, o helper rejeita a
+configuracao nesta fase, porque <code>CaseData</code> ainda nao fornece tensoes
+geostaticas completas e as options ainda nao carregam esses campos. O helper
+tambem nao usa perfil termico de <code>CaseData</code>; a temperatura permanece explicita
+em options ate existir persistencia termica apropriada.</p>
+<p>Classificacao operacional:</p>
+<pre><code class="language-text">LotSaltBridgeConfigBuilder:
+  status: experimental / opt-in only
+  output: SaltCreepTimeBridgeConfig
+  builds bridge: no
+  advances bridge: no
+  geostatic inference: no
+  runtime default: no
+  CLI wiring: none
+</code></pre>
+<p>O fluxo <code>lot-sim run --mode lot-pkn</code> permanece desacoplado. A Fase 10.3 nao
+implementa driver temporal, acoplamento fisico validado, dano, fluencia
+terciaria nem criterio constitutivo avancado.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

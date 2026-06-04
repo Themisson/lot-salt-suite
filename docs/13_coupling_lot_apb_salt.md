@@ -887,6 +887,60 @@ LotSaltSigmaThetaDriver:
   CLI wiring: none
 ```
 
+## Builder experimental de config do bridge (Fase 10.3)
+
+A Fase 10.3 cria `LotSaltBridgeConfigBuilder` como helper experimental opt-in
+para montar um `SaltCreepTimeBridgeConfig` a partir de `CaseData` e de opcoes
+explicitas do chamador:
+
+```text
+CaseData + LotSaltBridgeConfigOptions -> SaltCreepTimeBridgeConfig
+```
+
+O helper nao constroi `SaltCreepTimeBridge` e nao avanca o bridge. Ele apenas
+prepara uma configuracao rastreavel para testes e fases futuras.
+
+Regras implementadas:
+
+- a profundidade de referencia e `data.lot.shoe_depth_m`;
+- a layer usada e a unica que contem a sapata;
+- a rocha vem de `layer.rock_id`;
+- `elastic_modulus_Pa` e `poisson_ratio` vêm da rocha selecionada;
+- `inner_radius_m`, `outer_radius_m` e `radial_elements` vêm de
+  `LotSaltBridgeConfigOptions`;
+- `height_m = data.lot.fracture_height_m`;
+- `wall_pressure_Pa` inicial vem de `LotSaltHydrostaticContext`;
+- `temperature_K` vem de options;
+- geostatica nao e inferida de `CaseData`.
+
+`height_m = lot.fracture_height_m` e uma aproximacao experimental: altura PKN
+ou altura de fratura nao e necessariamente a altura fisica do dominio salino.
+A escolha foi feita apenas para remover hardcode dos testes e preparar uma
+ponte rastreavel para a proxima fase.
+
+Se `geostatic_enabled=true` for solicitado nas options, o helper rejeita a
+configuracao nesta fase, porque `CaseData` ainda nao fornece tensoes
+geostaticas completas e as options ainda nao carregam esses campos. O helper
+tambem nao usa perfil termico de `CaseData`; a temperatura permanece explicita
+em options ate existir persistencia termica apropriada.
+
+Classificacao operacional:
+
+```text
+LotSaltBridgeConfigBuilder:
+  status: experimental / opt-in only
+  output: SaltCreepTimeBridgeConfig
+  builds bridge: no
+  advances bridge: no
+  geostatic inference: no
+  runtime default: no
+  CLI wiring: none
+```
+
+O fluxo `lot-sim run --mode lot-pkn` permanece desacoplado. A Fase 10.3 nao
+implementa driver temporal, acoplamento fisico validado, dano, fluencia
+terciaria nem criterio constitutivo avancado.
+
 ## Interface proposta para coupling/
 
 ```cpp

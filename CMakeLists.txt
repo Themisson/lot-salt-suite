@@ -112,6 +112,7 @@ set(LSS_CORE_SOURCES
   src/lot/LeakoffModel.cpp
   src/lot/PknModel.cpp
   src/lot/PknRunner.cpp
+  src/coupling/LotSaltBridgeConfigBuilder.cpp
   src/coupling/LotSaltCouplingConfigBuilder.cpp
   src/coupling/LotSaltHydrostaticContext.cpp
   src/coupling/LotSaltPressureMap.cpp
@@ -166,6 +167,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_pkn_model_synthetic.cpp
     tests/cpp/test_pkn_runner.cpp
     tests/cpp/test_lot_pkn_salt_adapter_substitutability.cpp
+    tests/cpp/test_lot_salt_bridge_config_builder.cpp
     tests/cpp/test_lot_salt_coupling_config_builder.cpp
     tests/cpp/test_lot_salt_hydrostatic_context.cpp
     tests/cpp/test_lot_salt_pressure_map.cpp

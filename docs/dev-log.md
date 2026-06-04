@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.2B implementada, aguardando commit/push
+Fase ativa  : 10.3 implementada, aguardando commit/push
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 167/167 Catch2 lot-salt-suite em 2026-06-04 apos Fase 10.2B
+Testes C++  : 175/175 Catch2 lot-salt-suite em 2026-06-04 apos Fase 10.3
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,48 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 10.3 — `LotSaltBridgeConfigBuilder` experimental — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push ate a verificacao final.
+
+**Objetivo:** Criar um helper experimental opt-in em `coupling/` para montar
+`SaltCreepTimeBridgeConfig` a partir de `CaseData` e options explicitas, sem
+construir nem avancar o bridge.
+
+**Implementacao:**
+- Criado `include/coupling/LotSaltBridgeConfigBuilder.hpp`.
+- Criado `src/coupling/LotSaltBridgeConfigBuilder.cpp`.
+- Criado `tests/cpp/test_lot_salt_bridge_config_builder.cpp`.
+- O helper seleciona a unica layer que contem `lot.shoe_depth_m`, resolve a
+  rocha via `layer.rock_id`, copia `E_Pa` e `nu`, usa geometria/temperatura das
+  options e deriva `wall_pressure_Pa` inicial via `LotSaltHydrostaticContext`.
+
+**Limites deliberados:**
+- `SaltCreepTimeBridge` nao e construido pelo helper.
+- `bridge.advance_to()`, `bridge.advance_by()` e
+  `bridge.wall_stress_diagnostics()` nao sao chamados pelo helper.
+- Geostatica nao e inferida de `CaseData`; `geostatic_enabled=true` e rejeitado
+  nesta fase.
+- `height_m = lot.fracture_height_m` e aproximacao experimental documentada.
+- CLI, parser, `CaseData`, `PknRunner`, `PknModel`, `ResultWriter`, YAMLs,
+  LOT/APB, sal, `external/saltcreep/`, legados, baselines e postprocess
+  permanecem fora do escopo.
+
+**Verificacao executada:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure` passou com 175/175.
+- Filtro `bridge_config|BridgeConfig|bridge|Bridge|driver|Driver|
+  sigma_theta|SigmaTheta|wall_stress|WallStress|coupling|Coupling` passou com
+  54/54.
+- Filtro `LOT PKN.*identical` passou com 2/2.
+- `lot-sim validate` passou para `lot_pkn_minimal.yaml`,
+  `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
+- `lot-sim run --mode lot-pkn` passou para os tres casos, gerando saidas em
+  `results/phase10_3_minimal`, `results/phase10_3_leakoff` e
+  `results/phase10_3_buz67d`.
 
 ---
 
