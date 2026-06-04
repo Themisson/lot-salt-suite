@@ -829,6 +829,64 @@ wall_pressure_Pa > sigma_theta_compression_positive_Pa
 com a pressao vindo de `LotSaltPressureMap` e a tensao tangencial vindo do DTO
 publico de tensao de parede.
 
+## Driver experimental `LotSaltSigmaThetaDriver` (Fase 10.2B)
+
+A Fase 10.2B cria `LotSaltSigmaThetaDriver` como driver experimental opt-in
+para encadear os blocos da cadeia diagnostica a partir de um `CaseData` e de
+um `SaltCreepTimeBridge&` ja configurado pelo chamador:
+
+```text
+CaseData
+  -> make_hydrostatic_lot_salt_coupling_config(data, options)
+  -> run_pkn_case(data)
+  -> bridge.wall_stress_diagnostics()
+  -> evaluate_lot_salt_sigma_theta_series(...)
+  -> LotSaltSigmaThetaDriverResult
+```
+
+O driver retorna um resultado composto com:
+
+- `PknRun`;
+- `LotSaltCouplingConfig`;
+- `SaltWallStressDiagnostics`;
+- `LotSaltSigmaThetaDiagnosticResult`;
+- `valid`;
+- `caveat`.
+
+O bridge nao e construido pelo driver. A configuracao de geometria, malha,
+material, temperatura, geostatica e pressao inicial do sal permanece
+responsabilidade explicita do chamador. Isso evita inferir dados fisicos ainda
+ausentes ou ambiguos em `CaseData`.
+
+Limites deliberados:
+
+- o driver nao chama `bridge.advance_to()`;
+- o driver nao chama `bridge.advance_by()`;
+- o driver nao constroi `SaltCreepTimeBridgeConfig`;
+- o driver nao constroi `SaltCreepSaltcreepAdapter`;
+- o driver nao chama `SaltCreepInterface`;
+- o driver nao chama `SaltCreepSaltcreepAdapter`;
+- o driver nao chama `evaluate_lot_salt_step()`;
+- o driver nao e chamado por `lot-sim`;
+- o fluxo `lot-sim run --mode lot-pkn` permanece desacoplado.
+
+`SaltWallStressDiagnostics` e usado como snapshot unico do estado atual do
+bridge. O driver nao garante sincronizacao temporal entre o estado de tensao do
+sal e cada passo da serie PKN; essa sincronizacao fica para fase futura. Assim,
+a Fase 10.2B ainda nao implementa acoplamento temporal real, acoplamento fisico
+validado, dano, fluencia terciaria ou criterio constitutivo avancado.
+
+Classificacao operacional:
+
+```text
+LotSaltSigmaThetaDriver:
+  status: experimental / opt-in only
+  stress policy: single bridge snapshot
+  physical validation: not validated
+  runtime default: no
+  CLI wiring: none
+```
+
 ## Interface proposta para coupling/
 
 ```cpp

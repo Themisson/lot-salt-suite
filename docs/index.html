@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">32/39</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">164</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">33/40</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">167</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -3390,6 +3390,55 @@ torna rastreavel a comparacao experimental:</p>
 </code></pre>
 <p>com a pressao vindo de <code>LotSaltPressureMap</code> e a tensao tangencial vindo do DTO
 publico de tensao de parede.</p>
+<h2 id="driver-experimental-lotsaltsigmathetadriver-fase-102b">Driver experimental <code>LotSaltSigmaThetaDriver</code> (Fase 10.2B)</h2>
+<p>A Fase 10.2B cria <code>LotSaltSigmaThetaDriver</code> como driver experimental opt-in
+para encadear os blocos da cadeia diagnostica a partir de um <code>CaseData</code> e de
+um <code>SaltCreepTimeBridge&amp;</code> ja configurado pelo chamador:</p>
+<pre><code class="language-text">CaseData
+  -&gt; make_hydrostatic_lot_salt_coupling_config(data, options)
+  -&gt; run_pkn_case(data)
+  -&gt; bridge.wall_stress_diagnostics()
+  -&gt; evaluate_lot_salt_sigma_theta_series(...)
+  -&gt; LotSaltSigmaThetaDriverResult
+</code></pre>
+<p>O driver retorna um resultado composto com:</p>
+<ul>
+<li><code>PknRun</code>;</li>
+<li><code>LotSaltCouplingConfig</code>;</li>
+<li><code>SaltWallStressDiagnostics</code>;</li>
+<li><code>LotSaltSigmaThetaDiagnosticResult</code>;</li>
+<li><code>valid</code>;</li>
+<li><code>caveat</code>.</li>
+</ul>
+<p>O bridge nao e construido pelo driver. A configuracao de geometria, malha,
+material, temperatura, geostatica e pressao inicial do sal permanece
+responsabilidade explicita do chamador. Isso evita inferir dados fisicos ainda
+ausentes ou ambiguos em <code>CaseData</code>.</p>
+<p>Limites deliberados:</p>
+<ul>
+<li>o driver nao chama <code>bridge.advance_to()</code>;</li>
+<li>o driver nao chama <code>bridge.advance_by()</code>;</li>
+<li>o driver nao constroi <code>SaltCreepTimeBridgeConfig</code>;</li>
+<li>o driver nao constroi <code>SaltCreepSaltcreepAdapter</code>;</li>
+<li>o driver nao chama <code>SaltCreepInterface</code>;</li>
+<li>o driver nao chama <code>SaltCreepSaltcreepAdapter</code>;</li>
+<li>o driver nao chama <code>evaluate_lot_salt_step()</code>;</li>
+<li>o driver nao e chamado por <code>lot-sim</code>;</li>
+<li>o fluxo <code>lot-sim run --mode lot-pkn</code> permanece desacoplado.</li>
+</ul>
+<p><code>SaltWallStressDiagnostics</code> e usado como snapshot unico do estado atual do
+bridge. O driver nao garante sincronizacao temporal entre o estado de tensao do
+sal e cada passo da serie PKN; essa sincronizacao fica para fase futura. Assim,
+a Fase 10.2B ainda nao implementa acoplamento temporal real, acoplamento fisico
+validado, dano, fluencia terciaria ou criterio constitutivo avancado.</p>
+<p>Classificacao operacional:</p>
+<pre><code class="language-text">LotSaltSigmaThetaDriver:
+  status: experimental / opt-in only
+  stress policy: single bridge snapshot
+  physical validation: not validated
+  runtime default: no
+  CLI wiring: none
+</code></pre>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

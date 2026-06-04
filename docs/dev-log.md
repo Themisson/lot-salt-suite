@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.1 implementada, aguardando revisao/commit
+Fase ativa  : 10.2B implementada, aguardando commit/push
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 164/164 Catch2 lot-salt-suite em 2026-06-04 apos Fase 10.1
+Testes C++  : 167/167 Catch2 lot-salt-suite em 2026-06-04 apos Fase 10.2B
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,54 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 10.2B — `LotSaltSigmaThetaDriver` experimental opt-in — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push ate a verificacao final.
+
+**Objetivo:** Criar um driver experimental opt-in em `coupling/` que recebe
+`CaseData`, `SaltCreepTimeBridge&` ja configurado e
+`LotSaltCouplingConfigOptions`, executando a cadeia diagnostica:
+
+```text
+CaseData -> LotSaltCouplingConfigBuilder -> run_pkn_case(data)
+         -> bridge.wall_stress_diagnostics()
+         -> evaluate_lot_salt_sigma_theta_series(...)
+```
+
+**Implementacao:**
+- Criado `include/coupling/LotSaltSigmaThetaDriver.hpp`.
+- Criado `src/coupling/LotSaltSigmaThetaDriver.cpp`.
+- Criado `tests/cpp/test_lot_salt_sigma_theta_driver.cpp`.
+- O resultado composto carrega `PknRun`, `LotSaltCouplingConfig`,
+  `SaltWallStressDiagnostics`, `LotSaltSigmaThetaDiagnosticResult`, `valid` e
+  `caveat`.
+
+**Limites deliberados:**
+- O driver nao constroi `SaltCreepTimeBridgeConfig`.
+- O driver nao chama `bridge.advance_to()` nem `bridge.advance_by()`.
+- O driver nao constroi nem chama `SaltCreepSaltcreepAdapter`.
+- O driver nao chama `SaltCreepInterface`.
+- O driver nao chama `evaluate_lot_salt_step()`.
+- O driver usa snapshot unico de tensao do bridge e nao sincroniza tensoes do
+  sal com cada passo PKN.
+- CLI, parser, `CaseData`, `PknRunner`, `PknModel`, `ResultWriter`, YAMLs,
+  LOT/APB, `external/saltcreep/`, legados, baselines e postprocess permanecem
+  fora do escopo.
+
+**Verificacao executada:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure` passou com 167/167.
+- Filtro `driver|Driver|sigma_theta|SigmaTheta|diagnostic|Diagnostic|
+  wall_stress|WallStress|coupling|Coupling` passou com 28/28.
+- Filtro `LOT PKN.*identical` passou com 2/2.
+- `lot-sim validate` passou para `lot_pkn_minimal.yaml`,
+  `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
+- `lot-sim run --mode lot-pkn` passou para os tres casos, gerando saidas em
+  `results/phase10_2b_minimal`, `results/phase10_2b_leakoff` e
+  `results/phase10_2b_buz67d`.
 
 ---
 
