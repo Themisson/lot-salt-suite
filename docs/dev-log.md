@@ -57,6 +57,47 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-04] Fase 10.11B — mapeamento `LOT_Tese` para sigma-theta moderno — Codex
+
+**Status:** Documentacao/formulacao concluida nesta sessao, sem commit/push por
+instrucao da fase.
+
+**Objetivo:** Formalizar o contrato de mapeamento entre o criterio legado
+`LOT_Tese` e os campos do diagnostico sigma-theta moderno, sem comparacao
+numerica, sem instrumentar `legance/` e sem alterar runtime.
+
+**Mapeamento documentado:**
+- `pw = line_up[lu].pi(idAnnular) + line_up[lu].dP(idAnnular)` -> pressao de
+  poco/anular usada contra a parede/rocha vizinha, unidade aparente Pa.
+- `sigmaTheta = -line_up[lu].mdl->getSigmaTheta()` ->
+  `sigma_theta_compression_positive_Pa`.
+- `dP_leakoff = pw - sigmaTheta` -> `margin_Pa`.
+- `pw > sigmaTheta` -> `opened` e `legacy_algebra_opened`, apenas como algebra
+  legada/experimental.
+- `line_up[lu].depth_influence` e `line_up[lu].thickness` foram registrados
+  como profundidade e altura de influencia do legado, ainda sem equivalencia
+  plena com `wall_gp_*` moderno.
+
+**Lacunas registradas:**
+- `LOT_Tese` calcula `pw`, `sigmaTheta`, `margin` e `opened`, mas nao exporta
+  diretamente esses campos no `.dat` principal identificado.
+- Unidade temporal precisa ser confirmada por causa do historico FA01.
+- `LOT_APB_v5` exporta pressao em psi em JSON; o diagnostico moderno usa Pa.
+- `getElem(0)` e amostra mais interna/proxima da parede, nao extrapolacao exata.
+- Comparacao numerica direta exigira extractor legado, instrumentacao controlada
+  ou comparacao limitada aos campos ja exportados.
+
+**Escopo preservado:**
+- Nao houve alteracao em C++, testes, CMake, parser, `CaseData`, CLI, YAMLs,
+  schemas, `legance/`, `legacy/`, `external/saltcreep/`, baselines ou
+  postprocess.
+
+**Resultado:** Contrato documental registrado em `docs/13_coupling_lot_apb_salt.md`
+e status `phase_10_11b_lot_tese_sigma_theta_mapping: completed` adicionado em
+`tools/docs_status.yaml`.
+
+---
+
 ### [2026-06-04] Fase 10.10 — exportacao da matriz sigma-theta — Codex
 
 **Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.

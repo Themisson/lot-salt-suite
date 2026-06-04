@@ -56,6 +56,7 @@ phases:
   phase_10_8b_sigma_theta_internal_scenario_matrix: completed
   phase_10_9b_sigma_theta_diagnostic_writer: completed
   phase_10_10_sigma_theta_scenario_matrix_export: completed
+  phase_10_11b_lot_tese_sigma_theta_mapping: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -154,5 +155,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-04"
-updated_by: "codex (Fase 10.10 exportacao matriz sigma-theta)"
+updated_by: "codex (Fase 10.11B mapeamento LOT_Tese sigma-theta)"
 project_version: "0.1.0"

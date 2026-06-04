@@ -1330,6 +1330,163 @@ tese. Ela nao compara com `LOT_Tese`, nao cria pos-processamento Python, nao
 cria HTML, nao altera o formato do writer, nao usa `results/` de producao e nao
 conecta nada ao CLI. O fluxo `lot-sim run --mode lot-pkn` segue desacoplado.
 
+## Mapeamento `LOT_Tese` para diagnostico sigma-theta moderno (Fase 10.11B)
+
+A Fase 10.11B formaliza o contrato documental entre o criterio legado observado
+em `LOT_Tese` e os campos do diagnostico sigma-theta moderno. Esta fase nao
+implementa comparacao numerica, nao instrumenta `legance/`, nao cria parser de
+saida legada e nao altera o runtime.
+
+O criterio legado relevante foi localizado em:
+
+```text
+legance/LOT_Tese/src/apb_code/APB1da.cpp
+APB1da::calculateLOTFracturedSaltRock(...)
+```
+
+A forma auditada e:
+
+```text
+pw = line_up[lu].pi(idAnnular) + line_up[lu].dP(idAnnular)
+sigmaTheta = -line_up[lu].mdl->getSigmaTheta()
+margin = pw - sigmaTheta
+opened = pw > sigmaTheta
+```
+
+`pw` e interpretado como a pressao de poco/anular usada contra a parede/rocha
+vizinha. A unidade aparente no bloco legado e Pa. Essa pressao nao e
+`PknResult.net_pressure_series_Pa`, nao e apenas pressao liquida de fratura e
+nao deve ser confundida com `p_net = E' * w / h`. No legado, `pi` representa a
+pressao inicial no anular/camada e `dP` representa o incremento APB/LOT no passo.
+
+O termo `sigmaTheta` vem do caminho:
+
+```text
+APBSalt1D::getSigmaTheta()
+-> mdl->getElem(0)->getSigmaTheta()
+
+Element::getSigmaTheta()
+-> sig(2,0)
+```
+
+Portanto, o legado usa o elemento mais interno/proximo da parede no modelo 1D de
+sal. Como o criterio aplica `-getSigmaTheta()`, o campo moderno correspondente e:
+
+```text
+sigma_theta_compression_positive_Pa = -sigma_theta_raw
+```
+
+No diagnostico moderno, essa grandeza deve alimentar
+`SigmaThetaInfluenceLayer::sigma_theta_compression_positive_Pa` e os pontos
+exportados pelo writer em `sigma_theta_compression_positive_Pa`.
+
+A margem legada:
+
+```text
+dP_leakoff = pw - sigmaTheta
+```
+
+corresponde conceitualmente a `margin_Pa`. A condicao:
+
+```text
+pw > sigmaTheta
+```
+
+corresponde a `opened` e `legacy_algebra_opened`. Essa equivalencia e apenas
+algebra legada/experimental. Ela nao constitui criterio fisico moderno validado
+de fratura no sal.
+
+Camada, profundidade e altura de influencia tambem tem correspondentes apenas
+parciais. No legado:
+
+```text
+line_up[lu]                  -> camada/subdivisao vertical
+line_up[lu].depth_influence  -> profundidade no centro da altura de influencia
+line_up[lu].thickness        -> espessura/altura de influencia
+```
+
+No diagnostico moderno, os campos existentes sao `layer_id`,
+`wall_stress_depth_m`, `depth_m`, `gp_id`, `element_id` e `local_gp_id`. Esses
+campos rastreiam o ponto de amostragem do bridge/saltcreep, mas ainda nao sao
+equivalentes plenos a `line_up[lu].depth_influence` e
+`line_up[lu].thickness`.
+
+O tempo tambem exige cuidado. O legado chama `checkPwAndSaveTime()` no primeiro
+instante em que `pw > sigmaTheta`, armazenando `firstTimePwExceedsSigmaMin = t`.
+Depois, em formulas de fratura, aparece:
+
+```text
+time = t - firstTimePwExceedsSigmaMin
+```
+
+Antes de qualquer comparacao numerica, a unidade temporal precisa ser auditada e
+normalizada. O historico FA01 registra uso interno em `[1/min]` em trechos do
+legado, enquanto o diagnostico moderno exporta `time_s`.
+
+O bloco legado tambem chama:
+
+```cpp
+getDeviatoricStress()
+```
+
+mas esse valor nao controla diretamente o `if (pw > sigmaTheta)`. Em fases
+futuras, ele pode ser relacionado aos campos modernos de invariantes:
+
+```text
+getDeviatoricStress()
+-> stress_utils::deviatoric_stress(...)
+-> j2_Pa2
+-> von_mises_effective_stress_Pa
+```
+
+Essa relacao permanece diagnostica/futura, nao criterio principal desta fase.
+
+As saidas legadas identificadas em `APB1da::saveFile(...)` incluem:
+
+```text
+Time
+Layer
+dT
+dP
+dV
+u
+Compressibilidade
+C_Exp
+Vq
+dV_leakoff
+V_outflow
+```
+
+Lacuna critica: o legado calcula `pw`, `sigmaTheta`, `margin` e `opened`, mas
+nao exporta diretamente esses campos no arquivo `.dat` principal identificado.
+
+| Campo legado | Descricao | Campo moderno sugerido | Disponivel hoje? | Transformacao necessaria | Observacoes |
+|---|---|---|---|---|---|
+| `pw = pi + dP` | Pressao de poco/anular usada contra a parede/rocha vizinha | `wall_pressure_Pa` ou `pressure_Pa` | Parcial | Somar `pi` e `dP`; garantir Pa | Nao e `p_net` PKN |
+| `sigmaTheta = -getSigmaTheta()` | Tensao tangencial convertida para compressao positiva | `sigma_theta_compression_positive_Pa` | Sim, no diagnostico moderno | Inverter sinal do valor bruto se compressao vier negativa | Vem de `getElem(0)` no legado |
+| `pw - sigmaTheta` | Margem de abertura/leakoff | `margin_Pa` | Sim | `pressure_Pa - sigma_theta_compression_positive_Pa` | Igualdade nao abre |
+| `pw > sigmaTheta` | Abertura segundo algebra legada | `opened` / `legacy_algebra_opened` | Sim | Comparacao estrita `margin_Pa > 0` | Nao e criterio fisico validado |
+| `line_up[lu]` | Camada/subdivisao vertical do legado | `layer_id` | Parcial | Mapear indice legado para camada/ponto moderno | Ainda sem correspondencia direta |
+| `depth_influence` | Centro da altura de influencia | `depth_m` / `wall_stress_depth_m` | Parcial | Comparar profundidades apos definir tolerancia | Ponto moderno e Gauss/snapshot |
+| `thickness` | Espessura/altura de influencia | `height_m` futuro / `influence_height_m` futuro | Nao | Criar campo/contrato futuro se necessario | Nao equivale automaticamente a `lot.fracture_height_m` |
+| `t` / `timeResults` | Tempo do legado | `time_s` | Parcial | Confirmar unidade e converter para segundos | FA01 torna isso obrigatorio |
+| `dV_leakoff` | Volume de leakoff/fratura acumulado no balanco | Campo futuro de leakoff/fracture output | Parcial | Normalizar fator geometrico e unidade | O legado escreve `dV_leakoff * 2*pi` |
+| `getDeviatoricStress()` | Tensão desviadora disponivel no legado | `j2_Pa2` / `von_mises_effective_stress_Pa` | Sim no diagnostico moderno | Recalcular invariantes com convencao moderna | Nao controla o criterio `pw > sigmaTheta` |
+
+Antes de qualquer comparacao com `LOT_Tese`, ficam registradas as lacunas:
+
+- `LOT_Tese` nao exporta diretamente `sigmaTheta`, `pw`, `margin` ou `opened`.
+- A unidade temporal precisa ser confirmada e normalizada.
+- `LOT_APB_v5` exporta pressao em psi em JSON; o diagnostico moderno usa Pa.
+- `getElem(0)` e a amostra mais interna/proxima da parede, nao extrapolacao
+  exata para a parede.
+- `wall_gp_*` moderno ainda nao equivale automaticamente a layer fisica/altura
+  de influencia do legado.
+- `height_m = lot.fracture_height_m` nao equivale automaticamente a
+  `line_up[lu].thickness`.
+- Comparacao numerica direta exigira extractor legado, instrumentacao
+  controlada ou comparacao limitada aos campos ja exportados.
+
 ## Interface proposta para coupling/
 
 ```cpp
