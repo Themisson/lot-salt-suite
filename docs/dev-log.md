@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : auditoria/sync external/saltcreep concluida (APB CSV + diagnostico de tensao)
+Fase ativa  : 9.2B implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 112/112 Catch2 lot-salt-suite passaram com LSS_ENABLE_CLI_SUBPROCESS_TESTS=ON em 2026-06-04
+Testes C++  : 131/131 Catch2 lot-salt-suite em 2026-06-04 apos Fase 9.2B
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,47 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 9.2B — Utilitarios hidrostaticos puros em `units/` — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Fornecer a base matematica reutilizavel para calcular pressao
+hidrostatica sem automatizar ainda o fluxo `YAML -> CaseParser -> CaseData ->
+coupling`.
+
+**Mudanca implementada:**
+- `include/units/units.hpp` recebeu:
+  - `hydrostatic_pressure_Pa(density_kg_m3, depth_m, g)`;
+  - `ppg_hydrostatic_pressure_Pa(ppg, depth_m, g)`;
+  - `surface_plus_hydrostatic_pressure_Pa(surface_pressure_Pa,
+    density_kg_m3, depth_m, g)`.
+- As novas funcoes usam validacao robusta e rejeitam NaN, infinito, densidade
+  negativa, ppg negativo, profundidade negativa, gravidade nao positiva e
+  pressao de superficie negativa.
+- `tests/cpp/test_units.cpp` cobre calculo SI, calculo por ppg, superficie +
+  hidrostatica, profundidade zero e entradas invalidas.
+
+**Limite deliberado:**
+- `LotSaltPressureMap` nao foi alterado.
+- `LotSaltCouplingStep` nao foi alterado.
+- `CaseParser` e `CaseData` nao foram alterados.
+- `HydrostaticPlusNetPressure` continua recebendo `hydrostatic_pressure_Pa`
+  pronta.
+- `lot-sim run --mode lot-pkn` segue desacoplado do sal.
+
+**Testes/builds executados:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure` passou: 131/131.
+- `ctest --test-dir build -C Debug --output-on-failure -R "units|hydrostatic|pressure_map|lot_salt|coupling|Coupling"` passou: 12/12.
+- `ctest --test-dir build -C Debug --output-on-failure -R "LOT PKN.*identical"` passou: 2/2.
+- `lot-sim validate` passou para `lot_pkn_minimal.yaml`,
+  `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
+- `lot-sim run --mode lot-pkn` passou para os tres casos, gerando saidas em
+  `results/phase9_2b_minimal`, `results/phase9_2b_leakoff` e
+  `results/phase9_2b_buz67d`.
 
 ---
 

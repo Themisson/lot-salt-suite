@@ -1,5 +1,9 @@
 #pragma once
 
+#include <cmath>
+#include <stdexcept>
+#include <string>
+
 namespace units {
 
 inline constexpr double kKgM3PerPpg = 119.826;
@@ -74,6 +78,48 @@ constexpr double lbf_ft_to_N_m(double lbf_ft) {
 constexpr double ppg_hydrostatic_Pa_per_m(double ppg,
                                           double g = kStandardGravity) {
   return ppg_to_kg_m3(ppg) * g;
+}
+
+inline void require_non_negative_finite(double value, const std::string& field) {
+  if (!std::isfinite(value)) {
+    throw std::invalid_argument("units: " + field + " must be finite");
+  }
+  if (value < 0.0) {
+    throw std::invalid_argument("units: " + field + " must be non-negative");
+  }
+}
+
+inline void require_positive_finite(double value, const std::string& field) {
+  if (!std::isfinite(value)) {
+    throw std::invalid_argument("units: " + field + " must be finite");
+  }
+  if (value <= 0.0) {
+    throw std::invalid_argument("units: " + field + " must be positive");
+  }
+}
+
+inline double hydrostatic_pressure_Pa(double density_kg_m3, double depth_m,
+                                      double g = kStandardGravity) {
+  require_non_negative_finite(density_kg_m3, "density_kg_m3");
+  require_non_negative_finite(depth_m, "depth_m");
+  require_positive_finite(g, "g");
+  return density_kg_m3 * g * depth_m;
+}
+
+inline double ppg_hydrostatic_pressure_Pa(double ppg, double depth_m,
+                                          double g = kStandardGravity) {
+  require_non_negative_finite(ppg, "ppg");
+  require_non_negative_finite(depth_m, "depth_m");
+  require_positive_finite(g, "g");
+  return ppg_hydrostatic_Pa_per_m(ppg, g) * depth_m;
+}
+
+inline double surface_plus_hydrostatic_pressure_Pa(
+    double surface_pressure_Pa, double density_kg_m3, double depth_m,
+    double g = kStandardGravity) {
+  require_non_negative_finite(surface_pressure_Pa, "surface_pressure_Pa");
+  return surface_pressure_Pa +
+         hydrostatic_pressure_Pa(density_kg_m3, depth_m, g);
 }
 
 }  // namespace units

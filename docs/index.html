@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">23/30</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">127</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">24/31</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">131</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2880,6 +2880,26 @@ dados hidraulicos e geomecanicos que ainda nao estao no contrato runtime.</p>
 <p>O caminho <code>lot-sim run --mode lot-pkn</code> segue desacoplado do sal: a nova camada
 apenas organiza o ponto experimental em <code>coupling/</code> e nao retroalimenta PKN, nao
 conecta APB e nao altera o runner do LOT.</p>
+<h2 id="utilitarios-hidrostaticos-puros-fase-92b">Utilitarios hidrostaticos puros (Fase 9.2B)</h2>
+<p>A Fase 9.2B adiciona utilitarios matematicos puros em <code>include/units/units.hpp</code>
+para calcular pressao hidrostatica a partir de dados ja conhecidos:</p>
+<pre><code class="language-text">hydrostatic_pressure_Pa = density_kg_m3 * g * depth_m
+ppg_hydrostatic_pressure_Pa = ppg_hydrostatic_Pa_per_m(ppg, g) * depth_m
+surface_plus_hydrostatic_pressure_Pa =
+    surface_pressure_Pa + hydrostatic_pressure_Pa(density_kg_m3, depth_m, g)
+</code></pre>
+<p>Esses utilitarios rejeitam valores nao finitos, pressoes/densidades/profundidades
+negativas e gravidade nao positiva. Profundidade zero e pressao de superficie
+zero sao permitidas.</p>
+<p>Esta fase nao conecta o calculo automaticamente ao <code>coupling/</code>. O metodo
+<code>LotSaltPressureMapMethod::HydrostaticPlusNetPressure</code> continua recebendo
+<code>hydrostatic_pressure_Pa</code> pronta em <code>LotSaltCouplingConfig</code>. O fluxo
+<code>YAML -&gt; CaseParser -&gt; CaseData -&gt; coupling</code> ainda nao calcula hidrostática
+automaticamente, e <code>CaseData</code> continua sem persistir o bloco <code>wellbore</code>.</p>
+<p>O caminho <code>lot-sim run --mode lot-pkn</code> permanece desacoplado do sal e
+inalterado. Uma fase futura deve decidir se <code>hydrostatic_pressure_Pa</code> sera
+derivada de <code>CaseData</code>, <code>FluidData</code>, <code>LotConfig.shoe_depth_m</code> ou de um contexto
+especifico do <code>coupling/</code>.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

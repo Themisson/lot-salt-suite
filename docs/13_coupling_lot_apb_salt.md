@@ -297,6 +297,33 @@ O caminho `lot-sim run --mode lot-pkn` segue desacoplado do sal: a nova camada
 apenas organiza o ponto experimental em `coupling/` e nao retroalimenta PKN, nao
 conecta APB e nao altera o runner do LOT.
 
+## Utilitarios hidrostaticos puros (Fase 9.2B)
+
+A Fase 9.2B adiciona utilitarios matematicos puros em `include/units/units.hpp`
+para calcular pressao hidrostatica a partir de dados ja conhecidos:
+
+```text
+hydrostatic_pressure_Pa = density_kg_m3 * g * depth_m
+ppg_hydrostatic_pressure_Pa = ppg_hydrostatic_Pa_per_m(ppg, g) * depth_m
+surface_plus_hydrostatic_pressure_Pa =
+    surface_pressure_Pa + hydrostatic_pressure_Pa(density_kg_m3, depth_m, g)
+```
+
+Esses utilitarios rejeitam valores nao finitos, pressoes/densidades/profundidades
+negativas e gravidade nao positiva. Profundidade zero e pressao de superficie
+zero sao permitidas.
+
+Esta fase nao conecta o calculo automaticamente ao `coupling/`. O metodo
+`LotSaltPressureMapMethod::HydrostaticPlusNetPressure` continua recebendo
+`hydrostatic_pressure_Pa` pronta em `LotSaltCouplingConfig`. O fluxo
+`YAML -> CaseParser -> CaseData -> coupling` ainda nao calcula hidrostática
+automaticamente, e `CaseData` continua sem persistir o bloco `wellbore`.
+
+O caminho `lot-sim run --mode lot-pkn` permanece desacoplado do sal e
+inalterado. Uma fase futura deve decidir se `hydrostatic_pressure_Pa` sera
+derivada de `CaseData`, `FluidData`, `LotConfig.shoe_depth_m` ou de um contexto
+especifico do `coupling/`.
+
 ## Interface proposta para coupling/
 
 ```cpp

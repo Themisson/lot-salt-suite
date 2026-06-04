@@ -1,3 +1,6 @@
+#include <limits>
+#include <stdexcept>
+
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
@@ -37,4 +40,72 @@ TEST_CASE("Temperature conversions") {
 TEST_CASE("Torque and hydrostatic gradient conversions") {
   CHECK(units::lbf_ft_to_N_m(1.0) == Catch::Approx(14.5939));
   CHECK(units::ppg_hydrostatic_Pa_per_m(8.5) == Catch::Approx(9988.8).epsilon(0.001));
+}
+
+TEST_CASE("Hydrostatic pressure from SI density and depth") {
+  CHECK(units::hydrostatic_pressure_Pa(1000.0, 10.0) ==
+        Catch::Approx(1000.0 * units::kStandardGravity * 10.0));
+  CHECK(units::hydrostatic_pressure_Pa(1000.0, 0.0) ==
+        Catch::Approx(0.0));
+}
+
+TEST_CASE("Hydrostatic pressure from PPG and depth") {
+  constexpr double ppg = 8.5;
+  constexpr double depth_m = 1234.5;
+
+  CHECK(units::ppg_hydrostatic_pressure_Pa(ppg, depth_m) ==
+        Catch::Approx(units::ppg_hydrostatic_Pa_per_m(ppg) * depth_m));
+}
+
+TEST_CASE("Surface plus hydrostatic pressure combines absolute terms") {
+  constexpr double surface_pressure_Pa = 2.0e6;
+  constexpr double density_kg_m3 = 1200.0;
+  constexpr double depth_m = 2500.0;
+
+  CHECK(units::surface_plus_hydrostatic_pressure_Pa(
+            surface_pressure_Pa, density_kg_m3, depth_m) ==
+        Catch::Approx(surface_pressure_Pa +
+                      density_kg_m3 * units::kStandardGravity * depth_m));
+  CHECK(units::surface_plus_hydrostatic_pressure_Pa(0.0, density_kg_m3,
+                                                   depth_m) ==
+        Catch::Approx(density_kg_m3 * units::kStandardGravity * depth_m));
+}
+
+TEST_CASE("Hydrostatic pressure utilities reject invalid inputs") {
+  const double nan = std::numeric_limits<double>::quiet_NaN();
+  const double inf = std::numeric_limits<double>::infinity();
+
+  CHECK_THROWS_AS(units::hydrostatic_pressure_Pa(-1.0, 10.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(units::hydrostatic_pressure_Pa(1000.0, -1.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(units::hydrostatic_pressure_Pa(1000.0, 10.0, 0.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(units::hydrostatic_pressure_Pa(1000.0, 10.0, -1.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(units::hydrostatic_pressure_Pa(nan, 10.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(units::hydrostatic_pressure_Pa(1000.0, inf),
+                  std::invalid_argument);
+
+  CHECK_THROWS_AS(units::ppg_hydrostatic_pressure_Pa(-1.0, 10.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(units::ppg_hydrostatic_pressure_Pa(8.5, -1.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(units::ppg_hydrostatic_pressure_Pa(8.5, 10.0, 0.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(units::ppg_hydrostatic_pressure_Pa(nan, 10.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(units::ppg_hydrostatic_pressure_Pa(8.5, inf),
+                  std::invalid_argument);
+
+  CHECK_THROWS_AS(units::surface_plus_hydrostatic_pressure_Pa(-1.0, 1000.0,
+                                                              10.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(units::surface_plus_hydrostatic_pressure_Pa(nan, 1000.0,
+                                                              10.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(units::surface_plus_hydrostatic_pressure_Pa(inf, 1000.0,
+                                                              10.0),
+                  std::invalid_argument);
 }
