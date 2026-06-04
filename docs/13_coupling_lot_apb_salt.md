@@ -1,6 +1,6 @@
 # 13 — Acoplamento LOT–APB–Sal
 
-**Status:** Planejado | **Última atualização:** 2026-06-03
+**Status:** Planejado | **Última atualização:** 2026-06-04
 
 > A formulação detalhada deve ser verificada via `/formulation-audit`
 > comparando os legados antes de implementar o módulo `coupling/`.
@@ -94,6 +94,178 @@ Para cada passo de tempo dt:
 | Critério de convergência do loop | Médio | `legance/LOT_APB_v5/main/main.cpp` |
 | Semantica de tempo PKN (`t` absoluto vs. tempo desde breakdown) | Alto | `legance/LOT_Tese/src/apb_code/APB1da.cpp` |
 | Conversoes de vazao com fator geometrico embutido | Alto | `legance/LOT_Tese/src/apb_code/APB1da.cpp` |
+
+## Contrato de pressao LOT/PKN -> sal (Fase 9.1A)
+
+A Fase 9.0 criou um ponto experimental de chamada real em `coupling/`:
+`evaluate_lot_salt_step()` recebe um `PknResult`, seleciona um passo da serie
+temporal, constroi uma `SaltCreepQuery` e chama
+`SaltCreepInterface::evaluate_wall_response(query)`.
+
+Na Fase 9.0, `PknResult.net_pressure_series_Pa[step_index]` foi encaminhado
+diretamente para `SaltCreepQuery.wall_pressure_Pa`. Esse mapeamento e apenas um
+proxy experimental para demonstrar a chamada. Ele nao e o contrato fisico
+definitivo.
+
+### Significado de `PknResult.net_pressure_series_Pa`
+
+`PknResult.net_pressure_series_Pa` representa a pressao liquida PKN. No modelo
+PKN minimo atual, ela e calculada por:
+
+```text
+p_net = E' * w / h
+```
+
+onde `E'` e o modulo plano [Pa], `w` e a abertura da fratura [m] e `h` e a
+altura PKN [m]. Portanto, `p_net` e uma pressao relativa de fratura associada a
+abertura elastica da fratura. Ela nao e, por si so:
+
+- pressao absoluta do poco;
+- pressao anular;
+- pressao hidrostatica;
+- pressao de parede do sal;
+- tensao radial efetiva no sal.
+
+Consequencia: `p_net PKN != wall_pressure_Pa fisico do sal`.
+
+### Significado esperado de `SaltCreepQuery.wall_pressure_Pa`
+
+`SaltCreepQuery.wall_pressure_Pa` deve representar uma pressao compressiva
+absoluta aplicada na parede do sal, ou uma condicao radial equivalente definida
+explicitamente. Ela pertence ao contrato de contorno radial do dominio de sal:
+o adapter deve conseguir interpretar esse valor como carregamento normal na
+parede do poco/anular, coerente com a convencao geomecanica de compressao
+positiva.
+
+Se uma fase futura optar por enviar uma tensao radial equivalente em vez de uma
+pressao absoluta, essa equivalencia deve ser nomeada no metodo de mapeamento,
+documentada no resultado e testada separadamente. Nao se deve esconder uma
+tensao radial efetiva sob o nome `wall_pressure_Pa` sem registrar a referencia
+fisica usada.
+
+### Diferenca entre pressoes e tensoes
+
+| Quantidade | Definicao operacional | Pode alimentar `wall_pressure_Pa` diretamente? |
+|------------|-----------------------|-----------------------------------------------|
+| `p_net` PKN | Pressao liquida de fratura, relativa a abertura PKN (`E' * w / h`). | Somente no modo experimental da Fase 9.0. |
+| Pressao de fratura | Pressao no fluido da fratura; em geral exige referencia de tensao/pressao para sair de `p_net`. | Nao sem converter para pressao absoluta ou condicao radial. |
+| Pressao absoluta de poco | Pressao fisica no poco/sapata/anular em Pa absolutos. | Sim, e o candidato fisicamente preferivel. |
+| Pressao hidrostatica | Componente `rho * g * z` da coluna de fluido, possivelmente somada a pressao de superficie. | Sim, quando representa a pressao absoluta local. |
+| Pressao de superficie/bombeio | Pressao imposta/medida na superficie ou no sistema de bombeio. | Nao isoladamente; deve ser propagada ate a profundidade. |
+| Pressao anular | Pressao do fluido em anular selado ou aberto no trecho de interesse. | Sim, se for a pressao atuante na parede do sal. |
+| Pressao de poros | Pressao do fluido nos poros da formacao. | Nao diretamente; entra em tensao efetiva. |
+| Tensao radial | Componente normal radial aplicada ao contorno mecanico. | Pode ser equivalente, mas deve ser documentada como tal. |
+| Tensao efetiva | Tensao total corrigida por pressao de poros/convensao efetiva. | Nao deve ser confundida com pressao absoluta de parede. |
+| `wall_pressure_Pa` do sal | Pressao compressiva absoluta de parede, ou condicao radial equivalente explicita, enviada a `SaltCreepQuery`. | E o alvo do mapeamento. |
+
+### Metodos candidatos para `LotSaltPressureMap`
+
+A Fase 9.1B deve substituir o uso direto de `net_pressure_series_Pa` por um
+mapeador explicito. Metodos candidatos iniciais:
+
+#### Metodo 1 -- `ExperimentalNetPressureProxy`
+
+```text
+wall_pressure_Pa = net_pressure_Pa
+```
+
+Classificacao: experimental, nao fisico, compatibilidade com a Fase 9.0.
+
+Esse metodo deve existir apenas para preservar a prova de chamada criada na
+Fase 9.0 e para manter testes de transicao. Ele nao deve ser apresentado como
+pressao anular ou pressao absoluta.
+
+#### Metodo 2 -- `AbsoluteWellborePressure`
+
+```text
+wall_pressure_Pa = absolute_wellbore_pressure_Pa
+```
+
+Classificacao: fisicamente preferivel quando a pressao absoluta estiver
+disponivel.
+
+Esse metodo deve ser o alvo de producao quando o runtime fornecer pressao de
+poco/sapata/anular em Pa absolutos, no trecho de sal avaliado.
+
+#### Metodo 3 -- `HydrostaticPlusNetPressure`
+
+```text
+wall_pressure_Pa = surface_pressure_Pa + rho * g * depth_m + net_pressure_Pa
+```
+
+Classificacao: aproximacao intermediaria, valida somente se
+`net_pressure_Pa` for interpretada como incremento sobre a coluna hidrostatica.
+
+Esse metodo nao deve virar padrao sem validacao fisica e sem explicitar qual
+referencia transforma `p_net` em incremento de pressao absoluta.
+
+### Dados disponiveis e ausentes hoje
+
+Disponiveis no projeto apos a Fase 9.0:
+
+- `PknResult.net_pressure_series_Pa`;
+- `LotConfig.breakdown_pressure_Pa`;
+- `FluidData.density_kg_m3`;
+- `FluidData.weight_lb_per_gal`;
+- `FluidData.surface_pressure_Pa`, quando o modo do fluido exigir;
+- `LotConfig.shoe_depth_m`;
+- `AnnularData.top_m`, `AnnularData.base_m` e `AnnularData.fluid_id`;
+- `units::ppg_hydrostatic_Pa_per_m()`.
+
+Ausentes ou ainda nao integrados ao `coupling/`:
+
+- pressao absoluta de poco por tempo;
+- pressao de bombeio/superficie por tempo;
+- pressao no fundo/sapata por tempo;
+- pressao anular APB por tempo;
+- pressao de poros;
+- tensao horizontal minima/closure stress;
+- tensao radial geostatica de contorno para o sal;
+- bloco `wellbore` persistido em `CaseData`;
+- estado APB calculado;
+- regra explicita para converter pressao PKN em pressao absoluta.
+
+### Contrato proposto para a Fase 9.1B
+
+A proxima fase deve criar um mapeador explicito:
+
+- `include/coupling/LotSaltPressureMap.hpp`;
+- `src/coupling/LotSaltPressureMap.cpp`;
+- `tests/cpp/test_lot_salt_pressure_map.cpp`.
+
+API conceitual:
+
+```cpp
+enum class LotSaltPressureMapMethod {
+  ExperimentalNetPressureProxy,
+  AbsoluteWellborePressure,
+  HydrostaticPlusNetPressure
+};
+
+struct LotSaltPressureMapInput {
+  double net_pressure_Pa = 0.0;
+  double absolute_wellbore_pressure_Pa = 0.0;
+  double hydrostatic_pressure_Pa = 0.0;
+  double surface_pressure_Pa = 0.0;
+  double depth_m = 0.0;
+  LotSaltPressureMapMethod method =
+      LotSaltPressureMapMethod::ExperimentalNetPressureProxy;
+};
+
+struct LotSaltPressureMapResult {
+  double wall_pressure_Pa = 0.0;
+  LotSaltPressureMapMethod method;
+  std::string method_label;
+  bool physically_absolute = false;
+};
+
+LotSaltPressureMapResult map_lot_pkn_to_salt_wall_pressure(
+    const LotSaltPressureMapInput& input);
+```
+
+`evaluate_lot_salt_step()` deve ser adaptada futuramente para consumir
+`LotSaltPressureMapResult.wall_pressure_Pa`, nao
+`PknResult.net_pressure_series_Pa` diretamente.
 
 ## Interface proposta para coupling/
 

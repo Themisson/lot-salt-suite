@@ -246,7 +246,7 @@
 </div>
 <div class="nav-group">
   <div class="label">Formulações</div>
-  <a href="#lot" data-title="02 — formulação do leak-off test (lot)"><span>02 — Formulação do Leak-Off Test (LOT)</span><span class="nav-dot pill-muted"></span></a><a href="#apb" data-title="03 — formulação do annular pressure buildup (apb)"><span>03 — Formulação do Annular Pressure Buildup (APB)</span><span class="nav-dot pill-muted"></span></a><a href="#salt" data-title="04 — modelos de fluência de sal"><span>04 — Modelos de Fluência de Sal</span><span class="nav-dot pill-muted"></span></a><a href="#coupling" data-title="13 — acoplamento lot–apb–sal"><span>13 — Acoplamento LOT–APB–Sal</span><span class="nav-dot pill-info"></span></a><a href="#issues" data-title="08 — problemas conhecidos e riscos"><span>08 — Problemas Conhecidos e Riscos</span><span class="nav-dot pill-muted"></span></a>
+  <a href="#lot" data-title="02 — formulação do leak-off test (lot)"><span>02 — Formulação do Leak-Off Test (LOT)</span><span class="nav-dot pill-muted"></span></a><a href="#apb" data-title="03 — formulação do annular pressure buildup (apb)"><span>03 — Formulação do Annular Pressure Buildup (APB)</span><span class="nav-dot pill-muted"></span></a><a href="#salt" data-title="04 — modelos de fluência de sal"><span>04 — Modelos de Fluência de Sal</span><span class="nav-dot pill-muted"></span></a><a href="#coupling" data-title="13 — acoplamento lot–apb–sal"><span>13 — Acoplamento LOT–APB–Sal</span><span class="nav-dot pill-warn"></span></a><a href="#issues" data-title="08 — problemas conhecidos e riscos"><span>08 — Problemas Conhecidos e Riscos</span><span class="nav-dot pill-muted"></span></a>
 </div>
 <div class="nav-group">
   <div class="label">Entrada, CLI e validação</div>
@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">21/28</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">22/29</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">118</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -565,7 +565,7 @@ contém apenas <code>README.md</code> organizacional.</p>
 <div class="section-meta"><span>Documento</span><span class="pill pill-muted">Não iniciado</span></div>
 <h3>02 — Formulação do Leak-Off Test (LOT)</h3>
 <div class="doc-body">
-<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-04</p>
 <blockquote>
 <p>Este documento descreve a formulação matemática implementada no código legado e
 a ser reproduzida no código novo. <strong>Não alterar formulação sem documentar aqui primeiro.</strong></p>
@@ -596,6 +596,14 @@ p_net = E' * w / h
 <p>onde <code>Q</code> e a taxa de injecao [m3/s], <code>mu</code> e a viscosidade [Pa.s], <code>E'</code> e o
 modulo plano [Pa], <code>h</code> e a altura PKN [m], <code>w0</code> e a abertura inicial [m] e
 <code>t_acomodacao</code> e o tempo sem incremento operacional.</p>
+<p>O campo <code>PknResult.net_pressure_series_Pa</code> armazena essa serie <code>p_net</code>. Ela e
+uma pressao liquida PKN, relativa a mecanica da fratura e a abertura <code>w</code>.
+<code>p_net</code> nao e pressao absoluta de poco, nao e pressao anular e nao representa,
+isoladamente, a pressao compressiva de parede que deve ser enviada ao sal.</p>
+<p>Para acoplamento LOT/PKN/sal, <code>p_net</code> precisa passar por um mapeamento fisico
+explicito antes de preencher <code>SaltCreepQuery.wall_pressure_Pa</code>. O contrato
+detalhado e os metodos candidatos para esse mapeamento ficam em
+<code>docs/13_coupling_lot_apb_salt.md</code>.</p>
 <p>O leakoff fica encapsulado em <code>lot::LeakoffModel</code> e e acumulado em volume
 com entradas SI. O modelo fechado (<code>none</code>) preserva o volume acumulado anterior
 com incremento zero. A taxa constante (<code>constant_rate</code>) usa:</p>
@@ -719,7 +727,7 @@ comprimentos e pressao de breakdown para SI antes de preencher <code>CaseData</c
 <div class="section-meta"><span>Documento</span><span class="pill pill-muted">Não iniciado</span></div>
 <h3>03 — Formulação do Annular Pressure Buildup (APB)</h3>
 <div class="doc-body">
-<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-01</p>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-04</p>
 <blockquote>
 <p>Formulação a extrair do legado via <code>/formulation-audit</code> antes de implementar módulo <code>apb/</code>.</p>
 </blockquote>
@@ -733,6 +741,15 @@ temperatura. A pressão aumenta porque o anular tem volume constante.</p>
 - Leakage (vazamento pelo packer ou cimentação)
 - Ventilação (venting controlado)
 - Integração com deformação viscoelástica do sal</p>
+<h2 id="pressao-anular-e-interface-com-sal">Pressao anular e interface com sal</h2>
+<p>Para o acoplamento LOT/PKN/sal, a pressao anular relevante e a pressao
+compressiva atuante na parede do sal no trecho de interesse. Ela pode se tornar
+uma entrada fisicamente adequada para <code>SaltCreepQuery.wall_pressure_Pa</code> quando
+estiver disponivel como pressao absoluta por tempo e profundidade.</p>
+<p>No estado atual do projeto, o modulo APB moderno ainda nao calcula nem expoe uma
+serie temporal de pressao anular. Portanto, a Fase 9.1A apenas formaliza o
+contrato: pressao anular absoluta pode alimentar o sal; pressao liquida PKN nao
+deve ser usada como substituto fisico sem um mapeamento explicito.</p>
 <h2 id="parametros-de-referencia-lot_apb_v5-hard-coded">Parâmetros de referência (LOT_APB_v5 — hard-coded)</h2>
 <table>
 <thead>
@@ -2515,10 +2532,10 @@ python tools/compare_results.py \
 </section>
 
 <section id="coupling">
-<div class="section-meta"><span>Documento</span><span class="pill pill-info">Planejado</span></div>
+<div class="section-meta"><span>Documento</span><span class="pill pill-warn">Em andamento</span></div>
 <h3>13 — Acoplamento LOT–APB–Sal</h3>
 <div class="doc-body">
-<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-03</p>
+<p><strong>Status:</strong> Planejado | <strong>Última atualização:</strong> 2026-06-04</p>
 <blockquote>
 <p>A formulação detalhada deve ser verificada via <code>/formulation-audit</code>
 comparando os legados antes de implementar o módulo <code>coupling/</code>.</p>
@@ -2630,6 +2647,191 @@ converter resposta do backend em <code>radial_closure_m</code>.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="contrato-de-pressao-lotpkn-sal-fase-91a">Contrato de pressao LOT/PKN -&gt; sal (Fase 9.1A)</h2>
+<p>A Fase 9.0 criou um ponto experimental de chamada real em <code>coupling/</code>:
+<code>evaluate_lot_salt_step()</code> recebe um <code>PknResult</code>, seleciona um passo da serie
+temporal, constroi uma <code>SaltCreepQuery</code> e chama
+<code>SaltCreepInterface::evaluate_wall_response(query)</code>.</p>
+<p>Na Fase 9.0, <code>PknResult.net_pressure_series_Pa[step_index]</code> foi encaminhado
+diretamente para <code>SaltCreepQuery.wall_pressure_Pa</code>. Esse mapeamento e apenas um
+proxy experimental para demonstrar a chamada. Ele nao e o contrato fisico
+definitivo.</p>
+<h3 id="significado-de-pknresultnet_pressure_series_pa">Significado de <code>PknResult.net_pressure_series_Pa</code></h3>
+<p><code>PknResult.net_pressure_series_Pa</code> representa a pressao liquida PKN. No modelo
+PKN minimo atual, ela e calculada por:</p>
+<pre><code class="language-text">p_net = E' * w / h
+</code></pre>
+<p>onde <code>E'</code> e o modulo plano [Pa], <code>w</code> e a abertura da fratura [m] e <code>h</code> e a
+altura PKN [m]. Portanto, <code>p_net</code> e uma pressao relativa de fratura associada a
+abertura elastica da fratura. Ela nao e, por si so:</p>
+<ul>
+<li>pressao absoluta do poco;</li>
+<li>pressao anular;</li>
+<li>pressao hidrostatica;</li>
+<li>pressao de parede do sal;</li>
+<li>tensao radial efetiva no sal.</li>
+</ul>
+<p>Consequencia: <code>p_net PKN != wall_pressure_Pa fisico do sal</code>.</p>
+<h3 id="significado-esperado-de-saltcreepquerywall_pressure_pa">Significado esperado de <code>SaltCreepQuery.wall_pressure_Pa</code></h3>
+<p><code>SaltCreepQuery.wall_pressure_Pa</code> deve representar uma pressao compressiva
+absoluta aplicada na parede do sal, ou uma condicao radial equivalente definida
+explicitamente. Ela pertence ao contrato de contorno radial do dominio de sal:
+o adapter deve conseguir interpretar esse valor como carregamento normal na
+parede do poco/anular, coerente com a convencao geomecanica de compressao
+positiva.</p>
+<p>Se uma fase futura optar por enviar uma tensao radial equivalente em vez de uma
+pressao absoluta, essa equivalencia deve ser nomeada no metodo de mapeamento,
+documentada no resultado e testada separadamente. Nao se deve esconder uma
+tensao radial efetiva sob o nome <code>wall_pressure_Pa</code> sem registrar a referencia
+fisica usada.</p>
+<h3 id="diferenca-entre-pressoes-e-tensoes">Diferenca entre pressoes e tensoes</h3>
+<table>
+<thead>
+<tr>
+<th>Quantidade</th>
+<th>Definicao operacional</th>
+<th>Pode alimentar <code>wall_pressure_Pa</code> diretamente?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>p_net</code> PKN</td>
+<td>Pressao liquida de fratura, relativa a abertura PKN (<code>E' * w / h</code>).</td>
+<td>Somente no modo experimental da Fase 9.0.</td>
+</tr>
+<tr>
+<td>Pressao de fratura</td>
+<td>Pressao no fluido da fratura; em geral exige referencia de tensao/pressao para sair de <code>p_net</code>.</td>
+<td>Nao sem converter para pressao absoluta ou condicao radial.</td>
+</tr>
+<tr>
+<td>Pressao absoluta de poco</td>
+<td>Pressao fisica no poco/sapata/anular em Pa absolutos.</td>
+<td>Sim, e o candidato fisicamente preferivel.</td>
+</tr>
+<tr>
+<td>Pressao hidrostatica</td>
+<td>Componente <code>rho * g * z</code> da coluna de fluido, possivelmente somada a pressao de superficie.</td>
+<td>Sim, quando representa a pressao absoluta local.</td>
+</tr>
+<tr>
+<td>Pressao de superficie/bombeio</td>
+<td>Pressao imposta/medida na superficie ou no sistema de bombeio.</td>
+<td>Nao isoladamente; deve ser propagada ate a profundidade.</td>
+</tr>
+<tr>
+<td>Pressao anular</td>
+<td>Pressao do fluido em anular selado ou aberto no trecho de interesse.</td>
+<td>Sim, se for a pressao atuante na parede do sal.</td>
+</tr>
+<tr>
+<td>Pressao de poros</td>
+<td>Pressao do fluido nos poros da formacao.</td>
+<td>Nao diretamente; entra em tensao efetiva.</td>
+</tr>
+<tr>
+<td>Tensao radial</td>
+<td>Componente normal radial aplicada ao contorno mecanico.</td>
+<td>Pode ser equivalente, mas deve ser documentada como tal.</td>
+</tr>
+<tr>
+<td>Tensao efetiva</td>
+<td>Tensao total corrigida por pressao de poros/convensao efetiva.</td>
+<td>Nao deve ser confundida com pressao absoluta de parede.</td>
+</tr>
+<tr>
+<td><code>wall_pressure_Pa</code> do sal</td>
+<td>Pressao compressiva absoluta de parede, ou condicao radial equivalente explicita, enviada a <code>SaltCreepQuery</code>.</td>
+<td>E o alvo do mapeamento.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="metodos-candidatos-para-lotsaltpressuremap">Metodos candidatos para <code>LotSaltPressureMap</code></h3>
+<p>A Fase 9.1B deve substituir o uso direto de <code>net_pressure_series_Pa</code> por um
+mapeador explicito. Metodos candidatos iniciais:</p>
+<h4 id="metodo-1-experimentalnetpressureproxy">Metodo 1 -- <code>ExperimentalNetPressureProxy</code></h4>
+<pre><code class="language-text">wall_pressure_Pa = net_pressure_Pa
+</code></pre>
+<p>Classificacao: experimental, nao fisico, compatibilidade com a Fase 9.0.</p>
+<p>Esse metodo deve existir apenas para preservar a prova de chamada criada na
+Fase 9.0 e para manter testes de transicao. Ele nao deve ser apresentado como
+pressao anular ou pressao absoluta.</p>
+<h4 id="metodo-2-absolutewellborepressure">Metodo 2 -- <code>AbsoluteWellborePressure</code></h4>
+<pre><code class="language-text">wall_pressure_Pa = absolute_wellbore_pressure_Pa
+</code></pre>
+<p>Classificacao: fisicamente preferivel quando a pressao absoluta estiver
+disponivel.</p>
+<p>Esse metodo deve ser o alvo de producao quando o runtime fornecer pressao de
+poco/sapata/anular em Pa absolutos, no trecho de sal avaliado.</p>
+<h4 id="metodo-3-hydrostaticplusnetpressure">Metodo 3 -- <code>HydrostaticPlusNetPressure</code></h4>
+<pre><code class="language-text">wall_pressure_Pa = surface_pressure_Pa + rho * g * depth_m + net_pressure_Pa
+</code></pre>
+<p>Classificacao: aproximacao intermediaria, valida somente se
+<code>net_pressure_Pa</code> for interpretada como incremento sobre a coluna hidrostatica.</p>
+<p>Esse metodo nao deve virar padrao sem validacao fisica e sem explicitar qual
+referencia transforma <code>p_net</code> em incremento de pressao absoluta.</p>
+<h3 id="dados-disponiveis-e-ausentes-hoje">Dados disponiveis e ausentes hoje</h3>
+<p>Disponiveis no projeto apos a Fase 9.0:</p>
+<ul>
+<li><code>PknResult.net_pressure_series_Pa</code>;</li>
+<li><code>LotConfig.breakdown_pressure_Pa</code>;</li>
+<li><code>FluidData.density_kg_m3</code>;</li>
+<li><code>FluidData.weight_lb_per_gal</code>;</li>
+<li><code>FluidData.surface_pressure_Pa</code>, quando o modo do fluido exigir;</li>
+<li><code>LotConfig.shoe_depth_m</code>;</li>
+<li><code>AnnularData.top_m</code>, <code>AnnularData.base_m</code> e <code>AnnularData.fluid_id</code>;</li>
+<li><code>units::ppg_hydrostatic_Pa_per_m()</code>.</li>
+</ul>
+<p>Ausentes ou ainda nao integrados ao <code>coupling/</code>:</p>
+<ul>
+<li>pressao absoluta de poco por tempo;</li>
+<li>pressao de bombeio/superficie por tempo;</li>
+<li>pressao no fundo/sapata por tempo;</li>
+<li>pressao anular APB por tempo;</li>
+<li>pressao de poros;</li>
+<li>tensao horizontal minima/closure stress;</li>
+<li>tensao radial geostatica de contorno para o sal;</li>
+<li>bloco <code>wellbore</code> persistido em <code>CaseData</code>;</li>
+<li>estado APB calculado;</li>
+<li>regra explicita para converter pressao PKN em pressao absoluta.</li>
+</ul>
+<h3 id="contrato-proposto-para-a-fase-91b">Contrato proposto para a Fase 9.1B</h3>
+<p>A proxima fase deve criar um mapeador explicito:</p>
+<ul>
+<li><code>include/coupling/LotSaltPressureMap.hpp</code>;</li>
+<li><code>src/coupling/LotSaltPressureMap.cpp</code>;</li>
+<li><code>tests/cpp/test_lot_salt_pressure_map.cpp</code>.</li>
+</ul>
+<p>API conceitual:</p>
+<pre><code class="language-cpp">enum class LotSaltPressureMapMethod {
+  ExperimentalNetPressureProxy,
+  AbsoluteWellborePressure,
+  HydrostaticPlusNetPressure
+};
+
+struct LotSaltPressureMapInput {
+  double net_pressure_Pa = 0.0;
+  double absolute_wellbore_pressure_Pa = 0.0;
+  double hydrostatic_pressure_Pa = 0.0;
+  double surface_pressure_Pa = 0.0;
+  double depth_m = 0.0;
+  LotSaltPressureMapMethod method =
+      LotSaltPressureMapMethod::ExperimentalNetPressureProxy;
+};
+
+struct LotSaltPressureMapResult {
+  double wall_pressure_Pa = 0.0;
+  LotSaltPressureMapMethod method;
+  std::string method_label;
+  bool physically_absolute = false;
+};
+
+LotSaltPressureMapResult map_lot_pkn_to_salt_wall_pressure(
+    const LotSaltPressureMapInput&amp; input);
+</code></pre>
+<p><code>evaluate_lot_salt_step()</code> deve ser adaptada futuramente para consumir
+<code>LotSaltPressureMapResult.wall_pressure_Pa</code>, nao
+<code>PknResult.net_pressure_series_Pa</code> diretamente.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

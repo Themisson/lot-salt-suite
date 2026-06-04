@@ -1,6 +1,6 @@
 # 02 — Formulação do Leak-Off Test (LOT)
 
-**Status:** Planejado | **Última atualização:** 2026-06-01
+**Status:** Planejado | **Última atualização:** 2026-06-04
 
 > Este documento descreve a formulação matemática implementada no código legado e
 > a ser reproduzida no código novo. **Não alterar formulação sem documentar aqui primeiro.**
@@ -43,6 +43,16 @@ p_net = E' * w / h
 onde `Q` e a taxa de injecao [m3/s], `mu` e a viscosidade [Pa.s], `E'` e o
 modulo plano [Pa], `h` e a altura PKN [m], `w0` e a abertura inicial [m] e
 `t_acomodacao` e o tempo sem incremento operacional.
+
+O campo `PknResult.net_pressure_series_Pa` armazena essa serie `p_net`. Ela e
+uma pressao liquida PKN, relativa a mecanica da fratura e a abertura `w`.
+`p_net` nao e pressao absoluta de poco, nao e pressao anular e nao representa,
+isoladamente, a pressao compressiva de parede que deve ser enviada ao sal.
+
+Para acoplamento LOT/PKN/sal, `p_net` precisa passar por um mapeamento fisico
+explicito antes de preencher `SaltCreepQuery.wall_pressure_Pa`. O contrato
+detalhado e os metodos candidatos para esse mapeamento ficam em
+`docs/13_coupling_lot_apb_salt.md`.
 
 O leakoff fica encapsulado em `lot::LeakoffModel` e e acumulado em volume
 com entradas SI. O modelo fechado (`none`) preserva o volume acumulado anterior

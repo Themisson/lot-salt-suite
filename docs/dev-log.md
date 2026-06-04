@@ -57,6 +57,51 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-04] Fase 9.1A — Formalizacao documental da pressao de parede LOT/PKN/sal — Codex
+
+**Status:** Concluido nesta sessao como fase documental/formulacional.
+
+**Objetivo:** Formalizar o contrato de pressao entre o resultado LOT/PKN e a
+interface de sal antes de implementar `LotSaltPressureMap`.
+
+**Conclusao fisica documentada:**
+- `PknResult.net_pressure_series_Pa` representa a pressao liquida PKN.
+- No modelo PKN minimo, `p_net = E' * w / h`.
+- `p_net` e uma pressao relativa de fratura associada a abertura `w` e ao
+  modulo plano `E'`; nao e pressao absoluta de poco, pressao anular ou pressao
+  fisica de parede do sal.
+- `SaltCreepQuery.wall_pressure_Pa` deve representar uma pressao compressiva
+  absoluta aplicada na parede do sal, ou uma condicao radial equivalente
+  explicitamente definida.
+
+**Contrato preparado para Fase 9.1B:**
+- Documentados os metodos candidatos `ExperimentalNetPressureProxy`,
+  `AbsoluteWellborePressure` e `HydrostaticPlusNetPressure`.
+- Documentados dados disponiveis hoje (`net_pressure_series_Pa`,
+  `breakdown_pressure_Pa`, densidade de fluido, campos hidrostaticos quando
+  aplicaveis, profundidade da sapata, anulares e gradiente ppg).
+- Documentados dados ausentes ou ainda nao integrados: pressao absoluta por
+  tempo, pressao de bombeio/superficie por tempo, pressao na sapata por tempo,
+  pressao anular APB por tempo, pressao de poros, closure stress, tensao radial
+  geostatica, `wellbore` persistido em `CaseData`, estado APB calculado e regra
+  explicita para converter PKN em pressao absoluta.
+- Proposta API conceitual para `LotSaltPressureMap`.
+
+**Arquivos alterados:**
+- `docs/13_coupling_lot_apb_salt.md`
+- `docs/02_lot_formulation.md`
+- `docs/03_apb_formulation.md`
+- `docs/dev-log.md`
+- `tools/docs_status.yaml`
+- `docs/index.html`
+
+**Escopo preservado:**
+- Nenhum codigo C++, CMake, teste, caso YAML, `external/saltcreep/`, `legacy/`,
+  `legance/`, baseline ou `postprocess/` foi alterado.
+- Nenhum commit ou push foi executado por instrucao da fase.
+
+---
+
 ### [2026-06-04 09:21] `c6c5867` — Themisson
 **Commit:** `feat(coupling): add experimental salt injection point for LOT/PKN (Fase 9.0)`
 **Testes C++:** 20 arquivos | **Testes Python:** 1 arquivos

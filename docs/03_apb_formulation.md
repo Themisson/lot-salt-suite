@@ -1,6 +1,6 @@
 # 03 — Formulação do Annular Pressure Buildup (APB)
 
-**Status:** Planejado | **Última atualização:** 2026-06-01
+**Status:** Planejado | **Última atualização:** 2026-06-04
 
 > Formulação a extrair do legado via `/formulation-audit` antes de implementar módulo `apb/`.
 
@@ -17,6 +17,18 @@ Campos a documentar:
 - Leakage (vazamento pelo packer ou cimentação)
 - Ventilação (venting controlado)
 - Integração com deformação viscoelástica do sal
+
+## Pressao anular e interface com sal
+
+Para o acoplamento LOT/PKN/sal, a pressao anular relevante e a pressao
+compressiva atuante na parede do sal no trecho de interesse. Ela pode se tornar
+uma entrada fisicamente adequada para `SaltCreepQuery.wall_pressure_Pa` quando
+estiver disponivel como pressao absoluta por tempo e profundidade.
+
+No estado atual do projeto, o modulo APB moderno ainda nao calcula nem expoe uma
+serie temporal de pressao anular. Portanto, a Fase 9.1A apenas formaliza o
+contrato: pressao anular absoluta pode alimentar o sal; pressao liquida PKN nao
+deve ser usada como substituto fisico sem um mapeamento explicito.
 
 ## Parâmetros de referência (LOT_APB_v5 — hard-coded)
 

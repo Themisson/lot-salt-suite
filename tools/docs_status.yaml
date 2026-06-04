@@ -35,6 +35,7 @@ phases:
   phase_8_0_saltcreep_dynamic_pressure: completed
   phase_8_1_lot_pkn_salt_adapter_substitutability: completed
   phase_9_0_lot_pkn_salt_coupling_step: completed
+  phase_9_1a_lot_salt_wall_pressure_formulation: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -49,8 +50,8 @@ phases:
 docs:
   overview:               planned
   inventory:              planned
-  lot_formulation:        planned
-  apb_formulation:        planned
+  lot_formulation:        in_progress
+  apb_formulation:        in_progress
   salt_models:            planned
   input_formats:          in_progress
   validation_plan:        planned
@@ -60,7 +61,7 @@ docs:
   postprocessing:         implemented
   cli_usage:              in_progress
   validation_results:     in_progress    # NUNCA mudar para validated sem execução real
-  coupling:               planned
+  coupling:               in_progress
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -133,5 +134,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-04"
-updated_by: "claude-code (Fase 9.0)"
+updated_by: "codex (Fase 9.1A documentacao/formulacao)"
 project_version: "0.1.0"
