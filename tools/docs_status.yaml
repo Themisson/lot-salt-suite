@@ -40,6 +40,7 @@ phases:
   phase_9_2b_hydrostatic_units: completed
   phase_9_3b_lot_salt_hydrostatic_context: completed
   phase_9_4b_lot_salt_coupling_config_builder: completed
+  phase_9_5a_hydrostatic_plus_net_pressure_formulation: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -138,5 +139,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-04"
-updated_by: "codex (Fase 9.4B LotSaltCouplingConfigBuilder)"
+updated_by: "codex (Fase 9.5A HydrostaticPlusNetPressure formulation)"
 project_version: "0.1.0"

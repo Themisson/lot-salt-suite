@@ -393,6 +393,97 @@ Essa rota ainda nao e acoplamento fisico validado. `HydrostaticPlusNetPressure`
 continua exigindo a interpretacao explicita de `p_net` como incremento sobre a
 coluna hidrostatica, e nao deve virar default global sem validacao fisica.
 
+## Status fisico de `HydrostaticPlusNetPressure` (Fase 9.5A)
+
+A Fase 9.5 auditou a validade fisica da expressao:
+
+```text
+p_wall = p_hydrostatic + p_net
+```
+
+ou, na API atual:
+
+```text
+wall_pressure_Pa =
+    surface_pressure_Pa + hydrostatic_pressure_Pa + net_pressure_Pa
+```
+
+Conclusao da auditoria: `HydrostaticPlusNetPressure` deve permanecer como
+aproximacao provisoria opt-in. Ele nao e acoplamento fisico validado e nao deve
+virar default runtime.
+
+Classificacao operacional:
+
+```text
+HydrostaticPlusNetPressure:
+  status: provisional approximation / opt-in only
+  physical validation: not validated
+  runtime default: no
+  allowed use: controlled studies, chain tests, preliminary approximations
+```
+
+O motivo e a referencia fisica de `p_net`. No `PknModel` moderno,
+`PknResult.net_pressure_series_Pa` vem de:
+
+```text
+p_net = E' * w / h
+```
+
+Essa grandeza e uma pressao liquida PKN associada a abertura elastica da
+fratura. Ela nao carrega explicitamente:
+
+- `sigma_closure`;
+- tensao horizontal minima;
+- pressao de poros;
+- tensao radial geostatica;
+- pressao absoluta de poco por tempo;
+- pressao de bombeio/superficie por tempo;
+- uma referencia geomecanica completa.
+
+Assim, `p_net` pode ser interpretado como incremento sobre a coluna hidrostatica
+somente por hipotese documentada do chamador. Sem essa hipotese, a soma
+`p_hydrostatic + p_net` pode misturar uma pressao absoluta local com uma pressao
+relativa de fratura.
+
+`SaltCreepQuery.wall_pressure_Pa`, por outro lado, deve representar pressao
+compressiva absoluta na parede do sal ou uma condicao radial equivalente bem
+definida. Se uma fase futura precisar enviar tensao radial efetiva, pressao
+referenciada a closure stress ou historico APB, isso deve aparecer como metodo
+nomeado e testado, nao como uso implicito de `HydrostaticPlusNetPressure`.
+
+Status recomendado dos metodos existentes:
+
+| Metodo | Status fisico | Uso recomendado | Limite |
+|--------|---------------|-----------------|--------|
+| `ExperimentalNetPressureProxy` | Experimental only | Compatibilidade, teste de chamada e transicao | Nao representa pressao fisica de parede. |
+| `AbsoluteWellborePressure` | Preferivel quando disponivel | Pressao absoluta de poco/sapata/anular validada | Exige fonte runtime confiavel. |
+| `HydrostaticPlusNetPressure` | Provisional approximation / opt-in only | Estudos controlados, testes de cadeia e aproximacoes preliminares | Exige hipotese explicita de `p_net` como incremento operacional sobre a coluna. |
+
+Metodos futuros candidatos:
+
+- `BreakdownReferencedPressure`: quando o incremento for definido contra
+  `LotConfig.breakdown_pressure_Pa` ou uma pressao de iniciacao documentada.
+- `ClosureReferencedPressure`: quando `sigma_closure` ou tensao minima
+  horizontal estiver disponivel no caso.
+- `AnnularPressureHistory`: quando APB fornecer pressao anular absoluta por
+  tempo e profundidade.
+- `EffectiveRadialPressure`: quando o contrato for uma tensao radial efetiva,
+  com pressao de poros e convencao de sinal documentadas.
+
+Checklist minima antes de qualquer wiring runtime acoplado:
+
+- pressao absoluta conhecida por tempo e profundidade;
+- referencia de tensao clara para qualquer incremento LOT/PKN;
+- profundidade de acoplamento definida;
+- fluido selecionado e rastreavel;
+- pressao de superficie/bombeio definida quando usada;
+- convencao de sinal documentada entre LSS e backend de sal;
+- closure stress, tensao minima horizontal ou justificativa equivalente;
+- pressao de poros quando houver uso de tensao efetiva;
+- testes sinteticos dedicados;
+- comparacao com legado ou referencia externa quando aplicavel;
+- documentacao atualizada antes de tornar qualquer rota default.
+
 ## Interface proposta para coupling/
 
 ```cpp

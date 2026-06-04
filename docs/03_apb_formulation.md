@@ -30,6 +30,12 @@ serie temporal de pressao anular. Portanto, a Fase 9.1A apenas formaliza o
 contrato: pressao anular absoluta pode alimentar o sal; pressao liquida PKN nao
 deve ser usada como substituto fisico sem um mapeamento explicito.
 
+Para fases futuras, APB deve ser tratado como fonte propria de pressao anular
+absoluta por tempo e profundidade, nao como uma variacao do metodo
+`HydrostaticPlusNetPressure`. Se APB fornecer historico operacional validado, o
+acoplamento deve preferir um metodo explicito de pressao anular, separado de
+qualquer incremento `p_net` da fratura PKN.
+
 ## Parâmetros de referência (LOT_APB_v5 — hard-coded)
 
 | Parâmetro | Valor | Fonte |

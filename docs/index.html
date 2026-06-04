@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">26/33</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">27/34</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">146</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -599,7 +599,12 @@ modulo plano [Pa], <code>h</code> e a altura PKN [m], <code>w0</code> e a abertu
 <p>O campo <code>PknResult.net_pressure_series_Pa</code> armazena essa serie <code>p_net</code>. Ela e
 uma pressao liquida PKN, relativa a mecanica da fratura e a abertura <code>w</code>.
 <code>p_net</code> nao e pressao absoluta de poco, nao e pressao anular e nao representa,
-isoladamente, a pressao compressiva de parede que deve ser enviada ao sal.</p>
+isoladamente, a pressao compressiva de parede que deve ser enviada ao sal.
+Na formulacao moderna atual, <code>p_net</code> tambem nao carrega explicitamente
+<code>sigma_closure</code>, tensao horizontal minima, pressao de poros ou uma referencia
+geomecanica completa. Portanto, qualquer uso de <code>p_net</code> como incremento de
+pressao absoluta deve ser declarado como hipotese de mapeamento, nao como
+consequencia direta do <code>PknModel</code>.</p>
 <p>Para acoplamento LOT/PKN/sal, <code>p_net</code> precisa passar por um mapeamento fisico
 explicito antes de preencher <code>SaltCreepQuery.wall_pressure_Pa</code>. O contrato
 detalhado e os metodos candidatos para esse mapeamento ficam em
@@ -750,6 +755,11 @@ estiver disponivel como pressao absoluta por tempo e profundidade.</p>
 serie temporal de pressao anular. Portanto, a Fase 9.1A apenas formaliza o
 contrato: pressao anular absoluta pode alimentar o sal; pressao liquida PKN nao
 deve ser usada como substituto fisico sem um mapeamento explicito.</p>
+<p>Para fases futuras, APB deve ser tratado como fonte propria de pressao anular
+absoluta por tempo e profundidade, nao como uma variacao do metodo
+<code>HydrostaticPlusNetPressure</code>. Se APB fornecer historico operacional validado, o
+acoplamento deve preferir um metodo explicito de pressao anular, separado de
+qualquer incremento <code>p_net</code> da fratura PKN.</p>
 <h2 id="parametros-de-referencia-lot_apb_v5-hard-coded">Parâmetros de referência (LOT_APB_v5 — hard-coded)</h2>
 <table>
 <thead>
@@ -2952,6 +2962,104 @@ habilita um encadeamento explicito e testavel:</p>
 <p>Essa rota ainda nao e acoplamento fisico validado. <code>HydrostaticPlusNetPressure</code>
 continua exigindo a interpretacao explicita de <code>p_net</code> como incremento sobre a
 coluna hidrostatica, e nao deve virar default global sem validacao fisica.</p>
+<h2 id="status-fisico-de-hydrostaticplusnetpressure-fase-95a">Status fisico de <code>HydrostaticPlusNetPressure</code> (Fase 9.5A)</h2>
+<p>A Fase 9.5 auditou a validade fisica da expressao:</p>
+<pre><code class="language-text">p_wall = p_hydrostatic + p_net
+</code></pre>
+<p>ou, na API atual:</p>
+<pre><code class="language-text">wall_pressure_Pa =
+    surface_pressure_Pa + hydrostatic_pressure_Pa + net_pressure_Pa
+</code></pre>
+<p>Conclusao da auditoria: <code>HydrostaticPlusNetPressure</code> deve permanecer como
+aproximacao provisoria opt-in. Ele nao e acoplamento fisico validado e nao deve
+virar default runtime.</p>
+<p>Classificacao operacional:</p>
+<pre><code class="language-text">HydrostaticPlusNetPressure:
+  status: provisional approximation / opt-in only
+  physical validation: not validated
+  runtime default: no
+  allowed use: controlled studies, chain tests, preliminary approximations
+</code></pre>
+<p>O motivo e a referencia fisica de <code>p_net</code>. No <code>PknModel</code> moderno,
+<code>PknResult.net_pressure_series_Pa</code> vem de:</p>
+<pre><code class="language-text">p_net = E' * w / h
+</code></pre>
+<p>Essa grandeza e uma pressao liquida PKN associada a abertura elastica da
+fratura. Ela nao carrega explicitamente:</p>
+<ul>
+<li><code>sigma_closure</code>;</li>
+<li>tensao horizontal minima;</li>
+<li>pressao de poros;</li>
+<li>tensao radial geostatica;</li>
+<li>pressao absoluta de poco por tempo;</li>
+<li>pressao de bombeio/superficie por tempo;</li>
+<li>uma referencia geomecanica completa.</li>
+</ul>
+<p>Assim, <code>p_net</code> pode ser interpretado como incremento sobre a coluna hidrostatica
+somente por hipotese documentada do chamador. Sem essa hipotese, a soma
+<code>p_hydrostatic + p_net</code> pode misturar uma pressao absoluta local com uma pressao
+relativa de fratura.</p>
+<p><code>SaltCreepQuery.wall_pressure_Pa</code>, por outro lado, deve representar pressao
+compressiva absoluta na parede do sal ou uma condicao radial equivalente bem
+definida. Se uma fase futura precisar enviar tensao radial efetiva, pressao
+referenciada a closure stress ou historico APB, isso deve aparecer como metodo
+nomeado e testado, nao como uso implicito de <code>HydrostaticPlusNetPressure</code>.</p>
+<p>Status recomendado dos metodos existentes:</p>
+<table>
+<thead>
+<tr>
+<th>Metodo</th>
+<th>Status fisico</th>
+<th>Uso recomendado</th>
+<th>Limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ExperimentalNetPressureProxy</code></td>
+<td>Experimental only</td>
+<td>Compatibilidade, teste de chamada e transicao</td>
+<td>Nao representa pressao fisica de parede.</td>
+</tr>
+<tr>
+<td><code>AbsoluteWellborePressure</code></td>
+<td>Preferivel quando disponivel</td>
+<td>Pressao absoluta de poco/sapata/anular validada</td>
+<td>Exige fonte runtime confiavel.</td>
+</tr>
+<tr>
+<td><code>HydrostaticPlusNetPressure</code></td>
+<td>Provisional approximation / opt-in only</td>
+<td>Estudos controlados, testes de cadeia e aproximacoes preliminares</td>
+<td>Exige hipotese explicita de <code>p_net</code> como incremento operacional sobre a coluna.</td>
+</tr>
+</tbody>
+</table>
+<p>Metodos futuros candidatos:</p>
+<ul>
+<li><code>BreakdownReferencedPressure</code>: quando o incremento for definido contra
+  <code>LotConfig.breakdown_pressure_Pa</code> ou uma pressao de iniciacao documentada.</li>
+<li><code>ClosureReferencedPressure</code>: quando <code>sigma_closure</code> ou tensao minima
+  horizontal estiver disponivel no caso.</li>
+<li><code>AnnularPressureHistory</code>: quando APB fornecer pressao anular absoluta por
+  tempo e profundidade.</li>
+<li><code>EffectiveRadialPressure</code>: quando o contrato for uma tensao radial efetiva,
+  com pressao de poros e convencao de sinal documentadas.</li>
+</ul>
+<p>Checklist minima antes de qualquer wiring runtime acoplado:</p>
+<ul>
+<li>pressao absoluta conhecida por tempo e profundidade;</li>
+<li>referencia de tensao clara para qualquer incremento LOT/PKN;</li>
+<li>profundidade de acoplamento definida;</li>
+<li>fluido selecionado e rastreavel;</li>
+<li>pressao de superficie/bombeio definida quando usada;</li>
+<li>convencao de sinal documentada entre LSS e backend de sal;</li>
+<li>closure stress, tensao minima horizontal ou justificativa equivalente;</li>
+<li>pressao de poros quando houver uso de tensao efetiva;</li>
+<li>testes sinteticos dedicados;</li>
+<li>comparacao com legado ou referencia externa quando aplicavel;</li>
+<li>documentacao atualizada antes de tornar qualquer rota default.</li>
+</ul>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

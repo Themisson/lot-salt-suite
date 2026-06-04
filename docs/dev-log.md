@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 9.4B implementada, aguardando revisao/commit
+Fase ativa  : 9.5A documentacao fisica implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
@@ -54,6 +54,49 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 9.5A — formulacao fisica de `HydrostaticPlusNetPressure` — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Documentar formalmente as limitacoes fisicas do metodo
+`HydrostaticPlusNetPressure` antes de qualquer wiring runtime ou acoplamento
+operacional.
+
+**Conclusao documental:**
+- `HydrostaticPlusNetPressure` permanece `provisional approximation / opt-in only`.
+- A validacao fisica do metodo ainda nao esta concluida.
+- O metodo nao deve virar default runtime.
+- O uso permitido fica restrito a estudos controlados, testes de cadeia e
+  aproximacoes preliminares.
+
+**Motivo fisico:**
+- `PknResult.net_pressure_series_Pa` vem de `p_net = E' * w / h`.
+- `p_net` e pressao liquida PKN associada a abertura elastica da fratura.
+- `p_net` nao carrega explicitamente `sigma_closure`, tensao horizontal minima,
+  pressao de poros, tensao radial geostatica ou referencia geomecanica completa.
+- `SaltCreepQuery.wall_pressure_Pa` deve representar pressao compressiva
+  absoluta na parede do sal ou condicao radial equivalente bem definida.
+
+**Documentacao atualizada:**
+- `docs/13_coupling_lot_apb_salt.md` recebeu a classificacao formal do metodo,
+  status dos mapeamentos existentes, candidatos futuros e checklist minima antes
+  de wiring runtime.
+- `docs/02_lot_formulation.md` reforca que `p_net` nao inclui closure stress,
+  tensao minima horizontal, pressao de poros ou referencia geomecanica completa.
+- `docs/03_apb_formulation.md` registra que APB futuro deve fornecer pressao
+  anular absoluta por tempo/profundidade por metodo proprio, separado de
+  `HydrostaticPlusNetPressure`.
+- `tools/docs_status.yaml` registra a Fase 9.5A como concluida.
+
+**Limite deliberado:**
+- Nenhum codigo C++ foi alterado.
+- `CMakeLists.txt`, testes, YAMLs, parser, `CaseData`, `PknRunner`,
+  `PknModel`, `ResultWriter`, `apps/lot-sim.cpp`, `external/saltcreep/`,
+  `legacy/`, `legance/`, baselines e postprocess nao foram alterados.
+- `lot-sim run --mode lot-pkn` permanece desacoplado.
 
 ---
 

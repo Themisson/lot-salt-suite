@@ -48,6 +48,11 @@ O campo `PknResult.net_pressure_series_Pa` armazena essa serie `p_net`. Ela e
 uma pressao liquida PKN, relativa a mecanica da fratura e a abertura `w`.
 `p_net` nao e pressao absoluta de poco, nao e pressao anular e nao representa,
 isoladamente, a pressao compressiva de parede que deve ser enviada ao sal.
+Na formulacao moderna atual, `p_net` tambem nao carrega explicitamente
+`sigma_closure`, tensao horizontal minima, pressao de poros ou uma referencia
+geomecanica completa. Portanto, qualquer uso de `p_net` como incremento de
+pressao absoluta deve ser declarado como hipotese de mapeamento, nao como
+consequencia direta do `PknModel`.
 
 Para acoplamento LOT/PKN/sal, `p_net` precisa passar por um mapeamento fisico
 explicito antes de preencher `SaltCreepQuery.wall_pressure_Pa`. O contrato
