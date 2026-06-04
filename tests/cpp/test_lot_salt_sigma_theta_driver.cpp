@@ -3,7 +3,9 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
+#include "coupling/LotSaltBridgeConfigBuilder.hpp"
 #include "coupling/LotSaltSigmaThetaDriver.hpp"
+#include "io/CaseParser.hpp"
 #include "salt/SaltCreepTimeBridge.hpp"
 #include "units/units.hpp"
 
@@ -141,4 +143,61 @@ TEST_CASE("LotSaltSigmaThetaDriver returns traceable components and caveat") {
   CHECK(result.caveat.find("snapshot") != std::string::npos);
   CHECK(result.caveat.find("not temporally synchronized") !=
         std::string::npos);
+}
+
+TEST_CASE("LotSaltSigmaThetaDriver runs after bridge config builder without geostatic") {
+  const auto data =
+      lss::io::parse_yaml("cases/validation/lot_pkn_minimal.yaml");
+  lss::coupling::LotSaltBridgeConfigOptions bridge_options;
+  bridge_options.radial_elements = 12;
+  auto bridge_config =
+      lss::coupling::make_lot_salt_bridge_config(data, bridge_options);
+  // Keep this integration test focused on the opt-in wiring. The diagnostic
+  // rejects tensile hoop-stress snapshots, which can occur for the raw
+  // hydrostatic bridge pressure before a physically calibrated salt state.
+  bridge_config.wall_pressure_Pa = 0.0;
+  lss::salt::SaltCreepTimeBridge bridge(bridge_config);
+  const int step_count_before = bridge.result().step_count;
+
+  const auto result =
+      lss::coupling::run_lot_salt_sigma_theta_experimental(data, bridge);
+
+  CHECK(result.valid == true);
+  CHECK(result.wall_stress.valid == true);
+  CHECK(result.diagnostic.valid == true);
+  CHECK_FALSE(result.diagnostic.points.empty());
+  CHECK(result.coupling_config.pressure_map_method ==
+        lss::coupling::LotSaltPressureMapMethod::HydrostaticPlusNetPressure);
+  CHECK(bridge_config.elastic_modulus_Pa == Catch::Approx(20.4e9));
+  CHECK(bridge_config.poisson_ratio == Catch::Approx(0.36));
+  CHECK(bridge.result().step_count == step_count_before);
+  CHECK_FALSE(result.caveat.empty());
+}
+
+TEST_CASE("LotSaltSigmaThetaDriver runs after bridge config builder with explicit geostatic") {
+  const auto data =
+      lss::io::parse_yaml("cases/validation/lot_pkn_minimal.yaml");
+  lss::coupling::LotSaltBridgeConfigOptions bridge_options;
+  bridge_options.radial_elements = 12;
+  bridge_options.geostatic_enabled = true;
+  bridge_options.geostatic_radial_stress_Pa = -2.0e6;
+  bridge_options.geostatic_hoop_stress_Pa = -2.0e6;
+  bridge_options.geostatic_vertical_stress_Pa = -2.0e6;
+  auto bridge_config =
+      lss::coupling::make_lot_salt_bridge_config(data, bridge_options);
+  bridge_config.wall_pressure_Pa = 0.0;
+  lss::salt::SaltCreepTimeBridge bridge(bridge_config);
+  const int step_count_before = bridge.result().step_count;
+
+  const auto result =
+      lss::coupling::run_lot_salt_sigma_theta_experimental(data, bridge);
+
+  CHECK(result.valid == true);
+  CHECK(result.wall_stress.valid == true);
+  CHECK(result.diagnostic.valid == true);
+  CHECK_FALSE(result.diagnostic.points.empty());
+  CHECK(bridge.result().step_count == step_count_before);
+  REQUIRE_FALSE(result.wall_stress.wall_samples.empty());
+  CHECK(result.wall_stress.wall_samples.front()
+            .sigma_theta_compression_positive_Pa >= 0.0);
 }

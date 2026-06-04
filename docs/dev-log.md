@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.3 implementada, aguardando commit/push
+Fase ativa  : 10.4 implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 175/175 Catch2 lot-salt-suite em 2026-06-04 apos Fase 10.3
+Testes C++  : 180/180 Catch2 lot-salt-suite em 2026-06-04 apos Fase 10.4
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,54 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 10.4 — geostatica explicita e teste builder-bridge-driver — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Expandir `LotSaltBridgeConfigOptions` com geostatica explicita e
+testar a cadeia experimental `CaseData -> LotSaltBridgeConfigBuilder ->
+SaltCreepTimeBridge -> LotSaltSigmaThetaDriver`.
+
+**Fase 10.4A — geostatica explicita:**
+- `LotSaltBridgeConfigOptions` recebeu
+  `geostatic_radial_stress_Pa`, `geostatic_hoop_stress_Pa` e
+  `geostatic_vertical_stress_Pa`.
+- `geostatic_enabled=true` agora preenche as tres tensoes no
+  `SaltCreepTimeBridgeConfig` e marca `fix_outer_wall=true`.
+- Tensoes geostaticas precisam ser finitas; `NaN`/`Inf` sao rejeitados.
+- O default sem geostatica preserva a Fase 10.3.
+
+**Fase 10.4B — cadeia integrada:**
+- Adicionados testes que parseiam `lot_pkn_minimal.yaml`, constroem
+  `SaltCreepTimeBridgeConfig` pelo builder, instanciam `SaltCreepTimeBridge` e
+  chamam `run_lot_salt_sigma_theta_experimental(data, bridge)`.
+- A cadeia foi testada sem geostatica e com geostatica explicita.
+- O driver continua usando snapshot unico e nao avanca o bridge.
+
+**Limites deliberados:**
+- Geostatica vem de options, nao de `CaseData`.
+- Nenhuma tensao litostatica e calculada automaticamente.
+- CLI, parser, `CaseData`, `PknRunner`, `PknModel`, `ResultWriter`,
+  `SaltCreepTimeBridge`, driver, diagnostic, pressure map, YAMLs, schemas,
+  LOT/APB, sal, `external/saltcreep/`, legados, baselines e postprocess nao
+  foram alterados.
+- `lot-sim run --mode lot-pkn` permanece desacoplado.
+
+**Verificacao executada:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure` passou com 180/180.
+- Filtro `bridge_config|BridgeConfig|sigma_theta|SigmaTheta|wall_stress|
+  WallStress|time_bridge|TimeBridge|saltcreep` passou com 48/48.
+- Filtro `LOT PKN.*identical` passou com 2/2.
+- `lot-sim validate` passou para `lot_pkn_minimal.yaml`,
+  `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
+- `lot-sim run --mode lot-pkn` passou para os tres casos, gerando saidas em
+  `results/phase10_4_minimal`, `results/phase10_4_leakoff` e
+  `results/phase10_4_buz67d`.
+- `git diff --check` passou com aviso CRLF conhecido em `docs/dev-log.md`.
 
 ---
 

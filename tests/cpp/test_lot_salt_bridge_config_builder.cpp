@@ -104,6 +104,48 @@ TEST_CASE("LotSaltBridgeConfigBuilder output constructs an available bridge") {
   CHECK_FALSE(diagnostics.wall_samples.empty());
 }
 
+TEST_CASE("LotSaltBridgeConfigBuilder accepts explicit geostatic stresses") {
+  const auto data = make_case_data();
+  lss::coupling::LotSaltBridgeConfigOptions options;
+  options.geostatic_enabled = true;
+  options.geostatic_radial_stress_Pa = -2.0e6;
+  options.geostatic_hoop_stress_Pa = -2.0e6;
+  options.geostatic_vertical_stress_Pa = -2.0e6;
+  options.radial_elements = 12;
+
+  const auto config =
+      lss::coupling::make_lot_salt_bridge_config(data, options);
+  const lss::salt::SaltCreepTimeBridge bridge(config);
+  const auto diagnostics = bridge.wall_stress_diagnostics();
+
+  CHECK(config.geostatic_enabled == true);
+  CHECK(config.geostatic_radial_stress_Pa == Catch::Approx(-2.0e6));
+  CHECK(config.geostatic_hoop_stress_Pa == Catch::Approx(-2.0e6));
+  CHECK(config.geostatic_vertical_stress_Pa == Catch::Approx(-2.0e6));
+  CHECK(config.fix_outer_wall == true);
+  CHECK(bridge.is_available());
+  CHECK(diagnostics.valid);
+  CHECK_FALSE(diagnostics.wall_samples.empty());
+}
+
+TEST_CASE("LotSaltBridgeConfigBuilder accepts explicit zero geostatic stresses") {
+  const auto data = make_case_data();
+  lss::coupling::LotSaltBridgeConfigOptions options;
+  options.geostatic_enabled = true;
+  options.geostatic_radial_stress_Pa = 0.0;
+  options.geostatic_hoop_stress_Pa = 0.0;
+  options.geostatic_vertical_stress_Pa = 0.0;
+
+  const auto config =
+      lss::coupling::make_lot_salt_bridge_config(data, options);
+
+  CHECK(config.geostatic_enabled == true);
+  CHECK(config.geostatic_radial_stress_Pa == Catch::Approx(0.0));
+  CHECK(config.geostatic_hoop_stress_Pa == Catch::Approx(0.0));
+  CHECK(config.geostatic_vertical_stress_Pa == Catch::Approx(0.0));
+  CHECK(config.fix_outer_wall == true);
+}
+
 TEST_CASE("LotSaltBridgeConfigBuilder rejects missing layer at shoe") {
   auto data = make_case_data();
   data.layers.front().top_m = 0.0;
@@ -169,11 +211,6 @@ TEST_CASE("LotSaltBridgeConfigBuilder rejects invalid options and case fields") 
                   std::invalid_argument);
 
   options = {};
-  options.geostatic_enabled = true;
-  CHECK_THROWS_AS(lss::coupling::make_lot_salt_bridge_config(data, options),
-                  std::invalid_argument);
-
-  options = {};
   data = make_case_data();
   data.lot.fracture_height_m = 0.0;
   CHECK_THROWS_AS(lss::coupling::make_lot_salt_bridge_config(data, options),
@@ -186,6 +223,30 @@ TEST_CASE("LotSaltBridgeConfigBuilder rejects invalid options and case fields") 
 
   data = make_case_data();
   data.rocks.front().nu = 0.5;
+  CHECK_THROWS_AS(lss::coupling::make_lot_salt_bridge_config(data, options),
+                  std::invalid_argument);
+}
+
+TEST_CASE("LotSaltBridgeConfigBuilder rejects non-finite geostatic stresses") {
+  const auto data = make_case_data();
+  const double nan = std::numeric_limits<double>::quiet_NaN();
+  const double inf = std::numeric_limits<double>::infinity();
+  lss::coupling::LotSaltBridgeConfigOptions options;
+  options.geostatic_enabled = true;
+
+  options.geostatic_radial_stress_Pa = nan;
+  CHECK_THROWS_AS(lss::coupling::make_lot_salt_bridge_config(data, options),
+                  std::invalid_argument);
+
+  options = {};
+  options.geostatic_enabled = true;
+  options.geostatic_hoop_stress_Pa = inf;
+  CHECK_THROWS_AS(lss::coupling::make_lot_salt_bridge_config(data, options),
+                  std::invalid_argument);
+
+  options = {};
+  options.geostatic_enabled = true;
+  options.geostatic_vertical_stress_Pa = nan;
   CHECK_THROWS_AS(lss::coupling::make_lot_salt_bridge_config(data, options),
                   std::invalid_argument);
 }

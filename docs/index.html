@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">34/41</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">175</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">36/43</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">180</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -3482,6 +3482,53 @@ em options ate existir persistencia termica apropriada.</p>
 <p>O fluxo <code>lot-sim run --mode lot-pkn</code> permanece desacoplado. A Fase 10.3 nao
 implementa driver temporal, acoplamento fisico validado, dano, fluencia
 terciaria nem criterio constitutivo avancado.</p>
+<h2 id="geostatica-explicita-no-bridge-config-builder-fase-104">Geostatica explicita no bridge config builder (Fase 10.4)</h2>
+<p>A Fase 10.4 expande <code>LotSaltBridgeConfigOptions</code> para aceitar tensoes
+geostaticas explicitas:</p>
+<pre><code class="language-text">geostatic_enabled
+geostatic_radial_stress_Pa
+geostatic_hoop_stress_Pa
+geostatic_vertical_stress_Pa
+</code></pre>
+<p>Esses valores vêm exclusivamente de options. A fase nao infere geostatica de
+<code>CaseData</code>, nao calcula tensao litostatica automaticamente e nao altera parser,
+YAML ou schema. Quando <code>geostatic_enabled = true</code>, o builder preenche
+<code>SaltCreepTimeBridgeConfig</code> com as tres tensoes fornecidas e marca
+<code>fix_outer_wall = true</code>, porque essa aproximacao de confinamento externo exige
+fronteira externa restringida no bridge.</p>
+<p>Quando <code>geostatic_enabled = false</code>, o comportamento default da Fase 10.3 e
+preservado: tensoes geostaticas zeradas, geostatica desabilitada e
+<code>fix_outer_wall = false</code>.</p>
+<p>A Fase 10.4 tambem adiciona testes integrados da cadeia:</p>
+<pre><code class="language-text">CaseData
+  -&gt; make_lot_salt_bridge_config(data, options)
+  -&gt; SaltCreepTimeBridge
+  -&gt; run_lot_salt_sigma_theta_experimental(data, bridge)
+</code></pre>
+<p>Esses testes cobrem a cadeia sem geostatica e com geostatica explicita. O driver
+continua usando snapshot unico de tensao de parede, nao avanca o bridge e nao
+sincroniza temporalmente tensao do sal com cada passo PKN.</p>
+<p>Ressalva do teste integrado: nos cenarios builder -&gt; bridge -&gt; driver,
+<code>bridge_config.wall_pressure_Pa</code> e sobrescrito para <code>0.0</code> antes de construir o
+<code>SaltCreepTimeBridge</code>. Essa escolha mantem o teste focado no wiring opt-in da
+cadeia. A pressao hidrostatica derivada pelo builder a partir do YAML, quando
+aplicada sem confinamento geostatico fisicamente calibrado, pode gerar
+<code>sigma_theta_compression_positive_Pa &lt; 0</code>; esse valor e rejeitado pelo
+diagnostico <code>LotSaltSigmaThetaDiagnostic</code>, que exige tensao tangencial em
+convencao compressao-positiva nao negativa. Portanto, o teste nao valida a
+pressao hidrostatica como estado fisico de tensao do sal; ele valida apenas que
+o bridge configurado pelo builder pode alimentar explicitamente o driver em uma
+rota opt-in controlada.</p>
+<p>Classificacao operacional:</p>
+<pre><code class="language-text">LotSaltBridgeConfigOptions.geostatic_*:
+  status: experimental / opt-in only
+  source: explicit options
+  CaseData inference: no
+  fix_outer_wall when enabled: true
+  runtime default: no
+</code></pre>
+<p>O fluxo <code>lot-sim run --mode lot-pkn</code> permanece desacoplado. A Fase 10.4 nao
+implementa acoplamento temporal nem acoplamento fisico validado.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

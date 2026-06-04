@@ -941,6 +941,68 @@ O fluxo `lot-sim run --mode lot-pkn` permanece desacoplado. A Fase 10.3 nao
 implementa driver temporal, acoplamento fisico validado, dano, fluencia
 terciaria nem criterio constitutivo avancado.
 
+## Geostatica explicita no bridge config builder (Fase 10.4)
+
+A Fase 10.4 expande `LotSaltBridgeConfigOptions` para aceitar tensoes
+geostaticas explicitas:
+
+```text
+geostatic_enabled
+geostatic_radial_stress_Pa
+geostatic_hoop_stress_Pa
+geostatic_vertical_stress_Pa
+```
+
+Esses valores vêm exclusivamente de options. A fase nao infere geostatica de
+`CaseData`, nao calcula tensao litostatica automaticamente e nao altera parser,
+YAML ou schema. Quando `geostatic_enabled = true`, o builder preenche
+`SaltCreepTimeBridgeConfig` com as tres tensoes fornecidas e marca
+`fix_outer_wall = true`, porque essa aproximacao de confinamento externo exige
+fronteira externa restringida no bridge.
+
+Quando `geostatic_enabled = false`, o comportamento default da Fase 10.3 e
+preservado: tensoes geostaticas zeradas, geostatica desabilitada e
+`fix_outer_wall = false`.
+
+A Fase 10.4 tambem adiciona testes integrados da cadeia:
+
+```text
+CaseData
+  -> make_lot_salt_bridge_config(data, options)
+  -> SaltCreepTimeBridge
+  -> run_lot_salt_sigma_theta_experimental(data, bridge)
+```
+
+Esses testes cobrem a cadeia sem geostatica e com geostatica explicita. O driver
+continua usando snapshot unico de tensao de parede, nao avanca o bridge e nao
+sincroniza temporalmente tensao do sal com cada passo PKN.
+
+Ressalva do teste integrado: nos cenarios builder -> bridge -> driver,
+`bridge_config.wall_pressure_Pa` e sobrescrito para `0.0` antes de construir o
+`SaltCreepTimeBridge`. Essa escolha mantem o teste focado no wiring opt-in da
+cadeia. A pressao hidrostatica derivada pelo builder a partir do YAML, quando
+aplicada sem confinamento geostatico fisicamente calibrado, pode gerar
+`sigma_theta_compression_positive_Pa < 0`; esse valor e rejeitado pelo
+diagnostico `LotSaltSigmaThetaDiagnostic`, que exige tensao tangencial em
+convencao compressao-positiva nao negativa. Portanto, o teste nao valida a
+pressao hidrostatica como estado fisico de tensao do sal; ele valida apenas que
+o bridge configurado pelo builder pode alimentar explicitamente o driver em uma
+rota opt-in controlada.
+
+Classificacao operacional:
+
+```text
+LotSaltBridgeConfigOptions.geostatic_*:
+  status: experimental / opt-in only
+  source: explicit options
+  CaseData inference: no
+  fix_outer_wall when enabled: true
+  runtime default: no
+```
+
+O fluxo `lot-sim run --mode lot-pkn` permanece desacoplado. A Fase 10.4 nao
+implementa acoplamento temporal nem acoplamento fisico validado.
+
 ## Interface proposta para coupling/
 
 ```cpp

@@ -9,11 +9,15 @@
 namespace lss::coupling {
 namespace {
 
-void require_positive_finite(double value, const std::string& field) {
+void require_finite(double value, const std::string& field) {
   if (!std::isfinite(value)) {
     throw std::invalid_argument("LotSaltBridgeConfigBuilder: " + field +
                                 " must be finite");
   }
+}
+
+void require_positive_finite(double value, const std::string& field) {
+  require_finite(value, field);
   if (value <= 0.0) {
     throw std::invalid_argument("LotSaltBridgeConfigBuilder: " + field +
                                 " must be positive");
@@ -39,9 +43,12 @@ void validate_options(const LotSaltBridgeConfigOptions& options) {
         "supported until an explicit salt domain height is provided");
   }
   if (options.geostatic_enabled) {
-    throw std::invalid_argument(
-        "LotSaltBridgeConfigBuilder: geostatic_enabled=true is not supported "
-        "until explicit geostatic stresses are provided");
+    require_finite(options.geostatic_radial_stress_Pa,
+                   "geostatic_radial_stress_Pa");
+    require_finite(options.geostatic_hoop_stress_Pa,
+                   "geostatic_hoop_stress_Pa");
+    require_finite(options.geostatic_vertical_stress_Pa,
+                   "geostatic_vertical_stress_Pa");
   }
 }
 
@@ -112,11 +119,16 @@ lss::salt::SaltCreepTimeBridgeConfig make_lot_salt_bridge_config(
   config.reference_temperature_K = options.temperature_K;
   config.alpha_thermal_1_K = 0.0;
   config.wall_pressure_Pa = hydrostatic_context.hydrostatic_pressure_Pa;
-  config.geostatic_enabled = false;
-  config.geostatic_radial_stress_Pa = 0.0;
-  config.geostatic_hoop_stress_Pa = 0.0;
-  config.geostatic_vertical_stress_Pa = 0.0;
-  config.fix_outer_wall = false;
+  config.geostatic_enabled = options.geostatic_enabled;
+  config.geostatic_radial_stress_Pa = options.geostatic_enabled
+                                          ? options.geostatic_radial_stress_Pa
+                                          : 0.0;
+  config.geostatic_hoop_stress_Pa = options.geostatic_enabled
+                                        ? options.geostatic_hoop_stress_Pa
+                                        : 0.0;
+  config.geostatic_vertical_stress_Pa =
+      options.geostatic_enabled ? options.geostatic_vertical_stress_Pa : 0.0;
+  config.fix_outer_wall = options.geostatic_enabled;
   return config;
 }
 
