@@ -189,6 +189,22 @@ identicos. A comparacao cobre `PknResult`, `result.json` e `timeseries.csv` com
 igualdade exata para os casos LOT/PKN minimo e com leakoff. O adapter permanece
 sem chamadas (`backend_build_count() == 0`), confirmando que a presenca do sal
 no binario nao altera o caminho LOT/PKN nesta fase.
+Na Fase 9.0, o primeiro ponto experimental de injecao foi criado em
+`include/coupling/LotSaltCouplingStep.hpp` e `src/coupling/LotSaltCouplingStep.cpp`.
+A funcao `evaluate_lot_salt_step(pkn_result, step_index, config, salt)` constroi
+uma `SaltCreepQuery` a partir de um passo da serie temporal de `PknResult` e
+chama `salt.evaluate_wall_response()`. O teste com `SpySaltCreepInterface` prova
+`call_count() == 1`, tornando o ponto de injecao semanticamente verificado por
+contraste com a Fase 8.1 (onde `call_count() == 0`). Esta fase e feedforward:
+nao retroalimenta PKN, nao altera `PknResult`, nao conecta APB ao sal e nao
+implementa acoplamento fisico completo.
+
+**Atencao fisica:** `net_pressure_series_Pa[step_index]` e usado como
+`wall_pressure_Pa` apenas como sinal experimental. Ele nao representa a pressao
+anular real de parede no sal; o mapeamento fisico correto fica pendente.
+
+O caminho `lot-sim run --mode lot-pkn` segue desacoplado. `PknRunner`,
+`PknModel`, `CaseParser`, `ResultWriter` e `apps/lot-sim.cpp` nao foram alterados.
 
 ## Dependencia Eigen no acoplamento
 

@@ -34,6 +34,7 @@ phases:
   phase_7_9_saltcreep_adapter_time_bridge_connection: completed
   phase_8_0_saltcreep_dynamic_pressure: completed
   phase_8_1_lot_pkn_salt_adapter_substitutability: completed
+  phase_9_0_lot_pkn_salt_coupling_step: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -100,7 +101,7 @@ modules:
   lot:            in_progress
   apb:            not_started
   geomechanics:   not_started
-  coupling:       not_started
+  coupling:       in_progress
   validation:     not_started
   cli:            in_progress
 
@@ -123,7 +124,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 112        # Catch2 lot-salt-suite — Fase 8.1 provou substitutibilidade LOT/PKN com adapter ocioso
+  cpp_tests: 118        # Catch2 lot-salt-suite — Fase 9.0 criou ponto experimental de injecao em coupling/
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
   python_tests: 31      # unittest saltcreep — 31/31 passaram, com 7 skips esperados (2026-06-04)
   regression_baselines: 4
@@ -132,5 +133,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-04"
-updated_by: "codex (auditoria/sync external/saltcreep)"
+updated_by: "claude-code (Fase 9.0)"
 project_version: "0.1.0"

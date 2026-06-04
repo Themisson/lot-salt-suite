@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">20/27</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">112</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">21/28</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">118</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2719,7 +2719,21 @@ executar LOT/PKN com <code>NullSaltCreepInterface</code> presente ou com
 identicos. A comparacao cobre <code>PknResult</code>, <code>result.json</code> e <code>timeseries.csv</code> com
 igualdade exata para os casos LOT/PKN minimo e com leakoff. O adapter permanece
 sem chamadas (<code>backend_build_count() == 0</code>), confirmando que a presenca do sal
-no binario nao altera o caminho LOT/PKN nesta fase.</p>
+no binario nao altera o caminho LOT/PKN nesta fase.
+Na Fase 9.0, o primeiro ponto experimental de injecao foi criado em
+<code>include/coupling/LotSaltCouplingStep.hpp</code> e <code>src/coupling/LotSaltCouplingStep.cpp</code>.
+A funcao <code>evaluate_lot_salt_step(pkn_result, step_index, config, salt)</code> constroi
+uma <code>SaltCreepQuery</code> a partir de um passo da serie temporal de <code>PknResult</code> e
+chama <code>salt.evaluate_wall_response()</code>. O teste com <code>SpySaltCreepInterface</code> prova
+<code>call_count() == 1</code>, tornando o ponto de injecao semanticamente verificado por
+contraste com a Fase 8.1 (onde <code>call_count() == 0</code>). Esta fase e feedforward:
+nao retroalimenta PKN, nao altera <code>PknResult</code>, nao conecta APB ao sal e nao
+implementa acoplamento fisico completo.</p>
+<p><strong>Atencao fisica:</strong> <code>net_pressure_series_Pa[step_index]</code> e usado como
+<code>wall_pressure_Pa</code> apenas como sinal experimental. Ele nao representa a pressao
+anular real de parede no sal; o mapeamento fisico correto fica pendente.</p>
+<p>O caminho <code>lot-sim run --mode lot-pkn</code> segue desacoplado. <code>PknRunner</code>,
+<code>PknModel</code>, <code>CaseParser</code>, <code>ResultWriter</code> e <code>apps/lot-sim.cpp</code> nao foram alterados.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser
@@ -3107,6 +3121,13 @@ chamado enquanto <code>PknRunner</code> nao possuir ponto explicito de integraca
 Isso preserva a governanca: <code>external/saltcreep/</code> permanece somente leitura e
 qualquer acoplamento futuro deve entrar por fase propria, com interface
 explicita e testes dedicados.</p>
+<p>Na Fase 9.0, o primeiro ponto experimental de chamada foi criado em <code>coupling/</code>,
+fora de <code>src/salt/</code>. A funcao <code>evaluate_lot_salt_step()</code> chama
+<code>SaltCreepInterface::evaluate_wall_response()</code> com uma query construida a partir
+de um passo de <code>PknResult</code>. O <code>external/saltcreep/</code> permaneceu somente leitura;
+<code>PknRunner</code>, <code>PknModel</code> e <code>lot-sim</code> nao foram alterados. O caminho padrao
+<code>lot-sim run --mode lot-pkn</code> segue desacoplado. A funcao e feedforward e nao
+implementa acoplamento fisico completo.</p>
 <p>Em 2026-06-04, as atualizacoes locais em <code>external/saltcreep/</code> foram auditadas
 e integradas como evolucao da dependencia vendorizada ativa. O escopo observado
 incluiu pressao/temperatura de parede por CSV operacional, casos APB 1D/2D,

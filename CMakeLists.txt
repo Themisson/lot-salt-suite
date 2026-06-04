@@ -116,6 +116,7 @@ set(LSS_CORE_SOURCES
   src/salt/SaltCreepAdapterState.cpp
   src/salt/SaltCreepInterface.cpp
   src/salt/SaltCreepSaltcreepAdapter.cpp
+  src/coupling/LotSaltCouplingStep.cpp
 )
 
 add_library(lss_saltcreep_time_bridge STATIC
@@ -158,6 +159,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_pkn_model_synthetic.cpp
     tests/cpp/test_pkn_runner.cpp
     tests/cpp/test_lot_pkn_salt_adapter_substitutability.cpp
+    tests/cpp/test_lot_pkn_salt_coupling_step.cpp
     tests/cpp/test_result_writer.cpp
     tests/cpp/test_salt_creep_adapter_config.cpp
     tests/cpp/test_salt_creep_adapter_state.cpp

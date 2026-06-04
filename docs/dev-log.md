@@ -57,6 +57,62 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-04] Fase 9.0 — Ponto experimental de injecao em coupling/ — Claude Code
+
+**Status:** Concluido nesta sessao.
+
+**Objetivo:** Criar o primeiro ponto de chamada real de `SaltCreepInterface` a
+partir de um resultado LOT/PKN, em caminho experimental separado em `coupling/`,
+sem alterar `PknRunner`, `PknModel`, `lot-sim` ou o caminho padrao `lot-pkn`.
+
+**Mudanca implementada:**
+- Criado `include/coupling/LotSaltCouplingStep.hpp` com `LotSaltCouplingConfig`,
+  `LotSaltCouplingStepResult` e `evaluate_lot_salt_step()`.
+- Criado `src/coupling/LotSaltCouplingStep.cpp` com a implementacao que
+  constroi `SaltCreepQuery` a partir de `PknResult.time_series_s[step_index]`
+  e `net_pressure_series_Pa[step_index]` e chama `salt.evaluate_wall_response()`.
+- Criado `tests/cpp/test_lot_pkn_salt_coupling_step.cpp` com 6 testes Catch2.
+- `CMakeLists.txt` atualizado para incluir o novo fonte e teste no mesmo commit
+  (prevencao do problema `cb61159`).
+
+**Prova central:**
+- `SpySaltCreepInterface::call_count() == 1` apos uma chamada a `evaluate_lot_salt_step`.
+- `SpySaltCreepInterface::call_count() == 3` apos tres chamadas consecutivas.
+- Isso contrasta com a Fase 8.1, onde `call_count() == 0` porque o spy nunca foi injetado.
+
+**Limite deliberado — fisico:**
+- `net_pressure_series_Pa[step_index]` e usado como `wall_pressure_Pa` apenas
+  como sinal experimental de demonstracao. Ele nao representa a pressao anular
+  real de parede no sal. O mapeamento fisico correto (pressao anular/poco ->
+  condicao de contorno do sal) fica pendente para fase futura.
+- A funcao e feedforward: nao retroalimenta PKN, nao altera `PknResult`.
+- APB nao foi conectado ao sal.
+- Sem acoplamento fisico completo.
+
+**Limite deliberado — estrutural:**
+- `PknRunner`, `PknModel`, `CaseParser`, `ResultWriter` e `apps/lot-sim.cpp`
+  nao foram alterados.
+- `lot-sim run --mode lot-pkn` produz resultados identicos ao estado anterior.
+- Nenhum arquivo em `external/saltcreep/`, `legance/`, `legacy/`, `src/lot/`,
+  `include/lot/`, `src/apb/`, `include/apb/`, `src/io/`, `include/io/`,
+  `tests/baselines/` ou `postprocess/` foi alterado.
+
+**Testes/builds executados:**
+- `cmake --build build --config Debug -j`: OK.
+- `ctest --test-dir build -C Debug --output-on-failure`
+  Resultado: 118/118 Catch2 passaram (era 112 antes da Fase 9.0).
+- `ctest -R "lot_salt|coupling|Coupling|salt_coupling"`: 6/6 novos testes.
+- `ctest -R "LOT PKN result is identical"`: 1/1 (Fase 8.1 continua passando).
+
+**Validacao manual CLI:**
+- `cases/validation/lot_pkn_minimal.yaml`: `validate` OK, `run` OK.
+- `cases/validation/lot_pkn_with_leakoff.yaml`: `validate` OK, `run` OK.
+- `cases/lot_tese_migrated/buz67d_pkn.yaml`: `validate` OK, `run` OK.
+- Saidas geradas em `results/phase9_minimal`, `results/phase9_leakoff`,
+  `results/phase9_buz67d`.
+
+---
+
 ### [2026-06-04] Auditoria/sync `external/saltcreep` — APB CSV e diagnostico de tensao — Codex
 
 **Status:** Concluido nesta sessao.

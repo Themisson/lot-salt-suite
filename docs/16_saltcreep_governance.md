@@ -182,6 +182,14 @@ Isso preserva a governanca: `external/saltcreep/` permanece somente leitura e
 qualquer acoplamento futuro deve entrar por fase propria, com interface
 explicita e testes dedicados.
 
+Na Fase 9.0, o primeiro ponto experimental de chamada foi criado em `coupling/`,
+fora de `src/salt/`. A funcao `evaluate_lot_salt_step()` chama
+`SaltCreepInterface::evaluate_wall_response()` com uma query construida a partir
+de um passo de `PknResult`. O `external/saltcreep/` permaneceu somente leitura;
+`PknRunner`, `PknModel` e `lot-sim` nao foram alterados. O caminho padrao
+`lot-sim run --mode lot-pkn` segue desacoplado. A funcao e feedforward e nao
+implementa acoplamento fisico completo.
+
 Em 2026-06-04, as atualizacoes locais em `external/saltcreep/` foram auditadas
 e integradas como evolucao da dependencia vendorizada ativa. O escopo observado
 incluiu pressao/temperatura de parede por CSV operacional, casos APB 1D/2D,
