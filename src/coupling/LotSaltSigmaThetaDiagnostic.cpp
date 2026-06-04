@@ -45,9 +45,8 @@ void validate_wall_sample(const lss::salt::SaltWallStressSample& sample,
   require_finite(sample.r_m, prefix + "r_m");
   require_finite(sample.z_m, prefix + "z_m");
   require_finite(sample.depth_m, prefix + "depth_m");
-  require_non_negative_finite(sample.sigma_theta_compression_positive_Pa,
-                              prefix +
-                                  "sigma_theta_compression_positive_Pa");
+  require_finite(sample.sigma_theta_compression_positive_Pa,
+                 prefix + "sigma_theta_compression_positive_Pa");
   require_finite(sample.mean_stress_Pa, prefix + "mean_stress_Pa");
   require_non_negative_finite(sample.j2_Pa2, prefix + "j2_Pa2");
   require_non_negative_finite(sample.von_mises_effective_stress_Pa,

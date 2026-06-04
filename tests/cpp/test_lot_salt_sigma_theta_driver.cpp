@@ -152,10 +152,6 @@ TEST_CASE("LotSaltSigmaThetaDriver runs after bridge config builder without geos
   bridge_options.radial_elements = 12;
   auto bridge_config =
       lss::coupling::make_lot_salt_bridge_config(data, bridge_options);
-  // Keep this integration test focused on the opt-in wiring. The diagnostic
-  // rejects tensile hoop-stress snapshots, which can occur for the raw
-  // hydrostatic bridge pressure before a physically calibrated salt state.
-  bridge_config.wall_pressure_Pa = 0.0;
   lss::salt::SaltCreepTimeBridge bridge(bridge_config);
   const int step_count_before = bridge.result().step_count;
 
@@ -172,6 +168,11 @@ TEST_CASE("LotSaltSigmaThetaDriver runs after bridge config builder without geos
   CHECK(bridge_config.poisson_ratio == Catch::Approx(0.36));
   CHECK(bridge.result().step_count == step_count_before);
   CHECK_FALSE(result.caveat.empty());
+  REQUIRE_FALSE(result.diagnostic.points.empty());
+  CHECK(result.diagnostic.points.front().breakdown.hoop_state ==
+        lss::coupling::SigmaThetaHoopState::Tensile);
+  CHECK(result.diagnostic.points.front().breakdown.tensile_hoop_state);
+  CHECK_FALSE(result.diagnostic.points.front().breakdown.caveat.empty());
 }
 
 TEST_CASE("LotSaltSigmaThetaDriver runs after bridge config builder with explicit geostatic") {
@@ -185,7 +186,6 @@ TEST_CASE("LotSaltSigmaThetaDriver runs after bridge config builder with explici
   bridge_options.geostatic_vertical_stress_Pa = -2.0e6;
   auto bridge_config =
       lss::coupling::make_lot_salt_bridge_config(data, bridge_options);
-  bridge_config.wall_pressure_Pa = 0.0;
   lss::salt::SaltCreepTimeBridge bridge(bridge_config);
   const int step_count_before = bridge.result().step_count;
 
@@ -198,6 +198,9 @@ TEST_CASE("LotSaltSigmaThetaDriver runs after bridge config builder with explici
   CHECK_FALSE(result.diagnostic.points.empty());
   CHECK(bridge.result().step_count == step_count_before);
   REQUIRE_FALSE(result.wall_stress.wall_samples.empty());
-  CHECK(result.wall_stress.wall_samples.front()
-            .sigma_theta_compression_positive_Pa >= 0.0);
+  REQUIRE_FALSE(result.diagnostic.points.empty());
+  CHECK(result.diagnostic.points.front().breakdown.hoop_state ==
+        lss::coupling::classify_sigma_theta_hoop_state(
+            result.wall_stress.wall_samples.front()
+                .sigma_theta_compression_positive_Pa));
 }

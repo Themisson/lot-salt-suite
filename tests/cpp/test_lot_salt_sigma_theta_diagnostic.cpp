@@ -73,6 +73,8 @@ TEST_CASE("LotSaltSigmaThetaDiagnostic step uses ExperimentalNetPressureProxy") 
   CHECK(result.points[0].pressure_map.method ==
         lss::coupling::LotSaltPressureMapMethod::ExperimentalNetPressureProxy);
   CHECK(result.points[0].breakdown.opened);
+  CHECK(result.points[0].breakdown.hoop_state ==
+        lss::coupling::SigmaThetaHoopState::Compressive);
   CHECK(result.points[0].breakdown.margin_Pa == Catch::Approx(5.0 * kMPa));
   CHECK(result.points[0].breakdown.layer_id == "wall_gp_0");
 }
@@ -115,6 +117,30 @@ TEST_CASE("LotSaltSigmaThetaDiagnostic equality does not open") {
   CHECK(result.points[0].breakdown.margin_Pa == Catch::Approx(0.0));
 }
 
+TEST_CASE("LotSaltSigmaThetaDiagnostic accepts tensile hoop state") {
+  const auto pkn = make_pkn_result({0.0}, {2.0 * kMPa});
+  const lss::coupling::LotSaltCouplingConfig config;
+  auto sample = make_sample(-1.0 * kMPa);
+  sample.sigma_theta_Pa = 1.0 * kMPa;
+  const auto wall_stress = make_wall_stress({sample});
+
+  const auto result = lss::coupling::evaluate_lot_salt_sigma_theta_step(
+      pkn, 0, config, wall_stress);
+
+  REQUIRE(result.valid);
+  REQUIRE(result.points.size() == 1);
+  const auto& point = result.points.front();
+  CHECK(point.breakdown.hoop_state ==
+        lss::coupling::SigmaThetaHoopState::Tensile);
+  CHECK(point.breakdown.tensile_hoop_state);
+  CHECK(point.breakdown.margin_Pa == Catch::Approx(3.0 * kMPa));
+  CHECK(point.breakdown.legacy_algebra_opened);
+  CHECK(point.breakdown.opened);
+  CHECK_FALSE(point.breakdown.caveat.empty());
+  CHECK(point.pressure_map.method ==
+        lss::coupling::LotSaltPressureMapMethod::ExperimentalNetPressureProxy);
+}
+
 TEST_CASE("LotSaltSigmaThetaDiagnostic series is time-major") {
   const auto pkn = make_pkn_result({0.0, 10.0, 20.0},
                                    {10.0 * kMPa, 20.0 * kMPa, 30.0 * kMPa});
@@ -150,6 +176,25 @@ TEST_CASE("LotSaltSigmaThetaDiagnostic series is time-major") {
   CHECK_FALSE(result.points[3].breakdown.opened);
   CHECK(result.points[4].breakdown.opened);
   CHECK(result.points[5].breakdown.opened);
+}
+
+TEST_CASE("LotSaltSigmaThetaDiagnostic series supports tensile samples") {
+  const auto pkn = make_pkn_result({0.0, 10.0}, {1.0 * kMPa, 2.0 * kMPa});
+  const lss::coupling::LotSaltCouplingConfig config;
+  const auto wall_stress = make_wall_stress({make_sample(-0.5 * kMPa)});
+
+  const auto result = lss::coupling::evaluate_lot_salt_sigma_theta_series(
+      pkn, config, wall_stress);
+
+  REQUIRE(result.valid);
+  REQUIRE(result.points.size() == 2);
+  CHECK(result.any_opened);
+  for (const auto& point : result.points) {
+    CHECK(point.breakdown.hoop_state ==
+          lss::coupling::SigmaThetaHoopState::Tensile);
+    CHECK(point.breakdown.tensile_hoop_state);
+    CHECK_FALSE(point.breakdown.caveat.empty());
+  }
 }
 
 TEST_CASE("LotSaltSigmaThetaDiagnostic preserves wall stress metadata") {
@@ -203,11 +248,6 @@ TEST_CASE("LotSaltSigmaThetaDiagnostic rejects invalid inputs") {
 
   invalid_wall_stress = wall_stress;
   invalid_wall_stress.wall_samples.clear();
-  CHECK_THROWS_AS(lss::coupling::evaluate_lot_salt_sigma_theta_step(
-                      pkn, 0, config, invalid_wall_stress),
-                  std::invalid_argument);
-
-  invalid_wall_stress = make_wall_stress({make_sample(-1.0)});
   CHECK_THROWS_AS(lss::coupling::evaluate_lot_salt_sigma_theta_step(
                       pkn, 0, config, invalid_wall_stress),
                   std::invalid_argument);

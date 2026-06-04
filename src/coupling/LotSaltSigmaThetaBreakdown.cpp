@@ -7,11 +7,19 @@
 namespace lss::coupling {
 namespace {
 
-void require_non_negative_finite(double value, const std::string& field) {
+constexpr const char* kTensileHoopStateCaveat =
+    "tensile hoop state; legacy algebra only; not a validated fracture "
+    "criterion";
+
+void require_finite(double value, const std::string& field) {
   if (!std::isfinite(value)) {
     throw std::invalid_argument("LotSaltSigmaThetaBreakdown: " + field +
                                 " must be finite");
   }
+}
+
+void require_non_negative_finite(double value, const std::string& field) {
+  require_finite(value, field);
   if (value < 0.0) {
     throw std::invalid_argument("LotSaltSigmaThetaBreakdown: " + field +
                                 " must be non-negative");
@@ -24,11 +32,36 @@ void validate_layer(const SigmaThetaInfluenceLayer& layer) {
         "LotSaltSigmaThetaBreakdown: layer_id must not be empty");
   }
   require_non_negative_finite(layer.influence_depth_m, "influence_depth_m");
-  require_non_negative_finite(layer.sigma_theta_compression_positive_Pa,
-                              "sigma_theta_compression_positive_Pa");
+  require_finite(layer.sigma_theta_compression_positive_Pa,
+                 "sigma_theta_compression_positive_Pa");
 }
 
 }  // namespace
+
+const char* to_string(SigmaThetaHoopState state) {
+  switch (state) {
+    case SigmaThetaHoopState::Compressive:
+      return "compressive";
+    case SigmaThetaHoopState::Neutral:
+      return "neutral";
+    case SigmaThetaHoopState::Tensile:
+      return "tensile";
+  }
+  throw std::invalid_argument("LotSaltSigmaThetaBreakdown: unknown hoop state");
+}
+
+SigmaThetaHoopState classify_sigma_theta_hoop_state(
+    double sigma_theta_compression_positive_Pa) {
+  require_finite(sigma_theta_compression_positive_Pa,
+                 "sigma_theta_compression_positive_Pa");
+  if (sigma_theta_compression_positive_Pa > 0.0) {
+    return SigmaThetaHoopState::Compressive;
+  }
+  if (sigma_theta_compression_positive_Pa < 0.0) {
+    return SigmaThetaHoopState::Tensile;
+  }
+  return SigmaThetaHoopState::Neutral;
+}
 
 SigmaThetaBreakdownPoint evaluate_sigma_theta_breakdown_point(
     const SigmaThetaInfluenceLayer& layer,
@@ -45,9 +78,17 @@ SigmaThetaBreakdownPoint evaluate_sigma_theta_breakdown_point(
   point.pressure_Pa = pressure_Pa;
   point.sigma_theta_compression_positive_Pa =
       layer.sigma_theta_compression_positive_Pa;
+  point.hoop_state = classify_sigma_theta_hoop_state(
+      layer.sigma_theta_compression_positive_Pa);
+  point.tensile_hoop_state =
+      point.hoop_state == SigmaThetaHoopState::Tensile;
   point.margin_Pa =
       pressure_Pa - layer.sigma_theta_compression_positive_Pa;
-  point.opened = point.margin_Pa > 0.0;
+  point.legacy_algebra_opened = point.margin_Pa > 0.0;
+  point.opened = point.legacy_algebra_opened;
+  if (point.tensile_hoop_state) {
+    point.caveat = kTensileHoopStateCaveat;
+  }
   return point;
 }
 

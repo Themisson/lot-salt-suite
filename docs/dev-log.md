@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.4 implementada, aguardando revisao/commit
+Fase ativa  : 10.5B implementada, aguardando revisao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-04
-Testes C++  : 180/180 Catch2 lot-salt-suite em 2026-06-04 apos Fase 10.4
+Testes C++  : 186/186 Catch2 lot-salt-suite em 2026-06-04 apos Fase 10.5B
 Testes Py   : 3 unittest (3 passaram em 2026-06-01)
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,51 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-04] Fase 10.5B — classificacao explicita de hoop tensile state — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Permitir que o diagnostico experimental `sigma_theta` represente
+explicitamente estados tangenciais trativos em vez de rejeitar
+`sigma_theta_compression_positive_Pa < 0` por excecao.
+
+**Implementacao:**
+- Adicionado `SigmaThetaHoopState` com estados `Compressive`, `Neutral` e
+  `Tensile`.
+- Adicionados `classify_sigma_theta_hoop_state()` e `to_string()`.
+- `SigmaThetaBreakdownPoint` passou a carregar `hoop_state`,
+  `tensile_hoop_state`, `legacy_algebra_opened` e `caveat`.
+- `LotSaltSigmaThetaBreakdown` continua rejeitando `NaN`/`Inf`, mas nao rejeita
+  mais `sigma_theta_compression_positive_Pa < 0`.
+- `LotSaltSigmaThetaDiagnostic` tambem aceita amostras trativas de
+  `SaltWallStressDiagnostics` e preserva o estado/caveat no resultado.
+- Testes do driver builder -> bridge -> driver deixam de sobrescrever
+  `bridge_config.wall_pressure_Pa = 0.0`; a pressao hidrostatica derivada pelo
+  builder agora pode produzir estado `Tensile` rastreavel.
+
+**Limites deliberados:**
+- `opened` em estado `Tensile` representa apenas algebra experimental/legada
+  (`pressure > -getSigmaTheta()`), nao criterio fisico validado.
+- CLI, parser, `CaseData`, `PknRunner`, `PknModel`, `ResultWriter`,
+  `SaltCreepInterface`, `SaltCreepResponse`, adapters de sal, bridge, pressure
+  map, builders hidrostatico/bridge, YAMLs, schemas, LOT/APB, sal,
+  `external/saltcreep/`, legados, baselines e postprocess nao foram alterados.
+- `lot-sim run --mode lot-pkn` permanece desacoplado.
+
+**Verificacao executada:**
+- `cmake --build build --config Debug -j` passou.
+- `ctest --test-dir build -C Debug --output-on-failure` passou com 186/186.
+- Filtro `sigma_theta|SigmaTheta|diagnostic|Diagnostic|driver|Driver|
+  coupling|Coupling` passou com 36/36.
+- Filtro `LOT PKN.*identical` passou com 2/2.
+- `lot-sim validate` passou para `lot_pkn_minimal.yaml`,
+  `lot_pkn_with_leakoff.yaml` e `buz67d_pkn.yaml`.
+- `lot-sim run --mode lot-pkn` passou para os tres casos, gerando saidas em
+  `results/phase10_5b_minimal`, `results/phase10_5b_leakoff` e
+  `results/phase10_5b_buz67d`.
 
 ---
 

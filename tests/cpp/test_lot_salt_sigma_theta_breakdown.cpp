@@ -1,5 +1,6 @@
 #include <limits>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -34,7 +35,12 @@ TEST_CASE("SigmaThetaBreakdown point remains closed below sigma theta") {
   CHECK(point.pressure_Pa == Catch::Approx(40.0e6));
   CHECK(point.sigma_theta_compression_positive_Pa == Catch::Approx(45.0e6));
   CHECK(point.margin_Pa == Catch::Approx(-5.0e6));
+  CHECK(point.hoop_state ==
+        lss::coupling::SigmaThetaHoopState::Compressive);
+  CHECK_FALSE(point.tensile_hoop_state);
+  CHECK_FALSE(point.legacy_algebra_opened);
   CHECK(point.opened == false);
+  CHECK(point.caveat.empty());
 }
 
 TEST_CASE("SigmaThetaBreakdown point opens above sigma theta") {
@@ -42,6 +48,9 @@ TEST_CASE("SigmaThetaBreakdown point opens above sigma theta") {
       make_layer("salt", 3000.0, 45.0e6), 60.0, 50.0e6);
 
   CHECK(point.margin_Pa == Catch::Approx(5.0e6));
+  CHECK(point.hoop_state ==
+        lss::coupling::SigmaThetaHoopState::Compressive);
+  CHECK(point.legacy_algebra_opened == true);
   CHECK(point.opened == true);
 }
 
@@ -51,6 +60,52 @@ TEST_CASE("SigmaThetaBreakdown equality does not open") {
 
   CHECK(point.margin_Pa == Catch::Approx(0.0));
   CHECK(point.opened == false);
+}
+
+TEST_CASE("SigmaThetaBreakdown classifies hoop stress states") {
+  CHECK(lss::coupling::classify_sigma_theta_hoop_state(1.0) ==
+        lss::coupling::SigmaThetaHoopState::Compressive);
+  CHECK(lss::coupling::classify_sigma_theta_hoop_state(0.0) ==
+        lss::coupling::SigmaThetaHoopState::Neutral);
+  CHECK(lss::coupling::classify_sigma_theta_hoop_state(-1.0) ==
+        lss::coupling::SigmaThetaHoopState::Tensile);
+
+  CHECK(std::string(lss::coupling::to_string(
+            lss::coupling::SigmaThetaHoopState::Compressive)) ==
+        "compressive");
+  CHECK(std::string(lss::coupling::to_string(
+            lss::coupling::SigmaThetaHoopState::Neutral)) == "neutral");
+  CHECK(std::string(lss::coupling::to_string(
+            lss::coupling::SigmaThetaHoopState::Tensile)) == "tensile");
+}
+
+TEST_CASE("SigmaThetaBreakdown neutral state follows experimental algebra") {
+  const auto closed = lss::coupling::evaluate_sigma_theta_breakdown_point(
+      make_layer("neutral", 3000.0, 0.0), 0.0, 0.0);
+  CHECK(closed.hoop_state == lss::coupling::SigmaThetaHoopState::Neutral);
+  CHECK_FALSE(closed.tensile_hoop_state);
+  CHECK(closed.margin_Pa == Catch::Approx(0.0));
+  CHECK_FALSE(closed.opened);
+
+  const auto opened = lss::coupling::evaluate_sigma_theta_breakdown_point(
+      make_layer("neutral", 3000.0, 0.0), 0.0, 1.0);
+  CHECK(opened.hoop_state == lss::coupling::SigmaThetaHoopState::Neutral);
+  CHECK(opened.margin_Pa == Catch::Approx(1.0));
+  CHECK(opened.legacy_algebra_opened);
+  CHECK(opened.opened);
+}
+
+TEST_CASE("SigmaThetaBreakdown tensile state is explicit and non-throwing") {
+  const auto point = lss::coupling::evaluate_sigma_theta_breakdown_point(
+      make_layer("tensile", 3000.0, -5.0e6), 10.0, 1.0e6);
+
+  CHECK(point.hoop_state == lss::coupling::SigmaThetaHoopState::Tensile);
+  CHECK(point.tensile_hoop_state);
+  CHECK(point.margin_Pa == Catch::Approx(6.0e6));
+  CHECK(point.legacy_algebra_opened);
+  CHECK(point.opened);
+  CHECK_FALSE(point.caveat.empty());
+  CHECK(point.caveat.find("legacy algebra") != std::string::npos);
 }
 
 TEST_CASE("SigmaThetaBreakdown series evaluates multiple layers and times") {
@@ -98,6 +153,29 @@ TEST_CASE("SigmaThetaBreakdown series evaluates multiple layers and times") {
   CHECK(result.points[5].opened == true);
 }
 
+TEST_CASE("SigmaThetaBreakdown series supports mixed hoop states") {
+  const std::vector<lss::coupling::SigmaThetaInfluenceLayer> layers = {
+      make_layer("compressive", 2800.0, 10.0),
+      make_layer("neutral", 3000.0, 0.0),
+      make_layer("tensile", 3300.0, -10.0),
+  };
+
+  const auto result =
+      lss::coupling::evaluate_sigma_theta_breakdown_series(layers, {0.0},
+                                                           {5.0});
+
+  REQUIRE(result.points.size() == 3);
+  CHECK(result.points[0].hoop_state ==
+        lss::coupling::SigmaThetaHoopState::Compressive);
+  CHECK(result.points[1].hoop_state ==
+        lss::coupling::SigmaThetaHoopState::Neutral);
+  CHECK(result.points[2].hoop_state ==
+        lss::coupling::SigmaThetaHoopState::Tensile);
+  CHECK(result.points[2].tensile_hoop_state);
+  CHECK(result.points[2].legacy_algebra_opened);
+  CHECK(result.any_opened);
+}
+
 TEST_CASE("SigmaThetaBreakdown series returns points in time-major order") {
   const std::vector<lss::coupling::SigmaThetaInfluenceLayer> layers = {
       make_layer("a", 1000.0, 10.0),
@@ -132,9 +210,6 @@ TEST_CASE("SigmaThetaBreakdown rejects invalid point inputs") {
                   std::invalid_argument);
   CHECK_THROWS_AS(lss::coupling::evaluate_sigma_theta_breakdown_point(
                       make_layer(), 0.0, inf),
-                  std::invalid_argument);
-  CHECK_THROWS_AS(lss::coupling::evaluate_sigma_theta_breakdown_point(
-                      make_layer("salt", 3000.0, -1.0), 0.0, 1.0),
                   std::invalid_argument);
   CHECK_THROWS_AS(lss::coupling::evaluate_sigma_theta_breakdown_point(
                       make_layer("salt", 3000.0, nan), 0.0, 1.0),

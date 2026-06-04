@@ -700,6 +700,55 @@ controlados, comparacao futura com o legado e preparacao de criterios mais
 rigorosos quando `sigma_theta`, historicos absolutos de pressao e referencias
 geomecanicas forem disponibilizados por rotas validadas.
 
+## Classificacao explicita de estado hoop `sigma_theta` (Fase 10.5B)
+
+A Fase 10.5B formaliza que `sigma_theta_compression_positive_Pa < 0` nao e
+uma resistencia compressiva negativa. Esse valor significa que a tensao
+tangencial bruta do saltcreep esta trativa no ponto amostrado:
+
+```text
+sigma_theta_compression_positive_Pa = -sigma_theta_Pa
+sigma_theta_compression_positive_Pa < 0  <=>  sigma_theta_Pa > 0
+```
+
+O diagnostico passa a classificar explicitamente o estado hoop:
+
+```text
+sigma_theta_compression_positive_Pa > 0  -> Compressive
+sigma_theta_compression_positive_Pa == 0 -> Neutral
+sigma_theta_compression_positive_Pa < 0  -> Tensile
+```
+
+Para `Compressive`, o comportamento anterior e preservado:
+
+```text
+margin_Pa = pressure_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa > 0
+```
+
+Para `Neutral`, a mesma algebra experimental se aplica; pressao zero nao abre
+por igualdade, e pressao positiva produz `opened = true`.
+
+Para `Tensile`, o diagnostico nao lanca excecao. O resultado carrega
+`hoop_state = Tensile`, `tensile_hoop_state = true`, `legacy_algebra_opened` e
+um caveat:
+
+```text
+tensile hoop state; legacy algebra only; not a validated fracture criterion
+```
+
+Nesse estado, `opened` representa apenas a algebra experimental herdada da
+comparacao `pressure > -getSigmaTheta()`. Isso e util para rastrear e comparar
+o comportamento historico observado no `LOT_Tese`, no qual um
+`getSigmaTheta()` trativo geraria um limiar negativo e qualquer pressao positiva
+abriria pela algebra. Nao e uma validacao fisica de fratura do sal.
+
+Essa mudanca tambem remove a necessidade do workaround usado na Fase 10.4: os
+testes builder -> bridge -> driver podem manter a `wall_pressure_Pa`
+hidrostatica derivada pelo builder e representar o estado trativo resultante
+explicitamente, em vez de sobrescrever `bridge_config.wall_pressure_Pa = 0.0`
+apenas para evitar uma excecao.
+
 ## Diagnostico opt-in de tensao de parede do sal (Fase 9.9B)
 
 A Fase 9.9B cria `SaltWallStressDiagnostics` como DTO publico do
@@ -977,17 +1026,13 @@ Esses testes cobrem a cadeia sem geostatica e com geostatica explicita. O driver
 continua usando snapshot unico de tensao de parede, nao avanca o bridge e nao
 sincroniza temporalmente tensao do sal com cada passo PKN.
 
-Ressalva do teste integrado: nos cenarios builder -> bridge -> driver,
-`bridge_config.wall_pressure_Pa` e sobrescrito para `0.0` antes de construir o
-`SaltCreepTimeBridge`. Essa escolha mantem o teste focado no wiring opt-in da
-cadeia. A pressao hidrostatica derivada pelo builder a partir do YAML, quando
-aplicada sem confinamento geostatico fisicamente calibrado, pode gerar
-`sigma_theta_compression_positive_Pa < 0`; esse valor e rejeitado pelo
-diagnostico `LotSaltSigmaThetaDiagnostic`, que exige tensao tangencial em
-convencao compressao-positiva nao negativa. Portanto, o teste nao valida a
-pressao hidrostatica como estado fisico de tensao do sal; ele valida apenas que
-o bridge configurado pelo builder pode alimentar explicitamente o driver em uma
-rota opt-in controlada.
+Ressalva historica: antes da Fase 10.5B, os testes integrados precisavam
+sobrescrever `bridge_config.wall_pressure_Pa = 0.0` para evitar que a pressao
+hidrostatica derivada pelo builder gerasse
+`sigma_theta_compression_positive_Pa < 0` e fosse rejeitada pelo diagnostico.
+Com a classificacao explicita de estado hoop, esse workaround nao e mais
+necessario: o estado trativo e representado como `Tensile`, com caveat de
+algebra legada experimental.
 
 Classificacao operacional:
 
