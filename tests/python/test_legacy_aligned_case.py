@@ -82,17 +82,24 @@ def test_aligned_yaml_exists_if_not_blocked() -> None:
         assert ALIGNED_YAML_PATH.exists()
 
 
-def test_aligned_yaml_duration_is_750s() -> None:
+def test_aligned_yaml_full_cycle_duration_is_1320s() -> None:
     if not ALIGNED_YAML_PATH.exists():
         return
 
     data = load_yaml(ALIGNED_YAML_PATH)
 
     total_time = data["lot"]["injection"]["schedule"]["total_time"]
-    assert total_time["value"] == 12.5
+    assert total_time["value"] == 22.0
     assert total_time["unit"] == "min"
-    assert data["time"]["total_h"] == 0.2083333333
-    assert total_time["value"] * 60.0 == 750.0
+    assert data["time"]["total_h"] == 0.3666666667
+    assert total_time["value"] * 60.0 == 1320.0
+    phases = data["lot"]["injection"]["schedule"]["phases"]
+    assert phases[0]["name"] == "injection"
+    assert phases[0]["duration"]["value"] == 12.5
+    assert phases[1]["name"] == "shutin"
+    assert phases[1]["duration"]["value"] == 9.5
+    assert phases[1]["rate"]["value"] == 0.0
+    assert data["lot"]["initial_pressure"]["value"] == 26732215.17314985
 
 
 def test_aligned_yaml_is_different_from_migrated() -> None:

@@ -95,6 +95,12 @@ struct TimeConfig {
   Scheme scheme = Scheme::Explicit;
 };
 
+struct InjectionPhaseData {
+  std::string name = "injection";
+  double duration_s = 0.0;
+  double rate_m3_s = 0.0;
+};
+
 struct LotConfig {
   bool enabled = false;
   double shoe_depth_m = 0.0;
@@ -106,6 +112,8 @@ struct LotConfig {
   double injection_total_time_s = 0.0;
   double injection_dt_s = 0.0;
   double injection_accommodation_time_s = 0.0;
+  std::vector<InjectionPhaseData> injection_phases;
+  double initial_pressure_Pa = 0.0;
   double fracture_height_m = 0.0;
   double fracture_initial_width_m = 0.0;
   std::string breakdown_method;

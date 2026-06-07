@@ -364,6 +364,43 @@ normalização: `pw_Pa`, `net_pressure_Pa` e `wellbore_pressure_Pa` continuam
 campos distintos. Nenhum campo tensorial, `sigmaTheta`, `margin`, `opened`,
 dano ou ruptura foi comparado.
 
+## Fase 10.18B — campos de pressão inicial e schedule
+
+**Status:** `INITIAL_PRESSURE_AND_SHUTIN_FIELDS_EXPORTED_OPT_IN`.
+
+Campo moderno adicionado:
+
+| Campo | Unidade | Origem | Uso |
+|---|---|---|---|
+| `initial_pressure_Pa` | Pa | `lot.initial_pressure` | Pressão preexistente somada ao balanço volumétrico. |
+
+No caso BUZ67D controlado, `initial_pressure_Pa` foi extraído do primeiro
+registro auditado legado:
+
+```text
+pw_Pa(t=0) = 26732215.17314985
+dP(t=0) = 0
+```
+
+Assim, o mapeamento moderno documentado é:
+
+```text
+legacy pi        -> initial_pressure_Pa
+legacy dP        -> balance_delta_pressure_Pa acumulado
+legacy pw=pi+dP  -> wellbore_pressure_Pa
+```
+
+Esse mapeamento permanece diagnóstico. A Fase 10.18B também introduz
+`lot.injection.schedule.phases` no YAML para representar:
+
+| Fase | Vazão | Efeito normalizado |
+|---|---:|---|
+| `injection` | `Q > 0` | `injected_volume_m3` cresce. |
+| `shutin` | `Q = 0` | `injected_volume_m3` permanece constante. |
+
+Quando `phases` está ausente, o parser preserva a fase única histórica. Os
+casos padrão continuam com `initial_pressure_Pa = 0` e sem shut-in.
+
 ## Fase 10.17C — campos ainda planejados
 
 Campos futuros de acomodação, shut-in e Zamora permanecem fora do contrato

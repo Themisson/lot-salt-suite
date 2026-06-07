@@ -14,6 +14,7 @@ struct PknResult {
   double leakoff_volume_m3 = 0.0;
   double net_pressure_Pa = 0.0;
   std::string pressure_model = "pkn_direct";
+  double initial_pressure_Pa = 0.0;
   double wellbore_pressure_Pa = 0.0;
   double fluid_compressibility_per_Pa = 0.0;
   double balance_delta_pressure_Pa = 0.0;
@@ -39,6 +40,7 @@ struct PknResult {
   std::vector<double> fracture_length_series_m;
   std::vector<double> fracture_width_series_m;
   std::vector<double> net_pressure_series_Pa;
+  std::vector<double> initial_pressure_series_Pa;
   std::vector<double> leakoff_volume_series_m3;
   std::vector<double> fracture_volume_series_m3;
   std::vector<double> wellbore_pressure_series_Pa;

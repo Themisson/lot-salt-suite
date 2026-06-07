@@ -309,3 +309,84 @@ apenas cria uma alternativa controlada para análise comparativa futura.
 O planejamento de acomodação operacional, shut-in/no-injection e fluido Zamora
 fica registrado em `docs/16_future_features.md` como Fase 10.17C. Esses itens
 não foram conectados ao runtime nesta fase.
+
+### Pressão inicial e schedule com shut-in — Fase 10.18B
+
+**Status:** `PHASE10_18B_INITIAL_PRESSURE_AND_SHUTIN_DIAGNOSTIC_COMPLETE`.
+
+A auditoria da Fase 10.18B confirmou que o legado usa uma pressão
+preexistente/hidrostática por anular:
+
+```text
+line_up[lu].pi(idAnnular)
+```
+
+No caminho de fluido prescrito, essa pressão vem de:
+
+```text
+Fluids::getPFpressure(depth, seabed, rho)
+  = p_ref + 9.81 * rho_ppg * 119.826427 * depth
+```
+
+e é somada no critério legado como:
+
+```text
+pw = line_up[lu].pi(idAnnular) + dP(idAnnular)
+```
+
+No caso BUZ67D auditado, a série exportada registra em `t = 0`:
+
+```text
+pw_Pa = 26732215.17314985
+dP = 0
+```
+
+Logo, para o caso controlado, essa pressão foi registrada como:
+
+```yaml
+lot:
+  initial_pressure:
+    value: 26732215.17314985
+    unit: Pa
+```
+
+O contrato moderno é:
+
+```text
+wellbore_pressure_Pa = initial_pressure_Pa + dP_balance_accumulated
+```
+
+somente para `pressure_model = volumetric_balance`. O default `pkn_direct`
+permanece inalterado.
+
+A mesma fase implementa `lot.injection.schedule.phases` como rota opcional:
+
+```yaml
+phases:
+  - name: injection
+    duration: {value: 12.5, unit: min}
+    rate: {value: 0.5, unit: bbl_min}
+  - name: shutin
+    duration: {value: 9.5, unit: min}
+    rate: {value: 0.0, unit: bbl_min}
+```
+
+Se `phases` estiver ausente, o comportamento antigo de uma única fase de
+injeção é preservado. Com `shutin`, a vazão nova é zero e o volume injetado
+permanece constante. No modo `volumetric_balance`:
+
+- sem leakoff/fratura/fechamento ativo, a pressão não aumenta no shut-in;
+- com leakoff ativo, o volume efetivo pode ficar negativo e a pressão pode
+  declinar;
+- o gatilho de abertura usa o incremento acima de `initial_pressure_Pa`, para
+  evitar que a pressão inicial sozinha abra a fratura no tempo zero.
+
+O diagnóstico BUZ67D completo passou a cobrir `0..1320 s`, mas a pressão
+máxima moderna com `initial_pressure_Pa` ficou acima da pressão máxima legada.
+Portanto, a correção é classificada como:
+
+```text
+PRE_EXISTING_PRESSURE_FIX_PARTIAL_OTHER_FACTORS_REMAIN
+```
+
+e não como validação física.

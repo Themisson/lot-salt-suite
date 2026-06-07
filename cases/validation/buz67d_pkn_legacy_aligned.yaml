@@ -116,6 +116,12 @@ lot:
   # EXTRACTED from legacy: profTeste = 4374.0 m.
   shoe_depth_m: 4374.0
   model: pkn
+  initial_pressure:
+    # EXTRACTED from legacy audit Phase 10.18B:
+    # APB1da uses pw = line_up[lu].pi(idAnnular) + dP(idAnnular).
+    # At t = 0 in buz67d_audit_timeseries.csv, dP = 0 and pw_Pa = pi.
+    value: 26732215.17314985
+    unit: Pa
   injection:
     rate:
       # EXTRACTED from legacy: APB1da(..., idQ=6, Q=0.5), comment "0.5 bpm".
@@ -123,17 +129,37 @@ lot:
       unit: bbl_min
     schedule:
       total_time:
-        # EXTRACTED from legacy: tend = 12.5 min = 750 s.
-        value: 12.5
+        # EXTRACTED from legacy Phase 10.18B:
+        # tend = 12.5 min and t_no_injection = 9.5 min; full cycle = 22 min.
+        value: 22.0
         unit: min
       dt:
         # EXTRACTED from legacy: dt = 0.5 min = 30 s.
         value: 0.5
         unit: min
       accommodation_time:
-        # EXTRACTED from legacy: t_no_injection = 9.5 min.
-        value: 9.5
+        # Phase 10.18B: t_no_injection is modeled as shut-in after injection,
+        # not as pre-injection accommodation.
+        value: 0.0
         unit: min
+      phases:
+        - name: injection
+          # EXTRACTED from legacy: tend = 12.5 min with Q = 0.5 bpm.
+          duration:
+            value: 12.5
+            unit: min
+          rate:
+            value: 0.5
+            unit: bbl_min
+        - name: shutin
+          # EXTRACTED from legacy: t_no_injection = 9.5 min and Vq remains
+          # fixed at flowRate(tend), equivalent to Q = 0 for new injection.
+          duration:
+            value: 9.5
+            unit: min
+          rate:
+            value: 0.0
+            unit: bbl_min
   fracture:
     geometry: pkn
     # EXTRACTED from legacy leakoff props viscosity.
@@ -170,15 +196,16 @@ apb:
   venting_enabled: false
 
 time:
-  # EXTRACTED/DERIVED from legacy: 12.5 min = 0.2083333333 h = 750 s.
-  total_h: 0.2083333333
+  # EXTRACTED/DERIVED from legacy Phase 10.18B:
+  # 12.5 min injection + 9.5 min shut-in = 22 min = 0.3666666667 h = 1320 s.
+  total_h: 0.3666666667
   # EXTRACTED/DERIVED from legacy: 0.5 min = 0.0083333333 h = 30 s.
   dt_h: 0.0083333333
   scheme: explicit
   solver:
     tol_pressure_bar: 0.1
     tol_eq: 0.00000001
-    stabilization_h: 0.1583333333
+    stabilization_h: 0.0
 
 output:
   directory: output/buz67d_pkn_legacy_aligned

@@ -51,6 +51,8 @@ conectada automaticamente ao acoplamento sal/APB antes de testes dedicados.
 
 ### Shut-in / no-injection
 
+**Status:** implementado de forma opt-in para LOT/PKN na Fase 10.18B.
+
 O legado mantém `Vq = flowRate(tend)` após o fim da injeção quando `t > tend`,
 prolongando a simulação com o volume injetado final. Isso não é equivalente a
 continuar bombeando: é uma fase de volume imposto constante.
@@ -73,10 +75,12 @@ shutin phase:
   V_injected = V_injected_at_end_of_injection
 ```
 
-Para o modo `volumetric_balance`, a fase shut-in só deve alterar pressão por
-termos de acomodação, leakoff, fechamento, APB ou sal se esses mecanismos
-estiverem explicitamente conectados. Na ausência desses termos, a pressão deve
-permanecer constante ou seguir a regra documentada do modelo escolhido.
+Para o modo `volumetric_balance`, a fase shut-in altera pressão somente por
+termos explicitamente disponíveis no modelo moderno. Na implementação 10.18B,
+`Q=0` implica volume injetado constante; sem leakoff/fratura/fechamento ativo,
+a pressão permanece constante. Com leakoff ativo, o incremento efetivo pode ser
+negativo e a pressão pode declinar. APB, sal, casing elástico e Zamora ainda
+não foram conectados a esse ciclo.
 
 ### Fluido Zamora
 
@@ -177,12 +181,12 @@ unidades reais usadas no `LOT_APB_v5` antes de aceitar nomes ou dimensões.
 
 ### Ordem recomendada
 
-1. `OperationSchedule` moderno com fases `accommodation`, `injection` e
-   `shutin`, sem acoplar sal/APB automaticamente.
-2. Testes C++ para volume injetado por fase e preservação de `pkn_direct`.
-3. `FluidModel` abstrato e `ConstantFluidModel` compatível com o estado atual.
-4. Auditoria específica das unidades Zamora no `LOT_APB_v5`.
-5. `ZamoraFluidModel` experimental, opt-in e sem alterar defaults.
+1. Revisar o diagnóstico 10.18B porque `initial_pressure_Pa` somado ao balanço
+   moderno superestima a pressão máxima legada no BUZ67D controlado.
+2. Auditar a semântica de `dP` legado após abertura/leakoff.
+3. Criar `FluidModel` abstrato e `ConstantFluidModel` compatível com o estado atual.
+4. Auditar especificamente as unidades Zamora no `LOT_APB_v5`.
+5. Implementar `ZamoraFluidModel` experimental, opt-in e sem alterar defaults.
 
 ### Riscos
 

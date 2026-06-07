@@ -26,6 +26,7 @@ struct PknInput {
   PknPressureModel pressure_model = PknPressureModel::PknDirect;
   double annular_volume_m3 = 0.0;
   double fluid_compressibility_per_Pa = 0.0;
+  double initial_pressure_Pa = 0.0;
 };
 
 }  // namespace lss::lot

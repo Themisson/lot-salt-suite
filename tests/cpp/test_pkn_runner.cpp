@@ -161,9 +161,14 @@ TEST_CASE("PknRunner enables opt-in volumetric balance for legacy-aligned case")
   CHECK(run.input.annular_volume_m3 ==
         Catch::Approx(run.result.initial_annular_volume_m3));
   CHECK(run.input.fluid_compressibility_per_Pa == Catch::Approx(6.40e-10));
+  CHECK(run.input.initial_pressure_Pa == Catch::Approx(26732215.17314985));
+  REQUIRE(run.input.injection.phases.size() == 2);
+  CHECK(run.input.injection.scheduled_total_time_s() == Catch::Approx(1320.0));
   CHECK(run.result.pressure_model == "volumetric_balance");
-  CHECK(run.result.wellbore_pressure_Pa >= 0.0);
+  CHECK(run.result.initial_pressure_Pa == Catch::Approx(run.input.initial_pressure_Pa));
+  CHECK(run.result.wellbore_pressure_Pa >= run.input.initial_pressure_Pa);
   CHECK_FALSE(run.result.wellbore_pressure_series_Pa.empty());
+  CHECK(run.result.time_series_s.back() == Catch::Approx(1320.0));
   CHECK(run.result.wellbore_pressure_series_Pa.back() ==
         Catch::Approx(run.result.wellbore_pressure_Pa));
 }

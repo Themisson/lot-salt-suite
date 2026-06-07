@@ -261,3 +261,23 @@ TEST_CASE("Migrated BUZ67D PKN contract loads without declaring numeric validati
   REQUIRE(data.rocks.size() == 1);
   CHECK(data.rocks.front().e0_per_min == Catch::Approx(0.000000522 / 60.0));
 }
+
+TEST_CASE("Legacy-aligned BUZ67D case loads initial pressure and shutin phases") {
+  const auto data =
+      lss::io::parse_yaml("cases/validation/buz67d_pkn_legacy_aligned.yaml");
+
+  CHECK(data.name == "buz67d_pkn_legacy_aligned");
+  CHECK(data.lot.pressure_model == "volumetric_balance");
+  CHECK(data.lot.initial_pressure_Pa == Catch::Approx(26732215.17314985));
+  CHECK(data.lot.injection_dt_s == Catch::Approx(30.0));
+  CHECK(data.lot.injection_accommodation_time_s == Catch::Approx(0.0));
+  CHECK(data.lot.injection_total_time_s == Catch::Approx(1320.0));
+  REQUIRE(data.lot.injection_phases.size() == 2);
+  CHECK(data.lot.injection_phases[0].name == "injection");
+  CHECK(data.lot.injection_phases[0].duration_s == Catch::Approx(750.0));
+  CHECK(data.lot.injection_phases[0].rate_m3_s ==
+        Catch::Approx(0.5 * 0.158987294928 / 60.0));
+  CHECK(data.lot.injection_phases[1].name == "shutin");
+  CHECK(data.lot.injection_phases[1].duration_s == Catch::Approx(570.0));
+  CHECK(data.lot.injection_phases[1].rate_m3_s == Catch::Approx(0.0));
+}

@@ -46,6 +46,17 @@ void validate_input(const PknInput& input) {
   if (input.injection.accommodation_time_s < 0.0) {
     throw std::invalid_argument("PknModel: accommodation_time_s must be non-negative");
   }
+  if (!std::isfinite(input.initial_pressure_Pa) || input.initial_pressure_Pa < 0.0) {
+    throw std::invalid_argument("PknModel: initial_pressure_Pa must be finite and non-negative");
+  }
+  for (const auto& phase : input.injection.phases) {
+    if (!std::isfinite(phase.duration_s) || phase.duration_s <= 0.0) {
+      throw std::invalid_argument("PknModel: injection phase duration_s must be positive");
+    }
+    if (!std::isfinite(phase.rate_m3_s) || phase.rate_m3_s < 0.0) {
+      throw std::invalid_argument("PknModel: injection phase rate_m3_s must be non-negative");
+    }
+  }
   if (input.initial_width_m < 0.0) {
     throw std::invalid_argument("PknModel: initial_width_m must be non-negative");
   }
@@ -77,13 +88,15 @@ void validate_input(const PknInput& input) {
 PknResult make_point(const PknInput& input, double elapsed_time_s,
                      double previous_leakoff_m3 = 0.0) {
   const double active_time_s =
-      std::max(0.0, elapsed_time_s - input.injection.accommodation_time_s);
-  const double injected_volume_m3 = input.injection.rate_m3_s * active_time_s;
+      input.injection.active_injection_time_s(elapsed_time_s);
+  const double injected_volume_m3 = input.injection.injected_volume_m3(elapsed_time_s);
+  const double reference_rate_m3_s =
+      std::max(input.injection.reference_rate_m3_s(elapsed_time_s), kMinimumTimeS);
 
   const double scaling_time_s = std::max(active_time_s, kMinimumTimeS);
   const double scaled_width_m = 2.5 * std::pow(input.fluid_viscosity_Pa_s *
-                                                   input.injection.rate_m3_s *
-                                                   input.injection.rate_m3_s *
+                                                   reference_rate_m3_s *
+                                                   reference_rate_m3_s *
                                                    scaling_time_s /
                                                    (input.plane_strain_modulus_Pa *
                                                     input.fracture_height_m),
@@ -93,11 +106,12 @@ PknResult make_point(const PknInput& input, double elapsed_time_s,
 
   double leakoff_volume_m3 = 0.0;
   if (input.leakoff.enabled && injected_volume_m3 > 0.0) {
+    const double previous_elapsed_time_s =
+        std::max(0.0, elapsed_time_s - input.injection.dt_s);
+    const double previous_injected_volume_m3 =
+        input.injection.injected_volume_m3(previous_elapsed_time_s);
     const double previous_fracture_volume_m3 =
-        std::max(0.0, input.injection.rate_m3_s *
-                          std::max(0.0, elapsed_time_s - input.injection.dt_s -
-                                            input.injection.accommodation_time_s) -
-                          previous_leakoff_m3);
+        std::max(0.0, previous_injected_volume_m3 - previous_leakoff_m3);
     const double previous_length_m =
         previous_fracture_volume_m3 /
         (std::max(width_m, kMinimumWidthM) * input.fracture_height_m);
@@ -115,7 +129,8 @@ PknResult make_point(const PknInput& input, double elapsed_time_s,
     leakoff_input.area_m2 = leakoff_area_m2;
 
     const LeakoffState leakoff_state{
-        std::max(0.0, active_time_s - input.injection.dt_s),
+        std::max(0.0, elapsed_time_s - input.injection.accommodation_time_s -
+                          input.injection.dt_s),
         input.injection.dt_s,
         previous_leakoff_m3,
     };
@@ -146,6 +161,7 @@ PknResult make_point(const PknInput& input, double elapsed_time_s,
   result.leakoff_volume_m3 = leakoff_volume_m3;
   result.net_pressure_Pa = net_pressure_Pa;
   result.pressure_model = pressure_model_label(input.pressure_model);
+  result.initial_pressure_Pa = input.initial_pressure_Pa;
 
   if (!std::isfinite(result.time_s) || !std::isfinite(result.injected_volume_m3) ||
       !std::isfinite(result.width_m) || !std::isfinite(result.length_m) ||
@@ -163,6 +179,7 @@ void append_point(PknResult& series, const PknResult& point) {
   series.fracture_length_series_m.push_back(point.length_m);
   series.fracture_width_series_m.push_back(point.width_m);
   series.net_pressure_series_Pa.push_back(point.net_pressure_Pa);
+  series.initial_pressure_series_Pa.push_back(point.initial_pressure_Pa);
   series.leakoff_volume_series_m3.push_back(point.leakoff_volume_m3);
   series.fracture_volume_series_m3.push_back(point.fracture_volume_m3);
   series.wellbore_pressure_series_Pa.push_back(point.wellbore_pressure_Pa);
@@ -189,6 +206,7 @@ void copy_scalar_result(PknResult& target, const PknResult& point) {
   target.leakoff_volume_m3 = point.leakoff_volume_m3;
   target.net_pressure_Pa = point.net_pressure_Pa;
   target.pressure_model = point.pressure_model;
+  target.initial_pressure_Pa = point.initial_pressure_Pa;
   target.wellbore_pressure_Pa = point.wellbore_pressure_Pa;
   target.fluid_compressibility_per_Pa = point.fluid_compressibility_per_Pa;
   target.balance_delta_pressure_Pa = point.balance_delta_pressure_Pa;
@@ -206,7 +224,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
   double previous_injected_m3 = 0.0;
   double previous_fracture_m3 = 0.0;
   double previous_leakoff_m3 = 0.0;
-  double pressure_Pa = 0.0;
+  double pressure_Pa = input.initial_pressure_Pa;
   bool fracture_opened = false;
 
   for (std::size_t i = 0; i < series.time_series_s.size(); ++i) {
@@ -217,7 +235,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
 
     if (fracture_opened) {
       fracture_increment_m3 =
-          series.fracture_volume_series_m3[i] - previous_fracture_m3;
+          std::max(0.0, series.fracture_volume_series_m3[i] - previous_fracture_m3);
       leakoff_increment_m3 = series.leakoff_volume_series_m3[i] - previous_leakoff_m3;
     }
 
@@ -229,7 +247,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
     pressure_Pa = std::max(0.0, pressure_Pa + delta_pressure_Pa);
 
     if (!fracture_opened && input.breakdown.pressure_Pa > 0.0 &&
-        pressure_Pa >= input.breakdown.pressure_Pa) {
+        pressure_Pa - input.initial_pressure_Pa >= input.breakdown.pressure_Pa) {
       fracture_opened = true;
     }
 
@@ -279,12 +297,13 @@ PknResult PknModel::simulate(const PknInput& input) const {
 
   PknResult series;
   double previous_leakoff_m3 = 0.0;
+  const double total_time_s = input.injection.scheduled_total_time_s();
   const auto step_count =
-      static_cast<std::size_t>(std::floor(input.injection.total_time_s /
+      static_cast<std::size_t>(std::floor(total_time_s /
                                           input.injection.dt_s));
   for (std::size_t step = 0; step <= step_count; ++step) {
     const double time_s =
-        std::min(input.injection.total_time_s,
+        std::min(total_time_s,
                  static_cast<double>(step) * input.injection.dt_s);
     const PknResult point = make_point(input, time_s, previous_leakoff_m3);
     append_point(series, point);
@@ -293,9 +312,9 @@ PknResult PknModel::simulate(const PknInput& input) const {
   }
 
   if (series.time_series_s.empty() ||
-      series.time_series_s.back() < input.injection.total_time_s) {
+      series.time_series_s.back() < total_time_s) {
     const PknResult point =
-        make_point(input, input.injection.total_time_s, previous_leakoff_m3);
+        make_point(input, total_time_s, previous_leakoff_m3);
     append_point(series, point);
     copy_scalar_result(series, point);
   }

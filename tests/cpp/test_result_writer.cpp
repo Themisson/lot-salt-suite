@@ -39,7 +39,7 @@ TEST_CASE("ResultWriter creates PKN CSV and JSON outputs") {
   const std::string json = read_file(json_path);
   CHECK(csv.find("time_s,injected_volume_m3,fracture_length_m,fracture_width_m,"
                  "fracture_volume_m3,leakoff_volume_m3,net_pressure_Pa,"
-                 "wellbore_pressure_Pa,balance_delta_pressure_Pa") == 0);
+                 "initial_pressure_Pa,wellbore_pressure_Pa,balance_delta_pressure_Pa") == 0);
   CHECK(json.find("\"validation_status\": \"synthetic_modern_no_legacy_regression\"") !=
         std::string::npos);
   CHECK(json.find("No numerical regression against legacy was performed.") !=
@@ -50,6 +50,7 @@ TEST_CASE("ResultWriter creates PKN CSV and JSON outputs") {
   CHECK(json.find("\"initial_annular_volume_m3\"") != std::string::npos);
   CHECK(json.find("\"annular_volume_convention\"") != std::string::npos);
   CHECK(json.find("\"pressure_model\": \"pkn_direct\"") != std::string::npos);
+  CHECK(json.find("\"initial_pressure_Pa\"") != std::string::npos);
   CHECK(json.find("\"final_wellbore_pressure_Pa\"") != std::string::npos);
   CHECK(json.find("\"final_balance_effective_volume_increment_m3\"") !=
         std::string::npos);

@@ -216,6 +216,52 @@ diagnóstico, mas essa informação ainda não participa da pressão PKN.
 separados de `wellbore_pressure_Pa` e diagnóstico de balanço. Essa mitigação
 é diagnóstica e não constitui validação física de fratura.
 
+## R12 — Pressão inicial/hidrostática legada não fecha sozinha a comparação de `pw`
+
+**Severidade:** Média | **Status:** Confirmado na Fase 10.18B
+
+A Fase 10.18B confirmou que o legado da tese usa uma pressão inicial por anular:
+
+```text
+line_up[lu].pi(idAnnular)
+```
+
+No caminho de fluido prescrito, essa pressão é calculada por:
+
+```text
+p_ref + 9.81 * rho_ppg * 119.826427 * depth
+```
+
+e entra explicitamente em:
+
+```text
+pw = pi + dP
+```
+
+No BUZ67D auditado, o primeiro registro exportado indica:
+
+```text
+pw_Pa(t=0) = 26732215.17314985
+dP(t=0) = 0
+```
+
+A Fase 10.18B adicionou `lot.initial_pressure` como campo opt-in moderno e
+passou a calcular:
+
+```text
+wellbore_pressure_Pa = initial_pressure_Pa + dP_balance_accumulated
+```
+
+para `pressure_model = volumetric_balance`. Entretanto, a inclusão desse valor,
+com o modelo de balanço simplificado atual, superestima a pressão máxima legada
+no ciclo BUZ67D completo. Logo, a pressão inicial é parte necessária do contrato
+de `pw`, mas não é suficiente para validar equivalência física.
+
+**Mitigação:** manter o resultado como diagnóstico. Antes de declarar
+equivalência, ainda são necessários contratos para semântica de `dP`, shut-in
+com mecanismos dissipativos, casing/acomodação, Zamora e critério legado de
+fratura/leakoff.
+
 ## R08 — Unidade de `dt`: coerente com a taxa de fluência; LOT_APB_v5 usa [h]
 
 **Severidade:** Alta | **Status:** Confirmado em 2026-06-01

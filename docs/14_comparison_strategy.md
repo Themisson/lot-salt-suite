@@ -1115,6 +1115,58 @@ pressure_semantic_equivalence = false
 awaiting_human_review = true
 ```
 
+## Fase 10.18B — pressão inicial e ciclo completo com shut-in
+
+**Status:** `PHASE10_18B_INITIAL_PRESSURE_AND_SHUTIN_DIAGNOSTIC_COMPLETE`.
+
+A Fase 10.18B auditou dois pontos independentes:
+
+| Gate | Resultado |
+|---|---|
+| Pressão inicial/preexistente | `PRE_EXISTING_PRESSURE_CONFIRMED_IMPLEMENTATION_ALLOWED` |
+| Schedule com shut-in | `SHUTIN_CONFIRMED_IMPLEMENTATION_ALLOWED` |
+
+E implementou, de forma opt-in:
+
+- `lot.initial_pressure`;
+- `lot.injection.schedule.phases`;
+- fase `injection` com `Q > 0`;
+- fase `shutin` com `Q = 0`;
+- extensão do caso controlado BUZ67D para `0..1320 s`.
+
+O diagnóstico gera em `results/comparison/phase10_18b/`, sem versionar:
+
+```text
+phase10_18b_summary.csv
+phase10_18b_metadata.json
+pressure_vs_time_full_cycle.png
+injected_volume_vs_pressure_full_cycle.png
+injection_rate_vs_time.png
+pressure_comparison_all_modes.png
+```
+
+Resultado observado:
+
+| Métrica | Legado auditado | Moderno 10.18A | Moderno 10.18B |
+|---|---:|---:|---:|
+| Campo | `pw_Pa` | `wellbore_pressure_Pa` | `wellbore_pressure_Pa` |
+| Tempo | `0..1320 s` | `0..750 s` | `0..1320 s` |
+| Pressão inicial | `26.732215 MPa` | `0 MPa` | `26.732215 MPa` |
+| Máxima pressão | `69.035836 MPa` | `55.397022 MPa` | `82.129237 MPa` |
+| Diferença relativa no máximo | — | `0.198` | `0.190` |
+
+Classificação:
+
+```text
+PRE_EXISTING_PRESSURE_FIX_PARTIAL_OTHER_FACTORS_REMAIN
+```
+
+A comparação melhorou ligeiramente a diferença absoluta de máxima pressão, mas
+passou a superestimar a curva legada. A pressão inicial é, portanto, parte do
+contrato legado `pw = pi + dP`, mas não explica sozinha a diferença. O resultado
+continua diagnóstico e não valida equivalência física, fratura, dano, ruptura,
+`sigmaTheta`, `margin` ou `opened`.
+
 ## Fase 10.17C — planejamento antes de novos mecanismos
 
 A próxima evolução não deve avançar diretamente para validação física. A Fase

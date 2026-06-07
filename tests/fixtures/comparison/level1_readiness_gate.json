@@ -116,6 +116,27 @@
       "No shut-in, accommodation, Zamora, sigmaTheta, margin or opened comparison was performed."
     ]
   },
+  "phase10_18b_initial_pressure_shutin_diagnostic": {
+    "status": "PHASE10_18B_INITIAL_PRESSURE_AND_SHUTIN_DIAGNOSTIC_COMPLETE",
+    "pre_existing_pressure_gate": "PRE_EXISTING_PRESSURE_CONFIRMED_IMPLEMENTATION_ALLOWED",
+    "shutin_gate": "SHUTIN_CONFIRMED_IMPLEMENTATION_ALLOWED",
+    "pre_existing_pressure_fix_classification": "PRE_EXISTING_PRESSURE_FIX_PARTIAL_OTHER_FACTORS_REMAIN",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "pressure_semantic_equivalence": false,
+    "legacy_audit_csv": "results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv",
+    "modern_full_cycle_csv": "results/comparison/phase10_18b/modern_full_cycle/timeseries.csv",
+    "summary_csv": "results/comparison/phase10_18b/phase10_18b_summary.csv",
+    "metadata_json": "results/comparison/phase10_18b/phase10_18b_metadata.json",
+    "diagnostic_observation": "initial_pressure_Pa is confirmed in the legacy pw contract and the modern cycle now covers 0..1320 s, but the current simplified balance overshoots legacy maximum pressure.",
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "initial_pressure_Pa is extracted from audited legacy pw_Pa at t=0 where dP=0.",
+      "Shut-in is represented as Q=0 and constant injected volume.",
+      "No Zamora, casing elasticity, APB/salt feedback, sigmaTheta, margin or opened comparison was performed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

@@ -110,6 +110,7 @@ set(LSS_CORE_SOURCES
   src/io/ResultWriter.cpp
   src/wellbore/AnnularVolume.cpp
   src/lot/BreakdownDetector.cpp
+  src/lot/InjectionSchedule.cpp
   src/lot/LeakoffModel.cpp
   src/lot/PknModel.cpp
   src/lot/PknRunner.cpp

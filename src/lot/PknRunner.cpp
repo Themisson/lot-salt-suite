@@ -202,6 +202,9 @@ PknInput make_pkn_input(const lss::core::CaseData& data) {
   input.injection.total_time_s = data.lot.injection_total_time_s;
   input.injection.dt_s = data.lot.injection_dt_s;
   input.injection.accommodation_time_s = data.lot.injection_accommodation_time_s;
+  for (const auto& phase : data.lot.injection_phases) {
+    input.injection.phases.push_back({phase.name, phase.duration_s, phase.rate_m3_s});
+  }
   input.leakoff.enabled = data.lot.leakoff_enabled;
   input.leakoff.model = parse_leakoff_model(data.lot.leakoff_model);
   input.leakoff.coefficient_m_sqrt_s = data.lot.leakoff_coefficient_m_sqrt_s;
@@ -216,6 +219,7 @@ PknInput make_pkn_input(const lss::core::CaseData& data) {
   input.leakoff_coefficient_m_sqrt_s = data.lot.leakoff_coefficient_m_sqrt_s;
   input.leakoff_constant_rate_m3_s = data.lot.leakoff_constant_rate_m3_s;
   input.pressure_model = parse_pressure_model(data.lot.pressure_model);
+  input.initial_pressure_Pa = data.lot.initial_pressure_Pa;
   if (input.pressure_model == PknPressureModel::VolumetricBalance) {
     const auto annular_context = make_annular_volume_context(data);
     if (!annular_context.available || annular_context.total_m3 <= 0.0) {

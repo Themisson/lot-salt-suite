@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <cmath>
+#include <iterator>
 #include <vector>
 #include <stdexcept>
 
@@ -37,6 +39,7 @@ void check_finite_non_negative_series(const lss::lot::PknResult& result) {
   REQUIRE(result.time_series_s.size() == result.net_pressure_series_Pa.size());
   REQUIRE(result.time_series_s.size() == result.leakoff_volume_series_m3.size());
   REQUIRE(result.time_series_s.size() == result.fracture_volume_series_m3.size());
+  REQUIRE(result.time_series_s.size() == result.initial_pressure_series_Pa.size());
   REQUIRE(result.time_series_s.size() == result.wellbore_pressure_series_Pa.size());
   REQUIRE(result.time_series_s.size() ==
           result.balance_delta_pressure_series_Pa.size());
@@ -57,6 +60,7 @@ void check_finite_non_negative_series(const lss::lot::PknResult& result) {
     CHECK(std::isfinite(result.net_pressure_series_Pa[i]));
     CHECK(std::isfinite(result.leakoff_volume_series_m3[i]));
     CHECK(std::isfinite(result.fracture_volume_series_m3[i]));
+    CHECK(std::isfinite(result.initial_pressure_series_Pa[i]));
     CHECK(std::isfinite(result.wellbore_pressure_series_Pa[i]));
     CHECK(std::isfinite(result.balance_delta_pressure_series_Pa[i]));
     CHECK(std::isfinite(result.balance_effective_volume_increment_series_m3[i]));
@@ -69,6 +73,7 @@ void check_finite_non_negative_series(const lss::lot::PknResult& result) {
     CHECK(result.net_pressure_series_Pa[i] >= 0.0);
     CHECK(result.leakoff_volume_series_m3[i] >= 0.0);
     CHECK(result.fracture_volume_series_m3[i] >= 0.0);
+    CHECK(result.initial_pressure_series_Pa[i] >= 0.0);
     CHECK(result.wellbore_pressure_series_Pa[i] >= 0.0);
   }
 }
@@ -163,6 +168,7 @@ TEST_CASE("Minimal SI PKN model is deterministic") {
   CHECK(first.fracture_length_series_m == second.fracture_length_series_m);
   CHECK(first.fracture_width_series_m == second.fracture_width_series_m);
   CHECK(first.net_pressure_series_Pa == second.net_pressure_series_Pa);
+  CHECK(first.initial_pressure_series_Pa == second.initial_pressure_series_Pa);
   CHECK(first.leakoff_volume_series_m3 == second.leakoff_volume_series_m3);
   CHECK(first.fracture_volume_series_m3 == second.fracture_volume_series_m3);
   CHECK(first.wellbore_pressure_series_Pa == second.wellbore_pressure_series_Pa);
@@ -184,6 +190,101 @@ TEST_CASE("Volumetric balance pressure model increases pressure with injection")
   CHECK(is_monotonic_non_decreasing(result.wellbore_pressure_series_Pa));
   CHECK(result.balance_injected_volume_increment_m3 > 0.0);
   CHECK(result.balance_fracture_volume_increment_m3 == Catch::Approx(0.0));
+}
+
+TEST_CASE("Initial pressure shifts volumetric wellbore pressure") {
+  const lss::lot::PknModel model;
+  auto input = synthetic_input();
+  input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  input.annular_volume_m3 = 10.0;
+  input.fluid_compressibility_per_Pa = 1.0e-9;
+  input.initial_pressure_Pa = 13.0e6;
+  input.breakdown.pressure_Pa = 1.0e12;
+
+  const auto result = model.simulate(input);
+
+  REQUIRE_FALSE(result.wellbore_pressure_series_Pa.empty());
+  CHECK(result.initial_pressure_Pa == Catch::Approx(13.0e6));
+  CHECK(result.initial_pressure_series_Pa.front() == Catch::Approx(13.0e6));
+  CHECK(result.wellbore_pressure_series_Pa.front() == Catch::Approx(13.0e6));
+  CHECK(result.wellbore_pressure_Pa > 13.0e6);
+}
+
+TEST_CASE("Schedule phases preserve single phase injection volume") {
+  const lss::lot::PknModel model;
+  auto legacy = synthetic_input();
+  auto phased = synthetic_input();
+  phased.injection.phases.push_back({"injection", 100.0, 0.001});
+
+  const auto legacy_result = model.simulate(legacy);
+  const auto phased_result = model.simulate(phased);
+
+  CHECK(phased_result.time_s == Catch::Approx(legacy_result.time_s));
+  CHECK(phased_result.injected_volume_m3 ==
+        Catch::Approx(legacy_result.injected_volume_m3));
+  CHECK(phased_result.injected_volume_series_m3 ==
+        legacy_result.injected_volume_series_m3);
+}
+
+TEST_CASE("Schedule phases keep injected volume constant during shutin") {
+  const lss::lot::PknModel model;
+  auto input = synthetic_input();
+  input.injection.total_time_s = 130.0;
+  input.injection.phases.push_back({"injection", 100.0, 0.001});
+  input.injection.phases.push_back({"shutin", 30.0, 0.0});
+
+  const auto result = model.simulate(input);
+
+  REQUIRE(result.time_series_s.size() >= 2);
+  CHECK(result.time_s == Catch::Approx(130.0));
+  CHECK(result.injected_volume_m3 == Catch::Approx(0.1));
+  CHECK(result.injected_volume_series_m3.back() ==
+        Catch::Approx(result.injected_volume_series_m3[result.injected_volume_series_m3.size() - 2]));
+}
+
+TEST_CASE("Shutin pressure does not increase without leakoff") {
+  const lss::lot::PknModel model;
+  auto input = synthetic_input();
+  input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  input.annular_volume_m3 = 10.0;
+  input.fluid_compressibility_per_Pa = 1.0e-9;
+  input.breakdown.pressure_Pa = 1.0e12;
+  input.injection.total_time_s = 130.0;
+  input.injection.phases.push_back({"injection", 100.0, 0.001});
+  input.injection.phases.push_back({"shutin", 30.0, 0.0});
+
+  const auto result = model.simulate(input);
+
+  REQUIRE(result.time_series_s.size() >= 2);
+  CHECK(result.wellbore_pressure_series_Pa.back() ==
+        Catch::Approx(result.wellbore_pressure_series_Pa[result.wellbore_pressure_series_Pa.size() - 2]));
+}
+
+TEST_CASE("Shutin pressure decreases during leakoff") {
+  const lss::lot::PknModel model;
+  auto input = synthetic_input();
+  input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  input.annular_volume_m3 = 10.0;
+  input.fluid_compressibility_per_Pa = 1.0e-9;
+  input.breakdown.pressure_Pa = 1.0;
+  input.leakoff.enabled = true;
+  input.leakoff.model = lss::lot::LeakoffModel::ConstantRate;
+  input.leakoff.constant_rate_m3_s = 1.0e-4;
+  input.injection.total_time_s = 130.0;
+  input.injection.phases.push_back({"injection", 100.0, 0.001});
+  input.injection.phases.push_back({"shutin", 30.0, 0.0});
+
+  const auto result = model.simulate(input);
+
+  REQUIRE(result.time_series_s.size() >= 2);
+  const auto shutin_start = std::find(result.time_series_s.begin(),
+                                      result.time_series_s.end(), 100.0);
+  REQUIRE(shutin_start != result.time_series_s.end());
+  const auto shutin_index =
+      static_cast<std::size_t>(std::distance(result.time_series_s.begin(), shutin_start));
+  CHECK(result.balance_leakoff_volume_increment_series_m3.back() > 0.0);
+  CHECK(result.wellbore_pressure_series_Pa.back() <
+        result.wellbore_pressure_series_Pa[shutin_index]);
 }
 
 TEST_CASE("Volumetric balance responds to annular volume and compressibility") {
@@ -236,6 +337,14 @@ TEST_CASE("Minimal SI PKN model rejects invalid inputs") {
   auto bad_dt_gt_total = synthetic_input();
   bad_dt_gt_total.injection.dt_s = 200.0;
   CHECK_THROWS_AS(model.simulate(bad_dt_gt_total), std::invalid_argument);
+
+  auto bad_initial_pressure = synthetic_input();
+  bad_initial_pressure.initial_pressure_Pa = -1.0;
+  CHECK_THROWS_AS(model.simulate(bad_initial_pressure), std::invalid_argument);
+
+  auto bad_phase_rate = synthetic_input();
+  bad_phase_rate.injection.phases.push_back({"shutin", 10.0, -1.0});
+  CHECK_THROWS_AS(model.simulate(bad_phase_rate), std::invalid_argument);
 
   auto bad_balance_volume = synthetic_input();
   bad_balance_volume.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;

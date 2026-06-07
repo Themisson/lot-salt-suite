@@ -57,6 +57,59 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.18B — pressão inicial e schedule com shut-in — Codex
+
+**Status:** Implementada, testada e pronta para commit/push conforme gate da fase.
+
+**Gate 1:** `PRE_EXISTING_PRESSURE_CONFIRMED_IMPLEMENTATION_ALLOWED`.
+
+**Gate 2:** `SHUTIN_CONFIRMED_IMPLEMENTATION_ALLOWED`.
+
+**Classificação do diagnóstico de pressão inicial:**
+`PRE_EXISTING_PRESSURE_FIX_PARTIAL_OTHER_FACTORS_REMAIN`.
+
+**Auditoria legada:**
+- `Fluids::getPFpressure(depth, seabed, rho)` calcula pressão hidrostática
+  preexistente como `p_ref + 9.81 * rho_ppg * 119.826427 * depth`.
+- `Layers` armazena essa pressão em `line_up[lu].pi(idAnnular)`.
+- `APB1da` usa `pw = pi + dP`.
+- O audit CSV BUZ67D registra em `t=0`: `pw_Pa = 26732215.17314985` e
+  `dP = 0`.
+
+**Implementação moderna:**
+- `lot.initial_pressure` foi adicionado como campo opcional.
+- `PknInput` e `PknResult` carregam `initial_pressure_Pa`.
+- `volumetric_balance` passa a calcular
+  `wellbore_pressure_Pa = initial_pressure_Pa + dP_balance_accumulated`.
+- `lot.injection.schedule.phases` foi adicionado como rota opt-in.
+- O caso `buz67d_pkn_legacy_aligned.yaml` agora representa:
+  `12.5 min` de injeção e `9.5 min` de shut-in, total `1320 s`.
+
+**Diagnóstico:**
+- legado auditado `max(pw_Pa) = 69.035836 MPa`;
+- moderno 10.18A `max(wellbore_pressure_Pa) = 55.397022 MPa`;
+- moderno 10.18B `max(wellbore_pressure_Pa) = 82.129237 MPa`;
+- diferença relativa contra legado: `0.198` na 10.18A e `0.190` na 10.18B.
+
+**Conclusão:** a pressão inicial é parte confirmada do contrato legado, e o
+schedule com shut-in fecha a faixa temporal `0..1320 s`, mas a soma isolada da
+pressão inicial no balanço simplificado superestima a pressão máxima legada.
+Não há validação física.
+
+**Artefatos locais não versionados:**
+- `results/comparison/phase10_18b/phase10_18b_summary.csv`;
+- `results/comparison/phase10_18b/phase10_18b_metadata.json`;
+- `results/comparison/phase10_18b/pressure_vs_time_full_cycle.png`;
+- `results/comparison/phase10_18b/injected_volume_vs_pressure_full_cycle.png`;
+- `results/comparison/phase10_18b/injection_rate_vs_time.png`;
+- `results/comparison/phase10_18b/pressure_comparison_all_modes.png`.
+
+**Restrição:** não implementou Zamora, fluido composicional, APB/sal feedback,
+casing elástico, novas equações de fratura ou validação de `sigmaTheta`,
+`margin` e `opened`.
+
+---
+
 ### [2026-06-07] Fase 10.18A — diagnóstico visual do modo volumetric_balance — Codex
 
 **Status:** Implementada, testada e pronta para commit/push conforme gate da fase.

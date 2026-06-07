@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">58/65</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">59/66</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -928,6 +928,59 @@ apenas cria uma alternativa controlada para análise comparativa futura.</p>
 <p>O planejamento de acomodação operacional, shut-in/no-injection e fluido Zamora
 fica registrado em <code>docs/16_future_features.md</code> como Fase 10.17C. Esses itens
 não foram conectados ao runtime nesta fase.</p>
+<h3 id="pressao-inicial-e-schedule-com-shut-in-fase-1018b">Pressão inicial e schedule com shut-in — Fase 10.18B</h3>
+<p><strong>Status:</strong> <code>PHASE10_18B_INITIAL_PRESSURE_AND_SHUTIN_DIAGNOSTIC_COMPLETE</code>.</p>
+<p>A auditoria da Fase 10.18B confirmou que o legado usa uma pressão
+preexistente/hidrostática por anular:</p>
+<pre><code class="language-text">line_up[lu].pi(idAnnular)
+</code></pre>
+<p>No caminho de fluido prescrito, essa pressão vem de:</p>
+<pre><code class="language-text">Fluids::getPFpressure(depth, seabed, rho)
+  = p_ref + 9.81 * rho_ppg * 119.826427 * depth
+</code></pre>
+<p>e é somada no critério legado como:</p>
+<pre><code class="language-text">pw = line_up[lu].pi(idAnnular) + dP(idAnnular)
+</code></pre>
+<p>No caso BUZ67D auditado, a série exportada registra em <code>t = 0</code>:</p>
+<pre><code class="language-text">pw_Pa = 26732215.17314985
+dP = 0
+</code></pre>
+<p>Logo, para o caso controlado, essa pressão foi registrada como:</p>
+<pre><code class="language-yaml">lot:
+  initial_pressure:
+    value: 26732215.17314985
+    unit: Pa
+</code></pre>
+<p>O contrato moderno é:</p>
+<pre><code class="language-text">wellbore_pressure_Pa = initial_pressure_Pa + dP_balance_accumulated
+</code></pre>
+<p>somente para <code>pressure_model = volumetric_balance</code>. O default <code>pkn_direct</code>
+permanece inalterado.</p>
+<p>A mesma fase implementa <code>lot.injection.schedule.phases</code> como rota opcional:</p>
+<pre><code class="language-yaml">phases:
+  - name: injection
+    duration: {value: 12.5, unit: min}
+    rate: {value: 0.5, unit: bbl_min}
+  - name: shutin
+    duration: {value: 9.5, unit: min}
+    rate: {value: 0.0, unit: bbl_min}
+</code></pre>
+<p>Se <code>phases</code> estiver ausente, o comportamento antigo de uma única fase de
+injeção é preservado. Com <code>shutin</code>, a vazão nova é zero e o volume injetado
+permanece constante. No modo <code>volumetric_balance</code>:</p>
+<ul>
+<li>sem leakoff/fratura/fechamento ativo, a pressão não aumenta no shut-in;</li>
+<li>com leakoff ativo, o volume efetivo pode ficar negativo e a pressão pode
+  declinar;</li>
+<li>o gatilho de abertura usa o incremento acima de <code>initial_pressure_Pa</code>, para
+  evitar que a pressão inicial sozinha abra a fratura no tempo zero.</li>
+</ul>
+<p>O diagnóstico BUZ67D completo passou a cobrir <code>0..1320 s</code>, mas a pressão
+máxima moderna com <code>initial_pressure_Pa</code> ficou acima da pressão máxima legada.
+Portanto, a correção é classificada como:</p>
+<pre><code class="language-text">PRE_EXISTING_PRESSURE_FIX_PARTIAL_OTHER_FACTORS_REMAIN
+</code></pre>
+<p>e não como validação física.</p>
 </div>
 </section>
 
@@ -1779,6 +1832,33 @@ diagnóstico, mas essa informação ainda não participa da pressão PKN.</p>
 <code>volumetric_balance</code>, sem alterar o default <code>pkn_direct</code>, exportando campos
 separados de <code>wellbore_pressure_Pa</code> e diagnóstico de balanço. Essa mitigação
 é diagnóstica e não constitui validação física de fratura.</p>
+<h2 id="r12-pressao-inicialhidrostatica-legada-nao-fecha-sozinha-a-comparacao-de-pw">R12 — Pressão inicial/hidrostática legada não fecha sozinha a comparação de <code>pw</code></h2>
+<p><strong>Severidade:</strong> Média | <strong>Status:</strong> Confirmado na Fase 10.18B</p>
+<p>A Fase 10.18B confirmou que o legado da tese usa uma pressão inicial por anular:</p>
+<pre><code class="language-text">line_up[lu].pi(idAnnular)
+</code></pre>
+<p>No caminho de fluido prescrito, essa pressão é calculada por:</p>
+<pre><code class="language-text">p_ref + 9.81 * rho_ppg * 119.826427 * depth
+</code></pre>
+<p>e entra explicitamente em:</p>
+<pre><code class="language-text">pw = pi + dP
+</code></pre>
+<p>No BUZ67D auditado, o primeiro registro exportado indica:</p>
+<pre><code class="language-text">pw_Pa(t=0) = 26732215.17314985
+dP(t=0) = 0
+</code></pre>
+<p>A Fase 10.18B adicionou <code>lot.initial_pressure</code> como campo opt-in moderno e
+passou a calcular:</p>
+<pre><code class="language-text">wellbore_pressure_Pa = initial_pressure_Pa + dP_balance_accumulated
+</code></pre>
+<p>para <code>pressure_model = volumetric_balance</code>. Entretanto, a inclusão desse valor,
+com o modelo de balanço simplificado atual, superestima a pressão máxima legada
+no ciclo BUZ67D completo. Logo, a pressão inicial é parte necessária do contrato
+de <code>pw</code>, mas não é suficiente para validar equivalência física.</p>
+<p><strong>Mitigação:</strong> manter o resultado como diagnóstico. Antes de declarar
+equivalência, ainda são necessários contratos para semântica de <code>dP</code>, shut-in
+com mecanismos dissipativos, casing/acomodação, Zamora e critério legado de
+fratura/leakoff.</p>
 <h2 id="r08-unidade-de-dt-coerente-com-a-taxa-de-fluencia-lot_apb_v5-usa-h">R08 — Unidade de <code>dt</code>: coerente com a taxa de fluência; LOT_APB_v5 usa [h]</h2>
 <p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado em 2026-06-01</p>
 <p>Arquivos auditados:

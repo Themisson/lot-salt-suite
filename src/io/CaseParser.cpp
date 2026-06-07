@@ -334,6 +334,24 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
         parse_value_unit(schedule["dt"], "lot.injection.schedule.dt", "time");
     data.lot.injection_accommodation_time_s = parse_value_unit(
         schedule["accommodation_time"], "lot.injection.schedule.accommodation_time", "time");
+    if (schedule["phases"]) {
+      for (std::size_t i = 0; i < schedule["phases"].size(); ++i) {
+        const YAML::Node phase_node = schedule["phases"][i];
+        lss::core::InjectionPhaseData phase;
+        phase.name = optional_string(phase_node, "name", "injection");
+        phase.duration_s = parse_value_unit(
+            phase_node["duration"],
+            "lot.injection.schedule.phases[].duration", "time");
+        phase.rate_m3_s = parse_value_unit(
+            phase_node["rate"],
+            "lot.injection.schedule.phases[].rate", "rate");
+        data.lot.injection_phases.push_back(phase);
+      }
+    }
+  }
+  if (lot["initial_pressure"]) {
+    data.lot.initial_pressure_Pa =
+        parse_value_unit(lot["initial_pressure"], "lot.initial_pressure", "pressure");
   }
   if (lot["leakoff"]) {
     const YAML::Node leakoff = lot["leakoff"];
@@ -394,6 +412,32 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
     }
     if (data.lot.injection_dt_s <= 0.0 || data.lot.injection_total_time_s <= 0.0) {
       throw std::runtime_error("Validacao falhou: lot.injection.schedule exige tempos > 0");
+    }
+    if (!std::isfinite(data.lot.initial_pressure_Pa) ||
+        data.lot.initial_pressure_Pa < 0.0) {
+      throw std::runtime_error("Validacao falhou: lot.initial_pressure exige pressao >= 0");
+    }
+    double phase_total_s = 0.0;
+    bool has_positive_phase_rate = false;
+    for (const auto& phase : data.lot.injection_phases) {
+      if (phase.duration_s <= 0.0) {
+        throw std::runtime_error(
+            "Validacao falhou: lot.injection.schedule.phases exige duracao > 0");
+      }
+      if (phase.rate_m3_s < 0.0) {
+        throw std::runtime_error(
+            "Validacao falhou: lot.injection.schedule.phases exige vazao >= 0");
+      }
+      phase_total_s += phase.duration_s;
+      has_positive_phase_rate = has_positive_phase_rate || phase.rate_m3_s > 0.0;
+    }
+    if (!data.lot.injection_phases.empty() && !has_positive_phase_rate) {
+      throw std::runtime_error(
+          "Validacao falhou: LOT/PKN exige ao menos uma fase com vazao positiva");
+    }
+    if (!data.lot.injection_phases.empty()) {
+      data.lot.injection_total_time_s =
+          data.lot.injection_accommodation_time_s + phase_total_s;
     }
     if (data.lot.fracture_height_m <= 0.0 || data.lot.breakdown_pressure_Pa <= 0.0) {
       throw std::runtime_error("Validacao falhou: LOT/PKN exige altura e pressao de breakdown > 0");
