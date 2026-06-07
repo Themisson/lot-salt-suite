@@ -57,6 +57,33 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.16 — volume anular BUZ67D com drill pipe — Codex
+
+**Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
+
+**Classificacao:** `DRILLPIPE_ANNULAR_VOLUME_DIAGNOSTIC_EXPORTED`.
+
+**Objetivo:** Corrigir a geometria diagnostica de volume anular do caso
+controlado BUZ67D para descontar o drill pipe legado, preservando a convencao
+per-radian do `LOT_Tese`.
+
+**Evidencia legada:**
+- `Solids.h` define `di` e `de` como diametros em polegadas.
+- `Solids::getRi_m()/getRe_m()` convertem polegadas para metro e dividem por 2.
+- `Layers.cpp` calcula `Vi = 0.5 * (R_outer^2 - R_inner^2) * thickness`.
+- O BUZ67D PKN declara drill pipe `di = 4.67 in`, `de = 5.5 in`.
+
+**Implementacao moderna:** adiciona `wellbore.drill_pipe` ao parser/schema,
+utilitario `wellbore::annular_volume_per_radian_m3`, e exportacao de
+`initial_annular_volume_per_radian_m3` e `initial_annular_volume_m3` no
+`result.json`.
+
+**Escopo fisico:** diagnostico apenas. `PknModel` nao consome volume anular e
+`net_pressure_Pa` continua sem equivalencia semantica declarada com `pw_Pa`
+legado.
+
+---
+
 ### [2026-06-07] Fase 10.15B — audit run visual legado-moderno — Codex
 
 **Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.

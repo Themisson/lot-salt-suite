@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 namespace lss::lot {
@@ -12,6 +13,13 @@ struct PknResult {
   double fracture_volume_m3 = 0.0;
   double leakoff_volume_m3 = 0.0;
   double net_pressure_Pa = 0.0;
+  double initial_annular_volume_per_radian_m3 = 0.0;
+  double initial_annular_volume_m3 = 0.0;
+  double annular_outer_radius_m = 0.0;
+  double annular_inner_radius_m = 0.0;
+  double annular_length_m = 0.0;
+  std::string annular_volume_convention;
+  std::string annular_volume_source;
 
   // Backward-compatible aliases for early Fase 6.2 tests.
   double fracture_width_m = 0.0;

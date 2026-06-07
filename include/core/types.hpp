@@ -69,6 +69,21 @@ struct AnnularData {
   double base_m = 0.0;
 };
 
+struct DrillPipeData {
+  bool present = false;
+  double outer_diameter_m = 0.0;
+  double inner_diameter_m = 0.0;
+  double depth_m = 0.0;
+};
+
+struct WellboreData {
+  double airgap_m = 0.0;
+  double water_depth_m = 0.0;
+  double total_depth_m = 0.0;
+  double shoe_depth_m = 0.0;
+  DrillPipeData drill_pipe;
+};
+
 struct TimeConfig {
   enum class Scheme { Explicit, ImplicitAdaptive };
 
@@ -114,6 +129,7 @@ struct CaseData {
   std::string version;
   std::string mode;
   std::string legacy_source;
+  WellboreData wellbore;
   std::vector<CasingData> casings;
   std::vector<CementData> cements;
   std::vector<FluidData> fluids;

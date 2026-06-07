@@ -15,6 +15,7 @@ MODERN_PRESSURE_LABEL = "Modern net_pressure_Pa — lot-sim, semantic equivalenc
 CAVEATS = [
     "Legacy pw_Pa and modern net_pressure_Pa may differ semantically.",
     "Injected volume conversion depends on audited legacy flow-rate conversion.",
+    "Annular volume comparison reports per-radian and total volumes explicitly.",
     "This phase is diagnostic only and does not validate LOT physics.",
     "No sigmaTheta/pw/margin/opened equivalence is declared.",
 ]
@@ -102,7 +103,7 @@ def _load_modern_result(path: Path | None) -> dict[str, Any]:
         return json.load(handle)
 
 
-def _legacy_initial_volume(rows: list[dict[str, str]]) -> tuple[float | None, str, str]:
+def _legacy_initial_volume(rows: list[dict[str, str]]) -> tuple[float | None, float | None, str, str]:
     nonzero = [
         _finite_float(row.get("initial_annular_volume_m3"))
         for row in rows
@@ -110,16 +111,38 @@ def _legacy_initial_volume(rows: list[dict[str, str]]) -> tuple[float | None, st
     ]
     values = [value for value in nonzero if value is not None]
     if not values:
-        return None, "NOT_FOUND", "No injected legacy annular row with initial_annular_volume_m3"
-    return values[0], "DERIVED_FROM_LEGACY_GEOMETRY", "Selected from the injected annular audit row"
+        return None, None, "NOT_FOUND", "No injected legacy annular row with initial_annular_volume_m3"
+    total = values[0]
+    return (
+        total / (2.0 * math.pi),
+        total,
+        "DERIVED_FROM_LEGACY_GEOMETRY",
+        "Selected from the injected annular audit row; legacy Vi is per-radian internally",
+    )
 
 
-def _modern_initial_volume(result: dict[str, Any]) -> tuple[float | None, str, str]:
+def _modern_initial_volume(result: dict[str, Any]) -> tuple[float | None, float | None, str, str]:
     summary = result.get("summary", {}) if isinstance(result, dict) else {}
-    value = summary.get("initial_annular_volume_m3")
-    if isinstance(value, (int, float)) and math.isfinite(float(value)):
-        return float(value), "EXPORTED_BY_MODERN", "Read from modern result.json summary"
-    return None, "NOT_FOUND", "Modern result.json does not export initial_annular_volume_m3"
+    total = summary.get("initial_annular_volume_m3")
+    per_radian = summary.get("initial_annular_volume_per_radian_m3")
+    total_value = float(total) if isinstance(total, (int, float)) and math.isfinite(float(total)) else None
+    per_radian_value = (
+        float(per_radian)
+        if isinstance(per_radian, (int, float)) and math.isfinite(float(per_radian))
+        else None
+    )
+    if total_value is None and per_radian_value is not None:
+        total_value = 2.0 * math.pi * per_radian_value
+    if per_radian_value is None and total_value is not None:
+        per_radian_value = total_value / (2.0 * math.pi)
+    if total_value is not None and per_radian_value is not None:
+        return (
+            per_radian_value,
+            total_value,
+            "EXPORTED_BY_MODERN",
+            "Read from modern result.json summary",
+        )
+    return None, None, "NOT_FOUND", "Modern result.json does not export initial annular volume"
 
 
 def _plot_pressure_vs_time(path: Path, legacy: list[dict[str, Any]], modern: list[dict[str, Any]]) -> bool:
@@ -213,6 +236,7 @@ def _plot_annular_volume(path: Path, legacy_volume: float, modern_volume: float)
 def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    suffix = args.suffix or ""
 
     legacy_rows = _read_csv(Path(args.legacy_audit_csv))
     modern_rows = _read_csv(Path(args.modern_timeseries_csv))
@@ -233,21 +257,24 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
                 "notes": point.get("label"),
             }
         )
-    _write_csv(output_dir / "injected_volume_vs_pressure.csv", volume_pressure_rows)
+    volume_pressure_csv = output_dir / f"injected_volume_vs_pressure{suffix}.csv"
+    _write_csv(volume_pressure_csv, volume_pressure_rows)
 
-    legacy_volume, legacy_volume_status, legacy_volume_notes = _legacy_initial_volume(legacy_rows)
-    modern_volume, modern_volume_status, modern_volume_notes = _modern_initial_volume(modern_result)
+    legacy_volume_per_radian, legacy_volume, legacy_volume_status, legacy_volume_notes = _legacy_initial_volume(legacy_rows)
+    modern_volume_per_radian, modern_volume, modern_volume_status, modern_volume_notes = _modern_initial_volume(modern_result)
     annular_rows = [
         {
             "source": "legacy",
-            "initial_annular_volume_m3": legacy_volume if legacy_volume is not None else "",
+            "volume_per_radian_m3": legacy_volume_per_radian if legacy_volume_per_radian is not None else "",
+            "volume_total_m3": legacy_volume if legacy_volume is not None else "",
             "status": legacy_volume_status,
             "method": legacy_volume_status,
             "notes": legacy_volume_notes,
         },
         {
             "source": "modern",
-            "initial_annular_volume_m3": modern_volume if modern_volume is not None else "",
+            "volume_per_radian_m3": modern_volume_per_radian if modern_volume_per_radian is not None else "",
+            "volume_total_m3": modern_volume if modern_volume is not None else "",
             "status": modern_volume_status,
             "method": modern_volume_status,
             "notes": modern_volume_notes,
@@ -261,14 +288,20 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
             [
                 {
                     "source": "difference_abs_m3",
-                    "initial_annular_volume_m3": abs(difference),
+                    "volume_per_radian_m3": (
+                        abs((legacy_volume_per_radian or 0.0) - (modern_volume_per_radian or 0.0))
+                        if legacy_volume_per_radian is not None and modern_volume_per_radian is not None
+                        else ""
+                    ),
+                    "volume_total_m3": abs(difference),
                     "status": "DONE",
                     "method": "legacy_minus_modern",
                     "notes": "",
                 },
                 {
                     "source": "difference_percent",
-                    "initial_annular_volume_m3": percent if percent is not None else "",
+                    "volume_per_radian_m3": percent if percent is not None else "",
+                    "volume_total_m3": percent if percent is not None else "",
                     "status": "DONE",
                     "method": "legacy_minus_modern_over_modern",
                     "notes": "",
@@ -279,11 +312,11 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
     _write_csv(
         output_dir / "annular_volume_comparison.csv",
         annular_rows,
-        ["source", "initial_annular_volume_m3", "status", "method", "notes"],
+        ["source", "volume_per_radian_m3", "volume_total_m3", "status", "method", "notes"],
     )
 
-    volume_plot = _plot_volume_vs_pressure(output_dir / "injected_volume_vs_pressure.png", legacy, modern)
-    pressure_plot = _plot_pressure_vs_time(output_dir / "pressure_vs_time_diagnostic.png", legacy, modern)
+    volume_plot = _plot_volume_vs_pressure(output_dir / f"injected_volume_vs_pressure{suffix}.png", legacy, modern)
+    pressure_plot = _plot_pressure_vs_time(output_dir / f"pressure_vs_time{suffix}.png", legacy, modern)
     annular_plot = False
     if legacy_volume is not None and modern_volume is not None:
         annular_plot = _plot_annular_volume(output_dir / "annular_volume_comparison.png", legacy_volume, modern_volume)
@@ -310,6 +343,7 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
             "time_s_range": _range([point["time_s"] for point in legacy if point["time_s"] is not None]),
             "pw_Pa_range": _range(legacy_pressures),
             "initial_annular_volume_status": legacy_volume_status,
+            "initial_annular_volume_per_radian_m3": legacy_volume_per_radian,
             "initial_annular_volume_m3": legacy_volume,
         },
         "modern": {
@@ -317,12 +351,13 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
             "time_s_range": _range([point["time_s"] for point in modern if point["time_s"] is not None]),
             "net_pressure_Pa_range": _range(modern_pressures),
             "initial_annular_volume_status": modern_volume_status,
+            "initial_annular_volume_per_radian_m3": modern_volume_per_radian,
             "initial_annular_volume_m3": modern_volume,
         },
         "outputs": {
-            "injected_volume_vs_pressure_csv": str(output_dir / "injected_volume_vs_pressure.csv"),
-            "injected_volume_vs_pressure_png": str(output_dir / "injected_volume_vs_pressure.png"),
-            "pressure_vs_time_png": str(output_dir / "pressure_vs_time_diagnostic.png"),
+            "injected_volume_vs_pressure_csv": str(volume_pressure_csv),
+            "injected_volume_vs_pressure_png": str(output_dir / f"injected_volume_vs_pressure{suffix}.png"),
+            "pressure_vs_time_png": str(output_dir / f"pressure_vs_time{suffix}.png"),
             "annular_volume_comparison_csv": str(output_dir / "annular_volume_comparison.csv"),
             "annular_volume_comparison_png": str(output_dir / "annular_volume_comparison.png") if annular_plot else None,
         },
@@ -331,7 +366,9 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
     with (output_dir / "level1b_metadata.json").open("w", encoding="utf-8") as handle:
         json.dump(metadata, handle, indent=2)
         handle.write("\n")
-    with (output_dir / "legacy_audit" / "buz67d_audit_metadata.json").open("w", encoding="utf-8") as handle:
+    legacy_audit_dir = output_dir / "legacy_audit"
+    legacy_audit_dir.mkdir(parents=True, exist_ok=True)
+    with (legacy_audit_dir / "buz67d_audit_metadata.json").open("w", encoding="utf-8") as handle:
         json.dump(metadata, handle, indent=2)
         handle.write("\n")
     return metadata
@@ -343,6 +380,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--modern-timeseries-csv", required=True)
     parser.add_argument("--modern-result-json")
     parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--suffix", default="")
     return parser
 
 

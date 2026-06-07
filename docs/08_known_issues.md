@@ -232,6 +232,7 @@ Arquivos auditados:
 | R07 | Acoplamento sal-APB sequencial fraco | Médio | **CONFIRMADO** — staggered, uma iteração de sal/passo (FA04) |
 | R08 | Unidade de `dt` em modelos de fluência | Alto | **CONFIRMADO** — `dt` deve ser coerente com a taxa de deformação; no wrapper APB/SESTSAL do LOT_APB_v5 é [h] |
 | R09 | Expressão suspeita `/ M_PI / 22` na conversão de vazão | Alto | **MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION** — Fase 6.6 quantificou o fator 11 e confirmou que os dois PKN auditados usam `idQ == 6`, nao o ramo `/22` |
+| R10 | Volume anular sem raio interno de drill pipe | Alto | **MITIGATED_FOR_BUZ67D_DIAGNOSTIC; NOT_PHYSICAL_VALIDATION** — Fase 10.16 documenta a convencao per-radian do legado e adiciona geometria opcional de drill pipe ao caso controlado moderno |
 
 ## R09 — Expressão suspeita `/ M_PI / 22` na conversão de vazão PKN
 
@@ -284,6 +285,66 @@ unitários com entradas sintéticas. **Bloqueia:** comparação com baseline leg
 
 ---
 
+## R10 — Volume anular deve descontar drill pipe
+
+**Severidade:** Alta | **Status:** MITIGATED_FOR_BUZ67D_DIAGNOSTIC; NOT_PHYSICAL_VALIDATION
+
+**Localizacao:** `legance/LOT_Tese/src/apb_code/Layers.cpp`, funcao de montagem de
+`line_up[idLineUp].Vi(e)`, e `legance/LOT_Tese/src/apb_code/Solids.cpp`.
+
+**Evidencia direta:**
+
+```cpp
+// Layers.cpp
+a = this->v_solids[this->tier[idTier]->order(1, e_1)]->getRe_m();
+b = this->v_solids[this->tier[idTier]->order(1, e1)]->getRi_m();
+this->line_up[idLineUp].Vi(e) = (pow(b, 2) - pow(a, 2)) * this->getThickness(idLineUp) / 2;
+
+// Solids.cpp
+double Solids::getRi_m() { return Conv_pol_m(this->di) / 2; }
+double Solids::getRe_m() { return Conv_pol_m(this->de) / 2; }
+```
+
+O caso BUZ67D PKN legado declara o drill pipe como:
+
+```cpp
+vsolids.push_back(new Solids(true, 1922., profTeste, 210E9, 0.3, 4.67, 5.5, 20, 0));
+```
+
+`Solids.h` define `di` e `de` como diametros em polegadas. Portanto, para esta
+rota, `di = 4.67 in` e `de = 5.5 in` sao diametros, e os raios usados na
+geometria sao obtidos por conversao polegada -> metro e divisao por 2.
+
+**Convencao de volume:** o legado armazena `Vi` por radiano:
+
+```text
+V_rad = 0.5 * (R_outer^2 - R_inner^2) * L
+V_total = 2*pi*V_rad
+```
+
+**Impacto:** uma comparacao moderna que usa `R_inner = 0` superestima o volume
+hidraulico do anular quando ha drill pipe presente. Isso afeta diagnosticos de
+volume e qualquer futura rota APB/pressao que dependa de volume anular.
+
+**Mitigacao da Fase 10.16:** o caso controlado
+`cases/validation/buz67d_pkn_legacy_aligned.yaml` passa a declarar
+`wellbore.drill_pipe`, e o resultado moderno LOT/PKN passa a exportar:
+
+```text
+initial_annular_volume_per_radian_m3
+initial_annular_volume_m3
+annular_outer_radius_m
+annular_inner_radius_m
+annular_length_m
+annular_volume_convention
+annular_volume_source
+```
+
+Essa mitigacao e diagnostica. O `PknModel` continua sem consumir volume anular
+para calcular pressao, e nenhuma equivalencia fisica com o LOT_Tese e declarada.
+
+---
+
 ## Itens pendentes após auditoria
 
 - [x] Convenção de sinais → FA03 (compressão positiva)
@@ -292,6 +353,7 @@ unitários com entradas sintéticas. **Bloqueia:** comparação com baseline leg
 - [x] Mecanismo de acoplamento sal→APB → FA04
 - [x] **R08:** `dt` deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]
 - [x] **R09:** Fase 6.6 executou ensaio analitico controlado; mitigado para os dois PKN auditados (`idQ == 6`), ainda blocker para `idQ == 4` e regressao quantitativa ampla
+- [x] **R10:** Fase 10.16 adicionou suporte diagnostico a volume anular com drill pipe no caso controlado BUZ67D, preservando a convencao per-radian do legado
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

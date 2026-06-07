@@ -58,6 +58,17 @@ properties:
       water_depth_m: {type: number}
       total_depth_m: {type: number}
       shoe_depth_m: {type: number}
+      drill_pipe:
+        type: object
+        required: [outer_diameter, inner_diameter, depth]
+        additionalProperties: false
+        properties:
+          outer_diameter:
+            $ref: "#/$defs/length_quantity"
+          inner_diameter:
+            $ref: "#/$defs/length_quantity"
+          depth:
+            $ref: "#/$defs/length_quantity"
   casings:
     type: array
     minItems: 1

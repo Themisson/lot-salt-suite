@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 
+#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "io/CaseParser.hpp"
@@ -18,6 +19,8 @@ namespace {
 constexpr const char* kPknMinimalCasePath = "cases/validation/lot_pkn_minimal.yaml";
 constexpr const char* kPknLeakoffCasePath = "cases/validation/lot_pkn_with_leakoff.yaml";
 constexpr const char* kBuz67dPknCasePath = "cases/lot_tese_migrated/buz67d_pkn.yaml";
+constexpr const char* kBuz67dLegacyAlignedCasePath =
+    "cases/validation/buz67d_pkn_legacy_aligned.yaml";
 
 void check_finite_series(const lss::lot::PknResult& result) {
   REQUIRE_FALSE(result.time_series_s.empty());
@@ -106,6 +109,28 @@ TEST_CASE("Migrated BUZ67D PKN case remains validation-only contract") {
   CHECK(data.name == "buz67d_pkn_migrated_contract");
   CHECK(data.mode == "lot-pkn");
   CHECK(data.legacy_source.find("LOT_Tese") != std::string::npos);
+}
+
+TEST_CASE("PknRunner exports legacy-aligned annular volume with drill pipe") {
+  const auto data = lss::io::parse_yaml(kBuz67dLegacyAlignedCasePath);
+  const auto run = lss::lot::run_pkn_case(data);
+
+  const double outer_radius_m = 0.5 * 12.376 * 0.0254;
+  const double inner_radius_m = 0.5 * 5.5 * 0.0254;
+  const double length_m = 18.0;
+  const double per_radian =
+      0.5 * (outer_radius_m * outer_radius_m - inner_radius_m * inner_radius_m) *
+      length_m;
+
+  CHECK(run.result.annular_outer_radius_m == Catch::Approx(outer_radius_m));
+  CHECK(run.result.annular_inner_radius_m == Catch::Approx(inner_radius_m));
+  CHECK(run.result.annular_length_m == Catch::Approx(length_m));
+  CHECK(run.result.initial_annular_volume_per_radian_m3 ==
+        Catch::Approx(per_radian));
+  CHECK(run.result.initial_annular_volume_m3 ==
+        Catch::Approx(2.0 * 3.14159265358979323846 * per_radian));
+  CHECK(run.result.annular_volume_convention ==
+        "PER_RADIAN_INTERNAL_TOTAL_EXPORTED");
 }
 
 #if LSS_ENABLE_CLI_SUBPROCESS_TESTS

@@ -67,6 +67,7 @@ phases:
   phase_10_14ef_legacy_parameters_and_aligned_case: completed
   phase_10_15a_level1_structural_diagnostic: completed
   phase_10_15b_legacy_audit_visual_diagnostic: completed
+  phase_10_16_drillpipe_annular_volume: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -127,7 +128,7 @@ modules:
   core:           not_started
   io:             in_progress
   units:          in_progress
-  wellbore:       not_started
+  wellbore:       in_progress
   fluids:         not_started
   thermal:        not_started
   rocks:          not_started
@@ -167,5 +168,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-07"
-updated_by: "codex (Fase 10.15A diagnostico Level 1 temporal/estrutural)"
+updated_by: "codex (Fase 10.16 volume anular com drill pipe)"
 project_version: "0.1.0"

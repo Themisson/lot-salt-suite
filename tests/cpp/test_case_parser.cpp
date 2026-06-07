@@ -15,6 +15,8 @@ constexpr const char* kDoubleMechanismCasePath =
 constexpr const char* kPknMinimalCasePath = "cases/validation/lot_pkn_minimal.yaml";
 constexpr const char* kPknLeakoffCasePath = "cases/validation/lot_pkn_with_leakoff.yaml";
 constexpr const char* kBuz67dPknCasePath = "cases/lot_tese_migrated/buz67d_pkn.yaml";
+constexpr const char* kBuz67dLegacyAlignedCasePath =
+    "cases/validation/buz67d_pkn_legacy_aligned.yaml";
 
 std::string valid_case_yaml() {
   return R"(metadata:
@@ -105,6 +107,7 @@ TEST_CASE("Minimal LOT validation case loads") {
   CHECK(data.layers.size() == 1);
   CHECK(data.lot.enabled);
   CHECK_FALSE(data.apb.enabled);
+  CHECK_FALSE(data.wellbore.drill_pipe.present);
 }
 
 TEST_CASE("Fluid density is converted from PPG to kg/m3") {
@@ -119,6 +122,15 @@ TEST_CASE("Casing diameters are converted from inches to meters") {
 
   REQUIRE(data.casings.size() == 1);
   CHECK(data.casings.front().di_m == Catch::Approx(0.37465).margin(1e-5));
+}
+
+TEST_CASE("Optional drill pipe geometry is parsed and converted to SI") {
+  const auto data = lss::io::parse_yaml(kBuz67dLegacyAlignedCasePath);
+
+  REQUIRE(data.wellbore.drill_pipe.present);
+  CHECK(data.wellbore.drill_pipe.inner_diameter_m == Catch::Approx(4.67 * 0.0254));
+  CHECK(data.wellbore.drill_pipe.outer_diameter_m == Catch::Approx(5.5 * 0.0254));
+  CHECK(data.wellbore.drill_pipe.depth_m == Catch::Approx(4374.0));
 }
 
 TEST_CASE("Double mechanism e0 keeps FA01 conversion") {

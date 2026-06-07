@@ -71,6 +71,15 @@ void ensure_finite_values(const lss::lot::PknResult& result) {
   require_finite(result.fracture_volume_m3, "summary.fracture_volume_m3");
   require_finite(result.leakoff_volume_m3, "summary.leakoff_volume_m3");
   require_finite(result.net_pressure_Pa, "summary.net_pressure_Pa");
+  require_finite(result.initial_annular_volume_per_radian_m3,
+                 "summary.initial_annular_volume_per_radian_m3");
+  require_finite(result.initial_annular_volume_m3,
+                 "summary.initial_annular_volume_m3");
+  require_finite(result.annular_outer_radius_m,
+                 "summary.annular_outer_radius_m");
+  require_finite(result.annular_inner_radius_m,
+                 "summary.annular_inner_radius_m");
+  require_finite(result.annular_length_m, "summary.annular_length_m");
 
   for (std::size_t i = 0; i < result.time_series_s.size(); ++i) {
     require_finite(result.time_series_s[i], "series.time_s");
@@ -129,7 +138,17 @@ void write_summary_json(const std::filesystem::path& path, const std::string& ca
   out << "    \"final_fracture_width_m\": " << result.width_m << ",\n";
   out << "    \"final_fracture_volume_m3\": " << result.fracture_volume_m3 << ",\n";
   out << "    \"final_leakoff_volume_m3\": " << result.leakoff_volume_m3 << ",\n";
-  out << "    \"final_net_pressure_Pa\": " << result.net_pressure_Pa << "\n";
+  out << "    \"final_net_pressure_Pa\": " << result.net_pressure_Pa << ",\n";
+  out << "    \"initial_annular_volume_per_radian_m3\": "
+      << result.initial_annular_volume_per_radian_m3 << ",\n";
+  out << "    \"initial_annular_volume_m3\": " << result.initial_annular_volume_m3 << ",\n";
+  out << "    \"annular_outer_radius_m\": " << result.annular_outer_radius_m << ",\n";
+  out << "    \"annular_inner_radius_m\": " << result.annular_inner_radius_m << ",\n";
+  out << "    \"annular_length_m\": " << result.annular_length_m << ",\n";
+  out << "    \"annular_volume_convention\": \""
+      << escape_json(result.annular_volume_convention) << "\",\n";
+  out << "    \"annular_volume_source\": \""
+      << escape_json(result.annular_volume_source) << "\"\n";
   out << "  },\n";
   out << "  \"warnings\": [\n";
   out << "    \"No numerical regression against legacy was performed.\",\n";

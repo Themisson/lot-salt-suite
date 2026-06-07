@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">53/60</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">54/61</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -1677,6 +1677,12 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 <td>Alto</td>
 <td><strong>MITIGATED_FOR_AUDITED_PKN_CASES; BLOCKER_FOR_IDQ4_REGRESSION</strong> — Fase 6.6 quantificou o fator 11 e confirmou que os dois PKN auditados usam <code>idQ == 6</code>, nao o ramo <code>/22</code></td>
 </tr>
+<tr>
+<td>R10</td>
+<td>Volume anular sem raio interno de drill pipe</td>
+<td>Alto</td>
+<td><strong>MITIGATED_FOR_BUZ67D_DIAGNOSTIC; NOT_PHYSICAL_VALIDATION</strong> — Fase 10.16 documenta a convencao per-radian do legado e adiciona geometria opcional de drill pipe ao caso controlado moderno</td>
+</tr>
 </tbody>
 </table>
 <h2 id="r09-expressao-suspeita-m_pi-22-na-conversao-de-vazao-pkn">R09 — Expressão suspeita <code>/ M_PI / 22</code> na conversão de vazão PKN</h2>
@@ -1719,6 +1725,47 @@ controlado Fase 6.6 (<code>docs/audits/R09_pkn_conversion_experiment.md</code>) 
 <p><strong>Não bloqueia:</strong> implementação de tipos de entrada, estrutura do <code>PknModel</code> e testes
 unitários com entradas sintéticas. <strong>Bloqueia:</strong> comparação com baseline legado PKN.</p>
 <hr />
+<h2 id="r10-volume-anular-deve-descontar-drill-pipe">R10 — Volume anular deve descontar drill pipe</h2>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> MITIGATED_FOR_BUZ67D_DIAGNOSTIC; NOT_PHYSICAL_VALIDATION</p>
+<p><strong>Localizacao:</strong> <code>legance/LOT_Tese/src/apb_code/Layers.cpp</code>, funcao de montagem de
+<code>line_up[idLineUp].Vi(e)</code>, e <code>legance/LOT_Tese/src/apb_code/Solids.cpp</code>.</p>
+<p><strong>Evidencia direta:</strong></p>
+<pre><code class="language-cpp">// Layers.cpp
+a = this-&gt;v_solids[this-&gt;tier[idTier]-&gt;order(1, e_1)]-&gt;getRe_m();
+b = this-&gt;v_solids[this-&gt;tier[idTier]-&gt;order(1, e1)]-&gt;getRi_m();
+this-&gt;line_up[idLineUp].Vi(e) = (pow(b, 2) - pow(a, 2)) * this-&gt;getThickness(idLineUp) / 2;
+
+// Solids.cpp
+double Solids::getRi_m() { return Conv_pol_m(this-&gt;di) / 2; }
+double Solids::getRe_m() { return Conv_pol_m(this-&gt;de) / 2; }
+</code></pre>
+<p>O caso BUZ67D PKN legado declara o drill pipe como:</p>
+<pre><code class="language-cpp">vsolids.push_back(new Solids(true, 1922., profTeste, 210E9, 0.3, 4.67, 5.5, 20, 0));
+</code></pre>
+<p><code>Solids.h</code> define <code>di</code> e <code>de</code> como diametros em polegadas. Portanto, para esta
+rota, <code>di = 4.67 in</code> e <code>de = 5.5 in</code> sao diametros, e os raios usados na
+geometria sao obtidos por conversao polegada -&gt; metro e divisao por 2.</p>
+<p><strong>Convencao de volume:</strong> o legado armazena <code>Vi</code> por radiano:</p>
+<pre><code class="language-text">V_rad = 0.5 * (R_outer^2 - R_inner^2) * L
+V_total = 2*pi*V_rad
+</code></pre>
+<p><strong>Impacto:</strong> uma comparacao moderna que usa <code>R_inner = 0</code> superestima o volume
+hidraulico do anular quando ha drill pipe presente. Isso afeta diagnosticos de
+volume e qualquer futura rota APB/pressao que dependa de volume anular.</p>
+<p><strong>Mitigacao da Fase 10.16:</strong> o caso controlado
+<code>cases/validation/buz67d_pkn_legacy_aligned.yaml</code> passa a declarar
+<code>wellbore.drill_pipe</code>, e o resultado moderno LOT/PKN passa a exportar:</p>
+<pre><code class="language-text">initial_annular_volume_per_radian_m3
+initial_annular_volume_m3
+annular_outer_radius_m
+annular_inner_radius_m
+annular_length_m
+annular_volume_convention
+annular_volume_source
+</code></pre>
+<p>Essa mitigacao e diagnostica. O <code>PknModel</code> continua sem consumir volume anular
+para calcular pressao, e nenhuma equivalencia fisica com o LOT_Tese e declarada.</p>
+<hr />
 <h2 id="itens-pendentes-apos-auditoria">Itens pendentes após auditoria</h2>
 <ul>
 <li>[x] Convenção de sinais → FA03 (compressão positiva)</li>
@@ -1727,6 +1774,7 @@ unitários com entradas sintéticas. <strong>Bloqueia:</strong> comparação com
 <li>[x] Mecanismo de acoplamento sal→APB → FA04</li>
 <li>[x] <strong>R08:</strong> <code>dt</code> deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]</li>
 <li>[x] <strong>R09:</strong> Fase 6.6 executou ensaio analitico controlado; mitigado para os dois PKN auditados (<code>idQ == 6</code>), ainda blocker para <code>idQ == 4</code> e regressao quantitativa ampla</li>
+<li>[x] <strong>R10:</strong> Fase 10.16 adicionou suporte diagnostico a volume anular com drill pipe no caso controlado BUZ67D, preservando a convencao per-radian do legado</li>
 <li>[x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code></li>
 <li>[ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -4249,6 +4297,34 @@ implementa acoplamento fisico completo.</p>
 anular real de parede no sal; o mapeamento fisico correto fica pendente.</p>
 <p>O caminho <code>lot-sim run --mode lot-pkn</code> segue desacoplado. <code>PknRunner</code>,
 <code>PknModel</code>, <code>CaseParser</code>, <code>ResultWriter</code> e <code>apps/lot-sim.cpp</code> nao foram alterados.</p>
+<h2 id="volume-anular-buz67d-com-drill-pipe-fase-1016">Volume anular BUZ67D com drill pipe (Fase 10.16)</h2>
+<p>A Fase 10.16 adiciona suporte diagnostico para volume anular inicial com drill
+pipe no caso controlado <code>buz67d_pkn_legacy_aligned.yaml</code>.</p>
+<p>Auditoria do legado:</p>
+<pre><code class="language-text">legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+  Solids(true, 1922., profTeste, ..., di = 4.67, de = 5.5, ...)
+
+legance/LOT_Tese/src/apb_code/Solids.cpp
+  getRi_m() = di * 0.0254 / 2
+  getRe_m() = de * 0.0254 / 2
+
+legance/LOT_Tese/src/apb_code/Layers.cpp
+  Vi = 0.5 * (R_outer^2 - R_inner^2) * thickness
+</code></pre>
+<p>Portanto, a convencao moderna registrada para diagnostico e:</p>
+<pre><code class="language-text">volume_per_radian_m3 = 0.5 * (R_outer^2 - R_inner^2) * length
+volume_total_m3 = 2*pi*volume_per_radian_m3
+</code></pre>
+<p>Sem drill pipe, <code>R_inner = 0</code>, preservando o comportamento anterior. Com drill
+pipe, <code>R_inner</code> e o raio externo do drill pipe quando ele alcanca a sapata.</p>
+<p>O resultado <code>lot-sim run --mode lot-pkn</code> passa a exportar os campos de volume
+anular em <code>result.json</code>, mas o solver PKN continua sem consumir esse volume
+para calcular <code>net_pressure_Pa</code>. Assim, a fase corrige a geometria diagnostica
+e prepara comparacoes Level 1B, sem declarar acoplamento fisico ou equivalencia
+com <code>pw_Pa</code> legado.</p>
+<p>Para a configuracao BUZ67D controlada atual, o volume moderno diagnostico cai
+de <code>1.39698074804365 m3</code> para <code>1.12107852567506 m3</code> total ao descontar o drill
+pipe de <code>5.5 in</code> OD.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser
@@ -4433,6 +4509,15 @@ executável:</p>
 <div class="doc-body">
 <p><strong>Última atualização:</strong> 2026-06-01</p>
 <h2 id="unreleased">[Unreleased]</h2>
+<h3 id="fase-1016-volume-anular-com-drill-pipe-2026-06-07">Fase 10.16 — Volume anular com drill pipe (2026-06-07)</h3>
+<ul>
+<li>Adicionado suporte diagnostico para <code>wellbore.drill_pipe</code> no caso BUZ67D
+  controlado.</li>
+<li>Registrada a convencao legado/moderno <code>V_rad = 0.5*(R_outer^2-R_inner^2)*L</code>
+  e <code>V_total = 2*pi*V_rad</code>.</li>
+<li>Exportados campos modernos de volume anular em <code>result.json</code> sem alterar a
+  formulacao PKN.</li>
+</ul>
 <h3 id="fase-1-estrutura-do-repositorio-2026-06-01">Fase 1 — Estrutura do repositório (2026-06-01)</h3>
 <ul>
 <li>Criados diretórios: src/, include/, apps/, cases/, schemas/, tests/, postprocess/, tools/, docs/</li>

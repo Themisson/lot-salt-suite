@@ -220,9 +220,60 @@ injected_volume_vs_pressure.png
 pressure_vs_time_diagnostic.png
 ```
 
-`annular_volume_comparison.png` permanece bloqueado porque o resultado moderno
-nao exporta `initial_annular_volume_m3`. O CSV correspondente registra o
-status `BLOCKED_MISSING_VOLUME`.
+Na Fase 10.15B, `annular_volume_comparison.png` permanecia bloqueado porque o
+resultado moderno nao exportava `initial_annular_volume_m3`. A Fase 10.16
+remove esse bloqueio tecnico para o caso controlado BUZ67D, mas apenas como
+diagnostico geometrico.
+
+## Fase 10.16 — volume anular com drill pipe
+
+**Status:** `DRILLPIPE_ANNULAR_VOLUME_DIAGNOSTIC_EXPORTED`.
+
+O legado LOT_Tese calcula `Vi` por radiano com:
+
+```text
+V_rad = 0.5 * (R_outer^2 - R_inner^2) * L
+V_total = 2*pi*V_rad
+```
+
+Para o BUZ67D PKN, o drill pipe legado e:
+
+```text
+Solids(..., di = 4.67 in, de = 5.5 in, ...)
+```
+
+`di` e `de` sao diametros em polegadas, confirmados por `Solids.h` e por
+`Solids::getRi_m()/getRe_m()`. No moderno, o caso controlado registra:
+
+```text
+wellbore.drill_pipe.inner_diameter = 4.67 in
+wellbore.drill_pipe.outer_diameter = 5.5 in
+wellbore.drill_pipe.depth = 4374 m
+```
+
+Campos modernos exportados em `result.json`:
+
+| Campo | Unidade | Observacao |
+|---|---|---|
+| `initial_annular_volume_per_radian_m3` | m3/rad | mesma convencao interna do legado |
+| `initial_annular_volume_m3` | m3 | `2*pi*V_rad` |
+| `annular_outer_radius_m` | m | raio hidraulico externo selecionado |
+| `annular_inner_radius_m` | m | raio externo do drill pipe quando atinge a sapata |
+| `annular_length_m` | m | espessura vertical da layer que contem a sapata |
+| `annular_volume_convention` | texto | contrato de exportacao |
+| `annular_volume_source` | texto | origem dos dados usados |
+
+Na geometria controlada BUZ67D atual, usando o raio interno do casing moderno
+como raio hidraulico externo, o desconto do drill pipe altera o volume
+diagnostico moderno de:
+
+```text
+0.22233639145536 m3/rad -> 0.17842518895536 m3/rad
+1.39698074804365 m3     -> 1.12107852567506 m3
+```
+
+Essa normalizacao nao muda `PknModel` e nao transforma `net_pressure_Pa` em
+`pw_Pa`. A comparacao Level 1B permanece diagnostica.
 
 A comparacao visual usa os rotulos:
 

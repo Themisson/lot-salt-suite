@@ -5,6 +5,7 @@
 #include <string>
 
 #include "lot/PknModel.hpp"
+#include "wellbore/AnnularVolume.hpp"
 
 namespace lss::lot {
 namespace {
@@ -16,6 +17,30 @@ const lss::core::LayerData& layer_at_shoe(const lss::core::CaseData& data) {
     }
   }
   throw std::runtime_error("PknRunner: no layer contains lot.shoe_depth_m");
+}
+
+const lss::core::CasingData* casing_for_annular_outer_radius(
+    const lss::core::CaseData& data) {
+  const lss::core::CasingData* candidate = nullptr;
+  for (const auto& casing : data.casings) {
+    if (data.lot.shoe_depth_m >= casing.top_m &&
+        data.lot.shoe_depth_m <= casing.base_m) {
+      if (candidate == nullptr || casing.di_m < candidate->di_m) {
+        candidate = &casing;
+      }
+    }
+  }
+  if (candidate != nullptr) {
+    return candidate;
+  }
+
+  for (const auto& casing : data.casings) {
+    if (casing.base_m <= data.lot.shoe_depth_m &&
+        (candidate == nullptr || casing.base_m > candidate->base_m)) {
+      candidate = &casing;
+    }
+  }
+  return candidate;
 }
 
 const lss::core::RockData& rock_by_id(const lss::core::CaseData& data,
@@ -72,6 +97,39 @@ void validate_pkn_contract(const lss::core::CaseData& data) {
   }
 }
 
+void attach_initial_annular_volume(const lss::core::CaseData& data,
+                                   PknResult& result) {
+  const auto& layer = layer_at_shoe(data);
+  const auto* casing = casing_for_annular_outer_radius(data);
+  if (casing == nullptr) {
+    result.annular_volume_convention = "NOT_AVAILABLE";
+    result.annular_volume_source = "no casing available for annular volume";
+    return;
+  }
+
+  const double length_m = layer.base_m - layer.top_m;
+  const double outer_radius_m = 0.5 * casing->di_m;
+  double inner_radius_m = 0.0;
+  std::string source = "layer_at_shoe + casing.di_m";
+
+  if (data.wellbore.drill_pipe.present &&
+      data.wellbore.drill_pipe.depth_m >= data.lot.shoe_depth_m) {
+    inner_radius_m = 0.5 * data.wellbore.drill_pipe.outer_diameter_m;
+    source += " + wellbore.drill_pipe.outer_diameter";
+  }
+
+  result.annular_outer_radius_m = outer_radius_m;
+  result.annular_inner_radius_m = inner_radius_m;
+  result.annular_length_m = length_m;
+  result.initial_annular_volume_per_radian_m3 =
+      lss::wellbore::annular_volume_per_radian_m3(outer_radius_m,
+                                                  inner_radius_m, length_m);
+  result.initial_annular_volume_m3 = lss::wellbore::annular_total_volume_m3(
+      outer_radius_m, inner_radius_m, length_m);
+  result.annular_volume_convention = "PER_RADIAN_INTERNAL_TOTAL_EXPORTED";
+  result.annular_volume_source = source;
+}
+
 }  // namespace
 
 PknInput make_pkn_input(const lss::core::CaseData& data) {
@@ -105,6 +163,7 @@ PknRun run_pkn_case(const lss::core::CaseData& data) {
   PknRun run;
   run.input = make_pkn_input(data);
   run.result = PknModel{}.simulate(run.input);
+  attach_initial_annular_volume(data, run.result);
   return run;
 }
 

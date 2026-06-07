@@ -1841,6 +1841,45 @@ anular real de parede no sal; o mapeamento fisico correto fica pendente.
 O caminho `lot-sim run --mode lot-pkn` segue desacoplado. `PknRunner`,
 `PknModel`, `CaseParser`, `ResultWriter` e `apps/lot-sim.cpp` nao foram alterados.
 
+## Volume anular BUZ67D com drill pipe (Fase 10.16)
+
+A Fase 10.16 adiciona suporte diagnostico para volume anular inicial com drill
+pipe no caso controlado `buz67d_pkn_legacy_aligned.yaml`.
+
+Auditoria do legado:
+
+```text
+legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+  Solids(true, 1922., profTeste, ..., di = 4.67, de = 5.5, ...)
+
+legance/LOT_Tese/src/apb_code/Solids.cpp
+  getRi_m() = di * 0.0254 / 2
+  getRe_m() = de * 0.0254 / 2
+
+legance/LOT_Tese/src/apb_code/Layers.cpp
+  Vi = 0.5 * (R_outer^2 - R_inner^2) * thickness
+```
+
+Portanto, a convencao moderna registrada para diagnostico e:
+
+```text
+volume_per_radian_m3 = 0.5 * (R_outer^2 - R_inner^2) * length
+volume_total_m3 = 2*pi*volume_per_radian_m3
+```
+
+Sem drill pipe, `R_inner = 0`, preservando o comportamento anterior. Com drill
+pipe, `R_inner` e o raio externo do drill pipe quando ele alcanca a sapata.
+
+O resultado `lot-sim run --mode lot-pkn` passa a exportar os campos de volume
+anular em `result.json`, mas o solver PKN continua sem consumir esse volume
+para calcular `net_pressure_Pa`. Assim, a fase corrige a geometria diagnostica
+e prepara comparacoes Level 1B, sem declarar acoplamento fisico ou equivalencia
+com `pw_Pa` legado.
+
+Para a configuracao BUZ67D controlada atual, o volume moderno diagnostico cai
+de `1.39698074804365 m3` para `1.12107852567506 m3` total ao descontar o drill
+pipe de `5.5 in` OD.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que

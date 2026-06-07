@@ -27,6 +27,19 @@ wellbore:
   total_depth_m: 4374.0
   # EXTRACTED from legacy: LOT test depth uses profTeste = 4374.0 m.
   shoe_depth_m: 4374.0
+  drill_pipe:
+    # EXTRACTED from legacy Solids[0]: di = 4.67 in, de = 5.5 in.
+    # Solids::getRi_m/getRe_m convert diameters in inches to radii in meters.
+    inner_diameter:
+      value: 4.67
+      unit: in
+    outer_diameter:
+      value: 5.5
+      unit: in
+    # EXTRACTED from legacy Solids[0]: bottom = profTeste.
+    depth:
+      value: 4374.0
+      unit: m
 
 casings:
   - id: production_casing

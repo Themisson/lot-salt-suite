@@ -1,5 +1,6 @@
 #include "io/CaseParser.hpp"
 
+#include <cmath>
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
@@ -127,6 +128,44 @@ void validate_nonempty(bool condition, const std::string& field) {
   }
 }
 
+void parse_wellbore(const YAML::Node& root, lss::core::CaseData& data) {
+  const YAML::Node wellbore = require_node(root["wellbore"], "wellbore");
+  data.wellbore.airgap_m = require_as<double>(wellbore["airgap_m"], "wellbore.airgap_m");
+  data.wellbore.water_depth_m =
+      require_as<double>(wellbore["water_depth_m"], "wellbore.water_depth_m");
+  data.wellbore.total_depth_m =
+      require_as<double>(wellbore["total_depth_m"], "wellbore.total_depth_m");
+  data.wellbore.shoe_depth_m =
+      require_as<double>(wellbore["shoe_depth_m"], "wellbore.shoe_depth_m");
+
+  if (!wellbore["drill_pipe"]) {
+    return;
+  }
+
+  const YAML::Node drill_pipe = require_node(wellbore["drill_pipe"], "wellbore.drill_pipe");
+  data.wellbore.drill_pipe.present = true;
+  data.wellbore.drill_pipe.outer_diameter_m = parse_value_unit(
+      drill_pipe["outer_diameter"], "wellbore.drill_pipe.outer_diameter", "length");
+  data.wellbore.drill_pipe.inner_diameter_m = parse_value_unit(
+      drill_pipe["inner_diameter"], "wellbore.drill_pipe.inner_diameter", "length");
+  data.wellbore.drill_pipe.depth_m =
+      parse_value_unit(drill_pipe["depth"], "wellbore.drill_pipe.depth", "length");
+
+  const auto& dp = data.wellbore.drill_pipe;
+  if (!std::isfinite(dp.outer_diameter_m) || !std::isfinite(dp.inner_diameter_m) ||
+      !std::isfinite(dp.depth_m)) {
+    throw std::runtime_error("Validacao falhou: wellbore.drill_pipe exige valores finitos");
+  }
+  if (dp.outer_diameter_m <= 0.0 || dp.inner_diameter_m < 0.0 ||
+      dp.outer_diameter_m <= dp.inner_diameter_m) {
+    throw std::runtime_error(
+        "Validacao falhou: wellbore.drill_pipe exige outer_diameter > inner_diameter >= 0");
+  }
+  if (dp.depth_m < 0.0) {
+    throw std::runtime_error("Validacao falhou: wellbore.drill_pipe.depth deve ser >= 0");
+  }
+}
+
 void validate_references(const lss::core::CaseData& data) {
   std::unordered_set<std::string> fluid_ids;
   for (const auto& fluid : data.fluids) {
@@ -169,6 +208,8 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
   if (root["simulation"] && root["simulation"]["mode"]) {
     data.mode = root["simulation"]["mode"].as<std::string>();
   }
+
+  parse_wellbore(root, data);
 
   for (const auto& node : require_node(root["casings"], "casings")) {
     lss::core::CasingData casing;

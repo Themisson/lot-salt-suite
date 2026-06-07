@@ -932,13 +932,14 @@ Resumo observado:
 | Tempos agregados | 45 | 26 | diagnostico apenas |
 | Faixa temporal | `0..1320 s` | `0..750 s` | nao equivalente |
 | Pressao | `pw_Pa` | `net_pressure_Pa` | sem equivalencia semantica |
-| Volume inicial anular | derivado da geometria legada | nao exportado | bloqueado |
+| Volume inicial anular | derivado da geometria legada | exportado a partir da Fase 10.16 | diagnostico apenas |
 
 O legado auditado vai ate `1320 s` porque o caso hard-coded inclui a fase sem
 injecao (`t_no_injection = 9.5 min`). O caso moderno controlado permanece no
 horizonte de injecao `0..750 s`.
 
-O arquivo `annular_volume_comparison.csv` registra:
+Na Fase 10.15B, antes da correcao de geometria da Fase 10.16, o arquivo
+`annular_volume_comparison.csv` registrava:
 
 ```text
 annular_volume_comparison_status = BLOCKED_MISSING_VOLUME
@@ -959,3 +960,62 @@ numeric_equivalence = false
 pressure_semantic_equivalence = false
 awaiting_human_review = true
 ```
+
+---
+
+## Volume anular com drill pipe no caso controlado BUZ67D (Fase 10.16)
+
+**Status:** `DRILLPIPE_ANNULAR_VOLUME_DIAGNOSTIC_EXPORTED`.
+
+A Fase 10.16 resolve uma lacuna geometrica diagnostica: o legado calcula o
+volume anular por radiano descontando o raio externo do solido imediatamente
+interno ao anular. Para o BUZ67D PKN esse solido e o drill pipe:
+
+```text
+di = 4.67 in
+de = 5.5 in
+```
+
+No legado, `Solids::getRi_m()` e `Solids::getRe_m()` confirmam que esses
+valores sao diametros em polegadas convertidos para raios em metros. A
+convencao encontrada em `Layers.cpp` e:
+
+```text
+V_rad = 0.5 * (R_outer^2 - R_inner^2) * L
+V_total = 2*pi*V_rad
+```
+
+O caso controlado `cases/validation/buz67d_pkn_legacy_aligned.yaml` agora
+declara `wellbore.drill_pipe`. O resultado moderno `result.json` exporta:
+
+```text
+initial_annular_volume_per_radian_m3
+initial_annular_volume_m3
+annular_outer_radius_m
+annular_inner_radius_m
+annular_length_m
+annular_volume_convention
+annular_volume_source
+```
+
+Para a geometria moderna controlada atual (`R_outer = 0.1571752 m`,
+`R_inner = 0.06985 m`, `L = 18 m`), o diagnostico moderno muda de:
+
+```text
+sem drill pipe: 0.22233639145536 m3/rad; 1.39698074804365 m3 total
+com drill pipe: 0.17842518895536 m3/rad; 1.12107852567506 m3 total
+```
+
+O comparador Level 1B passa a registrar `volume_per_radian_m3` e
+`volume_total_m3` em `annular_volume_comparison.csv`, e pode gerar:
+
+```text
+injected_volume_vs_pressure_with_drillpipe.png
+pressure_vs_time_with_drillpipe.png
+annular_volume_comparison.png
+```
+
+Essa etapa continua diagnostica. O `PknModel` nao usa volume anular para
+alterar `net_pressure_Pa`, e `pw_Pa` legado continua sem equivalencia semantica
+declarada com `net_pressure_Pa` moderno. Portanto, a comparacao segue sem
+validar pressao, abertura de fratura, dano, ruptura ou estado tensional.

@@ -44,6 +44,10 @@ TEST_CASE("ResultWriter creates PKN CSV and JSON outputs") {
   CHECK(json.find("No numerical regression against legacy was performed.") !=
         std::string::npos);
   CHECK(json.find("R09 remains blocker for legacy comparison.") != std::string::npos);
+  CHECK(json.find("\"initial_annular_volume_per_radian_m3\"") !=
+        std::string::npos);
+  CHECK(json.find("\"initial_annular_volume_m3\"") != std::string::npos);
+  CHECK(json.find("\"annular_volume_convention\"") != std::string::npos);
 
   std::filesystem::remove_all(output_dir);
 }
