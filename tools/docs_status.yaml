@@ -63,6 +63,7 @@ phases:
   phase_10_14b_level0_reduced_real_comparison: completed
   phase_10_14b_reduced_real_fixtures: completed
   phase_10_14c_level0_field_mapping: completed
+  phase_10_14d_level1_readiness_gate: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -90,6 +91,7 @@ docs:
   validation_results:     in_progress    # NUNCA mudar para validated sem execução real
   coupling:               in_progress
   comparison_strategy:    implemented
+  field_normalization:    implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -161,6 +163,6 @@ test_counts:
 # ============================================================
 # Metadados
 # ============================================================
-last_updated: "2026-06-04"
-updated_by: "codex (Fase 10.11B mapeamento LOT_Tese sigma-theta)"
+last_updated: "2026-06-07"
+updated_by: "codex (Fase 10.14D evidence gate temporal Level 1)"
 project_version: "0.1.0"

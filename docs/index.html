@@ -234,7 +234,7 @@
   <div class="brand">
     <h1>lot-salt-suite<span class="dot">.</span></h1>
     <div class="sub">LOT · APB · Fluência de sal</div>
-    <span class="ver">v0.1.0 · atualizado 2026-06-04</span>
+    <span class="ver">v0.1.0 · atualizado 2026-06-07</span>
   </div>
   <div class="search-wrap">
     <input type="text" id="navSearch" placeholder="buscar na navegação..." autocomplete="off">
@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">49/56</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">50/57</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -4105,6 +4105,26 @@ ambíguo frente a <code>net_pressure_Pa</code>.</p>
 <p>Os campos <code>sigmaTheta</code>, <code>pw</code>, <code>margin</code> e <code>opened</code> seguem fora da comparacao
 legacy-modern ate que existam exportacoes auditaveis nos dois lados. Portanto,
 esta normalizacao e documental/estrutural e nao valida o acoplamento fisico.</p>
+<h2 id="evidence-gate-temporal-legado-moderno-fase-1014d">Evidence gate temporal legado-moderno (Fase 10.14D)</h2>
+<p>A Fase 10.14D registra uma normalizacao temporal documental para a comparacao
+legacy-modern. Por contexto fornecido pelo autor da tese, <code>APB1da</code> usa minutos
+para <code>dt</code>, <code>ttime</code> e para o campo <code>Time</code> exportado nos <code>.dat</code> LOT_Tese. A
+conversao permitida e:</p>
+<pre><code class="language-text">time_s = Time_raw * 60.0
+</code></pre>
+<p>Essa decisao fica registrada em <code>docs/15_field_normalization.md</code>,
+<code>tests/fixtures/comparison/field_mapping_level0.json</code> e
+<code>tests/fixtures/comparison/level1_readiness_gate.json</code>.</p>
+<p>O status da rota e:</p>
+<pre><code class="language-text">LEVEL1_TIME_UNIT_RESOLVED_CASE_EQUIVALENCE_PENDING
+</code></pre>
+<p>Nos fixtures reduzidos atuais, o legado cobre <code>0..12.5 min</code>, equivalente a
+<code>0..750 s</code>, enquanto o recorte moderno cobre <code>0..420 s</code>. Portanto, a unidade
+temporal esta resolvida, mas a equivalencia de caso/duracao ainda nao esta. A
+Fase 10.14D nao compara <code>sigmaTheta</code>, <code>pw</code>, <code>margin</code>, <code>opened</code>, <code>hoop_state</code>,
+<code>j2</code>, von Mises, dano, fratura, nem <code>dP</code> legado contra <code>net_pressure_Pa</code>
+moderno. Tambem nao altera <code>coupling/</code>, parser, <code>CaseData</code>, CLI ou
+<code>lot-sim run --mode lot-pkn</code>.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

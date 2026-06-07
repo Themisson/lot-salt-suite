@@ -1,19 +1,30 @@
 {
-  "phase": "10.14C",
+  "phase": "10.14D",
   "status": "LEVEL0_FIELD_MAPPING_DOCUMENTED_NO_PHYSICAL_VALIDATION",
   "physical_validation": false,
   "numeric_equivalence": false,
-  "temporal_comparison_status": "BLOCKED_UNKNOWN_UNIT",
+  "temporal_comparison_status": "RESOLVED_MINUTES_AUTHOR_CONTEXT",
+  "level1_status": "LEVEL1_TIME_UNIT_RESOLVED_CASE_EQUIVALENCE_PENDING",
   "temporal_evidence": {
     "legacy_dat_time_range_raw": [0.0, 12.5],
+    "legacy_dat_time_range_s": [0.0, 750.0],
     "modern_csv_time_range_s": [0.0, 420.0],
+    "time_range_equivalent": false,
+    "unit_evidence_type": "author_provided_context",
+    "unit_evidence_date": "2026-06-07",
+    "unit_evidence_statement": "Legacy APB1da dt, ttime and exported .dat Time are in minutes.",
+    "conversion_to_modern_time_s": {
+      "formula": "time_s = Time_raw * 60.0",
+      "factor": 60.0
+    },
     "legacy_source_observations": [
       "APB1da::saveFile writes the Time block from APB1da::ttime.",
       "APB1da::Solve increments t with t += dt and appends t to ttime.",
       "The legacy .dat output does not declare the physical unit of ttime.",
+      "The legacy time unit is resolved as minutes by direct author-provided context.",
       "The migrated YAML declares total_time=12.5 min and dt=0.5 min, but the reduced modern CSV sample spans only the first 420 s."
     ],
-    "classification_reason": "The legacy raw time can be read structurally, but an auditable unit conversion to modern time_s was not established in this phase."
+    "classification_reason": "The legacy time unit is resolved as minutes by author-provided context, but case and duration equivalence remain pending; numeric temporal comparison remains blocked except for explicit unit conversion."
   },
   "sources": {
     "legacy_dat": "tests/fixtures/comparison/legacy_buz67d_sample.dat",
@@ -24,13 +35,24 @@
     {
       "legacy_source": "legacy_dat",
       "legacy_field": "Time",
-      "legacy_unit": "unknown_raw",
+      "legacy_unit": "min",
       "modern_source": "modern_csv",
       "modern_field": "time_s",
       "modern_unit": "s",
-      "mapping_status": "BLOCKED_UNKNOWN_UNIT",
-      "comparison_allowed": "structural_only",
-      "notes": "Legacy Time unit could not be determined auditably; do not compare numerically with modern time_s."
+      "mapping_status": "RESOLVED_MINUTES_AUTHOR_CONTEXT",
+      "comparison_allowed": "time_unit_conversion_only",
+      "numeric_comparison_allowed": false,
+      "level1_ready": false,
+      "conversion": {
+        "formula": "time_s = Time_raw * 60.0",
+        "factor_to_seconds": 60.0
+      },
+      "evidence": {
+        "type": "author_provided_context",
+        "date": "2026-06-07",
+        "statement": "Legacy APB1da dt, ttime and exported .dat Time are in minutes."
+      },
+      "notes": "Legacy Time can be converted to seconds, but must not be compared numerically against modern time_s until case and duration equivalence are established."
     },
     {
       "legacy_source": "legacy_dat",
@@ -122,9 +144,10 @@
     }
   ],
   "caveats": [
-    "Legacy temporal unit remains unknown unless determined from source inspection.",
-    "Legacy Time must remain raw if unit is not auditably determined.",
-    "Legacy Time must not be compared numerically against modern time_s.",
+    "Legacy temporal unit is minutes based on author_provided_context.",
+    "Legacy Time can be converted documentally with time_s = Time_raw * 60.0.",
+    "Legacy Time must not be compared numerically against modern time_s until case and duration equivalence are established.",
+    "The reduced legacy fixture spans 0..750 s after conversion, while the reduced modern fixture spans 0..420 s.",
     "Legacy Layer is 1-based and is not equivalent to modern wall_gp_*.",
     "Legacy dP must not be assumed equivalent to modern net_pressure_Pa.",
     "sigmaTheta is not available for legacy-modern comparison.",

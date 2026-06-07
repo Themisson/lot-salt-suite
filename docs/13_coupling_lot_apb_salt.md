@@ -1670,6 +1670,35 @@ Os campos `sigmaTheta`, `pw`, `margin` e `opened` seguem fora da comparacao
 legacy-modern ate que existam exportacoes auditaveis nos dois lados. Portanto,
 esta normalizacao e documental/estrutural e nao valida o acoplamento fisico.
 
+## Evidence gate temporal legado-moderno (Fase 10.14D)
+
+A Fase 10.14D registra uma normalizacao temporal documental para a comparacao
+legacy-modern. Por contexto fornecido pelo autor da tese, `APB1da` usa minutos
+para `dt`, `ttime` e para o campo `Time` exportado nos `.dat` LOT_Tese. A
+conversao permitida e:
+
+```text
+time_s = Time_raw * 60.0
+```
+
+Essa decisao fica registrada em `docs/15_field_normalization.md`,
+`tests/fixtures/comparison/field_mapping_level0.json` e
+`tests/fixtures/comparison/level1_readiness_gate.json`.
+
+O status da rota e:
+
+```text
+LEVEL1_TIME_UNIT_RESOLVED_CASE_EQUIVALENCE_PENDING
+```
+
+Nos fixtures reduzidos atuais, o legado cobre `0..12.5 min`, equivalente a
+`0..750 s`, enquanto o recorte moderno cobre `0..420 s`. Portanto, a unidade
+temporal esta resolvida, mas a equivalencia de caso/duracao ainda nao esta. A
+Fase 10.14D nao compara `sigmaTheta`, `pw`, `margin`, `opened`, `hoop_state`,
+`j2`, von Mises, dano, fratura, nem `dP` legado contra `net_pressure_Pa`
+moderno. Tambem nao altera `coupling/`, parser, `CaseData`, CLI ou
+`lot-sim run --mode lot-pkn`.
+
 ## Interface proposta para coupling/
 
 ```cpp

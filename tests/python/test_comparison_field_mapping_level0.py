@@ -12,6 +12,7 @@ TEMPORAL_STATUSES = {
     "BLOCKED_UNKNOWN_UNIT",
     "PARTIALLY_INFERRED",
     "DETERMINED",
+    "RESOLVED_MINUTES_AUTHOR_CONTEXT",
     "BLOCKED_NON_EQUIVALENT_CASE",
     "BLOCKED_INSUFFICIENT_EVIDENCE",
 }
@@ -41,7 +42,7 @@ def find_modern_only_mapping(data: dict[str, Any], modern_field: str) -> dict[st
 def test_field_mapping_file_exists_and_is_parseable() -> None:
     assert MAPPING_PATH.exists()
     data = load_mapping()
-    assert data["phase"] == "10.14C"
+    assert data["phase"] == "10.14D"
     assert data["field_mappings"]
 
 
@@ -61,6 +62,14 @@ def test_temporal_mapping_is_blocked_or_documented() -> None:
     if mapping["mapping_status"] == "DETERMINED":
         assert mapping["legacy_unit"] not in {"unknown_raw", None, ""}
         assert "conversion" in mapping
+    elif mapping["mapping_status"] == "RESOLVED_MINUTES_AUTHOR_CONTEXT":
+        assert mapping["legacy_unit"] == "min"
+        assert mapping["modern_unit"] == "s"
+        assert mapping["conversion"]["factor_to_seconds"] == 60.0
+        assert mapping["comparison_allowed"] == "time_unit_conversion_only"
+        assert mapping["numeric_comparison_allowed"] is False
+        assert mapping["level1_ready"] is False
+        assert "must not be compared numerically" in mapping["notes"]
     else:
         assert mapping["comparison_allowed"] != "numeric"
         assert "do not compare numerically" in mapping["notes"]
@@ -97,7 +106,9 @@ def test_caveats_preserved_in_mapping() -> None:
     data = load_mapping()
     caveats = "\n".join(data["caveats"])
 
-    assert "temporal unit remains unknown" in caveats
+    assert "temporal unit is minutes" in caveats
+    assert "time_s = Time_raw * 60.0" in caveats
+    assert "case and duration equivalence" in caveats
     assert "Layer is 1-based" in caveats
     assert "not equivalent to modern wall_gp_*" in caveats
     assert "sigmaTheta is not available" in caveats

@@ -501,7 +501,8 @@ legado e `wall_gp_*` moderno permanece marcado como
 O resultado da comparacao Nível 0 deve carregar explicitamente:
 
 ```text
-legacy time unit is unknown
+legacy time unit is minutes by author_provided_context
+legacy converted duration still requires case/duration equivalence evidence
 legacy Layer is 1-based and not equivalent to wall_gp_*
 sigmaTheta is not exported by legacy output
 pw is not exported by legacy output
@@ -582,8 +583,9 @@ A comparacao continua limitada a Nível 0:
 
 Nao ha validacao fisica nesta fase. Mesmo com dados reais reduzidos, a
 comparacao nao usa `sigmaTheta`, `pw`, `margin`, `opened`, `hoop_state`, `j2`,
-von Mises, dano ou fratura como equivalencia fisica. A unidade temporal legada
-continua desconhecida e `Layer` legado continua nao equivalente a `wall_gp_*`.
+von Mises, dano ou fratura como equivalencia fisica. Na Fase 10.14D, a unidade
+temporal legada foi resolvida documentalmente como minutos por contexto do
+autor, mas `Layer` legado continua nao equivalente a `wall_gp_*`.
 
 ---
 
@@ -625,10 +627,11 @@ recorte moderno cobre apenas as primeiras linhas da saida moderna, e a unidade
 do `Time` legado nao foi determinada de forma auditavel nesta fase. Portanto:
 
 ```text
-temporal_comparison_status: BLOCKED_UNKNOWN_UNIT
-legacy Time remains raw and non-normalized
-legacy Time must not be compared numerically against modern time_s
-temporal comparison remains suspended beyond structural range checks
+temporal_comparison_status: RESOLVED_MINUTES_AUTHOR_CONTEXT
+legacy Time is documented as minutes by author_provided_context
+time_s = Time_raw * 60.0
+legacy Time must not be compared numerically against modern time_s until case
+and duration equivalence are established
 ```
 
 ### Mapeamentos bloqueados ou presenciais
@@ -648,3 +651,58 @@ temporal comparison remains suspended beyond structural range checks
 Esta fase continua documental/estrutural. Ela nao valida acoplamento fisico,
 nao compara tensoes, nao compara abertura/fratura, nao compara dano e nao
 estabelece correlacao quantitativa entre pressao legada e campos modernos.
+
+---
+
+## Evidence gate Level 1 para tempo legado (Fase 10.14D)
+
+**Status:** `LEVEL1_TIME_UNIT_RESOLVED_CASE_EQUIVALENCE_PENDING`.
+
+A Fase 10.14D registra a unidade temporal do legado LOT_Tese a partir de
+contexto fornecido pelo autor da tese:
+
+```text
+APB1da dt, ttime e o campo Time exportado em .dat estao em minutos.
+```
+
+Com isso, a conversao documental permitida passa a ser:
+
+```text
+time_s = Time_raw * 60.0
+```
+
+Essa resolucao remove apenas o bloqueio de unidade. Ela nao estabelece
+equivalencia quantitativa entre o legado e o moderno. Nos fixtures reduzidos
+atuais, a faixa legada `0..12.5 min` corresponde a `0..750 s`, enquanto a faixa
+moderna reduzida cobre `0..420 s`. Portanto, o gate Level 1 permanece fechado:
+
+```text
+level1_ready = false
+physical_validation = false
+numeric_equivalence = false
+```
+
+O par `8-BUZ-67D-PKN.dat` e `buz67d_pkn.yaml` deve ser tratado como
+`SIMILAR_CASE`, nao como `SAME_CASE`, ate que haja evidencia adicional de
+equivalencia de caso, duracao e amostragem.
+
+A Fase 10.14D cria `docs/15_field_normalization.md` e
+`tests/fixtures/comparison/level1_readiness_gate.json` para manter essa decisao
+testavel. Permanecem bloqueados para comparacao Level 1:
+
+```text
+sigmaTheta
+pw
+margin
+opened
+hoop_state como validacao fisica
+j2
+von Mises
+dano
+fratura fisica
+dP legado -> net_pressure_Pa moderno
+Layer legado -> wall_gp_* moderno
+```
+
+Assim, o proximo passo permitido e testar ou automatizar a conversao de unidade
+temporal, mantendo suspensa qualquer comparacao numerica fisica.

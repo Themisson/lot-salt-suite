@@ -1,0 +1,70 @@
+{
+  "phase": "10.14D",
+  "status": "LEVEL1_TIME_UNIT_RESOLVED_CASE_EQUIVALENCE_PENDING",
+  "level1_ready": false,
+  "physical_validation": false,
+  "numeric_equivalence": false,
+  "time_unit": {
+    "status": "RESOLVED_MINUTES_AUTHOR_CONTEXT",
+    "legacy_unit": "min",
+    "modern_unit": "s",
+    "evidence_type": "author_provided_context",
+    "evidence_date": "2026-06-07",
+    "evidence_statement": "Legacy APB1da dt, ttime and exported .dat Time are in minutes.",
+    "conversion": {
+      "formula": "time_s = Time_raw * 60.0",
+      "factor_to_seconds": 60.0
+    },
+    "legacy_time_min_raw": 0.0,
+    "legacy_time_max_raw": 12.5,
+    "legacy_time_min_s": 0.0,
+    "legacy_time_max_s": 750.0,
+    "modern_time_min_s": 0.0,
+    "modern_time_max_s": 420.0,
+    "time_range_equivalent": false
+  },
+  "case_equivalence": {
+    "status": "SIMILAR_CASE",
+    "legacy_case": "legance/LOT_Tese/results/8-BUZ-67D-PKN.dat",
+    "modern_case": "cases/lot_tese_migrated/buz67d_pkn.yaml",
+    "reason": "The files share the BUZ67D PKN lineage, but fixture duration, reduced sampling and migrated-case review caveats prevent declaring SAME_CASE equivalence."
+  },
+  "better_pair_search": {
+    "status": "NO_BETTER_PAIR_FOUND",
+    "reason": "Only buz67d_pkn.yaml is present under cases/lot_tese_migrated; other legacy .dat outputs do not have a clearer migrated YAML pair in this phase."
+  },
+  "blocked_items": [
+    "sigmaTheta",
+    "pw",
+    "margin",
+    "opened",
+    "hoop_state physical validation",
+    "j2",
+    "von Mises",
+    "damage",
+    "fracture physical validation",
+    "legacy dP semantic meaning",
+    "legacy Layer equivalence",
+    "Level 1 numeric temporal equivalence"
+  ],
+  "allowed_next_steps": [
+    "Use time_s = Time_raw * 60.0 as a documented unit conversion.",
+    "Build tests that assert the Level 1 gate remains closed until case equivalence evidence is added.",
+    "Search for additional metadata proving case and duration equivalence."
+  ],
+  "forbidden_next_steps": [
+    "Level 1 numeric comparison",
+    "dP to net_pressure_Pa equivalence",
+    "sigmaTheta comparison",
+    "pw comparison",
+    "margin comparison",
+    "opened comparison",
+    "physical fracture validation"
+  ],
+  "caveats": [
+    "The time unit is resolved by direct author context, not by a unit declaration in the legacy .dat file.",
+    "The converted legacy fixture spans 0..750 s while the reduced modern fixture spans 0..420 s.",
+    "The gate does not validate pressure, fracture opening, damage, rupture or stress equivalence.",
+    "The gate does not compare tensor fields or hoop-state classifications."
+  ]
+}

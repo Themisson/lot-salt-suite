@@ -57,6 +57,55 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.14D — evidence gate temporal para Level 1 — Codex
+
+**Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
+
+**Classificacao:** `LEVEL1_TIME_UNIT_RESOLVED_CASE_EQUIVALENCE_PENDING`.
+
+**Objetivo:** Registrar a unidade temporal legada confirmada por contexto do
+autor e manter um gate documental/testavel impedindo promocao indevida para
+comparacao Level 1.
+
+**Evidencia temporal:**
+- Tipo: `author_provided_context`.
+- Contexto: `APB1da` usa minutos para `dt`, `ttime` e para o campo `Time`
+  exportado nos `.dat` LOT_Tese.
+- Conversao permitida: `time_s = Time_raw * 60.0`.
+- Fixture legado: `0..12.5 min`, equivalente a `0..750 s`.
+- Fixture moderno reduzido: `0..420 s`.
+
+**Gate Level 1:**
+- `level1_ready = false`.
+- `physical_validation = false`.
+- `numeric_equivalence = false`.
+- Par BUZ67D/PKN classificado como `SIMILAR_CASE`, nao `SAME_CASE`.
+- Busca de par melhor nesta fase: `NO_BETTER_PAIR_FOUND`.
+
+**Implementacao:**
+- Criado `docs/15_field_normalization.md`.
+- Criado `tests/fixtures/comparison/level1_readiness_gate.json`.
+- Atualizado `tests/fixtures/comparison/field_mapping_level0.json`.
+- Atualizado `tests/python/test_comparison_field_mapping_level0.py`.
+- Criado `tests/python/test_level1_readiness_gate.py`.
+- Atualizado `tests/fixtures/comparison/README.md`.
+
+**Bloqueios preservados:**
+- Nao comparar `sigmaTheta`, `pw`, `margin`, `opened`, `hoop_state`, `j2`,
+  von Mises, dano ou fratura.
+- Nao assumir equivalencia de `dP` legado com `net_pressure_Pa` moderno.
+- Nao assumir equivalencia de `Layer` legado com `wall_gp_*` moderno.
+
+**Escopo preservado:**
+- Nenhuma alteracao em C++, CMake, parser, `CaseData`, CLI, YAMLs, `src/`,
+  `include/`, `apps/`, `legance/`, `legacy/`, `external/saltcreep/`,
+  baselines ou postprocess.
+
+**Proxima etapa recomendada:** revisar a Fase 10.14D; se limpa, commitar como
+`test(validation): add level 1 temporal evidence gate`.
+
+---
+
 ### [2026-06-07] Fase 10.14C — normalizacao documental de campos legacy-modern — Codex
 
 **Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
