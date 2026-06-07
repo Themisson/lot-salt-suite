@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">45/52</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">47/54</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -4044,6 +4044,50 @@ como preparacao para uma comparacao futura controlada.</p>
 <p>A estrategia de comparacao entre esses outputs legados e os artefatos modernos
 do diagnostico sigma-theta esta formalizada em
 <code>docs/14_comparison_strategy.md</code>.</p>
+<h2 id="comparacao-estrutural-nivel-0-com-fixtures-fase-1014a">Comparacao estrutural Nível 0 com fixtures (Fase 10.14A)</h2>
+<p>A Fase 10.14A adiciona a primeira comparacao executavel da estrategia
+legado-moderno, ainda limitada a fixtures Python temporarios. O teste
+<code>tests/python/test_compare_legacy_modern_level0.py</code> cria <code>legacy_points.csv</code>,
+<code>legacy_summary.csv</code>, <code>modern_points.csv</code> e <code>modern_summary.csv</code> dentro de um
+diretorio temporario e valida apenas metricas estruturais:</p>
+<pre><code class="language-text">n_records
+n_times
+time_min/time_max brutos
+n_layers
+n_points modernos
+n_steps modernos
+amostras modernas por step
+</code></pre>
+<p>Essa comparacao e deliberadamente estrutural. Ela nao processa outputs reais
+grandes de <code>legance/LOT_Tese/results/</code>, nao escreve em <code>results/</code>, nao altera
+o extrator read-only e nao declara validacao fisica.</p>
+<p>Os caveats obrigatorios permanecem parte do contrato:</p>
+<pre><code class="language-text">legacy time unit is unknown
+legacy Layer is 1-based and not equivalent to wall_gp_*
+sigmaTheta is not exported by legacy output
+pw is not exported by legacy output
+margin is not exported by legacy output
+opened is not exported by legacy output
+comparison is structural only, not physical validation
+</code></pre>
+<p>Portanto, a Fase 10.14A nao compara <code>sigmaTheta</code>, <code>pw</code>, <code>margin</code>, <code>opened</code>,
+<code>hoop_state</code>, <code>j2</code>, von Mises, dano ou fratura. A rota apenas congela o
+contrato minimo para uma futura ferramenta
+<code>tools/compare_legacy_modern_level0_level1.py</code>.</p>
+<h2 id="comparacao-nivel-0-com-dados-reais-reduzidos-fase-1014b">Comparacao Nível 0 com dados reais reduzidos (Fase 10.14B)</h2>
+<p>A Fase 10.14B complementa o contrato da Fase 10.14A com um par pequeno de
+fixtures versionados em:</p>
+<pre><code class="language-text">tests/fixtures/legacy_modern_level0/buz67d_reduced/
+</code></pre>
+<p>O lado legado representa um recorte real ja extraido de
+<code>legance/LOT_Tese/results/8-BUZ-67D-PKN.dat</code>. O lado moderno representa um
+recorte real reduzido de <code>lot-sim run --mode lot-pkn</code> para o caso BUZ67D
+migrado. Esses arquivos nao sao baselines fisicos; sao apenas amostras
+estruturais pequenas para testar o contrato Nível 0.</p>
+<p>A comparacao continua restrita a contagens, faixas de tempo brutas, camadas ou
+amostras e caveats obrigatorios. Ela nao compara <code>sigmaTheta</code>, <code>pw</code>, <code>margin</code>,
+<code>opened</code>, <code>hoop_state</code>, <code>j2</code>, von Mises, dano ou fratura, e nao declara
+validacao fisica legado-moderno.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

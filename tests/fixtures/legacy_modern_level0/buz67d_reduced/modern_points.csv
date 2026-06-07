@@ -1,0 +1,4 @@
+case_id,scenario_id,scenario_label,step_index,time_s,sample_index,layer_id,gp_id,wall_pressure_Pa,net_pressure_Pa,sigma_theta_compression_positive_Pa,hoop_state,margin_Pa,opened,legacy_algebra_opened
+buz67d_pkn_migrated_contract,lot_pkn_timeseries_reduced,real_reduced,0,0,0,timeseries_row,0,,43467.609548035529,,,,,
+buz67d_pkn_migrated_contract,lot_pkn_timeseries_reduced,real_reduced,1,30,0,timeseries_row,0,,43467.609548035529,,,,,
+buz67d_pkn_migrated_contract,lot_pkn_timeseries_reduced,real_reduced,2,60,0,timeseries_row,0,,43467.609548035529,,,,,

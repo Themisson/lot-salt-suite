@@ -1,0 +1,2 @@
+case_id,scenario_id,scenario_label,n_points,n_compressive,n_neutral,n_tensile,min_sigma_theta_compression_positive_Pa,max_sigma_theta_compression_positive_Pa,min_margin_Pa,max_margin_Pa,any_opened,any_legacy_algebra_opened
+buz67d_pkn_migrated_contract,lot_pkn_timeseries_reduced,real_reduced,3,,,,,,,,,

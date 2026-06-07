@@ -59,6 +59,8 @@ phases:
   phase_10_11b_lot_tese_sigma_theta_mapping: completed
   phase_10_12b_legacy_lot_output_extractor: completed
   phase_10_13_comparison_strategy: completed
+  phase_10_14a_level0_fixture_comparison: completed
+  phase_10_14b_level0_reduced_real_comparison: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started

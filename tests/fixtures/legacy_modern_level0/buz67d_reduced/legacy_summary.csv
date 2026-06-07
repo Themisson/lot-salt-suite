@@ -1,0 +1,2 @@
+source_file,source_kind,n_records,has_time,has_layer,has_dP,has_dV_leakoff,has_pressure_json,has_pressure_Pa,has_sigmaTheta,has_pw,has_margin,has_opened,comparison_readiness,notes
+legance\LOT_Tese\results\8-BUZ-67D-PKN.dat,LOT_Tese_DAT,4,true,true,true,false,false,false,false,false,false,false,limited_indirect,reduced real fixture from legacy extraction; structural only

@@ -444,3 +444,126 @@ Sequência recomendada:
 
 O próximo passo de implementação deve ser uma fase limitada a comparação Nível
 0/Nível 1, sem instrumentar legado e sem declarar validação física.
+
+---
+
+## Comparação Nível 0 com fixtures (Fase 10.14A)
+
+**Status:** implementada como teste Python com fixtures temporarios.
+
+A Fase 10.14A materializa o primeiro contrato executavel da estrategia, mas
+continua restrita a sanidade estrutural. Ela nao processa os arquivos reais
+grandes em `legance/LOT_Tese/results/`, nao escreve em `results/` e nao tenta
+validar comportamento fisico.
+
+O teste `tests/python/test_compare_legacy_modern_level0.py` cria, em diretorio
+temporario, quatro artefatos minimos:
+
+```text
+legacy_points.csv
+legacy_summary.csv
+modern_points.csv
+modern_summary.csv
+```
+
+Esses fixtures representam apenas o formato intermediario ja planejado pela
+Fase 10.12B e pelo writer sigma-theta moderno. O objetivo e testar a logica de
+comparacao antes de criar uma ferramenta real.
+
+### Metricas estruturais cobertas
+
+```text
+legacy_n_records
+legacy_n_times
+legacy_time_min_raw
+legacy_time_max_raw
+legacy_n_layers
+modern_n_points
+modern_n_steps
+modern_time_min_s
+modern_time_max_s
+modern_n_samples_per_step
+```
+
+As metricas de tempo legado sao classificadas como seguras apenas enquanto
+valores brutos. Qualquer alinhamento temporal legado-moderno permanece marcado
+como `requires_time_unit_normalization`. Qualquer alinhamento entre `Layer`
+legado e `wall_gp_*` moderno permanece marcado como
+`requires_layer_mapping`.
+
+### Caveats obrigatorios
+
+O resultado da comparacao Nível 0 deve carregar explicitamente:
+
+```text
+legacy time unit is unknown
+legacy Layer is 1-based and not equivalent to wall_gp_*
+sigmaTheta is not exported by legacy output
+pw is not exported by legacy output
+margin is not exported by legacy output
+opened is not exported by legacy output
+comparison is structural only, not physical validation
+```
+
+### Campos bloqueados
+
+A comparacao Nível 0 nao compara:
+
+```text
+sigmaTheta
+pw
+margin
+opened
+hoop_state como validacao fisica
+j2
+von Mises
+dano
+fratura
+```
+
+Esses campos continuam fora do escopo ate que exista instrumentacao ou contrato
+de equivalencia mais forte. A proxima fase pode criar
+`tools/compare_legacy_modern_level0_level1.py`, mas apenas depois de congelar
+as metricas e caveats em teste.
+
+---
+
+## Comparação Nível 0 com recortes reais reduzidos (Fase 10.14B)
+
+**Status:** implementada como teste Python com fixtures reais reduzidos.
+
+A Fase 10.14B complementa os fixtures temporarios da Fase 10.14A com um par
+pequeno e versionado em:
+
+```text
+tests/fixtures/legacy_modern_level0/buz67d_reduced/
+```
+
+O fixture legado e um recorte de linhas ja extraidas de
+`legance/LOT_Tese/results/8-BUZ-67D-PKN.dat`. O fixture moderno e um recorte
+reduzido de uma saida moderna `lot-sim run --mode lot-pkn` para o caso BUZ67D
+migrado. Ambos sao pequenos e servem apenas para validar o contrato estrutural.
+
+Arquivos versionados:
+
+```text
+legacy_points.csv
+legacy_summary.csv
+modern_points.csv
+modern_summary.csv
+```
+
+A comparacao continua limitada a Nível 0:
+
+- existencia de registros;
+- quantidade de tempos;
+- faixa de tempo bruta;
+- ordem/contagem de passos;
+- quantidade de camadas/amostras;
+- presenca de campos esperados;
+- emissao de caveats obrigatorios.
+
+Nao ha validacao fisica nesta fase. Mesmo com dados reais reduzidos, a
+comparacao nao usa `sigmaTheta`, `pw`, `margin`, `opened`, `hoop_state`, `j2`,
+von Mises, dano ou fratura como equivalencia fisica. A unidade temporal legada
+continua desconhecida e `Layer` legado continua nao equivalente a `wall_gp_*`.

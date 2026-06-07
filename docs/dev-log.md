@@ -57,6 +57,82 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.14B — comparação Nível 0 com dados reais reduzidos — Codex
+
+**Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Complementar os fixtures temporarios da Fase 10.14A com um par
+pequeno de arquivos reais reduzidos, versionados e apropriados para validar o
+contrato estrutural Nível 0 sem processar outputs legados grandes.
+
+**Implementacao:**
+- Criado `tests/fixtures/legacy_modern_level0/buz67d_reduced/`.
+- Adicionados `legacy_points.csv`, `legacy_summary.csv`, `modern_points.csv` e
+  `modern_summary.csv` reduzidos.
+- O lado legado representa linhas ja extraidas de
+  `legance/LOT_Tese/results/8-BUZ-67D-PKN.dat`.
+- O lado moderno representa linhas reduzidas de uma saida moderna
+  `lot-sim run --mode lot-pkn` do caso BUZ67D migrado.
+- `tests/python/test_compare_legacy_modern_level0.py` passou a testar esse par
+  versionado alem dos fixtures temporarios.
+
+**Escopo e caveats:**
+- A comparacao segue limitada a sanidade estrutural Nível 0.
+- A fase nao compara `sigmaTheta`, `pw`, `margin`, `opened`, `hoop_state`,
+  `j2`, von Mises, dano ou fratura.
+- A unidade temporal legada continua desconhecida.
+- `Layer` legado continua nao equivalente a `wall_gp_*`.
+- Nao ha validacao fisica legado-moderno.
+
+**Escopo preservado:**
+- Nao houve alteracao em codigo C++, CMake, YAMLs, schemas, parser,
+  `CaseData`, CLI, LOT/APB, `external/saltcreep/`, `legacy/`, `legance/`,
+  baselines ou postprocess.
+
+**Proxima etapa recomendada:** revisar a Fase 10.14B; se limpa, commitar junto
+com a Fase 10.14A ou em commit dedicado de testes de validacao.
+
+---
+
+### [2026-06-07] Fase 10.14A — comparação Nível 0 com fixtures Python — Codex
+
+**Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Criar a primeira comparacao executavel legado-moderno em Nível 0,
+limitada a sanidade estrutural e baseada somente em fixtures temporarios. A
+fase valida o contrato antes de uma ferramenta real e nao processa outputs
+legados grandes.
+
+**Implementacao:**
+- Criado `tests/python/test_compare_legacy_modern_level0.py`.
+- O teste cria `legacy_points.csv`, `legacy_summary.csv`, `modern_points.csv`
+  e `modern_summary.csv` dentro de `TemporaryDirectory`.
+- A comparacao calcula `legacy_n_records`, `legacy_n_times`,
+  `legacy_time_min_raw`, `legacy_time_max_raw`, `legacy_n_layers`,
+  `modern_n_points`, `modern_n_steps`, `modern_time_min_s`,
+  `modern_time_max_s` e `modern_n_samples_per_step`.
+- O alinhamento temporal legado-moderno permanece marcado como
+  `requires_time_unit_normalization`.
+- O alinhamento `Layer` legado versus `wall_gp_*` moderno permanece marcado
+  como `requires_layer_mapping`.
+
+**Caveats obrigatorios emitidos:**
+- unidade temporal legada desconhecida;
+- `Layer` legado 1-based nao equivalente a `wall_gp_*`;
+- `sigmaTheta`, `pw`, `margin` e `opened` nao exportados pelo legado;
+- comparacao apenas estrutural, sem validacao fisica.
+
+**Escopo preservado:**
+- Nao houve alteracao em codigo C++, CMake, YAMLs, schemas, parser,
+  `CaseData`, CLI, LOT/APB, `external/saltcreep/`, `legacy/`, `legance/`,
+  baselines ou postprocess.
+
+**Proxima etapa recomendada:** criar uma ferramenta opt-in
+`tools/compare_legacy_modern_level0_level1.py` somente depois de revisar e
+commitar este contrato de fixtures.
+
+---
+
 ### [2026-06-07] Fase 10.13 — estratégia de comparação legado ↔ moderno — Codex
 
 **Status:** Auditoria documental concluida nesta sessao, sem commit/push por

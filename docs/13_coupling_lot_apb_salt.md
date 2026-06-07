@@ -1590,6 +1590,65 @@ A estrategia de comparacao entre esses outputs legados e os artefatos modernos
 do diagnostico sigma-theta esta formalizada em
 `docs/14_comparison_strategy.md`.
 
+## Comparacao estrutural Nível 0 com fixtures (Fase 10.14A)
+
+A Fase 10.14A adiciona a primeira comparacao executavel da estrategia
+legado-moderno, ainda limitada a fixtures Python temporarios. O teste
+`tests/python/test_compare_legacy_modern_level0.py` cria `legacy_points.csv`,
+`legacy_summary.csv`, `modern_points.csv` e `modern_summary.csv` dentro de um
+diretorio temporario e valida apenas metricas estruturais:
+
+```text
+n_records
+n_times
+time_min/time_max brutos
+n_layers
+n_points modernos
+n_steps modernos
+amostras modernas por step
+```
+
+Essa comparacao e deliberadamente estrutural. Ela nao processa outputs reais
+grandes de `legance/LOT_Tese/results/`, nao escreve em `results/`, nao altera
+o extrator read-only e nao declara validacao fisica.
+
+Os caveats obrigatorios permanecem parte do contrato:
+
+```text
+legacy time unit is unknown
+legacy Layer is 1-based and not equivalent to wall_gp_*
+sigmaTheta is not exported by legacy output
+pw is not exported by legacy output
+margin is not exported by legacy output
+opened is not exported by legacy output
+comparison is structural only, not physical validation
+```
+
+Portanto, a Fase 10.14A nao compara `sigmaTheta`, `pw`, `margin`, `opened`,
+`hoop_state`, `j2`, von Mises, dano ou fratura. A rota apenas congela o
+contrato minimo para uma futura ferramenta
+`tools/compare_legacy_modern_level0_level1.py`.
+
+## Comparacao Nível 0 com dados reais reduzidos (Fase 10.14B)
+
+A Fase 10.14B complementa o contrato da Fase 10.14A com um par pequeno de
+fixtures versionados em:
+
+```text
+tests/fixtures/legacy_modern_level0/buz67d_reduced/
+```
+
+O lado legado representa um recorte real ja extraido de
+`legance/LOT_Tese/results/8-BUZ-67D-PKN.dat`. O lado moderno representa um
+recorte real reduzido de `lot-sim run --mode lot-pkn` para o caso BUZ67D
+migrado. Esses arquivos nao sao baselines fisicos; sao apenas amostras
+estruturais pequenas para testar o contrato Nível 0.
+
+A comparacao continua restrita a contagens, faixas de tempo brutas, camadas ou
+amostras e caveats obrigatorios. Ela nao compara `sigmaTheta`, `pw`, `margin`,
+`opened`, `hoop_state`, `j2`, von Mises, dano ou fratura, e nao declara
+validacao fisica legado-moderno.
+
 ## Interface proposta para coupling/
 
 ```cpp

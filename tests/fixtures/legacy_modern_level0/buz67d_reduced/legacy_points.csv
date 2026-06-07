@@ -1,0 +1,5 @@
+source_file,source_kind,record_type,annular,time_raw,time_unit_inferred,time_s,layer,dP,dV,dV_leakoff,V_outflow
+legance\LOT_Tese\results\8-BUZ-67D-PKN.dat,LOT_Tese_DAT,dP,1,0.0,unknown,,1,0.0,,,
+legance\LOT_Tese\results\8-BUZ-67D-PKN.dat,LOT_Tese_DAT,dP,1,0.5,unknown,,1,1845413.778,,,
+legance\LOT_Tese\results\8-BUZ-67D-PKN.dat,LOT_Tese_DAT,dP,1,0.0,unknown,,2,0.0,,,
+legance\LOT_Tese\results\8-BUZ-67D-PKN.dat,LOT_Tese_DAT,dP,1,0.5,unknown,,2,1845413.778,,,
