@@ -1586,6 +1586,10 @@ Esta fase tambem nao altera `ResultWriter`, `apps/lot-sim.cpp`, parser,
 `legance/`, baselines ou postprocess. A saida e intermediaria e serve apenas
 como preparacao para uma comparacao futura controlada.
 
+A estrategia de comparacao entre esses outputs legados e os artefatos modernos
+do diagnostico sigma-theta esta formalizada em
+`docs/14_comparison_strategy.md`.
+
 ## Interface proposta para coupling/
 
 ```cpp

@@ -57,6 +57,44 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.13 — estratégia de comparação legado ↔ moderno — Codex
+
+**Status:** Auditoria documental concluida nesta sessao, sem commit/push por
+instrucao da fase.
+
+**Objetivo:** Definir a estrategia de comparacao entre os outputs legados ja
+extraiveis (`LOT_Tese` `.dat` e `LOT_APB_v5` JSON) e os artefatos modernos do
+diagnostico sigma-theta, sem implementar comparacao numerica, sem instrumentar
+legado e sem alterar runtime.
+
+**Documento criado:**
+- `docs/14_comparison_strategy.md`.
+
+**Conteudo registrado:**
+- Inventario dos campos legados extraidos pela Fase 10.12B.
+- Inventario dos campos modernos exportados por `points.csv`, `summary.csv` e
+  `metadata.json` do writer sigma-theta.
+- Matriz de comparabilidade com 23 pares, usando as classes `direct`,
+  `transform`, `qualitative` e `blocked`.
+- Distribuicao por comparabilidade: `direct = 3`, `transform = 6`,
+  `qualitative = 5`, `blocked = 9`.
+- Distribuicao por prioridade: `P0 = 4`, `P1 = 5`, `P2 = 7`, `P3 = 7`.
+- Sequencia recomendada em cinco niveis, de sanidade estrutural ate campos de
+  acoplamento fisico.
+- Casos minimos recomendados para Nivel 0 e Nivel 1.
+- Pre-requisitos tecnicos, riscos de falso-positivo/falso-negativo e decisao
+  sobre instrumentacao futura.
+
+**Escopo preservado:**
+- Nao houve alteracao em C++, testes, CMake, parser, `CaseData`, CLI, YAMLs,
+  schemas, `external/saltcreep/`, `legance/`, `legacy/`, baselines ou
+  postprocess.
+
+**Resultado:** Documento de estrategia criado e referenciado em
+`docs/13_coupling_lot_apb_salt.md`.
+
+---
+
 ### [2026-06-07] Fase 10.12B — extrator read-only de outputs legados — Codex
 
 **Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
