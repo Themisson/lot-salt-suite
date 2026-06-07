@@ -789,3 +789,68 @@ numeric_equivalence = false
 Continuam bloqueadas comparacoes de `sigmaTheta`, `pw`, `margin`, `opened`,
 `hoop_state`, `j2`, von Mises, dano, fratura e equivalencia `dP` legado ->
 `net_pressure_Pa` moderno.
+
+---
+
+## Diagnostico temporal/estrutural Level 1 (Fase 10.15A)
+
+**Status:** `LEVEL1_STRUCTURAL_DIAGNOSTIC_COMPLETE`.
+
+A Fase 10.15A executa o caso controlado legacy-aligned e gera um diagnostico
+visual em `results/`, sem versionar os artefatos gerados:
+
+```text
+results/comparison/level1_buz67d/
+```
+
+Comandos principais:
+
+```powershell
+.\build\Debug\lot-sim.exe run --case cases\validation\buz67d_pkn_legacy_aligned.yaml --mode lot-pkn --output results\comparison\level1_buz67d\modern
+python tools\extract_legacy_lot_outputs.py --input legance\LOT_Tese\results\8-BUZ-67D-PKN.dat --output-dir results\comparison\level1_buz67d\legacy
+python tools\compare_level1.py --legacy-csv results\comparison\level1_buz67d\legacy\legacy_points.csv --modern-csv results\comparison\level1_buz67d\modern\timeseries.csv --output-dir results\comparison\level1_buz67d --legacy-time-unit min
+```
+
+Resumo estrutural observado:
+
+| Metrica | Legado | Moderno | Status |
+|---|---:|---:|---|
+| `n_records` | 5460 | 26 | diagnostico apenas |
+| `time_min_s` | 0 | 0 | unidade convertida |
+| `time_max_s` | 750 | 750 | unidade convertida |
+| `n_time_steps` | 26 | 26 | estrutural |
+| `dt_s_mean` | 30 | 30 | estrutural |
+
+Graficos gerados:
+
+```text
+time_coverage.png
+record_count.png
+pressure_range_diagnostic.png
+fields_availability.png
+```
+
+O grafico de pressao usa rotulos diagnosticos:
+
+```text
+legacy dP — semantic unconfirmed
+modern net_pressure_Pa
+```
+
+e o titulo:
+
+```text
+Level 1 Diagnostic — Pressure Range — DIAGNOSTIC ONLY — NOT PHYSICAL VALIDATION
+```
+
+O Level 1 permanece fechado para validacao fisica:
+
+```text
+level1_ready = false
+physical_validation = false
+numeric_equivalence = false
+awaiting_human_review = true
+```
+
+A proxima decisao deve ser uma revisao humana dos graficos antes de planejar
+Level 2 ou investigar divergencias.

@@ -1,10 +1,18 @@
 {
-  "phase": "10.14EF",
-  "status": "LEVEL1_CONTROLLED_EQUIVALENT_CASE_CREATED_RUN_PENDING",
+  "phase": "10.15A",
+  "status": "LEVEL1_STRUCTURAL_DIAGNOSTIC_COMPLETE",
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,
+  "structural_diagnostic": true,
+  "run_completed": true,
+  "plots_generated": true,
+  "awaiting_human_review": true,
   "controlled_case": "cases/validation/buz67d_pkn_legacy_aligned.yaml",
+  "run_output_dir": "results/comparison/level1_buz67d/modern",
+  "comparison_output_dir": "results/comparison/level1_buz67d",
+  "summary_csv": "results/comparison/level1_buz67d/level1_summary.csv",
+  "metadata_json": "results/comparison/level1_buz67d/level1_metadata.json",
   "time_unit": {
     "status": "RESOLVED_MINUTES_AUTHOR_CONTEXT",
     "legacy_unit": "min",
@@ -42,6 +50,25 @@
     "status": "CONTROLLED_CASE_CREATED",
     "reason": "A new controlled validation YAML was created instead of modifying the existing migrated BUZ67D case."
   },
+  "structural_diagnostic_summary": {
+    "legacy_records": 5460,
+    "modern_records": 26,
+    "legacy_time_min_s": 0.0,
+    "legacy_time_max_s": 750.0,
+    "modern_time_min_s": 0.0,
+    "modern_time_max_s": 750.0,
+    "legacy_n_time_steps": 26,
+    "modern_n_time_steps": 26,
+    "legacy_dt_s_mean": 30.0,
+    "modern_dt_s_mean": 30.0,
+    "matplotlib_available": true,
+    "plots": [
+      "results/comparison/level1_buz67d/time_coverage.png",
+      "results/comparison/level1_buz67d/record_count.png",
+      "results/comparison/level1_buz67d/pressure_range_diagnostic.png",
+      "results/comparison/level1_buz67d/fields_availability.png"
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",
@@ -60,7 +87,7 @@
     "Use time_s = Time_raw * 60.0 as a documented unit conversion.",
     "Build tests that assert the Level 1 gate remains closed until case equivalence evidence is added.",
     "Search for additional metadata proving case and duration equivalence.",
-    "Run the controlled legacy-aligned case in a future phase before any Level 1 result comparison."
+    "Review the Level 1 diagnostic plots before any Level 2 planning."
   ],
   "forbidden_next_steps": [
     "Level 1 numeric comparison",
@@ -73,7 +100,7 @@
   ],
   "caveats": [
     "The time unit is resolved by direct author context, not by a unit declaration in the legacy .dat file.",
-    "The controlled YAML now encodes 0..750 s, but it has not been run in this phase.",
+    "The controlled YAML was run and diagnostic outputs were generated under results/comparison/level1_buz67d, which must not be versioned.",
     "The gate does not validate pressure, fracture opening, damage, rupture or stress equivalence.",
     "The gate does not compare tensor fields or hoop-state classifications."
   ]

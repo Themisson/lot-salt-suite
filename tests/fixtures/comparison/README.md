@@ -59,3 +59,34 @@ is controlled and traceable; it does not mean physical outputs are equivalent.
 The controlled YAML encodes `12.5 min = 750 s` and validates with `lot-sim
 validate`. It has not been run in Phase 10.14EF, and no Level 1 numerical or
 physical comparison is enabled yet.
+
+## Level 1 structural diagnostic -- Phase 10.15A
+
+Phase 10.15A runs the controlled case and extracts the full legacy `.dat` into
+ignored `results/` artifacts:
+
+```text
+results/comparison/level1_buz67d/
+```
+
+Generated outputs include:
+
+```text
+level1_summary.csv
+level1_metadata.json
+time_coverage.png
+record_count.png
+pressure_range_diagnostic.png
+fields_availability.png
+```
+
+The diagnostic observed:
+
+```text
+legacy: 5460 records, 26 time steps, 0..750 s, mean dt = 30 s
+modern:   26 records, 26 time steps, 0..750 s, mean dt = 30 s
+```
+
+This is still structural/diagnostic only. `legacy dP` is not declared
+equivalent to `modern net_pressure_Pa`, and no `sigmaTheta`, `pw`, `margin`,
+`opened`, damage or fracture validation is performed.

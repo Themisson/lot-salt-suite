@@ -151,3 +151,38 @@ numeric_equivalence = false
 
 Assim, a normalizacao avanca de `SIMILAR_CASE` para um caso controlado de
 entrada, mas ainda nao para equivalencia de resultado.
+
+## Fase 10.15A — diagnostico Level 1 temporal/estrutural
+
+**Status:** `LEVEL1_STRUCTURAL_DIAGNOSTIC_COMPLETE`.
+
+A Fase 10.15A executa o caso controlado e aplica a conversao temporal ja
+registrada:
+
+```text
+time_s = Time_raw * 60.0
+```
+
+O diagnostico gerado em `results/comparison/level1_buz67d/` confirma apenas
+compatibilidade temporal/estrutural:
+
+| Fonte | Registros | Time steps | Faixa temporal | dt medio |
+|---|---:|---:|---:|---:|
+| Legado | 5460 | 26 | `0..750 s` | `30 s` |
+| Moderno | 26 | 26 | `0..750 s` | `30 s` |
+
+Essa compatibilidade nao valida campos fisicos. O legado tem varios blocos por
+camada/anular/campo, enquanto o moderno tem uma serie temporal LOT/PKN. A
+diferenca de `n_records` e esperada para este diagnostico estrutural.
+
+O gate permanece:
+
+```text
+level1_ready = false
+physical_validation = false
+numeric_equivalence = false
+awaiting_human_review = true
+```
+
+As imagens em `results/comparison/level1_buz67d/` sao diagnosticas e nao devem
+ser versionadas.

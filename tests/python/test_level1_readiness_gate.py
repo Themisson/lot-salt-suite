@@ -20,8 +20,8 @@ def test_level1_gate_file_exists_and_is_parseable() -> None:
     assert GATE_PATH.exists()
     data = load_gate()
 
-    assert data["phase"] == "10.14EF"
-    assert data["status"] == "LEVEL1_CONTROLLED_EQUIVALENT_CASE_CREATED_RUN_PENDING"
+    assert data["phase"] == "10.15A"
+    assert data["status"] == "LEVEL1_STRUCTURAL_DIAGNOSTIC_COMPLETE"
 
 
 def test_time_unit_is_resolved_as_minutes_by_author_context() -> None:
@@ -56,6 +56,9 @@ def test_level1_numeric_and_physical_validation_remain_closed() -> None:
     assert data["level1_ready"] is False
     assert data["physical_validation"] is False
     assert data["numeric_equivalence"] is False
+    assert data["structural_diagnostic"] is True
+    assert data["run_completed"] is True
+    assert data["awaiting_human_review"] is True
     assert data["case_equivalence"]["status"] == "CONTROLLED_EQUIVALENT"
     assert data["controlled_case"] == "cases/validation/buz67d_pkn_legacy_aligned.yaml"
 

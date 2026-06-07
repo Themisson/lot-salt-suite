@@ -57,6 +57,67 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.15A — diagnostico Level 1 temporal/estrutural — Codex
+
+**Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
+
+**Classificacao:** `LEVEL1_STRUCTURAL_DIAGNOSTIC_COMPLETE`.
+
+**Objetivo:** Executar o caso controlado BUZ67D legacy-aligned, extrair a saida
+legada completa e gerar diagnostico visual temporal/estrutural em `results/`,
+sem validacao fisica e sem versionar outputs gerados.
+
+**Execucao moderna:**
+- Caso: `cases/validation/buz67d_pkn_legacy_aligned.yaml`.
+- Comando: `lot-sim run --case ... --mode lot-pkn --output results/comparison/level1_buz67d/modern`.
+- Saida: `result.json`, `timeseries.csv`.
+- Time range moderno: `0..750 s`.
+- Time steps: `26`.
+- `dt_s_mean = 30`.
+
+**Extracao legada:**
+- Fonte: `legance/LOT_Tese/results/8-BUZ-67D-PKN.dat`.
+- Saida: `results/comparison/level1_buz67d/legacy`.
+- Registros extraidos: `5460`.
+- Time range raw: `0..12.5 min`.
+- Time range convertido: `0..750 s`.
+
+**Diagnostico Level 1:**
+- Criado `tools/compare_level1.py`.
+- Criados outputs ignorados em `results/comparison/level1_buz67d/`.
+- `level1_summary.csv` registra:
+  - legado: `5460 records`, `26 time steps`, `0..750 s`, `dt medio 30 s`;
+  - moderno: `26 records`, `26 time steps`, `0..750 s`, `dt medio 30 s`.
+- PNGs gerados:
+  - `time_coverage.png`;
+  - `record_count.png`;
+  - `pressure_range_diagnostic.png`;
+  - `fields_availability.png`.
+
+**Gate Level 1:**
+- `tests/fixtures/comparison/level1_readiness_gate.json` atualizado para
+  `LEVEL1_STRUCTURAL_DIAGNOSTIC_COMPLETE`.
+- `level1_ready = false`.
+- `physical_validation = false`.
+- `numeric_equivalence = false`.
+- `awaiting_human_review = true`.
+
+**Caveats:**
+- `legacy dP` nao e declarado equivalente a `modern net_pressure_Pa`.
+- `Layer` legado 1-based nao foi mapeado para indices modernos.
+- `sigmaTheta`, `pw`, `margin` e `opened` seguem indisponiveis.
+- Os graficos sao diagnosticos, nao validacao fisica.
+
+**Escopo preservado:**
+- Nenhuma alteracao em C++, CMake, parser, `CaseData`, CLI, YAMLs, `src/`,
+  `include/`, `apps/`, `legance/`, `legacy/`, `external/saltcreep/`,
+  baselines ou postprocess.
+
+**Proxima etapa recomendada:** Revisao humana dos graficos antes de decidir
+entre Level 2 ou investigacao de divergencias.
+
+---
+
 ### [2026-06-07] Fase 10.14EF — parametros legados e caso BUZ67D legacy-aligned — Codex
 
 **Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.

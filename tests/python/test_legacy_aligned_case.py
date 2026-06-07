@@ -121,7 +121,10 @@ def test_level1_gate_updated() -> None:
     if parameters["case_classification"] == "BLOCKED_INSUFFICIENT_LEGACY_PARAMETERS":
         assert gate["status"] == "LEVEL1_BLOCKED_INSUFFICIENT_LEGACY_PARAMETERS"
     elif parameters["case_classification"] == "CONTROLLED_EQUIVALENT":
-        assert gate["status"] == "LEVEL1_CONTROLLED_EQUIVALENT_CASE_CREATED_RUN_PENDING"
+        assert gate["status"] in {
+            "LEVEL1_CONTROLLED_EQUIVALENT_CASE_CREATED_RUN_PENDING",
+            "LEVEL1_STRUCTURAL_DIAGNOSTIC_COMPLETE",
+        }
         assert gate["case_equivalence"]["status"] == "CONTROLLED_EQUIVALENT"
     else:
         assert gate["status"] == "LEVEL1_LEGACY_ALIGNED_PARTIAL_CASE_CREATED_RUN_PENDING"
