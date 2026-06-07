@@ -71,6 +71,7 @@ phases:
   phase_10_17a_volumetric_balance_audit: completed
   phase_10_17b_optional_volumetric_balance_pressure_model: completed
   phase_10_17c_accommodation_shutin_zamora_plan: completed
+  phase_10_18a_volumetric_balance_diagnostic: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started

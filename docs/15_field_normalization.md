@@ -335,6 +335,35 @@ O campo `net_pressure_Pa` não foi renomeado nem reclassificado. Comparações
 legado-moderno que usem `wellbore_pressure_Pa` devem registrar explicitamente
 que estão usando a rota `volumetric_balance`, não a pressão PKN direta.
 
+## Fase 10.18A — uso diagnóstico de `wellbore_pressure_Pa`
+
+**Status:** `PHASE10_18A_VOLUMETRIC_BALANCE_DIAGNOSTIC_COMPLETE`.
+
+A comparação visual da Fase 10.18A usa os campos de pressão com os seguintes
+rótulos semânticos:
+
+| Fonte | Campo | Uso nesta fase |
+|---|---|---|
+| Legado auditado | `pw_Pa` | Pressão `pi + dP` exportada por instrumentação auditada. |
+| Moderno `pkn_direct` | `net_pressure_Pa` | Referência PKN direta; não equivalente a `pw_Pa`. |
+| Moderno `volumetric_balance` | `wellbore_pressure_Pa` | Diagnóstico opt-in de balanço volumétrico. |
+
+Campos de balanço usados no gráfico de componentes:
+
+| Campo | Interpretação |
+|---|---|
+| `balance_injected_volume_increment_m3` | Incremento de volume injetado no passo. |
+| `balance_effective_volume_increment_m3` | Incremento efetivo usado no balanço. |
+| `balance_fracture_volume_increment_m3` | Volume de fratura descontado quando aplicável. |
+| `balance_leakoff_volume_increment_m3` | Volume de leakoff descontado quando aplicável. |
+| `balance_delta_pressure_Pa` | Incremento de pressão por balanço. |
+
+O diagnóstico classificou a curva `volumetric_balance` como mais próxima do
+legado em pressão máxima do que `pkn_direct`, mas isso não altera o contrato de
+normalização: `pw_Pa`, `net_pressure_Pa` e `wellbore_pressure_Pa` continuam
+campos distintos. Nenhum campo tensorial, `sigmaTheta`, `margin`, `opened`,
+dano ou ruptura foi comparado.
+
 ## Fase 10.17C — campos ainda planejados
 
 Campos futuros de acomodação, shut-in e Zamora permanecem fora do contrato

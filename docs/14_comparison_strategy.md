@@ -1053,6 +1053,68 @@ BUZ67D, mas ainda não transforma Level 1 em validação física. A equivalênci
 com `pw = pi + dP` segue pendente de revisão humana, normalização de pressão
 inicial e entendimento do termo pós-fratura legado.
 
+## Fase 10.18A — diagnóstico visual do modo `volumetric_balance`
+
+**Status:** `PHASE10_18A_VOLUMETRIC_BALANCE_DIAGNOSTIC_COMPLETE`.
+
+A Fase 10.18A executa uma comparação visual diagnóstica entre:
+
+- legado auditado: `pw_Pa` e `injected_volume_m3` de
+  `results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv`;
+- moderno `pkn_direct`: `net_pressure_Pa` em saída temporária sob `results/`;
+- moderno `volumetric_balance`: `wellbore_pressure_Pa` em saída temporária sob
+  `results/`.
+
+A ferramenta:
+
+```text
+tools/compare_phase10_18a.py
+```
+
+gera, sem versionar artefatos de `results/`:
+
+```text
+phase10_18a_summary.csv
+phase10_18a_metadata.json
+injected_volume_vs_pressure_volumetric.png
+pressure_vs_time_volumetric.png
+volume_balance_components.png
+```
+
+Resultado observado no caso controlado BUZ67D:
+
+| Métrica | Legado auditado | Moderno `pkn_direct` | Moderno `volumetric_balance` |
+|---|---:|---:|---:|
+| Campo de pressão | `pw_Pa` | `net_pressure_Pa` | `wellbore_pressure_Pa` |
+| Máxima pressão | `6.9035836e7 Pa` | `3.0847520e7 Pa` | `5.5397022e7 Pa` |
+| Diferença relativa no máximo contra legado | — | `0.553` | `0.198` |
+| Registros | `900` | `26` | `26` |
+| Faixa temporal | `0..1320 s` | `0..750 s` | `0..750 s` |
+
+Classificação diagnóstica:
+
+```text
+VOLUMETRIC_BALANCE_CLOSER_TO_LEGACY
+```
+
+Essa classificação significa apenas que, neste recorte controlado, a ordem de
+grandeza da curva de pressão por balanço volumétrico ficou mais próxima de
+`pw_Pa` legado do que `net_pressure_Pa`. Ela não valida fratura, dano, ruptura,
+`sigmaTheta`, `margin`, `opened` ou equivalência física. A diferença remanescente
+continua compatível com a ausência de shut-in moderno, semântica distinta entre
+`pw` e pressões modernas, compressibilidade constante, ausência de Zamora e
+ausência de acomodação mecânica/casing.
+
+O gate permanece fechado:
+
+```text
+level1_ready = false
+physical_validation = false
+numeric_equivalence = false
+pressure_semantic_equivalence = false
+awaiting_human_review = true
+```
+
 ## Fase 10.17C — planejamento antes de novos mecanismos
 
 A próxima evolução não deve avançar diretamente para validação física. A Fase

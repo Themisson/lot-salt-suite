@@ -55,6 +55,13 @@ O legado mantém `Vq = flowRate(tend)` após o fim da injeção quando `t > tend
 prolongando a simulação com o volume injetado final. Isso não é equivalente a
 continuar bombeando: é uma fase de volume imposto constante.
 
+A Fase 10.18A não implementa shut-in. Ela apenas confirma, por diagnóstico
+visual, que o modo moderno `volumetric_balance` se aproxima mais da escala de
+`pw_Pa` legado do que `pkn_direct` no caso controlado BUZ67D. A diferença
+temporal remanescente permanece esperada porque o legado auditado inclui uma
+cauda sem injeção até `1320 s`, enquanto o run moderno controlado cobre
+`0..750 s`.
+
 Contrato futuro recomendado:
 
 ```text

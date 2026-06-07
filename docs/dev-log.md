@@ -57,6 +57,48 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.18A — diagnóstico visual do modo volumetric_balance — Codex
+
+**Status:** Implementada, testada e pronta para commit/push conforme gate da fase.
+
+**Classificação:** `VOLUMETRIC_BALANCE_CLOSER_TO_LEGACY`.
+
+**Gate:** `IMPLEMENTATION_ALLOWED_RUN_DIAGNOSTIC`.
+
+**Objetivo:** comparar visualmente, sem validação física, a curva legada
+auditada `pw_Pa`, a rota moderna `pkn_direct` (`net_pressure_Pa`) e a rota
+moderna opt-in `volumetric_balance` (`wellbore_pressure_Pa`) para o caso
+controlado BUZ67D.
+
+**Execução:**
+- legado auditado reutilizado de
+  `results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv`;
+- run moderno `volumetric_balance` gerado em
+  `results/comparison/phase10_18a/modern_volumetric`;
+- run moderno `pkn_direct` temporário gerado em
+  `results/comparison/phase10_18a/modern_direct`;
+- ferramenta criada: `tools/compare_phase10_18a.py`.
+
+**Resultado diagnóstico:**
+- `max(pw_Pa)` legado auditado: `6.9035836e7 Pa`;
+- `max(net_pressure_Pa)` moderno `pkn_direct`: `3.0847520e7 Pa`;
+- `max(wellbore_pressure_Pa)` moderno `volumetric_balance`: `5.5397022e7 Pa`;
+- diferença relativa no máximo contra legado: `0.553` para `pkn_direct` e
+  `0.198` para `volumetric_balance`.
+
+**Artefatos locais não versionados:**
+- `results/comparison/phase10_18a/phase10_18a_summary.csv`;
+- `results/comparison/phase10_18a/phase10_18a_metadata.json`;
+- `results/comparison/phase10_18a/injected_volume_vs_pressure_volumetric.png`;
+- `results/comparison/phase10_18a/pressure_vs_time_volumetric.png`;
+- `results/comparison/phase10_18a/volume_balance_components.png`.
+
+**Restrição:** diagnóstico apenas. Não declara equivalência numérica, validação
+física, comparação de `sigmaTheta`, `margin`, `opened`, dano ou ruptura. Não
+implementa shut-in, acomodação pré-injeção ou Zamora.
+
+---
+
 ### [2026-06-07] Fase 10.17A — auditoria de balanço volumétrico LOT — Codex
 
 **Status:** Implementada nesta sessao, aguardando commit/push conforme politica da fase.

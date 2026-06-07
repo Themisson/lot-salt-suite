@@ -92,6 +92,30 @@
     "modern_time_max_s_observed": 750.0,
     "legacy_full_run_includes_no_injection_phase": true
   },
+  "phase10_18a_volumetric_balance_diagnostic": {
+    "status": "PHASE10_18A_VOLUMETRIC_BALANCE_DIAGNOSTIC_COMPLETE",
+    "classification": "VOLUMETRIC_BALANCE_CLOSER_TO_LEGACY",
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "pressure_semantic_equivalence": false,
+    "legacy_audit_csv": "results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv",
+    "modern_volumetric_csv": "results/comparison/phase10_18a/modern_volumetric/timeseries.csv",
+    "modern_direct_csv": "results/comparison/phase10_18a/modern_direct/timeseries.csv",
+    "summary_csv": "results/comparison/phase10_18a/phase10_18a_summary.csv",
+    "metadata_json": "results/comparison/phase10_18a/phase10_18a_metadata.json",
+    "plots": [
+      "results/comparison/phase10_18a/injected_volume_vs_pressure_volumetric.png",
+      "results/comparison/phase10_18a/pressure_vs_time_volumetric.png",
+      "results/comparison/phase10_18a/volume_balance_components.png"
+    ],
+    "diagnostic_observation": "The opt-in volumetric_balance maximum pressure is closer to audited legacy pw_Pa than pkn_direct for the controlled BUZ67D run.",
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "Legacy pw_Pa and modern wellbore_pressure_Pa remain semantically distinct.",
+      "Legacy audit includes a no-injection tail to 1320 s, while the controlled modern run covers 0..750 s.",
+      "No shut-in, accommodation, Zamora, sigmaTheta, margin or opened comparison was performed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",
