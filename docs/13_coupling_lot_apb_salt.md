@@ -1632,14 +1632,18 @@ contrato minimo para uma futura ferramenta
 ## Comparacao Nível 0 com dados reais reduzidos (Fase 10.14B)
 
 A Fase 10.14B complementa o contrato da Fase 10.14A com um par pequeno de
-fixtures versionados em:
+fixtures versionados em `tests/fixtures/comparison/`:
 
 ```text
-tests/fixtures/legacy_modern_level0/buz67d_reduced/
+legacy_buz67d_sample.dat
+legacy_score_mro28_sample.json
+modern_buz67d_sample.csv
+README.md
 ```
 
-O lado legado representa um recorte real ja extraido de
-`legance/LOT_Tese/results/8-BUZ-67D-PKN.dat`. O lado moderno representa um
+O lado legado representa recortes reais reduzidos de
+`legance/LOT_Tese/results/8-BUZ-67D-PKN.dat` e
+`legance/LOT_APB_v5/SCORE-MRO-28_output.json`. O lado moderno representa um
 recorte real reduzido de `lot-sim run --mode lot-pkn` para o caso BUZ67D
 migrado. Esses arquivos nao sao baselines fisicos; sao apenas amostras
 estruturais pequenas para testar o contrato Nível 0.

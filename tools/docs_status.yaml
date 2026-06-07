@@ -61,6 +61,7 @@ phases:
   phase_10_13_comparison_strategy: completed
   phase_10_14a_level0_fixture_comparison: completed
   phase_10_14b_level0_reduced_real_comparison: completed
+  phase_10_14b_reduced_real_fixtures: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started

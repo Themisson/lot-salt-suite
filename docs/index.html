@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">47/54</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">48/55</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -4076,11 +4076,15 @@ contrato minimo para uma futura ferramenta
 <code>tools/compare_legacy_modern_level0_level1.py</code>.</p>
 <h2 id="comparacao-nivel-0-com-dados-reais-reduzidos-fase-1014b">Comparacao Nível 0 com dados reais reduzidos (Fase 10.14B)</h2>
 <p>A Fase 10.14B complementa o contrato da Fase 10.14A com um par pequeno de
-fixtures versionados em:</p>
-<pre><code class="language-text">tests/fixtures/legacy_modern_level0/buz67d_reduced/
+fixtures versionados em <code>tests/fixtures/comparison/</code>:</p>
+<pre><code class="language-text">legacy_buz67d_sample.dat
+legacy_score_mro28_sample.json
+modern_buz67d_sample.csv
+README.md
 </code></pre>
-<p>O lado legado representa um recorte real ja extraido de
-<code>legance/LOT_Tese/results/8-BUZ-67D-PKN.dat</code>. O lado moderno representa um
+<p>O lado legado representa recortes reais reduzidos de
+<code>legance/LOT_Tese/results/8-BUZ-67D-PKN.dat</code> e
+<code>legance/LOT_APB_v5/SCORE-MRO-28_output.json</code>. O lado moderno representa um
 recorte real reduzido de <code>lot-sim run --mode lot-pkn</code> para o caso BUZ67D
 migrado. Esses arquivos nao sao baselines fisicos; sao apenas amostras
 estruturais pequenas para testar o contrato Nível 0.</p>

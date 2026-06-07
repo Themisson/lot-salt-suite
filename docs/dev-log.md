@@ -61,11 +61,23 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 **Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
 
-**Objetivo:** Complementar os fixtures temporarios da Fase 10.14A com um par
-pequeno de arquivos reais reduzidos, versionados e apropriados para validar o
+**Classificacao:** `LEVEL0_REAL_REDUCED_FIXTURES_ESTABLISHED_NO_PHYSICAL_VALIDATION`.
+
+**Objetivo:** Complementar os fixtures temporarios da Fase 10.14A com um
+conjunto pequeno de arquivos reais reduzidos, versionados e apropriados para validar o
 contrato estrutural Nível 0 sem processar outputs legados grandes.
 
 **Implementacao:**
+- Criado `tests/fixtures/comparison/`.
+- Adicionados `legacy_buz67d_sample.dat`,
+  `legacy_score_mro28_sample.json`, `modern_buz67d_sample.csv` e `README.md`.
+- Criado `tests/python/test_comparison_level0.py`.
+- O fixture `.dat` e um recorte de
+  `legance/LOT_Tese/results/8-BUZ-67D-PKN.dat`.
+- O fixture JSON e um bloco temporal reduzido de
+  `legance/LOT_APB_v5/SCORE-MRO-28_output.json`.
+- O fixture CSV moderno e um recorte de `lot-sim run --mode lot-pkn` do caso
+  BUZ67D migrado.
 - Criado `tests/fixtures/legacy_modern_level0/buz67d_reduced/`.
 - Adicionados `legacy_points.csv`, `legacy_summary.csv`, `modern_points.csv` e
   `modern_summary.csv` reduzidos.

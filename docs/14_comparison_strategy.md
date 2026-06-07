@@ -537,26 +537,38 @@ as metricas e caveats em teste.
 
 **Status:** implementada como teste Python com fixtures reais reduzidos.
 
-A Fase 10.14B complementa os fixtures temporarios da Fase 10.14A com um par
-pequeno e versionado em:
+**Classificacao:** `LEVEL0_REAL_REDUCED_FIXTURES_ESTABLISHED_NO_PHYSICAL_VALIDATION`.
+
+A Fase 10.14B complementa os fixtures temporarios da Fase 10.14A com pequenos
+recortes versionados de artefatos reais em:
 
 ```text
-tests/fixtures/legacy_modern_level0/buz67d_reduced/
+tests/fixtures/comparison/
 ```
 
-O fixture legado e um recorte de linhas ja extraidas de
-`legance/LOT_Tese/results/8-BUZ-67D-PKN.dat`. O fixture moderno e um recorte
-reduzido de uma saida moderna `lot-sim run --mode lot-pkn` para o caso BUZ67D
-migrado. Ambos sao pequenos e servem apenas para validar o contrato estrutural.
+Esses recortes nao executam legado, nao instrumentam `legance/`, nao versionam
+diretorios completos de resultado e nao criam baseline numerico. Eles apenas
+provam que a comparacao Nível 0 consegue ler amostras reais pequenas e extrair
+metadados estruturais minimos.
 
 Arquivos versionados:
 
 ```text
-legacy_points.csv
-legacy_summary.csv
-modern_points.csv
-modern_summary.csv
+legacy_buz67d_sample.dat
+legacy_score_mro28_sample.json
+modern_buz67d_sample.csv
+README.md
 ```
+
+Origens:
+
+- `legacy_buz67d_sample.dat`: recorte textual de
+  `legance/LOT_Tese/results/8-BUZ-67D-PKN.dat`;
+- `legacy_score_mro28_sample.json`: bloco temporal reduzido de
+  `legance/LOT_APB_v5/SCORE-MRO-28_output.json`;
+- `modern_buz67d_sample.csv`: cabecalho e primeiras linhas de
+  `results/phase10_14b_buz67d/timeseries.csv`, gerado por
+  `lot-sim run --mode lot-pkn` para o caso BUZ67D migrado.
 
 A comparacao continua limitada a Nível 0:
 
