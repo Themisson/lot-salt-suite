@@ -306,3 +306,31 @@ A auditoria 10.17A preserva a distinção entre:
 O próximo campo moderno permitido por esta normalização é uma série separada
 `wellbore_pressure_Pa` em modo opt-in. Ela deve ser tratada como diagnóstico de
 balanço, não como substituição automática de `net_pressure_Pa`.
+
+## Fase 10.17B — campos exportados pelo modo `volumetric_balance`
+
+**Status:** `BALANCE_FIELDS_EXPORTED_OPT_IN`.
+
+O writer moderno passa a exportar campos de balanço no `timeseries.csv` e no
+`result.json`. Eles são sempre presentes para estabilidade de formato, mas só
+têm significado físico operacional quando:
+
+```text
+pressure_model = volumetric_balance
+```
+
+Campos:
+
+| Campo | Unidade | Interpretação |
+|---|---|---|
+| `pressure_model` | texto | `pkn_direct` ou `volumetric_balance`. |
+| `wellbore_pressure_Pa` | Pa | Pressão acumulada pelo balanço opt-in. |
+| `balance_delta_pressure_Pa` | Pa | Incremento do passo por `dV_effective/(C*V)`. |
+| `balance_effective_volume_increment_m3` | m3 | Volume líquido usado no balanço do passo. |
+| `balance_injected_volume_increment_m3` | m3 | Incremento de volume injetado. |
+| `balance_fracture_volume_increment_m3` | m3 | Incremento de volume de fratura descontado após abertura lógica. |
+| `balance_leakoff_volume_increment_m3` | m3 | Incremento de leakoff descontado após abertura lógica. |
+
+O campo `net_pressure_Pa` não foi renomeado nem reclassificado. Comparações
+legado-moderno que usem `wellbore_pressure_Pa` devem registrar explicitamente
+que estão usando a rota `volumetric_balance`, não a pressão PKN direta.

@@ -211,7 +211,7 @@ diagnóstico, mas essa informação ainda não participa da pressão PKN.
 **Impacto:** Comparações diretas entre `pw_Pa` legado e
 `net_pressure_Pa` moderno continuam semanticamente bloqueadas.
 
-**Mitigação permitida:** criar um modo moderno opcional
+**Mitigação implementada:** a Fase 10.17B cria o modo moderno opcional
 `volumetric_balance`, sem alterar o default `pkn_direct`, exportando campos
 separados de `wellbore_pressure_Pa` e diagnóstico de balanço. Essa mitigação
 é diagnóstica e não constitui validação física de fratura.

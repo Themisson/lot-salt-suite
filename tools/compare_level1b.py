@@ -21,6 +21,19 @@ CAVEATS = [
 ]
 
 
+def _caveats_for_pressure_field(field: str) -> list[str]:
+    if field == "wellbore_pressure_Pa":
+        return [
+            "Legacy pw_Pa and modern wellbore_pressure_Pa are compared only as diagnostic pressure curves.",
+            "Modern wellbore_pressure_Pa comes from volumetric_balance opt-in, not from pkn_direct.",
+            "Injected volume conversion depends on audited legacy flow-rate conversion.",
+            "Annular volume comparison reports per-radian and total volumes explicitly.",
+            "This phase is diagnostic only and does not validate LOT physics.",
+            "No sigmaTheta/pw/margin/opened equivalence is declared.",
+        ]
+    return CAVEATS
+
+
 def _read_csv(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8", newline="") as handle:
         return [dict(row) for row in csv.DictReader(handle)]
@@ -80,17 +93,23 @@ def _aggregate_legacy_by_time(rows: list[dict[str, str]]) -> list[dict[str, Any]
     return aggregated
 
 
-def _modern_points(rows: list[dict[str, str]]) -> list[dict[str, Any]]:
+def _modern_pressure_label(field: str) -> str:
+    if field == "wellbore_pressure_Pa":
+        return "Modern wellbore_pressure_Pa — volumetric_balance opt-in diagnostic"
+    return f"Modern {field} — lot-sim, semantic equivalence not confirmed"
+
+
+def _modern_points(rows: list[dict[str, str]], pressure_field: str) -> list[dict[str, Any]]:
     points: list[dict[str, Any]] = []
     for row in rows:
         points.append(
             {
                 "time_s": _finite_float(row.get("time_s")),
                 "injected_volume_m3": _finite_float(row.get("injected_volume_m3")),
-                "pressure_Pa": _finite_float(row.get("net_pressure_Pa")),
-                "pressure_field": "net_pressure_Pa",
+                "pressure_Pa": _finite_float(row.get(pressure_field)),
+                "pressure_field": pressure_field,
                 "source": "modern",
-                "label": MODERN_PRESSURE_LABEL,
+                "label": _modern_pressure_label(pressure_field),
             }
         )
     return [point for point in points if point["time_s"] is not None]
@@ -158,12 +177,12 @@ def _plot_pressure_vs_time(path: Path, legacy: list[dict[str, Any]], modern: lis
     ax.plot(
         [point["time_s"] for point in legacy if point["pressure_Pa"] is not None],
         [point["pressure_Pa"] for point in legacy if point["pressure_Pa"] is not None],
-        label=LEGACY_PRESSURE_LABEL,
+        label=legacy[0].get("label", LEGACY_PRESSURE_LABEL) if legacy else LEGACY_PRESSURE_LABEL,
     )
     ax.plot(
         [point["time_s"] for point in modern if point["pressure_Pa"] is not None],
         [point["pressure_Pa"] for point in modern if point["pressure_Pa"] is not None],
-        label=MODERN_PRESSURE_LABEL,
+        label=modern[0].get("label", MODERN_PRESSURE_LABEL) if modern else MODERN_PRESSURE_LABEL,
     )
     ax.set_title("LOT Diagnostic — Pressure vs Time — BUZ-67D-PKN")
     ax.set_xlabel("time_s")
@@ -189,12 +208,12 @@ def _plot_volume_vs_pressure(path: Path, legacy: list[dict[str, Any]], modern: l
     ax.plot(
         [point["injected_volume_m3"] for point in legacy if point["pressure_Pa"] is not None],
         [point["pressure_Pa"] for point in legacy if point["pressure_Pa"] is not None],
-        label=LEGACY_PRESSURE_LABEL,
+        label=legacy[0].get("label", LEGACY_PRESSURE_LABEL) if legacy else LEGACY_PRESSURE_LABEL,
     )
     ax.plot(
         [point["injected_volume_m3"] for point in modern if point["pressure_Pa"] is not None],
         [point["pressure_Pa"] for point in modern if point["pressure_Pa"] is not None],
-        label=MODERN_PRESSURE_LABEL,
+        label=modern[0].get("label", MODERN_PRESSURE_LABEL) if modern else MODERN_PRESSURE_LABEL,
     )
     ax.set_title("LOT Diagnostic — Injected Volume vs Pressure — BUZ-67D-PKN")
     ax.set_xlabel("injected_volume_m3")
@@ -206,6 +225,63 @@ def _plot_volume_vs_pressure(path: Path, legacy: list[dict[str, Any]], modern: l
         transform=ax.transAxes,
         fontsize=9,
     )
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+    return True
+
+
+def _plot_volume_balance_diagnostic(path: Path, rows: list[dict[str, str]]) -> bool:
+    required = [
+        "time_s",
+        "balance_effective_volume_increment_m3",
+        "balance_injected_volume_increment_m3",
+        "balance_fracture_volume_increment_m3",
+        "balance_leakoff_volume_increment_m3",
+    ]
+    if not rows or any(field not in rows[0] for field in required):
+        return False
+
+    times = [_finite_float(row.get("time_s")) for row in rows]
+    effective = [_finite_float(row.get("balance_effective_volume_increment_m3")) for row in rows]
+    injected = [_finite_float(row.get("balance_injected_volume_increment_m3")) for row in rows]
+    fracture = [_finite_float(row.get("balance_fracture_volume_increment_m3")) for row in rows]
+    leakoff = [_finite_float(row.get("balance_leakoff_volume_increment_m3")) for row in rows]
+    if not any(value not in {None, 0.0} for value in effective + injected + fracture + leakoff):
+        return False
+
+    try:
+        import matplotlib
+
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except Exception:
+        return False
+
+    def valid_pair(values: list[float | None]) -> tuple[list[float], list[float]]:
+        x: list[float] = []
+        y: list[float] = []
+        for time, value in zip(times, values):
+            if time is not None and value is not None:
+                x.append(time)
+                y.append(value)
+        return x, y
+
+    fig, ax = plt.subplots(figsize=(9, 5))
+    for label, values in [
+        ("effective", effective),
+        ("injected", injected),
+        ("fracture", fracture),
+        ("leakoff", leakoff),
+    ]:
+        x, y = valid_pair(values)
+        if x:
+            ax.plot(x, y, label=label)
+    ax.set_title("LOT Diagnostic — Volumetric Balance Increments — BUZ-67D-PKN")
+    ax.set_xlabel("time_s")
+    ax.set_ylabel("volume_increment_m3")
+    ax.text(0.02, 0.02, "DIAGNOSTIC ONLY — not physical validation", transform=ax.transAxes, fontsize=9)
     ax.legend()
     fig.tight_layout()
     fig.savefig(path, dpi=150)
@@ -243,7 +319,7 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
     modern_result = _load_modern_result(Path(args.modern_result_json) if args.modern_result_json else None)
 
     legacy = _aggregate_legacy_by_time(legacy_rows)
-    modern = _modern_points(modern_rows)
+    modern = _modern_points(modern_rows, args.modern_pressure_field)
 
     volume_pressure_rows = []
     for point in legacy + modern:
@@ -317,6 +393,7 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
 
     volume_plot = _plot_volume_vs_pressure(output_dir / f"injected_volume_vs_pressure{suffix}.png", legacy, modern)
     pressure_plot = _plot_pressure_vs_time(output_dir / f"pressure_vs_time{suffix}.png", legacy, modern)
+    balance_plot = _plot_volume_balance_diagnostic(output_dir / f"volume_balance_diagnostic{suffix}.png", modern_rows)
     annular_plot = False
     if legacy_volume is not None and modern_volume is not None:
         annular_plot = _plot_annular_volume(output_dir / "annular_volume_comparison.png", legacy_volume, modern_volume)
@@ -324,8 +401,12 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
     legacy_pressures = [point["pressure_Pa"] for point in legacy if point["pressure_Pa"] is not None]
     modern_pressures = [point["pressure_Pa"] for point in modern if point["pressure_Pa"] is not None]
     metadata = {
-        "phase": "10.15B",
-        "comparison_type": "audit_run_visual_diagnostic",
+        "phase": "10.17B" if args.modern_pressure_field == "wellbore_pressure_Pa" else "10.15B",
+        "comparison_type": (
+            "volumetric_balance_visual_diagnostic"
+            if args.modern_pressure_field == "wellbore_pressure_Pa"
+            else "audit_run_visual_diagnostic"
+        ),
         "legacy_compiled": True,
         "legacy_run_completed": True,
         "legacy_instrumented": True,
@@ -337,6 +418,7 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
         "pressure_time_plot_generated": pressure_plot,
         "annular_volume_comparison_status": annular_status,
         "annular_volume_plot_generated": annular_plot,
+        "volume_balance_diagnostic_plot_generated": balance_plot,
         "legacy": {
             "n_raw_rows": len(legacy_rows),
             "n_aggregated_times": len(legacy),
@@ -349,7 +431,8 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
         "modern": {
             "n_rows": len(modern),
             "time_s_range": _range([point["time_s"] for point in modern if point["time_s"] is not None]),
-            "net_pressure_Pa_range": _range(modern_pressures),
+            f"{args.modern_pressure_field}_range": _range(modern_pressures),
+            "pressure_field": args.modern_pressure_field,
             "initial_annular_volume_status": modern_volume_status,
             "initial_annular_volume_per_radian_m3": modern_volume_per_radian,
             "initial_annular_volume_m3": modern_volume,
@@ -360,8 +443,9 @@ def run_comparison(args: argparse.Namespace) -> dict[str, Any]:
             "pressure_vs_time_png": str(output_dir / f"pressure_vs_time{suffix}.png"),
             "annular_volume_comparison_csv": str(output_dir / "annular_volume_comparison.csv"),
             "annular_volume_comparison_png": str(output_dir / "annular_volume_comparison.png") if annular_plot else None,
+            "volume_balance_diagnostic_png": str(output_dir / f"volume_balance_diagnostic{suffix}.png") if balance_plot else None,
         },
-        "caveats": CAVEATS,
+        "caveats": _caveats_for_pressure_field(args.modern_pressure_field),
     }
     with (output_dir / "level1b_metadata.json").open("w", encoding="utf-8") as handle:
         json.dump(metadata, handle, indent=2)
@@ -379,6 +463,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--legacy-audit-csv", required=True)
     parser.add_argument("--modern-timeseries-csv", required=True)
     parser.add_argument("--modern-result-json")
+    parser.add_argument("--modern-pressure-field", default="net_pressure_Pa")
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--suffix", default="")
     return parser

@@ -11,6 +11,16 @@ namespace {
 constexpr double kMinimumWidthM = 1.0e-9;
 constexpr double kMinimumTimeS = 1.0e-12;
 
+const char* pressure_model_label(PknPressureModel model) {
+  switch (model) {
+    case PknPressureModel::PknDirect:
+      return "pkn_direct";
+    case PknPressureModel::VolumetricBalance:
+      return "volumetric_balance";
+  }
+  throw std::invalid_argument("PknModel: unsupported pressure model");
+}
+
 void validate_input(const PknInput& input) {
   if (input.fracture_height_m <= 0.0) {
     throw std::invalid_argument("PknModel: fracture_height_m must be positive");
@@ -50,6 +60,17 @@ void validate_input(const PknInput& input) {
   }
   if (input.leakoff.enabled && input.leakoff.constant_rate_m3_s < 0.0) {
     throw std::invalid_argument("PknModel: leakoff.constant_rate_m3_s must be non-negative");
+  }
+  if (input.pressure_model == PknPressureModel::VolumetricBalance) {
+    if (input.annular_volume_m3 <= 0.0 || !std::isfinite(input.annular_volume_m3)) {
+      throw std::invalid_argument(
+          "PknModel: volumetric_balance requires positive annular_volume_m3");
+    }
+    if (input.fluid_compressibility_per_Pa <= 0.0 ||
+        !std::isfinite(input.fluid_compressibility_per_Pa)) {
+      throw std::invalid_argument(
+          "PknModel: volumetric_balance requires positive fluid_compressibility_per_Pa");
+    }
   }
 }
 
@@ -124,6 +145,7 @@ PknResult make_point(const PknInput& input, double elapsed_time_s,
   result.volume_m3 = fracture_volume_m3;
   result.leakoff_volume_m3 = leakoff_volume_m3;
   result.net_pressure_Pa = net_pressure_Pa;
+  result.pressure_model = pressure_model_label(input.pressure_model);
 
   if (!std::isfinite(result.time_s) || !std::isfinite(result.injected_volume_m3) ||
       !std::isfinite(result.width_m) || !std::isfinite(result.length_m) ||
@@ -143,6 +165,16 @@ void append_point(PknResult& series, const PknResult& point) {
   series.net_pressure_series_Pa.push_back(point.net_pressure_Pa);
   series.leakoff_volume_series_m3.push_back(point.leakoff_volume_m3);
   series.fracture_volume_series_m3.push_back(point.fracture_volume_m3);
+  series.wellbore_pressure_series_Pa.push_back(point.wellbore_pressure_Pa);
+  series.balance_delta_pressure_series_Pa.push_back(point.balance_delta_pressure_Pa);
+  series.balance_effective_volume_increment_series_m3.push_back(
+      point.balance_effective_volume_increment_m3);
+  series.balance_injected_volume_increment_series_m3.push_back(
+      point.balance_injected_volume_increment_m3);
+  series.balance_fracture_volume_increment_series_m3.push_back(
+      point.balance_fracture_volume_increment_m3);
+  series.balance_leakoff_volume_increment_series_m3.push_back(
+      point.balance_leakoff_volume_increment_m3);
 }
 
 void copy_scalar_result(PknResult& target, const PknResult& point) {
@@ -156,6 +188,77 @@ void copy_scalar_result(PknResult& target, const PknResult& point) {
   target.volume_m3 = point.volume_m3;
   target.leakoff_volume_m3 = point.leakoff_volume_m3;
   target.net_pressure_Pa = point.net_pressure_Pa;
+  target.pressure_model = point.pressure_model;
+  target.wellbore_pressure_Pa = point.wellbore_pressure_Pa;
+  target.fluid_compressibility_per_Pa = point.fluid_compressibility_per_Pa;
+  target.balance_delta_pressure_Pa = point.balance_delta_pressure_Pa;
+  target.balance_effective_volume_increment_m3 =
+      point.balance_effective_volume_increment_m3;
+  target.balance_injected_volume_increment_m3 =
+      point.balance_injected_volume_increment_m3;
+  target.balance_fracture_volume_increment_m3 =
+      point.balance_fracture_volume_increment_m3;
+  target.balance_leakoff_volume_increment_m3 =
+      point.balance_leakoff_volume_increment_m3;
+}
+
+void apply_volumetric_balance(const PknInput& input, PknResult& series) {
+  double previous_injected_m3 = 0.0;
+  double previous_fracture_m3 = 0.0;
+  double previous_leakoff_m3 = 0.0;
+  double pressure_Pa = 0.0;
+  bool fracture_opened = false;
+
+  for (std::size_t i = 0; i < series.time_series_s.size(); ++i) {
+    const double injected_increment_m3 =
+        series.injected_volume_series_m3[i] - previous_injected_m3;
+    double fracture_increment_m3 = 0.0;
+    double leakoff_increment_m3 = 0.0;
+
+    if (fracture_opened) {
+      fracture_increment_m3 =
+          series.fracture_volume_series_m3[i] - previous_fracture_m3;
+      leakoff_increment_m3 = series.leakoff_volume_series_m3[i] - previous_leakoff_m3;
+    }
+
+    const double effective_increment_m3 =
+        injected_increment_m3 - fracture_increment_m3 - leakoff_increment_m3;
+    const double delta_pressure_Pa =
+        effective_increment_m3 /
+        (input.fluid_compressibility_per_Pa * input.annular_volume_m3);
+    pressure_Pa = std::max(0.0, pressure_Pa + delta_pressure_Pa);
+
+    if (!fracture_opened && input.breakdown.pressure_Pa > 0.0 &&
+        pressure_Pa >= input.breakdown.pressure_Pa) {
+      fracture_opened = true;
+    }
+
+    series.wellbore_pressure_series_Pa[i] = pressure_Pa;
+    series.balance_delta_pressure_series_Pa[i] = delta_pressure_Pa;
+    series.balance_effective_volume_increment_series_m3[i] = effective_increment_m3;
+    series.balance_injected_volume_increment_series_m3[i] = injected_increment_m3;
+    series.balance_fracture_volume_increment_series_m3[i] = fracture_increment_m3;
+    series.balance_leakoff_volume_increment_series_m3[i] = leakoff_increment_m3;
+
+    previous_injected_m3 = series.injected_volume_series_m3[i];
+    previous_fracture_m3 = series.fracture_volume_series_m3[i];
+    previous_leakoff_m3 = series.leakoff_volume_series_m3[i];
+  }
+
+  series.pressure_model = pressure_model_label(input.pressure_model);
+  series.fluid_compressibility_per_Pa = input.fluid_compressibility_per_Pa;
+  if (!series.time_series_s.empty()) {
+    series.wellbore_pressure_Pa = series.wellbore_pressure_series_Pa.back();
+    series.balance_delta_pressure_Pa = series.balance_delta_pressure_series_Pa.back();
+    series.balance_effective_volume_increment_m3 =
+        series.balance_effective_volume_increment_series_m3.back();
+    series.balance_injected_volume_increment_m3 =
+        series.balance_injected_volume_increment_series_m3.back();
+    series.balance_fracture_volume_increment_m3 =
+        series.balance_fracture_volume_increment_series_m3.back();
+    series.balance_leakoff_volume_increment_m3 =
+        series.balance_leakoff_volume_increment_series_m3.back();
+  }
 }
 
 }  // namespace
@@ -165,7 +268,10 @@ PknResult PknModel::evaluate(const PknInput& input, double elapsed_time_s) const
     throw std::invalid_argument("PknModel: elapsed_time_s must be non-negative");
   }
   validate_input(input);
-  return make_point(input, elapsed_time_s);
+  PknResult point = make_point(input, elapsed_time_s);
+  point.pressure_model = pressure_model_label(input.pressure_model);
+  point.fluid_compressibility_per_Pa = input.fluid_compressibility_per_Pa;
+  return point;
 }
 
 PknResult PknModel::simulate(const PknInput& input) const {
@@ -192,6 +298,11 @@ PknResult PknModel::simulate(const PknInput& input) const {
         make_point(input, input.injection.total_time_s, previous_leakoff_m3);
     append_point(series, point);
     copy_scalar_result(series, point);
+  }
+  if (input.pressure_model == PknPressureModel::VolumetricBalance) {
+    apply_volumetric_balance(input, series);
+  } else {
+    series.pressure_model = pressure_model_label(input.pressure_model);
   }
   return series;
 }

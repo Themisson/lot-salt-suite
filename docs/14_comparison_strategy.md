@@ -1022,6 +1022,39 @@ validar pressao, abertura de fratura, dano, ruptura ou estado tensional.
 
 ---
 
+## Fase 10.17B — pressão de balanço volumétrico moderna opt-in
+
+**Status:** `OPTIONAL_BALANCE_MODE_AVAILABLE`.
+
+A Fase 10.17B implementa o modo:
+
+```text
+lot.pressure_model.type = volumetric_balance
+```
+
+apenas como rota opt-in. O default permanece:
+
+```text
+lot.pressure_model.type = pkn_direct
+```
+
+A comparação futura deve tratar os campos assim:
+
+| Campo moderno | Uso permitido |
+|---|---|
+| `net_pressure_Pa` | Pressão líquida PKN direta; não equivale a `pw_Pa`. |
+| `wellbore_pressure_Pa` | Diagnóstico de balanço volumétrico opt-in. |
+| `balance_delta_pressure_Pa` | Incremento calculado por `dV_effective/(C*V)`. |
+| `balance_effective_volume_increment_m3` | Incremento volumétrico após descontos de fratura/leakoff quando aplicáveis. |
+| `pressure_model` | Rótulo obrigatório para impedir mistura semântica. |
+
+Esse modo permite gerar curvas modernas alternativas para o caso controlado
+BUZ67D, mas ainda não transforma Level 1 em validação física. A equivalência
+com `pw = pi + dP` segue pendente de revisão humana, normalização de pressão
+inicial e entendimento do termo pós-fratura legado.
+
+---
+
 ## Fase 10.17A — gate para balanço volumétrico opcional
 
 **Status:** `IMPLEMENTATION_ALLOWED_OPTIONAL_BALANCE_MODE`.

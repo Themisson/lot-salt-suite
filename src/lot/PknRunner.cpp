@@ -10,6 +10,17 @@
 namespace lss::lot {
 namespace {
 
+struct AnnularVolumeContext {
+  bool available = false;
+  double per_radian_m3 = 0.0;
+  double total_m3 = 0.0;
+  double outer_radius_m = 0.0;
+  double inner_radius_m = 0.0;
+  double length_m = 0.0;
+  std::string convention = "NOT_AVAILABLE";
+  std::string source = "no casing available for annular volume";
+};
+
 const lss::core::LayerData& layer_at_shoe(const lss::core::CaseData& data) {
   for (const auto& layer : data.layers) {
     if (data.lot.shoe_depth_m >= layer.top_m && data.lot.shoe_depth_m <= layer.base_m) {
@@ -53,6 +64,33 @@ const lss::core::RockData& rock_by_id(const lss::core::CaseData& data,
   throw std::runtime_error("PknRunner: layer rock_id not found in rocks");
 }
 
+const lss::core::FluidData& fluid_by_id(const lss::core::CaseData& data,
+                                        const std::string& id) {
+  for (const auto& fluid : data.fluids) {
+    if (fluid.id == id) {
+      return fluid;
+    }
+  }
+  throw std::runtime_error("PknRunner: annular fluid_id not found in fluids");
+}
+
+const lss::core::AnnularData& annular_at_shoe(const lss::core::CaseData& data) {
+  const lss::core::AnnularData* match = nullptr;
+  for (const auto& annular : data.annulars) {
+    if (data.lot.shoe_depth_m >= annular.top_m &&
+        data.lot.shoe_depth_m <= annular.base_m) {
+      if (match != nullptr) {
+        throw std::runtime_error("PknRunner: more than one annular contains lot.shoe_depth_m");
+      }
+      match = &annular;
+    }
+  }
+  if (match == nullptr) {
+    throw std::runtime_error("PknRunner: no annular contains lot.shoe_depth_m");
+  }
+  return *match;
+}
+
 LeakoffModel parse_leakoff_model(const std::string& model) {
   if (model.empty() || model == "none") {
     return LeakoffModel::None;
@@ -79,6 +117,16 @@ BreakdownMethod parse_breakdown_method(const std::string& method) {
   throw std::runtime_error("PknRunner: unsupported breakdown method: " + method);
 }
 
+PknPressureModel parse_pressure_model(const std::string& model) {
+  if (model.empty() || model == "pkn_direct") {
+    return PknPressureModel::PknDirect;
+  }
+  if (model == "volumetric_balance") {
+    return PknPressureModel::VolumetricBalance;
+  }
+  throw std::runtime_error("PknRunner: unsupported pressure model: " + model);
+}
+
 double plane_strain_modulus(const lss::core::RockData& rock) {
   const double denominator = 1.0 - rock.nu * rock.nu;
   if (rock.E_Pa <= 0.0 || denominator <= 0.0 || !std::isfinite(denominator)) {
@@ -97,14 +145,12 @@ void validate_pkn_contract(const lss::core::CaseData& data) {
   }
 }
 
-void attach_initial_annular_volume(const lss::core::CaseData& data,
-                                   PknResult& result) {
+AnnularVolumeContext make_annular_volume_context(const lss::core::CaseData& data) {
+  AnnularVolumeContext context;
   const auto& layer = layer_at_shoe(data);
   const auto* casing = casing_for_annular_outer_radius(data);
   if (casing == nullptr) {
-    result.annular_volume_convention = "NOT_AVAILABLE";
-    result.annular_volume_source = "no casing available for annular volume";
-    return;
+    return context;
   }
 
   const double length_m = layer.base_m - layer.top_m;
@@ -118,16 +164,29 @@ void attach_initial_annular_volume(const lss::core::CaseData& data,
     source += " + wellbore.drill_pipe.outer_diameter";
   }
 
-  result.annular_outer_radius_m = outer_radius_m;
-  result.annular_inner_radius_m = inner_radius_m;
-  result.annular_length_m = length_m;
-  result.initial_annular_volume_per_radian_m3 =
+  context.available = true;
+  context.outer_radius_m = outer_radius_m;
+  context.inner_radius_m = inner_radius_m;
+  context.length_m = length_m;
+  context.per_radian_m3 =
       lss::wellbore::annular_volume_per_radian_m3(outer_radius_m,
                                                   inner_radius_m, length_m);
-  result.initial_annular_volume_m3 = lss::wellbore::annular_total_volume_m3(
-      outer_radius_m, inner_radius_m, length_m);
-  result.annular_volume_convention = "PER_RADIAN_INTERNAL_TOTAL_EXPORTED";
-  result.annular_volume_source = source;
+  context.total_m3 =
+      lss::wellbore::annular_total_volume_m3(outer_radius_m, inner_radius_m, length_m);
+  context.convention = "PER_RADIAN_INTERNAL_TOTAL_EXPORTED";
+  context.source = source;
+  return context;
+}
+
+void attach_initial_annular_volume(const AnnularVolumeContext& context,
+                                   PknResult& result) {
+  result.annular_outer_radius_m = context.outer_radius_m;
+  result.annular_inner_radius_m = context.inner_radius_m;
+  result.annular_length_m = context.length_m;
+  result.initial_annular_volume_per_radian_m3 = context.per_radian_m3;
+  result.initial_annular_volume_m3 = context.total_m3;
+  result.annular_volume_convention = context.convention;
+  result.annular_volume_source = context.source;
 }
 
 }  // namespace
@@ -156,6 +215,22 @@ PknInput make_pkn_input(const lss::core::CaseData& data) {
   input.fluid_viscosity_Pa_s = data.lot.fracture_fluid_viscosity_Pa_s;
   input.leakoff_coefficient_m_sqrt_s = data.lot.leakoff_coefficient_m_sqrt_s;
   input.leakoff_constant_rate_m3_s = data.lot.leakoff_constant_rate_m3_s;
+  input.pressure_model = parse_pressure_model(data.lot.pressure_model);
+  if (input.pressure_model == PknPressureModel::VolumetricBalance) {
+    const auto annular_context = make_annular_volume_context(data);
+    if (!annular_context.available || annular_context.total_m3 <= 0.0) {
+      throw std::runtime_error(
+          "PknRunner: volumetric_balance requires available annular volume");
+    }
+    const auto& fluid = fluid_by_id(data, annular_at_shoe(data).fluid_id);
+    if (fluid.compressibility_per_Pa <= 0.0 ||
+        !std::isfinite(fluid.compressibility_per_Pa)) {
+      throw std::runtime_error(
+          "PknRunner: volumetric_balance requires positive fluid compressibility");
+    }
+    input.annular_volume_m3 = annular_context.total_m3;
+    input.fluid_compressibility_per_Pa = fluid.compressibility_per_Pa;
+  }
   return input;
 }
 
@@ -163,7 +238,7 @@ PknRun run_pkn_case(const lss::core::CaseData& data) {
   PknRun run;
   run.input = make_pkn_input(data);
   run.result = PknModel{}.simulate(run.input);
-  attach_initial_annular_volume(data, run.result);
+  attach_initial_annular_volume(make_annular_volume_context(data), run.result);
   return run;
 }
 

@@ -238,3 +238,70 @@ Isto significa:
 - `net_pressure_Pa` não deve ser reclassificado como `pw`;
 - campos de pressão de poço/balanço devem ser exportados separadamente;
 - a rota continua diagnóstica até haver validação física independente.
+
+### Modo opcional `volumetric_balance` — Fase 10.17B
+
+**Status:** `OPTIONAL_BALANCE_MODE_IMPLEMENTED_NO_DEFAULT_CHANGE`.
+
+A Fase 10.17B adiciona um modo explícito:
+
+```yaml
+lot:
+  pressure_model:
+    type: volumetric_balance
+```
+
+Quando o bloco está ausente, o parser mantém:
+
+```text
+pressure_model = pkn_direct
+```
+
+Portanto, os casos existentes continuam usando a formulação PKN direta. O modo
+`volumetric_balance` é usado apenas no caso controlado:
+
+```text
+cases/validation/buz67d_pkn_legacy_aligned.yaml
+```
+
+O cálculo de balanço usa dados já disponíveis no `CaseData`:
+
+```text
+annular_volume_m3
+FluidData.compressibility_per_Pa
+injected_volume_series_m3
+fracture_volume_series_m3
+leakoff_volume_series_m3
+```
+
+Antes da abertura lógica do balanço:
+
+```text
+dV_effective = dV_injected
+dP = dV_effective / (C_fluid * V_annular)
+P_wellbore,new = max(0, P_wellbore,old + dP)
+```
+
+Após o limiar de breakdown ser atingido no balanço opcional:
+
+```text
+dV_effective = dV_injected - dV_fracture - dV_leakoff
+dP = dV_effective / (C_fluid * V_annular)
+```
+
+Esse modelo não altera `PknResult.net_pressure_series_Pa`; ele exporta uma
+série separada:
+
+```text
+wellbore_pressure_Pa
+balance_delta_pressure_Pa
+balance_effective_volume_increment_m3
+balance_injected_volume_increment_m3
+balance_fracture_volume_increment_m3
+balance_leakoff_volume_increment_m3
+```
+
+Assim, `net_pressure_Pa` continua sendo a pressão líquida PKN, enquanto
+`wellbore_pressure_Pa` representa a rota diagnóstica de balanço volumétrico. A
+Fase 10.17B não valida fisicamente `wellbore_pressure_Pa` contra o legado; ela
+apenas cria uma alternativa controlada para análise comparativa futura.

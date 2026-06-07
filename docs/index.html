@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">55/62</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">56/63</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -882,6 +882,49 @@ autoriza mudar o default runtime nem declarar validação física.</p>
 <li>campos de pressão de poço/balanço devem ser exportados separadamente;</li>
 <li>a rota continua diagnóstica até haver validação física independente.</li>
 </ul>
+<h3 id="modo-opcional-volumetric_balance-fase-1017b">Modo opcional <code>volumetric_balance</code> — Fase 10.17B</h3>
+<p><strong>Status:</strong> <code>OPTIONAL_BALANCE_MODE_IMPLEMENTED_NO_DEFAULT_CHANGE</code>.</p>
+<p>A Fase 10.17B adiciona um modo explícito:</p>
+<pre><code class="language-yaml">lot:
+  pressure_model:
+    type: volumetric_balance
+</code></pre>
+<p>Quando o bloco está ausente, o parser mantém:</p>
+<pre><code class="language-text">pressure_model = pkn_direct
+</code></pre>
+<p>Portanto, os casos existentes continuam usando a formulação PKN direta. O modo
+<code>volumetric_balance</code> é usado apenas no caso controlado:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_aligned.yaml
+</code></pre>
+<p>O cálculo de balanço usa dados já disponíveis no <code>CaseData</code>:</p>
+<pre><code class="language-text">annular_volume_m3
+FluidData.compressibility_per_Pa
+injected_volume_series_m3
+fracture_volume_series_m3
+leakoff_volume_series_m3
+</code></pre>
+<p>Antes da abertura lógica do balanço:</p>
+<pre><code class="language-text">dV_effective = dV_injected
+dP = dV_effective / (C_fluid * V_annular)
+P_wellbore,new = max(0, P_wellbore,old + dP)
+</code></pre>
+<p>Após o limiar de breakdown ser atingido no balanço opcional:</p>
+<pre><code class="language-text">dV_effective = dV_injected - dV_fracture - dV_leakoff
+dP = dV_effective / (C_fluid * V_annular)
+</code></pre>
+<p>Esse modelo não altera <code>PknResult.net_pressure_series_Pa</code>; ele exporta uma
+série separada:</p>
+<pre><code class="language-text">wellbore_pressure_Pa
+balance_delta_pressure_Pa
+balance_effective_volume_increment_m3
+balance_injected_volume_increment_m3
+balance_fracture_volume_increment_m3
+balance_leakoff_volume_increment_m3
+</code></pre>
+<p>Assim, <code>net_pressure_Pa</code> continua sendo a pressão líquida PKN, enquanto
+<code>wellbore_pressure_Pa</code> representa a rota diagnóstica de balanço volumétrico. A
+Fase 10.17B não valida fisicamente <code>wellbore_pressure_Pa</code> contra o legado; ela
+apenas cria uma alternativa controlada para análise comparativa futura.</p>
 </div>
 </section>
 
@@ -1729,7 +1772,7 @@ série de pressão de poço. A Fase 10.16 passou a exportar volume anular
 diagnóstico, mas essa informação ainda não participa da pressão PKN.</p>
 <p><strong>Impacto:</strong> Comparações diretas entre <code>pw_Pa</code> legado e
 <code>net_pressure_Pa</code> moderno continuam semanticamente bloqueadas.</p>
-<p><strong>Mitigação permitida:</strong> criar um modo moderno opcional
+<p><strong>Mitigação implementada:</strong> a Fase 10.17B cria o modo moderno opcional
 <code>volumetric_balance</code>, sem alterar o default <code>pkn_direct</code>, exportando campos
 separados de <code>wellbore_pressure_Pa</code> e diagnóstico de balanço. Essa mitigação
 é diagnóstica e não constitui validação física de fratura.</p>

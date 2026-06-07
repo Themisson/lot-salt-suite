@@ -158,6 +158,10 @@ lot:
     model: synthetic_constant
   detection:
     method: derivative_drop
+  pressure_model:
+    # Fase 10.17B opt-in diagnostic route. Existing cases remain pkn_direct
+    # through the parser default when this block is absent.
+    type: volumetric_balance
 
 apb:
   enabled: false

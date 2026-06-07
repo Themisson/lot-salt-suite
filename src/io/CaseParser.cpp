@@ -354,6 +354,11 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
     data.lot.detection_method =
         require_as<std::string>(lot["detection"]["method"], "lot.detection.method");
   }
+  if (lot["pressure_model"]) {
+    data.lot.pressure_model =
+        require_as<std::string>(lot["pressure_model"]["type"],
+                                "lot.pressure_model.type");
+  }
 
   const YAML::Node apb = require_node(root["apb"], "apb");
   data.apb.enabled = require_as<bool>(apb["enabled"], "apb.enabled");
@@ -401,6 +406,11 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
     }
     if (data.lot.leakoff_constant_rate_m3_s < 0.0) {
       throw std::runtime_error("Validacao falhou: LOT/PKN exige taxa constante de leakoff >= 0");
+    }
+    if (data.lot.pressure_model != "pkn_direct" &&
+        data.lot.pressure_model != "volumetric_balance") {
+      throw std::runtime_error(
+          "Validacao falhou: LOT/PKN exige pressure_model.type pkn_direct ou volumetric_balance");
     }
   }
   validate_nonempty(!data.casings.empty(), "casings");

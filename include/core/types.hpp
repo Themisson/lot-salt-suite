@@ -115,6 +115,7 @@ struct LotConfig {
   double leakoff_coefficient_m_sqrt_s = 0.0;
   double leakoff_constant_rate_m3_s = 0.0;
   std::string detection_method;
+  std::string pressure_model = "pkn_direct";
 };
 
 struct ApbConfig {

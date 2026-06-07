@@ -30,6 +30,17 @@ void check_finite_series(const lss::lot::PknResult& result) {
   REQUIRE(result.time_series_s.size() == result.fracture_volume_series_m3.size());
   REQUIRE(result.time_series_s.size() == result.leakoff_volume_series_m3.size());
   REQUIRE(result.time_series_s.size() == result.net_pressure_series_Pa.size());
+  REQUIRE(result.time_series_s.size() == result.wellbore_pressure_series_Pa.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.balance_delta_pressure_series_Pa.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.balance_effective_volume_increment_series_m3.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.balance_injected_volume_increment_series_m3.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.balance_fracture_volume_increment_series_m3.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.balance_leakoff_volume_increment_series_m3.size());
 
   for (std::size_t i = 0; i < result.time_series_s.size(); ++i) {
     CHECK(std::isfinite(result.time_series_s[i]));
@@ -39,6 +50,12 @@ void check_finite_series(const lss::lot::PknResult& result) {
     CHECK(std::isfinite(result.fracture_volume_series_m3[i]));
     CHECK(std::isfinite(result.leakoff_volume_series_m3[i]));
     CHECK(std::isfinite(result.net_pressure_series_Pa[i]));
+    CHECK(std::isfinite(result.wellbore_pressure_series_Pa[i]));
+    CHECK(std::isfinite(result.balance_delta_pressure_series_Pa[i]));
+    CHECK(std::isfinite(result.balance_effective_volume_increment_series_m3[i]));
+    CHECK(std::isfinite(result.balance_injected_volume_increment_series_m3[i]));
+    CHECK(std::isfinite(result.balance_fracture_volume_increment_series_m3[i]));
+    CHECK(std::isfinite(result.balance_leakoff_volume_increment_series_m3[i]));
   }
 }
 
@@ -85,6 +102,8 @@ TEST_CASE("PknRunner executes minimal LOT PKN case") {
   const auto run = lss::lot::run_pkn_case(data);
 
   CHECK(data.mode == "lot-pkn");
+  CHECK(data.lot.pressure_model == "pkn_direct");
+  CHECK(run.input.pressure_model == lss::lot::PknPressureModel::PknDirect);
   CHECK(run.input.fracture_height_m > 0.0);
   CHECK(run.input.fluid_viscosity_Pa_s > 0.0);
   CHECK(run.input.plane_strain_modulus_Pa > 0.0);
@@ -131,6 +150,22 @@ TEST_CASE("PknRunner exports legacy-aligned annular volume with drill pipe") {
         Catch::Approx(2.0 * 3.14159265358979323846 * per_radian));
   CHECK(run.result.annular_volume_convention ==
         "PER_RADIAN_INTERNAL_TOTAL_EXPORTED");
+}
+
+TEST_CASE("PknRunner enables opt-in volumetric balance for legacy-aligned case") {
+  const auto data = lss::io::parse_yaml(kBuz67dLegacyAlignedCasePath);
+  const auto run = lss::lot::run_pkn_case(data);
+
+  CHECK(data.lot.pressure_model == "volumetric_balance");
+  CHECK(run.input.pressure_model == lss::lot::PknPressureModel::VolumetricBalance);
+  CHECK(run.input.annular_volume_m3 ==
+        Catch::Approx(run.result.initial_annular_volume_m3));
+  CHECK(run.input.fluid_compressibility_per_Pa == Catch::Approx(6.40e-10));
+  CHECK(run.result.pressure_model == "volumetric_balance");
+  CHECK(run.result.wellbore_pressure_Pa >= 0.0);
+  CHECK_FALSE(run.result.wellbore_pressure_series_Pa.empty());
+  CHECK(run.result.wellbore_pressure_series_Pa.back() ==
+        Catch::Approx(run.result.wellbore_pressure_Pa));
 }
 
 #if LSS_ENABLE_CLI_SUBPROCESS_TESTS

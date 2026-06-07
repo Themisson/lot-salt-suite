@@ -37,6 +37,17 @@ void check_finite_non_negative_series(const lss::lot::PknResult& result) {
   REQUIRE(result.time_series_s.size() == result.net_pressure_series_Pa.size());
   REQUIRE(result.time_series_s.size() == result.leakoff_volume_series_m3.size());
   REQUIRE(result.time_series_s.size() == result.fracture_volume_series_m3.size());
+  REQUIRE(result.time_series_s.size() == result.wellbore_pressure_series_Pa.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.balance_delta_pressure_series_Pa.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.balance_effective_volume_increment_series_m3.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.balance_injected_volume_increment_series_m3.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.balance_fracture_volume_increment_series_m3.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.balance_leakoff_volume_increment_series_m3.size());
 
   for (std::size_t i = 0; i < result.time_series_s.size(); ++i) {
     CHECK(std::isfinite(result.time_series_s[i]));
@@ -46,12 +57,19 @@ void check_finite_non_negative_series(const lss::lot::PknResult& result) {
     CHECK(std::isfinite(result.net_pressure_series_Pa[i]));
     CHECK(std::isfinite(result.leakoff_volume_series_m3[i]));
     CHECK(std::isfinite(result.fracture_volume_series_m3[i]));
+    CHECK(std::isfinite(result.wellbore_pressure_series_Pa[i]));
+    CHECK(std::isfinite(result.balance_delta_pressure_series_Pa[i]));
+    CHECK(std::isfinite(result.balance_effective_volume_increment_series_m3[i]));
+    CHECK(std::isfinite(result.balance_injected_volume_increment_series_m3[i]));
+    CHECK(std::isfinite(result.balance_fracture_volume_increment_series_m3[i]));
+    CHECK(std::isfinite(result.balance_leakoff_volume_increment_series_m3[i]));
     CHECK(result.injected_volume_series_m3[i] >= 0.0);
     CHECK(result.fracture_length_series_m[i] >= 0.0);
     CHECK(result.fracture_width_series_m[i] >= 0.0);
     CHECK(result.net_pressure_series_Pa[i] >= 0.0);
     CHECK(result.leakoff_volume_series_m3[i] >= 0.0);
     CHECK(result.fracture_volume_series_m3[i] >= 0.0);
+    CHECK(result.wellbore_pressure_series_Pa[i] >= 0.0);
   }
 }
 
@@ -147,6 +165,45 @@ TEST_CASE("Minimal SI PKN model is deterministic") {
   CHECK(first.net_pressure_series_Pa == second.net_pressure_series_Pa);
   CHECK(first.leakoff_volume_series_m3 == second.leakoff_volume_series_m3);
   CHECK(first.fracture_volume_series_m3 == second.fracture_volume_series_m3);
+  CHECK(first.wellbore_pressure_series_Pa == second.wellbore_pressure_series_Pa);
+}
+
+TEST_CASE("Volumetric balance pressure model increases pressure with injection") {
+  const lss::lot::PknModel model;
+  auto input = synthetic_input();
+  input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  input.annular_volume_m3 = 10.0;
+  input.fluid_compressibility_per_Pa = 1.0e-9;
+  input.breakdown.pressure_Pa = 1.0e12;
+
+  const auto result = model.simulate(input);
+
+  check_finite_non_negative_series(result);
+  CHECK(result.pressure_model == "volumetric_balance");
+  CHECK(result.wellbore_pressure_Pa > 0.0);
+  CHECK(is_monotonic_non_decreasing(result.wellbore_pressure_series_Pa));
+  CHECK(result.balance_injected_volume_increment_m3 > 0.0);
+  CHECK(result.balance_fracture_volume_increment_m3 == Catch::Approx(0.0));
+}
+
+TEST_CASE("Volumetric balance responds to annular volume and compressibility") {
+  const lss::lot::PknModel model;
+  auto smaller_annulus = synthetic_input();
+  smaller_annulus.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  smaller_annulus.annular_volume_m3 = 5.0;
+  smaller_annulus.fluid_compressibility_per_Pa = 1.0e-9;
+  smaller_annulus.breakdown.pressure_Pa = 1.0e12;
+
+  auto larger_annulus = smaller_annulus;
+  larger_annulus.annular_volume_m3 = 10.0;
+
+  auto higher_compressibility = smaller_annulus;
+  higher_compressibility.fluid_compressibility_per_Pa = 2.0e-9;
+
+  CHECK(model.simulate(smaller_annulus).wellbore_pressure_Pa >
+        model.simulate(larger_annulus).wellbore_pressure_Pa);
+  CHECK(model.simulate(smaller_annulus).wellbore_pressure_Pa >
+        model.simulate(higher_compressibility).wellbore_pressure_Pa);
 }
 
 TEST_CASE("Minimal SI PKN model rejects invalid inputs") {
@@ -179,4 +236,18 @@ TEST_CASE("Minimal SI PKN model rejects invalid inputs") {
   auto bad_dt_gt_total = synthetic_input();
   bad_dt_gt_total.injection.dt_s = 200.0;
   CHECK_THROWS_AS(model.simulate(bad_dt_gt_total), std::invalid_argument);
+
+  auto bad_balance_volume = synthetic_input();
+  bad_balance_volume.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  bad_balance_volume.annular_volume_m3 = 0.0;
+  bad_balance_volume.fluid_compressibility_per_Pa = 1.0e-9;
+  CHECK_THROWS_AS(model.simulate(bad_balance_volume), std::invalid_argument);
+
+  auto bad_balance_compressibility = synthetic_input();
+  bad_balance_compressibility.pressure_model =
+      lss::lot::PknPressureModel::VolumetricBalance;
+  bad_balance_compressibility.annular_volume_m3 = 1.0;
+  bad_balance_compressibility.fluid_compressibility_per_Pa = 0.0;
+  CHECK_THROWS_AS(model.simulate(bad_balance_compressibility),
+                  std::invalid_argument);
 }

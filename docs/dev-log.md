@@ -87,6 +87,30 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.17B — modo opcional de balanço volumétrico LOT — Codex
+
+**Status:** Implementada nesta sessao, aguardando commit/push conforme politica da fase.
+
+**Classificacao:** `OPTIONAL_BALANCE_MODE_IMPLEMENTED_NO_DEFAULT_CHANGE`.
+
+**Objetivo:** Adicionar uma rota moderna opt-in para estimar
+`wellbore_pressure_Pa` por balanço volumetrico anular, sem substituir
+`net_pressure_Pa` e sem alterar o default `pkn_direct`.
+
+**Implementacao:**
+- `lot.pressure_model.type` aceita `pkn_direct` e `volumetric_balance`.
+- `pkn_direct` permanece default quando o bloco YAML esta ausente.
+- `PknModel` calcula uma serie separada `wellbore_pressure_Pa` quando o modo
+  opt-in esta ativo.
+- `ResultWriter` exporta campos de diagnostico de balanço no CSV/JSON.
+- `cases/validation/buz67d_pkn_legacy_aligned.yaml` ativa
+  `volumetric_balance` para o caso controlado.
+
+**Restricao:** a rota e diagnostica. Nao valida pressao, ruptura, abertura de
+fratura ou equivalencia fisica com `pw = pi + dP` legado.
+
+---
+
 ### [2026-06-07] Fase 10.16 — volume anular BUZ67D com drill pipe — Codex
 
 **Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.

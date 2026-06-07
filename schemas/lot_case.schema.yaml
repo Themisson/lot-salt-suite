@@ -244,6 +244,14 @@ properties:
           method:
             type: string
             enum: [derivative_drop, pressure_threshold]
+      pressure_model:
+        type: object
+        required: [type]
+        additionalProperties: false
+        properties:
+          type:
+            type: string
+            enum: [pkn_direct, volumetric_balance]
   apb:
     type: object
     required: [enabled, top_packer_m, leakage_enabled, venting_enabled]

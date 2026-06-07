@@ -13,6 +13,14 @@ struct PknResult {
   double fracture_volume_m3 = 0.0;
   double leakoff_volume_m3 = 0.0;
   double net_pressure_Pa = 0.0;
+  std::string pressure_model = "pkn_direct";
+  double wellbore_pressure_Pa = 0.0;
+  double fluid_compressibility_per_Pa = 0.0;
+  double balance_delta_pressure_Pa = 0.0;
+  double balance_effective_volume_increment_m3 = 0.0;
+  double balance_injected_volume_increment_m3 = 0.0;
+  double balance_fracture_volume_increment_m3 = 0.0;
+  double balance_leakoff_volume_increment_m3 = 0.0;
   double initial_annular_volume_per_radian_m3 = 0.0;
   double initial_annular_volume_m3 = 0.0;
   double annular_outer_radius_m = 0.0;
@@ -33,6 +41,12 @@ struct PknResult {
   std::vector<double> net_pressure_series_Pa;
   std::vector<double> leakoff_volume_series_m3;
   std::vector<double> fracture_volume_series_m3;
+  std::vector<double> wellbore_pressure_series_Pa;
+  std::vector<double> balance_delta_pressure_series_Pa;
+  std::vector<double> balance_effective_volume_increment_series_m3;
+  std::vector<double> balance_injected_volume_increment_series_m3;
+  std::vector<double> balance_fracture_volume_increment_series_m3;
+  std::vector<double> balance_leakoff_volume_increment_series_m3;
 };
 
 }  // namespace lss::lot
