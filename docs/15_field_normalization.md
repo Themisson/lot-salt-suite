@@ -285,3 +285,24 @@ Modern net_pressure_Pa — lot-sim, semantic equivalence not confirmed
 Esses rotulos sao deliberadamente conservadores: `pw_Pa` legado e
 `net_pressure_Pa` moderno podem ter semanticas diferentes. A fase nao valida
 fisica de LOT, nao valida equivalencia numerica e nao abre o gate de Level 1.
+
+## Fase 10.17A — normalização de campos para balanço volumétrico
+
+**Status:** `BALANCE_AUDIT_COMPLETE_OPTIONAL_MODE_ALLOWED`.
+
+A auditoria 10.17A preserva a distinção entre:
+
+| Campo | Origem | Status de comparação |
+|---|---|---|
+| `pw_Pa` | Legado `pi + dP` | Pressão de poço/anular do balanço legado. |
+| `dP` | Legado `APB1da` | Incremento do balanço volumétrico legado. |
+| `Vq` | Legado `flowRate(...)` | Volume injetado, com convenção geométrica legada. |
+| `Vi` | Legado `0.5*(R_outer^2-R_inner^2)*L` | Volume anular de referência. |
+| `k` | Legado `Fluid::kt` | Compressibilidade do fluido. |
+| `net_pressure_Pa` | Moderno `PknResult` | Pressão líquida PKN, não equivalente a `pw_Pa`. |
+| `initial_annular_volume_m3` | Moderno `result.json` | Disponível como diagnóstico desde a Fase 10.16. |
+| `FluidData.compressibility_per_Pa` | Moderno `CaseData` | Disponível no parser, ainda não usado no `PknModel` direto. |
+
+O próximo campo moderno permitido por esta normalização é uma série separada
+`wellbore_pressure_Pa` em modo opt-in. Ela deve ser tratada como diagnóstico de
+balanço, não como substituição automática de `net_pressure_Pa`.

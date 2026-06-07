@@ -1019,3 +1019,37 @@ Essa etapa continua diagnostica. O `PknModel` nao usa volume anular para
 alterar `net_pressure_Pa`, e `pw_Pa` legado continua sem equivalencia semantica
 declarada com `net_pressure_Pa` moderno. Portanto, a comparacao segue sem
 validar pressao, abertura de fratura, dano, ruptura ou estado tensional.
+
+---
+
+## Fase 10.17A — gate para balanço volumétrico opcional
+
+**Status:** `IMPLEMENTATION_ALLOWED_OPTIONAL_BALANCE_MODE`.
+
+A auditoria 10.17A registra que a divergência mais importante para comparação
+de pressão LOT_Tese versus moderno é estrutural:
+
+```text
+LOT_Tese:
+  pw = pi + dP
+  dP vem de balanço Vq, Vi, k, dV e dV_leakoff
+
+Moderno atual:
+  net_pressure_Pa = E' * w / h
+  sem uso de Vi ou k no cálculo da pressão PKN
+```
+
+O artefato:
+
+```text
+tests/fixtures/comparison/phase10_17_balance_audit.json
+```
+
+classifica `annular_volume`, `compressibility` e `wellbore_pressure` como
+lacunas do modelo moderno direto para fins de comparação de pressão. O gate
+permite implementar uma rota opcional `volumetric_balance`, mas não permite:
+
+- mudar o default `pkn_direct`;
+- comparar `pw_Pa` com `net_pressure_Pa` como equivalentes;
+- declarar validação física de fratura;
+- promover Level 1 para equivalência quantitativa.

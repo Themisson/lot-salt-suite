@@ -57,6 +57,36 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.17A — auditoria de balanço volumétrico LOT — Codex
+
+**Status:** Implementada nesta sessao, aguardando commit/push conforme politica da fase.
+
+**Classificacao:** `IMPLEMENTATION_ALLOWED_OPTIONAL_BALANCE_MODE`.
+
+**Objetivo:** Auditar a diferenca entre o balanço volumetrico legado do
+`LOT_Tese` e a pressao direta PKN moderna antes de criar qualquer modo novo.
+
+**Evidencia legada:**
+- `APB1da(..., LOT=true, idQ=6, Q=0.5, t_no_injection=9.5)` define o
+  carregamento BUZ67D PKN.
+- `Conv_bbmin_m3min(Q)` converte a vazao com convencao interna por radiano.
+- `Vi = 0.5 * (R_outer^2 - R_inner^2) * thickness` entra no balanço.
+- `Fluid::kt` vem de `setPFluid(..., 6.40E-10)`.
+- `AssemblyFML` usa termos proporcionais a `Vq/Vi/k` e `dV/Vi/k`.
+- `calculateLOTFracturedSaltRock()` usa `pw = pi + dP` e `pw > sigmaTheta`.
+
+**Evidencia moderna:**
+- `PknModel` calcula `net_pressure_Pa = E' * w / h`.
+- `FluidData.compressibility_per_Pa` e volume anular estao disponiveis, mas nao
+  participam da pressao PKN direta.
+
+**Artefato:** `tests/fixtures/comparison/phase10_17_balance_audit.json`.
+
+**Gate:** permitido implementar modo opcional `volumetric_balance`, preservando
+`pkn_direct` como default e sem declarar validacao fisica.
+
+---
+
 ### [2026-06-07] Fase 10.16 — volume anular BUZ67D com drill pipe — Codex
 
 **Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.

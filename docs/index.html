@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">54/61</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">55/62</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -757,6 +757,131 @@ breakdown.</p>
 </table>
 <h2 id="convencao-de-sinais">Convenção de sinais</h2>
 <p>Compressao positiva, conforme FA03 em <code>docs/08_known_issues.md</code>.</p>
+<hr />
+<h2 id="auditoria-de-balanco-volumetrico-lot-fase-1017a">Auditoria de balanço volumétrico LOT — Fase 10.17A</h2>
+<p><strong>Status:</strong> <code>IMPLEMENTATION_ALLOWED_OPTIONAL_BALANCE_MODE</code>.</p>
+<p>A Fase 10.17A auditou a diferença estrutural entre o LOT legado da tese e o
+caminho moderno <code>lot-pkn</code>. A conclusão é que o legado calcula pressão de poço
+por um balanço volumétrico anular, enquanto o moderno atual calcula apenas a
+pressão líquida PKN direta:</p>
+<pre><code class="language-text">p_net = E' * w / h
+</code></pre>
+<p>Essa diferença é suficiente para justificar uma rota moderna opcional, mas não
+autoriza mudar o default runtime nem declarar validação física.</p>
+<p>Artefato rastreável:</p>
+<pre><code class="language-text">tests/fixtures/comparison/phase10_17_balance_audit.json
+</code></pre>
+<h3 id="evidencias-do-lot_tese">Evidências do LOT_Tese</h3>
+<table>
+<thead>
+<tr>
+<th>Conceito</th>
+<th>Evidência legada</th>
+<th>Interpretação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Taxa de injeção</td>
+<td><code>APB1da(..., LOT=true, idQ=6, Q=0.5, t_no_injection=9.5)</code></td>
+<td>Caso BUZ67D PKN injeta <code>0.5 bbl/min</code> no contrato legado.</td>
+</tr>
+<tr>
+<td>Conversão de vazão</td>
+<td><code>Conv_bbmin_m3min(Q) = Q * 0.158987 / pi / 2</code></td>
+<td>Convenção interna por radiano; algumas saídas são reescaladas por <code>2*pi</code>.</td>
+</tr>
+<tr>
+<td>Volume anular</td>
+<td><code>Vi = 0.5 * (R_outer^2 - R_inner^2) * thickness</code></td>
+<td>O volume de referência participa do balanço de pressão.</td>
+</tr>
+<tr>
+<td>Compressibilidade</td>
+<td><code>setPFluid(11.5, 8E-4, 6.40E-10)</code></td>
+<td>O fluido carrega <code>k = 6.40e-10 1/Pa</code>.</td>
+</tr>
+<tr>
+<td>Balanço de pressão</td>
+<td>Termos proporcionais a <code>(Vq/Vi)/k</code> e <code>-(dV/Vi)/k</code> em <code>AssemblyFML</code></td>
+<td>A pressão <code>dP</code> é resolvida pelo balanço volumétrico anular.</td>
+</tr>
+<tr>
+<td>Pressão de poço</td>
+<td><code>pw = pi + dP</code></td>
+<td><code>pw</code> não é <code>p_net</code> PKN.</td>
+</tr>
+<tr>
+<td>Fratura/leakoff</td>
+<td><code>if (pw &gt; sigmaTheta)</code> e cálculo PKN de <code>dV_leakoff</code></td>
+<td>A abertura entra como acomodação volumétrica após o critério legado.</td>
+</tr>
+<tr>
+<td>No-injection/shut-in</td>
+<td><code>t_no_injection</code> e <code>Vq = flowRate(tend)</code> após <code>t &gt; tend</code></td>
+<td>O legado mantém volume injetado final durante a fase sem injeção.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="estado-moderno-auditado">Estado moderno auditado</h3>
+<table>
+<thead>
+<tr>
+<th>Conceito</th>
+<th>Estado moderno</th>
+<th>Lacuna</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Taxa de injeção</td>
+<td><code>CaseParser</code> converte <code>lot.injection.rate</code> para <code>m3/s</code>.</td>
+<td>Disponível.</td>
+</tr>
+<tr>
+<td>Volume injetado</td>
+<td><code>PknModel</code> usa <code>V_inj = Q * t_ativo</code>.</td>
+<td>Disponível.</td>
+</tr>
+<tr>
+<td>Volume anular</td>
+<td>Fase 10.16 exporta <code>initial_annular_volume_*</code> em <code>result.json</code>.</td>
+<td>Exportado, mas ainda não usado no cálculo de pressão PKN.</td>
+</tr>
+<tr>
+<td>Compressibilidade</td>
+<td><code>FluidData.compressibility_per_Pa</code> é parseado.</td>
+<td>Disponível, mas ainda não usado pelo <code>PknModel</code>.</td>
+</tr>
+<tr>
+<td>Pressão direta</td>
+<td><code>PknResult.net_pressure_series_Pa</code> armazena <code>p_net</code>.</td>
+<td>Não representa <code>pw = pi + dP</code>.</td>
+</tr>
+<tr>
+<td>Pressão de poço/anular</td>
+<td>Não há série moderna explícita de <code>wellbore_pressure_Pa</code>.</td>
+<td>Ausente no resultado atual.</td>
+</tr>
+<tr>
+<td>Fratura/leakoff</td>
+<td>Séries de volume de fratura e leakoff existem.</td>
+<td>Podem alimentar diagnóstico opcional de balanço, sem validar física.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="gate-da-fase-1017a">Gate da Fase 10.17A</h3>
+<p>O gate da auditoria é:</p>
+<pre><code class="language-text">IMPLEMENTATION_ALLOWED_OPTIONAL_BALANCE_MODE
+</code></pre>
+<p>Isto significa:</p>
+<ul>
+<li>pode ser criado um modo opcional <code>volumetric_balance</code>;</li>
+<li>o default moderno deve continuar <code>pkn_direct</code>;</li>
+<li><code>net_pressure_Pa</code> não deve ser reclassificado como <code>pw</code>;</li>
+<li>campos de pressão de poço/balanço devem ser exportados separadamente;</li>
+<li>a rota continua diagnóstica até haver validação física independente.</li>
+</ul>
 </div>
 </section>
 
@@ -1587,6 +1712,27 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 </tr>
 </tbody>
 </table>
+<h2 id="r11-lotpkn-moderno-nao-resolve-balanco-volumetrico-anular-legado">R11 — LOT/PKN moderno não resolve balanço volumétrico anular legado</h2>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado na Fase 10.17A</p>
+<p>A auditoria da Fase 10.17A confirmou que o caminho legado <code>LOT_Tese</code> calcula
+pressão de poço/anular por balanço volumétrico envolvendo volume injetado
+<code>Vq</code>, volume anular <code>Vi</code>, compressibilidade do fluido <code>k</code>, variação de volume
+<code>dV</code> e, após abertura, termo de leakoff/fratura. O critério legado usa:</p>
+<pre><code class="language-text">pw = pi + dP
+opened = pw &gt; sigmaTheta
+</code></pre>
+<p>O caminho moderno <code>lot-pkn</code> atual calcula:</p>
+<pre><code class="language-text">p_net = E' * w / h
+</code></pre>
+<p>e não usa volume anular nem compressibilidade do fluido para resolver uma
+série de pressão de poço. A Fase 10.16 passou a exportar volume anular
+diagnóstico, mas essa informação ainda não participa da pressão PKN.</p>
+<p><strong>Impacto:</strong> Comparações diretas entre <code>pw_Pa</code> legado e
+<code>net_pressure_Pa</code> moderno continuam semanticamente bloqueadas.</p>
+<p><strong>Mitigação permitida:</strong> criar um modo moderno opcional
+<code>volumetric_balance</code>, sem alterar o default <code>pkn_direct</code>, exportando campos
+separados de <code>wellbore_pressure_Pa</code> e diagnóstico de balanço. Essa mitigação
+é diagnóstica e não constitui validação física de fratura.</p>
 <h2 id="r08-unidade-de-dt-coerente-com-a-taxa-de-fluencia-lot_apb_v5-usa-h">R08 — Unidade de <code>dt</code>: coerente com a taxa de fluência; LOT_APB_v5 usa [h]</h2>
 <p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado em 2026-06-01</p>
 <p>Arquivos auditados:

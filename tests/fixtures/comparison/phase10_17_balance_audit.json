@@ -1,0 +1,156 @@
+{
+  "phase": "10.17A",
+  "title": "Volumetric balance audit: legacy LOT_Tese vs modern LOT/PKN",
+  "status": "AUDIT_COMPLETE",
+  "physical_validation": false,
+  "implementation_performed": false,
+  "implementation_gate": "IMPLEMENTATION_ALLOWED_OPTIONAL_BALANCE_MODE",
+  "legacy_lot_tese": {
+    "case": "8-BUZ-67D-RJS-VISCO-pkn.cpp",
+    "source_files": [
+      "legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp",
+      "legance/LOT_Tese/include/apb_code/APB1da.h",
+      "legance/LOT_Tese/src/apb_code/APB1da.cpp",
+      "legance/LOT_Tese/include/apb_code/Fluids.h",
+      "legance/LOT_Tese/src/apb_code/Fluids.cpp"
+    ],
+    "injection": {
+      "status": "EXTRACTED",
+      "constructor": "APB1da simulation(0.5, 0.1, 1E-8, 12.5, 0, false, true, 6, 0.5, 9.5)",
+      "dt_min": 0.5,
+      "tend_min": 12.5,
+      "t_no_injection_min": 9.5,
+      "idQ": 6,
+      "Q_raw_bbl_min": 0.5,
+      "conversion": "Conv_bbmin_m3min(Q) = Q * 0.158987 / M_PI / 2",
+      "accumulated_volume": "flowRate(t) accumulates injected volume; after tend the LOT no-injection interval holds Vq at flowRate(tend)"
+    },
+    "annular_volume": {
+      "status": "EXTRACTED",
+      "formula": "Vi = 0.5 * (R_outer^2 - R_inner^2) * thickness",
+      "geometry_convention": "per-radian internally; output scales selected volume fields by 2*pi"
+    },
+    "compressibility": {
+      "status": "EXTRACTED",
+      "source": "vfluids[0]->setPFluid(11.5, 8E-4, 6.40E-10)",
+      "fluid_compressibility_per_Pa": 6.4e-10
+    },
+    "pressure_balance": {
+      "status": "EXTRACTED",
+      "variables": [
+        "Vq",
+        "Vi",
+        "k",
+        "dV",
+        "dP"
+      ],
+      "equation_role": "AssemblyFML includes volumetric terms proportional to (Vq/Vi)/k and -(dV/Vi)/k",
+      "wellbore_pressure": "pw = pi + dP in calculateLOTFracturedSaltRock(...)"
+    },
+    "fracture_and_leakoff": {
+      "status": "EXTRACTED",
+      "criterion": "pw > sigmaTheta",
+      "pkn_branch": "calculates PKN width/length and stores dV_leakoff as fracture/leakoff accommodation volume"
+    },
+    "shutin_or_no_injection": {
+      "status": "EXTRACTED",
+      "field": "t_no_injection",
+      "behavior": "after injection duration, Vq is kept at the final injected volume while the simulation continues"
+    }
+  },
+  "modern_lot_pkn": {
+    "source_files": [
+      "include/core/types.hpp",
+      "src/io/CaseParser.cpp",
+      "include/lot/PknInput.hpp",
+      "src/lot/PknRunner.cpp",
+      "src/lot/PknModel.cpp",
+      "include/lot/PknResult.hpp",
+      "src/io/ResultWriter.cpp"
+    ],
+    "injection": {
+      "status": "EXTRACTED",
+      "parser": "lot.injection.rate is converted to m3/s",
+      "model": "PknModel uses injected_volume_m3 = rate_m3_s * active_time_s"
+    },
+    "annular_volume": {
+      "status": "PARTIALLY_AVAILABLE",
+      "case_data_available": true,
+      "exported_in_result_json": true,
+      "used_in_pressure_calculation": false
+    },
+    "compressibility": {
+      "status": "PARTIALLY_AVAILABLE",
+      "field": "FluidData.compressibility_per_Pa",
+      "parsed": true,
+      "used_in_pressure_calculation": false
+    },
+    "pressure_model": {
+      "status": "DIRECT_PKN_ONLY",
+      "current_formula": "p_net = E_prime * w / h",
+      "uses_annular_volume": false,
+      "uses_fluid_compressibility": false,
+      "exports_wellbore_pressure": false
+    },
+    "fracture_and_leakoff": {
+      "status": "AVAILABLE_AS_PKN_SERIES",
+      "series": [
+        "injected_volume_series_m3",
+        "fracture_volume_series_m3",
+        "leakoff_volume_series_m3",
+        "net_pressure_series_Pa"
+      ],
+      "note": "The direct PKN route does not solve the legacy annular pressure residual."
+    }
+  },
+  "comparison_findings": [
+    {
+      "topic": "injection_rate",
+      "legacy": "Q and idQ converted by ConvflowRate()",
+      "modern": "lot.injection.rate converted by CaseParser",
+      "classification": "AVAILABLE_BOTH"
+    },
+    {
+      "topic": "annular_volume",
+      "legacy": "Vi is part of pressure residual",
+      "modern": "initial annular volume is derived/exported but not used by PknModel pressure",
+      "classification": "MISSING_IN_MODERN_PRESSURE_MODEL"
+    },
+    {
+      "topic": "compressibility",
+      "legacy": "fluid k participates in dP balance",
+      "modern": "FluidData.compressibility_per_Pa is parsed but unused by PknModel pressure",
+      "classification": "MISSING_IN_MODERN_PRESSURE_MODEL"
+    },
+    {
+      "topic": "wellbore_pressure",
+      "legacy": "pw = pi + dP",
+      "modern": "only p_net is exported by the direct PKN path",
+      "classification": "MISSING_EXPLICIT_MODERN_OUTPUT"
+    },
+    {
+      "topic": "post_fracture_volume",
+      "legacy": "dV_leakoff is included in volume balance/export",
+      "modern": "fracture and leakoff volumes are available as PKN series",
+      "classification": "AVAILABLE_FOR_OPTIONAL_BALANCE_DIAGNOSTIC"
+    },
+    {
+      "topic": "runtime_default",
+      "legacy": "volumetric APB/LOT residual controls dP",
+      "modern": "pkn_direct controls net pressure",
+      "classification": "DO_NOT_CHANGE_DEFAULT"
+    }
+  ],
+  "gate_conclusion": {
+    "modern_lacks_annular_volumetric_pressure_balance": true,
+    "modern_has_required_inputs_for_optional_balance": true,
+    "recommended_action": "Add optional volumetric_balance pressure model while preserving pkn_direct as default",
+    "gate": "IMPLEMENTATION_ALLOWED_OPTIONAL_BALANCE_MODE",
+    "constraints": [
+      "No change to legacy files",
+      "No change to default pkn_direct behavior",
+      "No physical validation claim",
+      "Export balance diagnostics separately from net_pressure_Pa"
+    ]
+  }
+}

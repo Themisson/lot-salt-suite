@@ -173,3 +173,68 @@ O detector `derivative_drop` opera em series sintéticas `time_s`,
 ## Convenção de sinais
 
 Compressao positiva, conforme FA03 em `docs/08_known_issues.md`.
+
+---
+
+## Auditoria de balanço volumétrico LOT — Fase 10.17A
+
+**Status:** `IMPLEMENTATION_ALLOWED_OPTIONAL_BALANCE_MODE`.
+
+A Fase 10.17A auditou a diferença estrutural entre o LOT legado da tese e o
+caminho moderno `lot-pkn`. A conclusão é que o legado calcula pressão de poço
+por um balanço volumétrico anular, enquanto o moderno atual calcula apenas a
+pressão líquida PKN direta:
+
+```text
+p_net = E' * w / h
+```
+
+Essa diferença é suficiente para justificar uma rota moderna opcional, mas não
+autoriza mudar o default runtime nem declarar validação física.
+
+Artefato rastreável:
+
+```text
+tests/fixtures/comparison/phase10_17_balance_audit.json
+```
+
+### Evidências do LOT_Tese
+
+| Conceito | Evidência legada | Interpretação |
+|---|---|---|
+| Taxa de injeção | `APB1da(..., LOT=true, idQ=6, Q=0.5, t_no_injection=9.5)` | Caso BUZ67D PKN injeta `0.5 bbl/min` no contrato legado. |
+| Conversão de vazão | `Conv_bbmin_m3min(Q) = Q * 0.158987 / pi / 2` | Convenção interna por radiano; algumas saídas são reescaladas por `2*pi`. |
+| Volume anular | `Vi = 0.5 * (R_outer^2 - R_inner^2) * thickness` | O volume de referência participa do balanço de pressão. |
+| Compressibilidade | `setPFluid(11.5, 8E-4, 6.40E-10)` | O fluido carrega `k = 6.40e-10 1/Pa`. |
+| Balanço de pressão | Termos proporcionais a `(Vq/Vi)/k` e `-(dV/Vi)/k` em `AssemblyFML` | A pressão `dP` é resolvida pelo balanço volumétrico anular. |
+| Pressão de poço | `pw = pi + dP` | `pw` não é `p_net` PKN. |
+| Fratura/leakoff | `if (pw > sigmaTheta)` e cálculo PKN de `dV_leakoff` | A abertura entra como acomodação volumétrica após o critério legado. |
+| No-injection/shut-in | `t_no_injection` e `Vq = flowRate(tend)` após `t > tend` | O legado mantém volume injetado final durante a fase sem injeção. |
+
+### Estado moderno auditado
+
+| Conceito | Estado moderno | Lacuna |
+|---|---|---|
+| Taxa de injeção | `CaseParser` converte `lot.injection.rate` para `m3/s`. | Disponível. |
+| Volume injetado | `PknModel` usa `V_inj = Q * t_ativo`. | Disponível. |
+| Volume anular | Fase 10.16 exporta `initial_annular_volume_*` em `result.json`. | Exportado, mas ainda não usado no cálculo de pressão PKN. |
+| Compressibilidade | `FluidData.compressibility_per_Pa` é parseado. | Disponível, mas ainda não usado pelo `PknModel`. |
+| Pressão direta | `PknResult.net_pressure_series_Pa` armazena `p_net`. | Não representa `pw = pi + dP`. |
+| Pressão de poço/anular | Não há série moderna explícita de `wellbore_pressure_Pa`. | Ausente no resultado atual. |
+| Fratura/leakoff | Séries de volume de fratura e leakoff existem. | Podem alimentar diagnóstico opcional de balanço, sem validar física. |
+
+### Gate da Fase 10.17A
+
+O gate da auditoria é:
+
+```text
+IMPLEMENTATION_ALLOWED_OPTIONAL_BALANCE_MODE
+```
+
+Isto significa:
+
+- pode ser criado um modo opcional `volumetric_balance`;
+- o default moderno deve continuar `pkn_direct`;
+- `net_pressure_Pa` não deve ser reclassificado como `pw`;
+- campos de pressão de poço/balanço devem ser exportados separadamente;
+- a rota continua diagnóstica até haver validação física independente.

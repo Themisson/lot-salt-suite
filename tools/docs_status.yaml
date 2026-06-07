@@ -68,6 +68,7 @@ phases:
   phase_10_15a_level1_structural_diagnostic: completed
   phase_10_15b_legacy_audit_visual_diagnostic: completed
   phase_10_16_drillpipe_annular_volume: completed
+  phase_10_17a_volumetric_balance_audit: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started

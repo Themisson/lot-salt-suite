@@ -184,6 +184,38 @@ de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativ
 | H07 | Viscosidade fluido LOT | 3.0 cP | `8-BUZ-67D-*.cpp` | Parser converte cP → Pa·s |
 | H08 | Geometria LOT | `"elliptical"` | `8-BUZ-67D-*.cpp` | YAML `lot.fracture.geometry` |
 
+## R11 — LOT/PKN moderno não resolve balanço volumétrico anular legado
+
+**Severidade:** Alta | **Status:** Confirmado na Fase 10.17A
+
+A auditoria da Fase 10.17A confirmou que o caminho legado `LOT_Tese` calcula
+pressão de poço/anular por balanço volumétrico envolvendo volume injetado
+`Vq`, volume anular `Vi`, compressibilidade do fluido `k`, variação de volume
+`dV` e, após abertura, termo de leakoff/fratura. O critério legado usa:
+
+```text
+pw = pi + dP
+opened = pw > sigmaTheta
+```
+
+O caminho moderno `lot-pkn` atual calcula:
+
+```text
+p_net = E' * w / h
+```
+
+e não usa volume anular nem compressibilidade do fluido para resolver uma
+série de pressão de poço. A Fase 10.16 passou a exportar volume anular
+diagnóstico, mas essa informação ainda não participa da pressão PKN.
+
+**Impacto:** Comparações diretas entre `pw_Pa` legado e
+`net_pressure_Pa` moderno continuam semanticamente bloqueadas.
+
+**Mitigação permitida:** criar um modo moderno opcional
+`volumetric_balance`, sem alterar o default `pkn_direct`, exportando campos
+separados de `wellbore_pressure_Pa` e diagnóstico de balanço. Essa mitigação
+é diagnóstica e não constitui validação física de fratura.
+
 ## R08 — Unidade de `dt`: coerente com a taxa de fluência; LOT_APB_v5 usa [h]
 
 **Severidade:** Alta | **Status:** Confirmado em 2026-06-01
