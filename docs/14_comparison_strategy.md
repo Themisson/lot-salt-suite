@@ -1053,6 +1053,18 @@ BUZ67D, mas ainda não transforma Level 1 em validação física. A equivalênci
 com `pw = pi + dP` segue pendente de revisão humana, normalização de pressão
 inicial e entendimento do termo pós-fratura legado.
 
+## Fase 10.17C — planejamento antes de novos mecanismos
+
+A próxima evolução não deve avançar diretamente para validação física. A Fase
+10.17C registra em `docs/16_future_features.md` os contratos futuros de:
+
+- agenda operacional com acomodação;
+- shut-in/no-injection com volume injetado constante;
+- modelo de fluido Zamora moderno em `fluids/`.
+
+Esses itens permanecem planejados. Nenhum deles altera o comparador Level 1,
+o `PknModel`, o parser runtime ou os casos padrão nesta fase.
+
 ---
 
 ## Fase 10.17A — gate para balanço volumétrico opcional

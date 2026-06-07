@@ -305,3 +305,7 @@ Assim, `net_pressure_Pa` continua sendo a pressão líquida PKN, enquanto
 `wellbore_pressure_Pa` representa a rota diagnóstica de balanço volumétrico. A
 Fase 10.17B não valida fisicamente `wellbore_pressure_Pa` contra o legado; ela
 apenas cria uma alternativa controlada para análise comparativa futura.
+
+O planejamento de acomodação operacional, shut-in/no-injection e fluido Zamora
+fica registrado em `docs/16_future_features.md` como Fase 10.17C. Esses itens
+não foram conectados ao runtime nesta fase.

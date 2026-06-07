@@ -111,6 +111,31 @@ fratura ou equivalencia fisica com `pw = pi + dP` legado.
 
 ---
 
+### [2026-06-07] Fase 10.17C — plano de acomodação, shut-in e Zamora — Codex
+
+**Status:** Implementada como planejamento documental, aguardando commit/push
+conforme politica da fase.
+
+**Classificacao:** `PLANNED_NO_RUNTIME_CHANGE`.
+
+**Objetivo:** Registrar os proximos contratos antes de implementar mecanismos
+que mudam a fisica operacional do LOT.
+
+**Planejado:**
+- `OperationSchedule` com fases `accommodation`, `injection` e `shutin`.
+- Shut-in/no-injection como volume injetado constante apos o fim da injecao.
+- Interface futura `FluidModel` em C++.
+- `ZamoraFluidModel` experimental e opt-in apos auditoria dedicada de unidades.
+
+**Evidencia read-only:** `LOT_APB_v5` contem `Zamora`,
+`Zamora_Coefficients`, `setZamora*`, `attZamora*` e getters por profundidade
+para densidade, pressao, compressibilidade e expansao termica.
+
+**Restricao:** nenhum runtime, parser, caso YAML padrao ou codigo legado foi
+alterado por esta fase.
+
+---
+
 ### [2026-06-07] Fase 10.16 — volume anular BUZ67D com drill pipe — Codex
 
 **Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.

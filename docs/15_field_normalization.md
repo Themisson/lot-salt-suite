@@ -334,3 +334,22 @@ Campos:
 O campo `net_pressure_Pa` não foi renomeado nem reclassificado. Comparações
 legado-moderno que usem `wellbore_pressure_Pa` devem registrar explicitamente
 que estão usando a rota `volumetric_balance`, não a pressão PKN direta.
+
+## Fase 10.17C — campos ainda planejados
+
+Campos futuros de acomodação, shut-in e Zamora permanecem fora do contrato
+normalizado atual. Antes de comparar ou exportar esses dados, uma fase futura
+deve definir:
+
+- `operation_phase`;
+- `phase_elapsed_time_s`;
+- `injection_active`;
+- `shutin_active`;
+- `fluid_model`;
+- `fluid_density_kg_m3`;
+- `fluid_compressibility_per_Pa`;
+- `fluid_thermal_expansion_per_K`;
+- `fluid_state_source`.
+
+Até lá, a comparação Level 1 continua restrita aos campos já exportados e
+documentados.
