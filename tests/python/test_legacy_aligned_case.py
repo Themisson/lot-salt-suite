@@ -124,6 +124,7 @@ def test_level1_gate_updated() -> None:
         assert gate["status"] in {
             "LEVEL1_CONTROLLED_EQUIVALENT_CASE_CREATED_RUN_PENDING",
             "LEVEL1_STRUCTURAL_DIAGNOSTIC_COMPLETE",
+            "LEVEL1B_LEGACY_AUDIT_VISUAL_DIAGNOSTIC_COMPLETE",
         }
         assert gate["case_equivalence"]["status"] == "CONTROLLED_EQUIVALENT"
     else:

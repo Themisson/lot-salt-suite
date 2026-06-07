@@ -1,18 +1,22 @@
 {
-  "phase": "10.15A",
-  "status": "LEVEL1_STRUCTURAL_DIAGNOSTIC_COMPLETE",
+  "phase": "10.15B",
+  "status": "LEVEL1B_LEGACY_AUDIT_VISUAL_DIAGNOSTIC_COMPLETE",
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,
   "structural_diagnostic": true,
   "run_completed": true,
   "plots_generated": true,
+  "legacy_audit_run_completed": true,
+  "volume_pressure_diagnostic_generated": true,
   "awaiting_human_review": true,
   "controlled_case": "cases/validation/buz67d_pkn_legacy_aligned.yaml",
   "run_output_dir": "results/comparison/level1_buz67d/modern",
   "comparison_output_dir": "results/comparison/level1_buz67d",
+  "legacy_audit_output_dir": "results/comparison/level1_buz67d/legacy_audit",
   "summary_csv": "results/comparison/level1_buz67d/level1_summary.csv",
   "metadata_json": "results/comparison/level1_buz67d/level1_metadata.json",
+  "level1b_metadata_json": "results/comparison/level1_buz67d/level1b_metadata.json",
   "time_unit": {
     "status": "RESOLVED_MINUTES_AUTHOR_CONTEXT",
     "legacy_unit": "min",
@@ -69,6 +73,25 @@
       "results/comparison/level1_buz67d/fields_availability.png"
     ]
   },
+  "legacy_audit_visual_diagnostic": {
+    "status": "DIAGNOSTIC_ONLY_NO_PHYSICAL_VALIDATION",
+    "legacy_compiled": true,
+    "legacy_run_completed": true,
+    "legacy_instrumented": true,
+    "legacy_instrumentation_committable": false,
+    "legacy_audit_patch": "results/comparison/level1_buz67d/legacy_audit/legacy_audit.patch",
+    "legacy_audit_csv": "results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv",
+    "legacy_audit_stdout": "results/comparison/level1_buz67d/legacy_audit/legacy_audit_stdout.txt",
+    "injected_volume_vs_pressure_csv": "results/comparison/level1_buz67d/injected_volume_vs_pressure.csv",
+    "injected_volume_vs_pressure_png": "results/comparison/level1_buz67d/injected_volume_vs_pressure.png",
+    "pressure_vs_time_diagnostic_png": "results/comparison/level1_buz67d/pressure_vs_time_diagnostic.png",
+    "annular_volume_comparison_csv": "results/comparison/level1_buz67d/annular_volume_comparison.csv",
+    "annular_volume_comparison_status": "BLOCKED_MISSING_VOLUME",
+    "pressure_semantic_equivalence": false,
+    "legacy_time_max_s_observed": 1320.0,
+    "modern_time_max_s_observed": 750.0,
+    "legacy_full_run_includes_no_injection_phase": true
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",
@@ -101,6 +124,8 @@
   "caveats": [
     "The time unit is resolved by direct author context, not by a unit declaration in the legacy .dat file.",
     "The controlled YAML was run and diagnostic outputs were generated under results/comparison/level1_buz67d, which must not be versioned.",
+    "The Phase 10.15B legacy audit run generated visual diagnostics under results/comparison/level1_buz67d, which must not be versioned.",
+    "Legacy pw_Pa and modern net_pressure_Pa may differ semantically.",
     "The gate does not validate pressure, fracture opening, damage, rupture or stress equivalence.",
     "The gate does not compare tensor fields or hoop-state classifications."
   ]

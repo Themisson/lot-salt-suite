@@ -20,8 +20,8 @@ def test_level1_gate_file_exists_and_is_parseable() -> None:
     assert GATE_PATH.exists()
     data = load_gate()
 
-    assert data["phase"] == "10.15A"
-    assert data["status"] == "LEVEL1_STRUCTURAL_DIAGNOSTIC_COMPLETE"
+    assert data["phase"] == "10.15B"
+    assert data["status"] == "LEVEL1B_LEGACY_AUDIT_VISUAL_DIAGNOSTIC_COMPLETE"
 
 
 def test_time_unit_is_resolved_as_minutes_by_author_context() -> None:
@@ -58,9 +58,24 @@ def test_level1_numeric_and_physical_validation_remain_closed() -> None:
     assert data["numeric_equivalence"] is False
     assert data["structural_diagnostic"] is True
     assert data["run_completed"] is True
+    assert data["legacy_audit_run_completed"] is True
+    assert data["volume_pressure_diagnostic_generated"] is True
     assert data["awaiting_human_review"] is True
     assert data["case_equivalence"]["status"] == "CONTROLLED_EQUIVALENT"
     assert data["controlled_case"] == "cases/validation/buz67d_pkn_legacy_aligned.yaml"
+
+
+def test_level1b_legacy_audit_visual_diagnostic_remains_non_validating() -> None:
+    data = load_gate()
+    diagnostic = data["legacy_audit_visual_diagnostic"]
+
+    assert diagnostic["status"] == "DIAGNOSTIC_ONLY_NO_PHYSICAL_VALIDATION"
+    assert diagnostic["legacy_compiled"] is True
+    assert diagnostic["legacy_run_completed"] is True
+    assert diagnostic["legacy_instrumented"] is True
+    assert diagnostic["legacy_instrumentation_committable"] is False
+    assert diagnostic["pressure_semantic_equivalence"] is False
+    assert diagnostic["annular_volume_comparison_status"] == "BLOCKED_MISSING_VOLUME"
 
 
 def test_blocked_items_preserve_level1_evidence_gate() -> None:

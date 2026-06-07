@@ -186,3 +186,51 @@ awaiting_human_review = true
 
 As imagens em `results/comparison/level1_buz67d/` sao diagnosticas e nao devem
 ser versionadas.
+
+## Fase 10.15B — diagnostico visual com execucao legada auditada
+
+**Status:** `LEVEL1B_LEGACY_AUDIT_VISUAL_DIAGNOSTIC_COMPLETE`.
+
+A Fase 10.15B adiciona uma execucao auditada do `LOT_Tese` com instrumentacao
+temporaria e nao comitavel. A instrumentacao exporta valores ja calculados pelo
+legado para:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+```
+
+Campos exportados:
+
+| Campo | Origem | Normalizacao |
+|---|---|---|
+| `time_min` | `ttime`/`timeResults` legado | mantido em minutos |
+| `time_s` | `time_min` | `time_min * 60` |
+| `pw_Pa` | `pi + dP` | Pa, sem equivalencia com `net_pressure_Pa` |
+| `injected_volume_m3` | `Vq * 2*pi` | derivado de vazao auditada |
+| `Q_raw` | `Q` legado | mantido como valor hard-coded |
+| `Q_SI_m3_per_min` | `ConvflowRate() * 2*pi` | m3/min |
+| `initial_annular_volume_m3` | `Vi * 2*pi` | derivado da geometria legada |
+| `dP` | `results[lu].dP` | Pa, incremento legado |
+| `sigmaTheta_Pa` | nao exportado nesta fase | vazio |
+
+Os graficos gerados sao diagnosticos:
+
+```text
+injected_volume_vs_pressure.png
+pressure_vs_time_diagnostic.png
+```
+
+`annular_volume_comparison.png` permanece bloqueado porque o resultado moderno
+nao exporta `initial_annular_volume_m3`. O CSV correspondente registra o
+status `BLOCKED_MISSING_VOLUME`.
+
+A comparacao visual usa os rotulos:
+
+```text
+Legacy pw_Pa — LOT_Tese audit run
+Modern net_pressure_Pa — lot-sim, semantic equivalence not confirmed
+```
+
+Esses rotulos sao deliberadamente conservadores: `pw_Pa` legado e
+`net_pressure_Pa` moderno podem ter semanticas diferentes. A fase nao valida
+fisica de LOT, nao valida equivalencia numerica e nao abre o gate de Level 1.

@@ -854,3 +854,108 @@ awaiting_human_review = true
 
 A proxima decisao deve ser uma revisao humana dos graficos antes de planejar
 Level 2 ou investigar divergencias.
+
+---
+
+## Diagnostico visual com execucao legada auditada (Fase 10.15B)
+
+**Status:** `LEVEL1B_LEGACY_AUDIT_VISUAL_DIAGNOSTIC_COMPLETE`.
+
+A Fase 10.15B executa uma instrumentacao temporaria e nao comitavel em
+`legance/LOT_Tese/` para exportar valores ja calculados pelo legado. Toda
+linha adicionada na instrumentacao contem o marcador:
+
+```cpp
+// AUDIT: Phase 10.15B
+```
+
+A instrumentacao nao altera equacoes, parametros fisicos, conversoes de
+unidade, convencoes de sinal, `dt`, tempo total, vazao, geometria ou criterios
+de parada. O patch usado na execucao fica registrado em:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/legacy_audit.patch
+```
+
+Saidas geradas:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_metadata.json
+results/comparison/level1_buz67d/legacy_audit/legacy_audit_stdout.txt
+results/comparison/level1_buz67d/injected_volume_vs_pressure.csv
+results/comparison/level1_buz67d/injected_volume_vs_pressure.png
+results/comparison/level1_buz67d/pressure_vs_time_diagnostic.png
+results/comparison/level1_buz67d/annular_volume_comparison.csv
+results/comparison/level1_buz67d/level1b_metadata.json
+```
+
+O grafico volume injetado x pressao usa:
+
+```text
+X legado: injected_volume_m3
+Y legado: pw_Pa
+X moderno: injected_volume_m3
+Y moderno: net_pressure_Pa
+```
+
+Rotulos:
+
+```text
+Legacy pw_Pa — LOT_Tese audit run
+Modern net_pressure_Pa — lot-sim, semantic equivalence not confirmed
+```
+
+Titulo:
+
+```text
+LOT Diagnostic — Injected Volume vs Pressure — BUZ-67D-PKN
+```
+
+Nota:
+
+```text
+DIAGNOSTIC ONLY — pw_Pa and net_pressure_Pa may differ semantically
+```
+
+O grafico pressao x tempo usa os mesmos rotulos de pressao e a nota:
+
+```text
+DIAGNOSTIC ONLY — not physical validation
+```
+
+Resumo observado:
+
+| Metrica | Legado auditado | Moderno controlado | Status |
+|---|---:|---:|---|
+| Linhas brutas | 900 | 26 | diagnostico apenas |
+| Tempos agregados | 45 | 26 | diagnostico apenas |
+| Faixa temporal | `0..1320 s` | `0..750 s` | nao equivalente |
+| Pressao | `pw_Pa` | `net_pressure_Pa` | sem equivalencia semantica |
+| Volume inicial anular | derivado da geometria legada | nao exportado | bloqueado |
+
+O legado auditado vai ate `1320 s` porque o caso hard-coded inclui a fase sem
+injecao (`t_no_injection = 9.5 min`). O caso moderno controlado permanece no
+horizonte de injecao `0..750 s`.
+
+O arquivo `annular_volume_comparison.csv` registra:
+
+```text
+annular_volume_comparison_status = BLOCKED_MISSING_VOLUME
+```
+
+porque o moderno `result.json` nao exporta `initial_annular_volume_m3`. O
+grafico `annular_volume_comparison.png` e omitido ate que esse campo exista ou
+ate que uma regra de derivacao moderna seja formalizada.
+
+Esta fase nao declara validacao fisica, equivalencia numerica ou equivalencia
+semantica entre `pw_Pa` e `net_pressure_Pa`. Tambem nao compara `sigmaTheta`,
+`margin`, `opened`, `hoop_state`, dano, ruptura ou tensores. O gate permanece:
+
+```text
+level1_ready = false
+physical_validation = false
+numeric_equivalence = false
+pressure_semantic_equivalence = false
+awaiting_human_review = true
+```

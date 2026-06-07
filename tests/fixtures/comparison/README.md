@@ -90,3 +90,35 @@ modern:   26 records, 26 time steps, 0..750 s, mean dt = 30 s
 This is still structural/diagnostic only. `legacy dP` is not declared
 equivalent to `modern net_pressure_Pa`, and no `sigmaTheta`, `pw`, `margin`,
 `opened`, damage or fracture validation is performed.
+
+## Legacy audit visual diagnostic -- Phase 10.15B
+
+Phase 10.15B temporarily instruments `legance/LOT_Tese/` for an audit run only.
+The instrumentation is not committable and is preserved only as:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/legacy_audit.patch
+```
+
+Generated outputs include:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_metadata.json
+results/comparison/level1_buz67d/legacy_audit/legacy_audit_stdout.txt
+results/comparison/level1_buz67d/injected_volume_vs_pressure.csv
+results/comparison/level1_buz67d/injected_volume_vs_pressure.png
+results/comparison/level1_buz67d/pressure_vs_time_diagnostic.png
+results/comparison/level1_buz67d/annular_volume_comparison.csv
+results/comparison/level1_buz67d/level1b_metadata.json
+```
+
+The audit labels the pressure curves as `Legacy pw_Pa -- LOT_Tese audit run`
+and `Modern net_pressure_Pa -- lot-sim, semantic equivalence not confirmed`.
+This is still diagnostic only: it does not validate physical equivalence, does
+not validate numerical equivalence, and keeps `level1_ready = false`.
+
+The legacy audit run spans `0..1320 s` because the hard-coded case includes the
+no-injection phase. The modern controlled case spans `0..750 s`. The annular
+volume comparison is currently blocked because the modern `result.json` does
+not export `initial_annular_volume_m3`.

@@ -57,6 +57,69 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.15B — audit run visual legado-moderno — Codex
+
+**Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
+
+**Classificacao:** `LEVEL1B_LEGACY_AUDIT_VISUAL_DIAGNOSTIC_COMPLETE`.
+
+**Objetivo:** Instrumentar temporariamente `legance/LOT_Tese/` apenas para
+auditoria, executar o caso BUZ-67D PKN legado, exportar `pw_Pa` e volume
+injetado ja calculados pelo legado, e gerar diagnosticos visuais contra a saida
+moderna controlada sem declarar validacao fisica.
+
+**Instrumentacao legada:** temporaria, nao comitavel, restaurada ao final.
+O patch usado na execucao foi salvo em:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/legacy_audit.patch
+```
+
+**Arquivos legados temporariamente instrumentados:**
+- `legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp` — redirecionamento de
+  output para `results/comparison/...`, desativacao de chamada Python/pause.
+- `legance/LOT_Tese/src/apb_code/APB1da.cpp` — export CSV auditado em
+  `saveFile`, com valores ja calculados: `time_min`, `time_s`, `pw_Pa`,
+  `injected_volume_m3`, `Q_raw`, `Q_SI_m3_per_min`,
+  `initial_annular_volume_m3`, `dP`.
+
+**Execucao legada auditada:**
+- Build: `g++ 16.1.0`, flags `-std=c++17 -w -fpermissive`.
+- Binario local: `results/comparison/level1_buz67d/legacy_audit/lot_tese_pkn_audit.exe`.
+- Stdout: `results/comparison/level1_buz67d/legacy_audit/legacy_audit_stdout.txt`.
+- CSV auditado: `results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv`.
+- Linhas auditadas: `900`.
+- Tempos agregados: `45`.
+- Faixa temporal legada auditada: `0..1320 s`, incluindo fase sem injecao.
+
+**Diagnosticos gerados:**
+- `results/comparison/level1_buz67d/injected_volume_vs_pressure.csv`.
+- `results/comparison/level1_buz67d/injected_volume_vs_pressure.png`.
+- `results/comparison/level1_buz67d/pressure_vs_time_diagnostic.png`.
+- `results/comparison/level1_buz67d/annular_volume_comparison.csv`.
+- `results/comparison/level1_buz67d/level1b_metadata.json`.
+
+**Bloqueio esperado:** `annular_volume_comparison_status =
+BLOCKED_MISSING_VOLUME`, porque o moderno `result.json` nao exporta
+`initial_annular_volume_m3`.
+
+**Gate atualizado:** `tests/fixtures/comparison/level1_readiness_gate.json`
+permanece com:
+
+```text
+level1_ready = false
+physical_validation = false
+numeric_equivalence = false
+pressure_semantic_equivalence = false
+awaiting_human_review = true
+```
+
+**Caveat central:** `Legacy pw_Pa` e `Modern net_pressure_Pa` podem ter
+semanticas diferentes. Esta fase e diagnostica apenas; nao valida equivalencia
+fisica, abertura de fratura, dano, ruptura, tensores ou estado tensional.
+
+---
+
 ### [2026-06-07] Fase 10.15A — diagnostico Level 1 temporal/estrutural — Codex
 
 **Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
