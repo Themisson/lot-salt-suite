@@ -57,6 +57,49 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.14C — normalizacao documental de campos legacy-modern — Codex
+
+**Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
+
+**Classificacao:** `LEVEL0_FIELD_MAPPING_DOCUMENTED_NO_PHYSICAL_VALIDATION`.
+
+**Objetivo:** Formalizar um mapeamento documental e testavel dos campos
+legacy-modern para comparacao Nível 0, sem comparacao fisica, sem equivalencia
+numerica e sem alterar runtime.
+
+**Implementacao:**
+- Criado `tests/fixtures/comparison/field_mapping_level0.json`.
+- Criado `tests/python/test_comparison_field_mapping_level0.py`.
+- Atualizado `tests/fixtures/comparison/README.md`.
+- O mapeamento registra `physical_validation = false` e
+  `numeric_equivalence = false`.
+- `Time` legado -> `time_s` moderno foi classificado como
+  `BLOCKED_UNKNOWN_UNIT`.
+- `Layer` legado foi classificado como `BLOCKED_NON_EQUIVALENT_INDEX`.
+- `dP` legado -> `net_pressure_Pa` moderno foi classificado como
+  `BLOCKED_SEMANTIC_AMBIGUITY`.
+- `sigmaTheta`, `pw`, `margin` e `opened` foram classificados como
+  `NOT_AVAILABLE_FOR_COMPARISON`.
+
+**Unidade temporal legada:**
+- `APB1da::saveFile()` escreve o bloco `Time` a partir de `ttime`.
+- `APB1da::Solve()` incrementa `t` com `t += dt` e adiciona `t` a `ttime`.
+- O `.dat` legado nao declara a unidade fisica de `ttime`.
+- O fixture legado possui `Time raw = 0.0 .. 12.5`; o fixture moderno possui
+  `time_s = 0.0 .. 420.0`.
+- Conclusao: `Legacy temporal unit remains BLOCKED_UNKNOWN_UNIT; temporal
+  numeric comparison remains suspended.`
+
+**Escopo preservado:**
+- Nao houve alteracao em C++, CMake, YAMLs, schemas, parser, `CaseData`, CLI,
+  LOT/APB, `external/saltcreep/`, `legacy/`, `legance/`, baselines ou
+  postprocess.
+
+**Proxima etapa recomendada:** Fase 10.14D — normalizacao temporal controlada
+ou bloqueio formal definitivo.
+
+---
+
 ### [2026-06-07] Fase 10.14B — comparação Nível 0 com dados reais reduzidos — Codex
 
 **Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.

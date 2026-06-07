@@ -1,0 +1,136 @@
+{
+  "phase": "10.14C",
+  "status": "LEVEL0_FIELD_MAPPING_DOCUMENTED_NO_PHYSICAL_VALIDATION",
+  "physical_validation": false,
+  "numeric_equivalence": false,
+  "temporal_comparison_status": "BLOCKED_UNKNOWN_UNIT",
+  "temporal_evidence": {
+    "legacy_dat_time_range_raw": [0.0, 12.5],
+    "modern_csv_time_range_s": [0.0, 420.0],
+    "legacy_source_observations": [
+      "APB1da::saveFile writes the Time block from APB1da::ttime.",
+      "APB1da::Solve increments t with t += dt and appends t to ttime.",
+      "The legacy .dat output does not declare the physical unit of ttime.",
+      "The migrated YAML declares total_time=12.5 min and dt=0.5 min, but the reduced modern CSV sample spans only the first 420 s."
+    ],
+    "classification_reason": "The legacy raw time can be read structurally, but an auditable unit conversion to modern time_s was not established in this phase."
+  },
+  "sources": {
+    "legacy_dat": "tests/fixtures/comparison/legacy_buz67d_sample.dat",
+    "legacy_json": "tests/fixtures/comparison/legacy_score_mro28_sample.json",
+    "modern_csv": "tests/fixtures/comparison/modern_buz67d_sample.csv"
+  },
+  "field_mappings": [
+    {
+      "legacy_source": "legacy_dat",
+      "legacy_field": "Time",
+      "legacy_unit": "unknown_raw",
+      "modern_source": "modern_csv",
+      "modern_field": "time_s",
+      "modern_unit": "s",
+      "mapping_status": "BLOCKED_UNKNOWN_UNIT",
+      "comparison_allowed": "structural_only",
+      "notes": "Legacy Time unit could not be determined auditably; do not compare numerically with modern time_s."
+    },
+    {
+      "legacy_source": "legacy_dat",
+      "legacy_field": "Layer",
+      "legacy_unit": "1_based_layer_index",
+      "modern_source": "modern_csv",
+      "modern_field": null,
+      "modern_unit": null,
+      "mapping_status": "BLOCKED_NON_EQUIVALENT_INDEX",
+      "comparison_allowed": "presence_only",
+      "notes": "Legacy Layer is not equivalent to modern wall_gp_* or any modern discretization index."
+    },
+    {
+      "legacy_source": "legacy_dat",
+      "legacy_field": "dP",
+      "legacy_unit": "unknown_or_legacy_pressure_increment",
+      "modern_source": "modern_csv",
+      "modern_field": "net_pressure_Pa",
+      "modern_unit": "Pa",
+      "mapping_status": "BLOCKED_SEMANTIC_AMBIGUITY",
+      "comparison_allowed": "presence_only",
+      "notes": "Legacy dP must not be assumed equivalent to modern net_pressure_Pa."
+    },
+    {
+      "legacy_source": "legacy_dat",
+      "legacy_field": null,
+      "legacy_unit": null,
+      "modern_source": "modern_csv",
+      "modern_field": "fracture_width_m",
+      "modern_unit": "m",
+      "mapping_status": "NOT_EXPORTED_BY_LEGACY",
+      "comparison_allowed": "modern_presence_only",
+      "notes": "Fracture width is present in modern CSV but not available in the legacy dat fixture."
+    },
+    {
+      "legacy_source": "legacy_json",
+      "legacy_field": "pressure",
+      "legacy_unit": "psi_in_v5_output",
+      "modern_source": "modern_csv",
+      "modern_field": "net_pressure_Pa",
+      "modern_unit": "Pa",
+      "mapping_status": "BLOCKED_NON_EQUIVALENT_CASE",
+      "comparison_allowed": "presence_only",
+      "notes": "The SCORE-MRO-28 JSON fixture is useful for parser structure but is not a case-equivalent pressure comparison with BUZ67D modern LOT/PKN."
+    },
+    {
+      "legacy_source": "legacy_dat",
+      "legacy_field": null,
+      "legacy_unit": null,
+      "modern_source": null,
+      "modern_field": "sigmaTheta",
+      "modern_unit": null,
+      "mapping_status": "NOT_AVAILABLE_FOR_COMPARISON",
+      "comparison_allowed": "none",
+      "notes": "sigmaTheta is not exported by the legacy fixture and must not be compared in this phase."
+    },
+    {
+      "legacy_source": "legacy_dat",
+      "legacy_field": null,
+      "legacy_unit": null,
+      "modern_source": null,
+      "modern_field": "pw",
+      "modern_unit": null,
+      "mapping_status": "NOT_AVAILABLE_FOR_COMPARISON",
+      "comparison_allowed": "none",
+      "notes": "pw is not exported by the legacy fixture and must not be compared in this phase."
+    },
+    {
+      "legacy_source": "legacy_dat",
+      "legacy_field": null,
+      "legacy_unit": null,
+      "modern_source": null,
+      "modern_field": "margin",
+      "modern_unit": null,
+      "mapping_status": "NOT_AVAILABLE_FOR_COMPARISON",
+      "comparison_allowed": "none",
+      "notes": "margin is not exported by the legacy fixture and must not be compared in this phase."
+    },
+    {
+      "legacy_source": "legacy_dat",
+      "legacy_field": null,
+      "legacy_unit": null,
+      "modern_source": null,
+      "modern_field": "opened",
+      "modern_unit": null,
+      "mapping_status": "NOT_AVAILABLE_FOR_COMPARISON",
+      "comparison_allowed": "none",
+      "notes": "opened is not exported by the legacy fixture and must not be compared in this phase."
+    }
+  ],
+  "caveats": [
+    "Legacy temporal unit remains unknown unless determined from source inspection.",
+    "Legacy Time must remain raw if unit is not auditably determined.",
+    "Legacy Time must not be compared numerically against modern time_s.",
+    "Legacy Layer is 1-based and is not equivalent to modern wall_gp_*.",
+    "Legacy dP must not be assumed equivalent to modern net_pressure_Pa.",
+    "sigmaTheta is not available for legacy-modern comparison.",
+    "pw is not available for legacy-modern comparison.",
+    "margin is not available for legacy-modern comparison.",
+    "opened is not available for legacy-modern comparison.",
+    "This phase is structural/documental only and performs no physical validation."
+  ]
+}

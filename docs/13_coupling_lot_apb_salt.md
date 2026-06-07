@@ -1653,6 +1653,23 @@ amostras e caveats obrigatorios. Ela nao compara `sigmaTheta`, `pw`, `margin`,
 `opened`, `hoop_state`, `j2`, von Mises, dano ou fratura, e nao declara
 validacao fisica legado-moderno.
 
+## Normalizacao documental de campos legado-moderno (Fase 10.14C)
+
+A Fase 10.14C adiciona `tests/fixtures/comparison/field_mapping_level0.json`
+como contrato documental testavel para os campos de comparacao Nível 0. Essa
+fase nao altera `coupling/`, nao altera o bridge, nao altera o driver
+sigma-theta e nao cria validacao fisica LOT/APB/sal.
+
+A unidade temporal do `Time` legado permanece classificada como
+`BLOCKED_UNKNOWN_UNIT`: o valor deve continuar raw e nao deve ser comparado
+numericamente contra `time_s` moderno. `Layer` legado permanece um indice
+1-based nao equivalente a `wall_gp_*`, e `dP` legado permanece semanticamente
+ambíguo frente a `net_pressure_Pa`.
+
+Os campos `sigmaTheta`, `pw`, `margin` e `opened` seguem fora da comparacao
+legacy-modern ate que existam exportacoes auditaveis nos dois lados. Portanto,
+esta normalizacao e documental/estrutural e nao valida o acoplamento fisico.
+
 ## Interface proposta para coupling/
 
 ```cpp

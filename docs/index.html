@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">48/55</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">49/56</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -4092,6 +4092,19 @@ estruturais pequenas para testar o contrato Nível 0.</p>
 amostras e caveats obrigatorios. Ela nao compara <code>sigmaTheta</code>, <code>pw</code>, <code>margin</code>,
 <code>opened</code>, <code>hoop_state</code>, <code>j2</code>, von Mises, dano ou fratura, e nao declara
 validacao fisica legado-moderno.</p>
+<h2 id="normalizacao-documental-de-campos-legado-moderno-fase-1014c">Normalizacao documental de campos legado-moderno (Fase 10.14C)</h2>
+<p>A Fase 10.14C adiciona <code>tests/fixtures/comparison/field_mapping_level0.json</code>
+como contrato documental testavel para os campos de comparacao Nível 0. Essa
+fase nao altera <code>coupling/</code>, nao altera o bridge, nao altera o driver
+sigma-theta e nao cria validacao fisica LOT/APB/sal.</p>
+<p>A unidade temporal do <code>Time</code> legado permanece classificada como
+<code>BLOCKED_UNKNOWN_UNIT</code>: o valor deve continuar raw e nao deve ser comparado
+numericamente contra <code>time_s</code> moderno. <code>Layer</code> legado permanece um indice
+1-based nao equivalente a <code>wall_gp_*</code>, e <code>dP</code> legado permanece semanticamente
+ambíguo frente a <code>net_pressure_Pa</code>.</p>
+<p>Os campos <code>sigmaTheta</code>, <code>pw</code>, <code>margin</code> e <code>opened</code> seguem fora da comparacao
+legacy-modern ate que existam exportacoes auditaveis nos dois lados. Portanto,
+esta normalizacao e documental/estrutural e nao valida o acoplamento fisico.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {

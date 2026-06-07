@@ -584,3 +584,67 @@ Nao ha validacao fisica nesta fase. Mesmo com dados reais reduzidos, a
 comparacao nao usa `sigmaTheta`, `pw`, `margin`, `opened`, `hoop_state`, `j2`,
 von Mises, dano ou fratura como equivalencia fisica. A unidade temporal legada
 continua desconhecida e `Layer` legado continua nao equivalente a `wall_gp_*`.
+
+---
+
+## Level 0 field mapping (Fase 10.14C)
+
+**Status:** `LEVEL0_FIELD_MAPPING_DOCUMENTED_NO_PHYSICAL_VALIDATION`.
+
+A Fase 10.14C cria um artefato documental versionado em:
+
+```text
+tests/fixtures/comparison/field_mapping_level0.json
+```
+
+Esse arquivo nao e uma ferramenta de comparacao fisica. Ele registra, em
+formato testavel, quais campos podem ser vistos apenas como presenca estrutural
+e quais permanecem bloqueados para qualquer equivalencia numerica.
+
+### Unidade temporal legada
+
+A investigacao em modo leitura encontrou que `APB1da::saveFile()` escreve o
+bloco `Time` do `.dat` a partir de `APB1da::ttime`, enquanto `APB1da::Solve()`
+incrementa `t` por `t += dt` e armazena esse valor em `ttime`. O arquivo `.dat`
+nao declara a unidade fisica de `ttime`.
+
+O fixture legado reduzido tem:
+
+```text
+Time raw: 0.0 .. 12.5
+```
+
+O fixture moderno reduzido tem:
+
+```text
+time_s: 0.0 .. 420.0
+```
+
+Embora o YAML migrado registre `total_time = 12.5 min` e `dt = 0.5 min`, o
+recorte moderno cobre apenas as primeiras linhas da saida moderna, e a unidade
+do `Time` legado nao foi determinada de forma auditavel nesta fase. Portanto:
+
+```text
+temporal_comparison_status: BLOCKED_UNKNOWN_UNIT
+legacy Time remains raw and non-normalized
+legacy Time must not be compared numerically against modern time_s
+temporal comparison remains suspended beyond structural range checks
+```
+
+### Mapeamentos bloqueados ou presenciais
+
+- `Time` legado -> `time_s` moderno: `BLOCKED_UNKNOWN_UNIT`,
+  `structural_only`.
+- `Layer` legado -> indice moderno: `BLOCKED_NON_EQUIVALENT_INDEX`,
+  `presence_only`; `Layer` 1-based nao equivale a `wall_gp_*`.
+- `dP` legado -> `net_pressure_Pa` moderno:
+  `BLOCKED_SEMANTIC_AMBIGUITY`, `presence_only`; `dP` nao deve ser assumido
+  como pressao liquida PKN moderna.
+- `fracture_width_m` moderno: `NOT_EXPORTED_BY_LEGACY`,
+  `modern_presence_only`.
+- `sigmaTheta`, `pw`, `margin` e `opened`:
+  `NOT_AVAILABLE_FOR_COMPARISON`, `comparison_allowed = none`.
+
+Esta fase continua documental/estrutural. Ela nao valida acoplamento fisico,
+nao compara tensoes, nao compara abertura/fratura, nao compara dano e nao
+estabelece correlacao quantitativa entre pressao legada e campos modernos.
