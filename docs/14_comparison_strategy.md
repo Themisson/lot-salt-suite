@@ -456,6 +456,11 @@ continua restrita a sanidade estrutural. Ela nao processa os arquivos reais
 grandes em `legance/LOT_Tese/results/`, nao escreve em `results/` e nao tenta
 validar comportamento fisico.
 
+A comparacao Nível 0 verifica apenas compatibilidade estrutural minima entre
+saidas legadas e modernas. Esta etapa nao valida equivalencia fisica, nao
+compara campos tensoriais e nao estabelece correlacao quantitativa entre
+pressao, abertura de fratura, dano, ruptura ou estado tensional.
+
 O teste `tests/python/test_compare_legacy_modern_level0.py` cria, em diretorio
 temporario, quatro artefatos minimos:
 

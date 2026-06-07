@@ -98,6 +98,8 @@ com a Fase 10.14A ou em commit dedicado de testes de validacao.
 
 **Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
 
+**Classificacao:** `LEVEL0_STRUCTURAL_CONTRACT_ESTABLISHED_NO_PHYSICAL_VALIDATION`.
+
 **Objetivo:** Criar a primeira comparacao executavel legado-moderno em Nível 0,
 limitada a sanidade estrutural e baseada somente em fixtures temporarios. A
 fase valida o contrato antes de uma ferramenta real e nao processa outputs
