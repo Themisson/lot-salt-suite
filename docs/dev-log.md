@@ -57,6 +57,57 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.12B — extrator read-only de outputs legados — Codex
+
+**Status:** Implementado nesta sessao, sem commit/push por instrucao da fase.
+
+**Objetivo:** Criar uma ferramenta nao-runtime em `tools/` para extrair campos
+ja exportados por outputs legados do `LOT_Tese` e do `LOT_APB_v5`, sem
+instrumentar `legance/`, sem executar o legado e sem comparar numericamente com
+o diagnostico sigma-theta moderno.
+
+**Implementacao:**
+- Criado `tools/extract_legacy_lot_outputs.py`.
+- Criado `tests/python/test_extract_legacy_lot_outputs.py` com fixtures
+  minimos temporarios para `.dat` do `LOT_Tese`, JSON do `LOT_APB_v5`,
+  `Momento da quebra`, entrada por diretorio e metadados.
+- A ferramenta aceita arquivos ou diretorios em `--input` e escreve em
+  `--output-dir`:
+  - `legacy_points.csv`;
+  - `legacy_summary.csv`;
+  - `legacy_metadata.json`.
+- Para `.dat`, o parser expande blocos `Time`/`Layer`/campo/matriz e preserva
+  `time_raw`; a unidade temporal permanece `unknown`.
+- Para JSON v5, o parser extrai pressoes, volumes, vazamentos e deslocamentos
+  quando presentes, convertendo `psi -> Pa` com `1 psi = 6894.757293168 Pa`.
+- `pw`, `sigmaTheta`, `margin` e `opened` sao marcados como ausentes sem
+  instrumentacao.
+
+**Escopo preservado:**
+- Nao houve alteracao em C++, CMake, parser, `CaseData`, CLI, YAMLs, schemas,
+  LOT/APB, `ResultWriter`, `apps/lot-sim.cpp`, `legance/`, `legacy/`,
+  `external/saltcreep/`, baselines ou postprocess.
+
+**Testes e verificacoes executados:**
+- `python -m pytest tests/python/test_extract_legacy_lot_outputs.py`: 5/5
+  passaram.
+- `python -m unittest discover -s tests\python`: 8/8 passaram.
+- Extracao real `legance/LOT_Tese/results`: 54 inputs processados,
+  8.855.768 registros em `results/legacy_extract/LOT_Tese`.
+- Extracao real `legance/LOT_APB_v5/SCORE-MRO-28_output.json`: 1 input
+  processado, 297 registros em
+  `results/legacy_extract/LOT_APB_v5_SCORE_MRO_28_sample`.
+- Validacoes `lot-sim validate` passaram para os tres casos LOT/PKN principais.
+- `lot-sim run --mode lot-pkn` passou para os tres casos LOT/PKN principais.
+- `python tools/generate_docs_index.py` executado.
+- `git diff --check` passou com aviso CRLF conhecido em `docs/dev-log.md`.
+- Escopo protegido verificado vazio.
+
+**Resultado:** Implementado e validado localmente nesta sessao, aguardando
+revisao/commit.
+
+---
+
 ### [2026-06-04] Fase 10.11B — mapeamento `LOT_Tese` para sigma-theta moderno — Codex
 
 **Status:** Documentacao/formulacao concluida nesta sessao, sem commit/push por

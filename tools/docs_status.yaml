@@ -57,6 +57,7 @@ phases:
   phase_10_9b_sigma_theta_diagnostic_writer: completed
   phase_10_10_sigma_theta_scenario_matrix_export: completed
   phase_10_11b_lot_tese_sigma_theta_mapping: completed
+  phase_10_12b_legacy_lot_output_extractor: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started

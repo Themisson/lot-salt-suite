@@ -1487,6 +1487,105 @@ Antes de qualquer comparacao com `LOT_Tese`, ficam registradas as lacunas:
 - Comparacao numerica direta exigira extractor legado, instrumentacao
   controlada ou comparacao limitada aos campos ja exportados.
 
+## Extrator read-only de outputs legados (Fase 10.12B)
+
+A Fase 10.12B cria uma ferramenta nao-runtime em
+`tools/extract_legacy_lot_outputs.py` para ler outputs existentes do
+`LOT_Tese` e do `LOT_APB_v5` sem modificar `legance/`, sem instrumentar o
+legado e sem conectar nada ao CLI moderno. A ferramenta materializa uma
+representacao intermediaria para comparacao futura, mas nao compara
+numericamente com o diagnostico sigma-theta moderno nesta fase.
+
+O extrator aceita arquivos individuais ou diretorios:
+
+```text
+python tools/extract_legacy_lot_outputs.py --input legance/LOT_Tese/results/8-BUZ-67D-PKN.dat --output-dir results/legacy_extract/8-BUZ-67D-PKN
+python tools/extract_legacy_lot_outputs.py --input legance/LOT_Tese/results --output-dir results/legacy_extract/LOT_Tese
+```
+
+A saida e sempre composta por:
+
+```text
+legacy_points.csv
+legacy_summary.csv
+legacy_metadata.json
+```
+
+Para arquivos `.dat` do `LOT_Tese`, o parser le os blocos textuais exportados
+por `APB1da::saveFile(...)`:
+
+```text
+Time
+Layer
+dT
+dP
+dV
+u
+Compressibilidade
+C_Exp
+Vq
+dV_leakoff
+V_outflow
+Momento da quebra
+```
+
+O formato legado e tratado como matriz por bloco: cada `Layer` ativa o indice
+1-based da camada, o campo seguinte define o tipo de registro e as linhas
+seguintes sao expandidas contra a serie `Time`. A unidade de tempo permanece
+`unknown` quando nao for inequívoca; por isso `time_s` nao e inferido para
+`.dat` nesta fase. `Momento da quebra` e preservado como escalar bruto.
+
+Para JSONs do `LOT_APB_v5`, o extrator le `annuli[*].results_by_time[*]` de
+forma tolerante e extrai, quando presentes:
+
+```text
+pressure.start
+pressure.final
+pressure.diff
+pressure.APB
+volume.start
+volume.final
+volume.diff
+vented_bbl
+leakage_bbl
+leakage_mass
+salt_displacement
+```
+
+As pressoes do `LOT_APB_v5` sao interpretadas como psi e convertidas para Pa
+com:
+
+```text
+1 psi = 6894.757293168 Pa
+```
+
+O `legacy_metadata.json` registra os grupos de campos:
+
+```text
+directly_comparable:
+  Time, Layer, dP, dV, dV_leakoff, V_outflow
+
+requires_transformation:
+  Time -> time_s
+  Layer -> layer_id/depth mapping
+  pressure psi -> Pa
+  dV_leakoff -> metric only, not opened
+
+missing_without_instrumentation:
+  pw, sigmaTheta, margin, opened, hoop_state, j2, von_mises
+```
+
+Os campos `pw`, `sigmaTheta`, `margin` e `opened` continuam ausentes nos
+outputs existentes e sao marcados como nao disponiveis no resumo. O extrator
+nao tenta reconstruir `pw = pi + dP`, nao calcula `sigmaTheta`, nao calcula
+`margin` e nao infere `opened`. Essa decisao evita transformar um artefato de
+auditoria em uma instrumentacao fisica implícita.
+
+Esta fase tambem nao altera `ResultWriter`, `apps/lot-sim.cpp`, parser,
+`CaseData`, YAMLs, schemas, LOT/APB, `external/saltcreep/`, `legacy/`,
+`legance/`, baselines ou postprocess. A saida e intermediaria e serve apenas
+como preparacao para uma comparacao futura controlada.
+
 ## Interface proposta para coupling/
 
 ```cpp

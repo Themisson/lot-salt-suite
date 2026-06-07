@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">43/50</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">44/51</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -3965,6 +3965,82 @@ nao exporta diretamente esses campos no arquivo <code>.dat</code> principal iden
 <li>Comparacao numerica direta exigira extractor legado, instrumentacao
   controlada ou comparacao limitada aos campos ja exportados.</li>
 </ul>
+<h2 id="extrator-read-only-de-outputs-legados-fase-1012b">Extrator read-only de outputs legados (Fase 10.12B)</h2>
+<p>A Fase 10.12B cria uma ferramenta nao-runtime em
+<code>tools/extract_legacy_lot_outputs.py</code> para ler outputs existentes do
+<code>LOT_Tese</code> e do <code>LOT_APB_v5</code> sem modificar <code>legance/</code>, sem instrumentar o
+legado e sem conectar nada ao CLI moderno. A ferramenta materializa uma
+representacao intermediaria para comparacao futura, mas nao compara
+numericamente com o diagnostico sigma-theta moderno nesta fase.</p>
+<p>O extrator aceita arquivos individuais ou diretorios:</p>
+<pre><code class="language-text">python tools/extract_legacy_lot_outputs.py --input legance/LOT_Tese/results/8-BUZ-67D-PKN.dat --output-dir results/legacy_extract/8-BUZ-67D-PKN
+python tools/extract_legacy_lot_outputs.py --input legance/LOT_Tese/results --output-dir results/legacy_extract/LOT_Tese
+</code></pre>
+<p>A saida e sempre composta por:</p>
+<pre><code class="language-text">legacy_points.csv
+legacy_summary.csv
+legacy_metadata.json
+</code></pre>
+<p>Para arquivos <code>.dat</code> do <code>LOT_Tese</code>, o parser le os blocos textuais exportados
+por <code>APB1da::saveFile(...)</code>:</p>
+<pre><code class="language-text">Time
+Layer
+dT
+dP
+dV
+u
+Compressibilidade
+C_Exp
+Vq
+dV_leakoff
+V_outflow
+Momento da quebra
+</code></pre>
+<p>O formato legado e tratado como matriz por bloco: cada <code>Layer</code> ativa o indice
+1-based da camada, o campo seguinte define o tipo de registro e as linhas
+seguintes sao expandidas contra a serie <code>Time</code>. A unidade de tempo permanece
+<code>unknown</code> quando nao for inequívoca; por isso <code>time_s</code> nao e inferido para
+<code>.dat</code> nesta fase. <code>Momento da quebra</code> e preservado como escalar bruto.</p>
+<p>Para JSONs do <code>LOT_APB_v5</code>, o extrator le <code>annuli[*].results_by_time[*]</code> de
+forma tolerante e extrai, quando presentes:</p>
+<pre><code class="language-text">pressure.start
+pressure.final
+pressure.diff
+pressure.APB
+volume.start
+volume.final
+volume.diff
+vented_bbl
+leakage_bbl
+leakage_mass
+salt_displacement
+</code></pre>
+<p>As pressoes do <code>LOT_APB_v5</code> sao interpretadas como psi e convertidas para Pa
+com:</p>
+<pre><code class="language-text">1 psi = 6894.757293168 Pa
+</code></pre>
+<p>O <code>legacy_metadata.json</code> registra os grupos de campos:</p>
+<pre><code class="language-text">directly_comparable:
+  Time, Layer, dP, dV, dV_leakoff, V_outflow
+
+requires_transformation:
+  Time -&gt; time_s
+  Layer -&gt; layer_id/depth mapping
+  pressure psi -&gt; Pa
+  dV_leakoff -&gt; metric only, not opened
+
+missing_without_instrumentation:
+  pw, sigmaTheta, margin, opened, hoop_state, j2, von_mises
+</code></pre>
+<p>Os campos <code>pw</code>, <code>sigmaTheta</code>, <code>margin</code> e <code>opened</code> continuam ausentes nos
+outputs existentes e sao marcados como nao disponiveis no resumo. O extrator
+nao tenta reconstruir <code>pw = pi + dP</code>, nao calcula <code>sigmaTheta</code>, nao calcula
+<code>margin</code> e nao infere <code>opened</code>. Essa decisao evita transformar um artefato de
+auditoria em uma instrumentacao fisica implícita.</p>
+<p>Esta fase tambem nao altera <code>ResultWriter</code>, <code>apps/lot-sim.cpp</code>, parser,
+<code>CaseData</code>, YAMLs, schemas, LOT/APB, <code>external/saltcreep/</code>, <code>legacy/</code>,
+<code>legance/</code>, baselines ou postprocess. A saida e intermediaria e serve apenas
+como preparacao para uma comparacao futura controlada.</p>
 <h2 id="interface-proposta-para-coupling">Interface proposta para coupling/</h2>
 <pre><code class="language-cpp">// include/coupling/LotApbSaltCoupling.hpp
 class LotApbSaltCoupling {
@@ -5841,7 +5917,7 @@ provado.</p>
 
   </div>
 </main>
-<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-04 por <span class="mono">generate_docs_index.py</span></footer>
+<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-07 por <span class="mono">generate_docs_index.py</span></footer>
 <script>
   const sidebar = document.getElementById('sidebar');
   const menuBtn = document.getElementById('menuBtn');
