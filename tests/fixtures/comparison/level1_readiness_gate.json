@@ -1,9 +1,10 @@
 {
-  "phase": "10.14D",
-  "status": "LEVEL1_TIME_UNIT_RESOLVED_CASE_EQUIVALENCE_PENDING",
+  "phase": "10.14EF",
+  "status": "LEVEL1_CONTROLLED_EQUIVALENT_CASE_CREATED_RUN_PENDING",
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,
+  "controlled_case": "cases/validation/buz67d_pkn_legacy_aligned.yaml",
   "time_unit": {
     "status": "RESOLVED_MINUTES_AUTHOR_CONTEXT",
     "legacy_unit": "min",
@@ -19,19 +20,27 @@
     "legacy_time_max_raw": 12.5,
     "legacy_time_min_s": 0.0,
     "legacy_time_max_s": 750.0,
-    "modern_time_min_s": 0.0,
-    "modern_time_max_s": 420.0,
-    "time_range_equivalent": false
+    "reduced_modern_fixture_time_min_s": 0.0,
+    "reduced_modern_fixture_time_max_s": 420.0,
+    "controlled_case_time_min_s": 0.0,
+    "controlled_case_time_max_s": 750.0,
+    "time_range_equivalent": true,
+    "time_range_equivalence_scope": "configured_controlled_case_only"
   },
   "case_equivalence": {
-    "status": "SIMILAR_CASE",
+    "status": "CONTROLLED_EQUIVALENT",
     "legacy_case": "legance/LOT_Tese/results/8-BUZ-67D-PKN.dat",
-    "modern_case": "cases/lot_tese_migrated/buz67d_pkn.yaml",
-    "reason": "The files share the BUZ67D PKN lineage, but fixture duration, reduced sampling and migrated-case review caveats prevent declaring SAME_CASE equivalence."
+    "modern_case": "cases/validation/buz67d_pkn_legacy_aligned.yaml",
+    "parameters_fixture": "tests/fixtures/comparison/buz67d_legacy_parameters.json",
+    "n_extracted": 29,
+    "n_inferred": 1,
+    "n_not_found": 4,
+    "n_not_applicable": 1,
+    "reason": "Essential temporal, injection, geometry, fluid, formation and PKN-identification parameters were extracted from the hard-coded legacy main. The controlled modern case is created for future run-level checks, but no run or physical equivalence is asserted in this phase."
   },
   "better_pair_search": {
-    "status": "NO_BETTER_PAIR_FOUND",
-    "reason": "Only buz67d_pkn.yaml is present under cases/lot_tese_migrated; other legacy .dat outputs do not have a clearer migrated YAML pair in this phase."
+    "status": "CONTROLLED_CASE_CREATED",
+    "reason": "A new controlled validation YAML was created instead of modifying the existing migrated BUZ67D case."
   },
   "blocked_items": [
     "sigmaTheta",
@@ -50,7 +59,8 @@
   "allowed_next_steps": [
     "Use time_s = Time_raw * 60.0 as a documented unit conversion.",
     "Build tests that assert the Level 1 gate remains closed until case equivalence evidence is added.",
-    "Search for additional metadata proving case and duration equivalence."
+    "Search for additional metadata proving case and duration equivalence.",
+    "Run the controlled legacy-aligned case in a future phase before any Level 1 result comparison."
   ],
   "forbidden_next_steps": [
     "Level 1 numeric comparison",
@@ -63,7 +73,7 @@
   ],
   "caveats": [
     "The time unit is resolved by direct author context, not by a unit declaration in the legacy .dat file.",
-    "The converted legacy fixture spans 0..750 s while the reduced modern fixture spans 0..420 s.",
+    "The controlled YAML now encodes 0..750 s, but it has not been run in this phase.",
     "The gate does not validate pressure, fracture opening, damage, rupture or stress equivalence.",
     "The gate does not compare tensor fields or hoop-state classifications."
   ]

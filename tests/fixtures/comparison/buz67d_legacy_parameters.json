@@ -1,0 +1,269 @@
+{
+  "phase": "10.14EF",
+  "case_id": "8-BUZ-67D-PKN",
+  "extraction_status": "EXTRACTED",
+  "sources_inspected": [
+    "legance/LOT_Tese/results/8-BUZ-67D-PKN.dat",
+    "legance/LOT_Tese/results/8-BUZ-67D-PKN-INC_DT_FULL.dat",
+    "tests/fixtures/comparison/legacy_buz67d_sample.dat",
+    "legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp",
+    "legance/LOT_Tese/include/apb_code/APB1da.h",
+    "legance/LOT_Tese/src/apb_code/APB1da.cpp",
+    "legance/LOT_Tese/include/apb_code/Fluids.h",
+    "legance/LOT_Tese/src/apb_code/Fluids.cpp",
+    "legance/LOT_Tese/include/apb_code/Rock.h"
+  ],
+  "parameters": {
+    "temporal": {
+      "time_unit": {
+        "value": "min",
+        "status": "EXTRACTED",
+        "source": "legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:135 states simulation in minutes; author_provided_context confirms dt, ttime and exported Time are minutes."
+      },
+      "total_time_min": {
+        "value": 12.5,
+        "status": "EXTRACTED",
+        "source": "APB1da simulation(..., tend=12.5, ...) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:137"
+      },
+      "total_time_s": {
+        "value": 750.0,
+        "status": "DERIVED",
+        "conversion": "12.5 * 60.0"
+      },
+      "dt_min": {
+        "value": 0.5,
+        "status": "EXTRACTED",
+        "source": "APB1da simulation(dt=0.5, ...) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:137"
+      },
+      "dt_s": {
+        "value": 30.0,
+        "status": "DERIVED",
+        "conversion": "0.5 * 60.0"
+      },
+      "accommodation_time_min": {
+        "value": 9.5,
+        "status": "EXTRACTED",
+        "source": "APB1da simulation(..., t_no_injection=9.5) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:137"
+      },
+      "accommodation_time_s": {
+        "value": 570.0,
+        "status": "DERIVED",
+        "conversion": "9.5 * 60.0"
+      }
+    },
+    "injection": {
+      "rate_value": {
+        "value": 0.5,
+        "status": "EXTRACTED",
+        "unit": "bbl_min_legacy_idQ6",
+        "source": "APB1da simulation(..., idQ=6, Q=0.5) and comment 'vazao de 0.5 bpm' in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:137"
+      },
+      "rate_modern_unit": {
+        "value": "bbl_min",
+        "status": "INFERRED",
+        "source": "Legacy comment states 0.5 bpm; modern migrated case already represents this as unit=bbl_min."
+      },
+      "toldP": {
+        "value": 0.1,
+        "status": "EXTRACTED",
+        "source": "APB1da simulation(..., toldP=0.1, ...) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:137"
+      },
+      "tolEq": {
+        "value": 1.0e-8,
+        "status": "EXTRACTED",
+        "source": "APB1da simulation(..., tolEq=1E-8, ...) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:137"
+      },
+      "initial_pressure_Pa": {
+        "value": 101325.0,
+        "status": "EXTRACTED",
+        "source": "Fluids(0, false, 0., profTeste, 26.66, 101325.) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:36"
+      },
+      "initial_well_volume": {
+        "value": null,
+        "status": "NOT_FOUND",
+        "source": null
+      }
+    },
+    "geometry": {
+      "total_depth_m": {
+        "value": 4374.0,
+        "status": "EXTRACTED",
+        "source": "double profTeste = 4374. in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:20"
+      },
+      "shoe_depth_m": {
+        "value": 4374.0,
+        "status": "EXTRACTED",
+        "source": "profTeste is used as LOT/simulation depth in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp"
+      },
+      "open_hole_diameter_in": {
+        "value": 13.5,
+        "status": "EXTRACTED",
+        "source": "Halite Rock(..., di=13.5, ...) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:89 and :93"
+      },
+      "production_casing_inner_diameter_in": {
+        "value": 12.376,
+        "status": "EXTRACTED",
+        "source": "Solids(..., di=12.376, de=14., ...) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:62"
+      },
+      "production_casing_outer_diameter_in": {
+        "value": 14.0,
+        "status": "EXTRACTED",
+        "source": "Solids(..., di=12.376, de=14., ...) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:62"
+      },
+      "open_well_radius_m": {
+        "value": 0.17145,
+        "status": "DERIVED",
+        "conversion": "13.5 in / 2 * 0.0254"
+      }
+    },
+    "fluid": {
+      "density_ppg": {
+        "value": 11.5,
+        "status": "EXTRACTED",
+        "source": "vfluids[0]->setPFluid(11.5, 8E-4, 6.40E-10) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:39"
+      },
+      "thermal_expansion_per_degC": {
+        "value": 0.0008,
+        "status": "EXTRACTED",
+        "source": "Fluids::setPFluid(_rho, _alpha, _kt) and vfluids[0]->setPFluid(11.5, 8E-4, 6.40E-10)"
+      },
+      "compressibility_per_Pa": {
+        "value": 6.4e-10,
+        "status": "EXTRACTED",
+        "source": "Fluids::setPFluid(_rho, _alpha, _kt) and vfluids[0]->setPFluid(11.5, 8E-4, 6.40E-10)"
+      },
+      "viscosity_cP": {
+        "value": 3.0,
+        "status": "EXTRACTED",
+        "source": "vfluids[0]->setLeakoffProps(\"pa_min\", 3., \"pkn\") in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:43"
+      },
+      "viscosity_basis": {
+        "value": "pa_min",
+        "status": "EXTRACTED",
+        "source": "vfluids[0]->setLeakoffProps(\"pa_min\", 3., \"pkn\")"
+      }
+    },
+    "formation": {
+      "salt_model": {
+        "value": "halite viscoelastic double mechanism",
+        "status": "EXTRACTED",
+        "source": "active HALITA Rock entries in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:89 and :93"
+      },
+      "salt_top_m": {
+        "value": 4356.0,
+        "status": "EXTRACTED",
+        "source": "active HALITA Rock top in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:89"
+      },
+      "salt_base_m": {
+        "value": 4374.0,
+        "status": "EXTRACTED",
+        "source": "active HALITA Rock base uses profTeste=4374. in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:93"
+      },
+      "young_modulus_Pa": {
+        "value": 20400000000.0,
+        "status": "EXTRACTED",
+        "source": "Rock(..., E=20.4E09, ...) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:89 and :93"
+      },
+      "poisson_ratio": {
+        "value": 0.36,
+        "status": "EXTRACTED",
+        "source": "Rock(..., nu=0.36, ...) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:89 and :93"
+      },
+      "rock_density_kg_m3": {
+        "value": 2200.0,
+        "status": "EXTRACTED",
+        "source": "Rock(..., sg=2200., ...) in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:89 and :93; Rock.h labels sg as overburden/geostatic density-like kg/m^2 legacy field."
+      },
+      "pore_pressure": {
+        "value": null,
+        "status": "NOT_FOUND",
+        "source": null
+      },
+      "in_situ_stress": {
+        "value": null,
+        "status": "NOT_FOUND",
+        "source": null
+      }
+    },
+    "pkn": {
+      "fracture_model": {
+        "value": "pkn",
+        "status": "EXTRACTED",
+        "source": "setLeakoffProps(\"pa_min\", 3., \"pkn\") and APB1da idTypeFracture=2 PKN path."
+      },
+      "fracture_height_m": {
+        "value": null,
+        "status": "NOT_FOUND",
+        "source": null
+      },
+      "breakdown_pressure_Pa": {
+        "value": null,
+        "status": "NOT_FOUND",
+        "source": null
+      }
+    },
+    "salt": {
+      "constitutive_model": {
+        "value": "legacy viscoelastic halite creep parameters",
+        "status": "EXTRACTED",
+        "source": "active HALITA Rock entries in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:89 and :93"
+      },
+      "e0_per_min": {
+        "value": 3.132e-8,
+        "status": "EXTRACTED",
+        "source": "5.22e-10 * 60 in active HALITA Rock entries"
+      },
+      "sig0_Pa": {
+        "value": 9920000.0,
+        "status": "EXTRACTED",
+        "source": "Rock(..., sig0=9.92e+06, ...) in active HALITA Rock entries"
+      },
+      "T0_degC": {
+        "value": 86.0,
+        "status": "EXTRACTED",
+        "source": "Rock(..., T0=86., ...) in active HALITA Rock entries"
+      },
+      "n1": {
+        "value": 3.36,
+        "status": "EXTRACTED",
+        "source": "Rock(..., n1=3.36, ...) in active HALITA Rock entries"
+      },
+      "n2": {
+        "value": 7.55,
+        "status": "EXTRACTED",
+        "source": "Rock(..., n2=7.55, ...) in active HALITA Rock entries"
+      },
+      "carnallite_candidate": {
+        "value": "commented out",
+        "status": "NOT_APPLICABLE",
+        "source": "Carnallite Rock entry is commented out in legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp:87"
+      }
+    },
+    "identification": {
+      "case_name": {
+        "value": "8-BUZ-67D-PKN",
+        "status": "EXTRACTED",
+        "source": "legacy result filename and main filename"
+      },
+      "legacy_main": {
+        "value": "legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp",
+        "status": "EXTRACTED",
+        "source": "read-only source inspection"
+      }
+    }
+  },
+  "fallbacks": [],
+  "extraction_summary": {
+    "n_extracted": 29,
+    "n_inferred": 1,
+    "n_not_found": 4,
+    "n_not_applicable": 1
+  },
+  "case_classification": "CONTROLLED_EQUIVALENT",
+  "caveats": [
+    "CONTROLLED_EQUIVALENT means essential setup fields were extracted directly from the legacy hard-coded main; it does not mean physical result equivalence is validated.",
+    "The modern YAML still uses the existing parser contract and cannot encode every legacy APB/SESTSAL detail.",
+    "Legacy dP, sigmaTheta, pw, margin and opened remain outside numerical comparison.",
+    "Fracture height and breakdown pressure were not found in the legacy main and remain modern placeholders."
+  ]
+}

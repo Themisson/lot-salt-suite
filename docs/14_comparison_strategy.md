@@ -706,3 +706,86 @@ Layer legado -> wall_gp_* moderno
 
 Assim, o proximo passo permitido e testar ou automatizar a conversao de unidade
 temporal, mantendo suspensa qualquer comparacao numerica fisica.
+
+---
+
+## Caso moderno controlado legacy-aligned (Fase 10.14EF)
+
+**Status:** `LEVEL1_CONTROLLED_EQUIVALENT_CASE_CREATED_RUN_PENDING`.
+
+A Fase 10.14EF executa duas etapas sem modificar o legado:
+
+```text
+Etapa E: extracao read-only de parametros do main legado BUZ67D/PKN.
+Etapa F: criacao de um YAML moderno controlado em cases/validation/.
+```
+
+Fontes principais inspecionadas:
+
+```text
+legance/LOT_Tese/results/8-BUZ-67D-PKN.dat
+legance/LOT_Tese/results/8-BUZ-67D-PKN-INC_DT_FULL.dat
+tests/fixtures/comparison/legacy_buz67d_sample.dat
+legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+legance/LOT_Tese/include/apb_code/APB1da.h
+legance/LOT_Tese/src/apb_code/APB1da.cpp
+legance/LOT_Tese/include/apb_code/Fluids.h
+legance/LOT_Tese/src/apb_code/Fluids.cpp
+legance/LOT_Tese/include/apb_code/Rock.h
+```
+
+Artefatos criados:
+
+```text
+tests/fixtures/comparison/buz67d_legacy_parameters.json
+cases/validation/buz67d_pkn_legacy_aligned.yaml
+tests/python/test_legacy_aligned_case.py
+```
+
+Classificacao final:
+
+```text
+CONTROLLED_EQUIVALENT
+```
+
+Essa classificacao significa que parametros essenciais de entrada foram
+extraidos diretamente do main legado hard-coded:
+
+| Grupo | Exemplos extraidos |
+|---|---|
+| Temporal | `dt = 0.5 min`, `tend = 12.5 min`, `t_no_injection = 9.5 min` |
+| Injecao | `Q = 0.5`, `idQ = 6`, comentario legado `0.5 bpm` |
+| Geometria | `profTeste = 4374 m`, casing `12.376/14 in`, open hole `13.5 in` |
+| Fluido | `density = 11.5 ppg`, `alpha = 8E-4`, `kt = 6.40E-10 Pa^-1`, `viscosity = 3 cP` |
+| Rocha/sal | halita ativa, `E = 20.4E9 Pa`, `nu = 0.36`, `sg = 2200`, `sig0 = 9.92E6 Pa` |
+| PKN | `setLeakoffProps("pa_min", 3., "pkn")` |
+
+Contagens registradas no JSON:
+
+```text
+n_extracted = 29
+n_inferred = 1
+n_not_found = 4
+n_not_applicable = 1
+```
+
+O novo YAML usa a duracao controlada:
+
+```text
+lot.injection.schedule.total_time = 12.5 min
+time.total_h = 0.2083333333
+equivalente a 750 s
+```
+
+O YAML validou com `lot-sim validate`, mas a fase nao executa `lot-sim run`
+nesse caso. Portanto, o Level 1 segue fechado:
+
+```text
+level1_ready = false
+physical_validation = false
+numeric_equivalence = false
+```
+
+Continuam bloqueadas comparacoes de `sigmaTheta`, `pw`, `margin`, `opened`,
+`hoop_state`, `j2`, von Mises, dano, fratura e equivalencia `dP` legado ->
+`net_pressure_Pa` moderno.

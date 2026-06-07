@@ -102,3 +102,52 @@ Ela nao permite:
 - comparar `sigmaTheta`, `pw`, `margin` ou `opened`;
 - declarar validacao fisica de fratura;
 - usar `hoop_state` como evidencia de equivalencia legado-moderno.
+
+## Fase 10.14EF — caso moderno controlado legacy-aligned
+
+**Status:** `LEVEL1_CONTROLLED_EQUIVALENT_CASE_CREATED_RUN_PENDING`.
+
+A Fase 10.14EF adiciona um registro de parametros extraidos em modo read-only:
+
+```text
+tests/fixtures/comparison/buz67d_legacy_parameters.json
+```
+
+e cria um novo caso moderno controlado:
+
+```text
+cases/validation/buz67d_pkn_legacy_aligned.yaml
+```
+
+O caso migrado original permanece inalterado:
+
+```text
+cases/lot_tese_migrated/buz67d_pkn.yaml
+```
+
+Classificacao:
+
+```text
+CONTROLLED_EQUIVALENT
+```
+
+Essa classificacao e limitada a parametros de entrada essenciais. Foram
+extraidos diretamente do main legado hard-coded campos temporais, injecao,
+geometria, fluido, formacao/sal e identificacao PKN. O novo YAML codifica:
+
+```text
+total_time = 12.5 min = 750 s
+dt = 0.5 min = 30 s
+```
+
+O gate Level 1 continua fechado porque a fase nao executa `lot-sim run` no caso
+novo e nao compara saidas:
+
+```text
+level1_ready = false
+physical_validation = false
+numeric_equivalence = false
+```
+
+Assim, a normalizacao avanca de `SIMILAR_CASE` para um caso controlado de
+entrada, mas ainda nao para equivalencia de resultado.

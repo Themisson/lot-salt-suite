@@ -57,6 +57,68 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.14EF — parametros legados e caso BUZ67D legacy-aligned — Codex
+
+**Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.
+
+**Classificacao:** `LEVEL1_CONTROLLED_EQUIVALENT_CASE_CREATED_RUN_PENDING`.
+
+**Objetivo:** Extrair parametros legados BUZ67D/PKN em modo read-only e criar um
+caso moderno controlado em `cases/validation/`, sem alterar o caso migrado
+existente e sem executar `lot-sim run` no caso novo.
+
+**Fontes inspecionadas:**
+- `legance/LOT_Tese/results/8-BUZ-67D-PKN.dat`.
+- `legance/LOT_Tese/results/8-BUZ-67D-PKN-INC_DT_FULL.dat`.
+- `tests/fixtures/comparison/legacy_buz67d_sample.dat`.
+- `legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp`.
+- `legance/LOT_Tese/include/apb_code/APB1da.h`.
+- `legance/LOT_Tese/src/apb_code/APB1da.cpp`.
+- `legance/LOT_Tese/include/apb_code/Fluids.h`.
+- `legance/LOT_Tese/src/apb_code/Fluids.cpp`.
+- `legance/LOT_Tese/include/apb_code/Rock.h`.
+
+**Parametros extraidos:**
+- Temporal: `dt = 0.5 min`, `tend = 12.5 min`, `t_no_injection = 9.5 min`.
+- Injecao: `Q = 0.5`, `idQ = 6`, comentario legado `0.5 bpm`.
+- Geometria: `profTeste = 4374 m`, casing `12.376/14 in`, open hole `13.5 in`.
+- Fluido: `density = 11.5 ppg`, `alpha = 8E-4`, `kt = 6.40E-10 Pa^-1`,
+  `viscosity = 3 cP`.
+- Sal/formacao: halita ativa, `E = 20.4E9 Pa`, `nu = 0.36`, `sg = 2200`,
+  `sig0 = 9.92E6 Pa`, `T0 = 86 C`, `n1 = 3.36`, `n2 = 7.55`.
+- PKN: `setLeakoffProps("pa_min", 3., "pkn")`.
+
+**Artefatos criados:**
+- `tests/fixtures/comparison/buz67d_legacy_parameters.json`.
+- `cases/validation/buz67d_pkn_legacy_aligned.yaml`.
+- `tests/python/test_legacy_aligned_case.py`.
+
+**Gate Level 1:**
+- `tests/fixtures/comparison/level1_readiness_gate.json` atualizado para
+  `LEVEL1_CONTROLLED_EQUIVALENT_CASE_CREATED_RUN_PENDING`.
+- `level1_ready = false`.
+- `physical_validation = false`.
+- `numeric_equivalence = false`.
+
+**Validacao:**
+- `lot-sim validate --case cases/validation/buz67d_pkn_legacy_aligned.yaml`
+  passou.
+- A fase nao executou `lot-sim run` no novo caso por restricao de escopo.
+
+**Escopo preservado:**
+- Nenhuma alteracao em C++, CMake, parser, `CaseData`, CLI, `src/`, `include/`,
+  `apps/`, `legance/`, `legacy/`, `external/saltcreep/`, baselines ou
+  postprocess.
+- `cases/lot_tese_migrated/buz67d_pkn.yaml`,
+  `cases/validation/lot_pkn_minimal.yaml` e
+  `cases/validation/lot_pkn_with_leakoff.yaml` permanecem inalterados.
+
+**Proxima etapa recomendada:** Fase 10.15A — executar `lot-sim run` no caso
+legacy-aligned e comparar apenas Level 1 temporal/estrutural, sem validacao
+fisica.
+
+---
+
 ### [2026-06-07] Fase 10.14D — evidence gate temporal para Level 1 — Codex
 
 **Status:** Implementada nesta sessao, sem commit/push por instrucao da fase.

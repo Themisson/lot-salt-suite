@@ -20,8 +20,8 @@ def test_level1_gate_file_exists_and_is_parseable() -> None:
     assert GATE_PATH.exists()
     data = load_gate()
 
-    assert data["phase"] == "10.14D"
-    assert data["status"] == "LEVEL1_TIME_UNIT_RESOLVED_CASE_EQUIVALENCE_PENDING"
+    assert data["phase"] == "10.14EF"
+    assert data["status"] == "LEVEL1_CONTROLLED_EQUIVALENT_CASE_CREATED_RUN_PENDING"
 
 
 def test_time_unit_is_resolved_as_minutes_by_author_context() -> None:
@@ -36,15 +36,18 @@ def test_time_unit_is_resolved_as_minutes_by_author_context() -> None:
     assert time_unit["conversion"]["factor_to_seconds"] == 60.0
 
 
-def test_converted_legacy_duration_does_not_match_reduced_modern_fixture() -> None:
+def test_converted_legacy_duration_matches_configured_controlled_case() -> None:
     data = load_gate()
     time_unit = data["time_unit"]
 
     assert time_unit["legacy_time_min_s"] == 0.0
     assert time_unit["legacy_time_max_s"] == 750.0
-    assert time_unit["modern_time_min_s"] == 0.0
-    assert time_unit["modern_time_max_s"] == 420.0
-    assert time_unit["time_range_equivalent"] is False
+    assert time_unit["reduced_modern_fixture_time_min_s"] == 0.0
+    assert time_unit["reduced_modern_fixture_time_max_s"] == 420.0
+    assert time_unit["controlled_case_time_min_s"] == 0.0
+    assert time_unit["controlled_case_time_max_s"] == 750.0
+    assert time_unit["time_range_equivalent"] is True
+    assert time_unit["time_range_equivalence_scope"] == "configured_controlled_case_only"
 
 
 def test_level1_numeric_and_physical_validation_remain_closed() -> None:
@@ -53,7 +56,8 @@ def test_level1_numeric_and_physical_validation_remain_closed() -> None:
     assert data["level1_ready"] is False
     assert data["physical_validation"] is False
     assert data["numeric_equivalence"] is False
-    assert data["case_equivalence"]["status"] == "SIMILAR_CASE"
+    assert data["case_equivalence"]["status"] == "CONTROLLED_EQUIVALENT"
+    assert data["controlled_case"] == "cases/validation/buz67d_pkn_legacy_aligned.yaml"
 
 
 def test_blocked_items_preserve_level1_evidence_gate() -> None:

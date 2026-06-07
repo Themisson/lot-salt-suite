@@ -1699,6 +1699,37 @@ Fase 10.14D nao compara `sigmaTheta`, `pw`, `margin`, `opened`, `hoop_state`,
 moderno. Tambem nao altera `coupling/`, parser, `CaseData`, CLI ou
 `lot-sim run --mode lot-pkn`.
 
+## Caso BUZ67D/PKN controlado legacy-aligned (Fase 10.14EF)
+
+A Fase 10.14EF extrai parametros legados em modo somente leitura e cria um novo
+YAML moderno controlado:
+
+```text
+cases/validation/buz67d_pkn_legacy_aligned.yaml
+```
+
+O caso original `cases/lot_tese_migrated/buz67d_pkn.yaml` nao e alterado. O
+novo YAML e classificado como `CONTROLLED_EQUIVALENT` porque tempo, injecao,
+geometria, fluido, formacao/sal e identificacao PKN foram localizados no main
+legado hard-coded `legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp`.
+
+O campo temporal usado no YAML novo e:
+
+```text
+lot.injection.schedule.total_time = 12.5 min
+time.total_h = 0.2083333333
+```
+
+equivalente a `750 s`. A fase valida o YAML com `lot-sim validate`, mas nao
+executa `lot-sim run` no caso novo e nao habilita comparacao fisica. O gate
+permanece:
+
+```text
+level1_ready = false
+physical_validation = false
+numeric_equivalence = false
+```
+
 ## Interface proposta para coupling/
 
 ```cpp

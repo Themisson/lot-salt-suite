@@ -64,6 +64,7 @@ phases:
   phase_10_14b_reduced_real_fixtures: completed
   phase_10_14c_level0_field_mapping: completed
   phase_10_14d_level1_readiness_gate: completed
+  phase_10_14ef_legacy_parameters_and_aligned_case: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -164,5 +165,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-07"
-updated_by: "codex (Fase 10.14D evidence gate temporal Level 1)"
+updated_by: "codex (Fase 10.14EF parametros legados e caso legacy-aligned)"
 project_version: "0.1.0"
