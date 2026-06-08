@@ -462,6 +462,47 @@ pressão de fratura física a partir dessa rota.
 - [x] **R09:** Fase 6.6 executou ensaio analitico controlado; mitigado para os dois PKN auditados (`idQ == 6`), ainda blocker para `idQ == 4` e regressao quantitativa ampla
 - [x] **R10:** Fase 10.16 adicionou suporte diagnostico a volume anular com drill pipe no caso controlado BUZ67D, preservando a convencao per-radian do legado
 - [x] **R13:** Fase 10.18C auditou o criterio legado de fratura por sigma tangencial e manteve a rota moderna como aproximacao opt-in por `fracture.breakdown.pressure`
+- [x] **R14:** Fase 10.18D confirmou que `sigma_theta_compression_positive_Pa`
+  existe no diagnostico moderno, mas ainda nao e fonte runtime para
+  `lot-sim run --mode lot-pkn`
+
+### R14 — Sigma-theta disponivel apenas como diagnostico
+
+**Severidade:** Alta | **Status:** Confirmado na Fase 10.18D
+
+A Fase 10.18D auditou o criterio legado:
+
+```text
+pw = pi + dP
+sigmaTheta = -getSigmaTheta()
+opened = pw > sigmaTheta
+```
+
+O moderno ja possui `sigma_theta_compression_positive_Pa`,
+`margin_Pa`, `opened` e `legacy_algebra_opened` no diagnostico sigma-theta.
+Entretanto, esses campos sao gerados pelo caminho experimental:
+
+```text
+SaltCreepTimeBridge -> SaltWallStressDiagnostics -> LotSaltSigmaThetaDiagnostic
+```
+
+e nao pelo runtime:
+
+```text
+CaseParser -> PknRunner -> PknModel -> ResultWriter
+```
+
+Portanto, `sigma_theta_compression_positive_Pa` nao deve ser usado como gatilho
+runtime de fratura no `volumetric_balance` enquanto nao houver uma fronteira
+opt-in que forneca, de forma testada, `SigmaThetaInfluenceLayer` ao calculo de
+pressao. O gate da fase e:
+
+```text
+SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY
+```
+
+Usar `first_wall_sample` ou ponto de Gauss mais proximo da parede como criterio
+fisico sem mapear a altura de influencia legada e risco de falso positivo.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

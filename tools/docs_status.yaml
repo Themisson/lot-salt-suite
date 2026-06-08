@@ -74,6 +74,7 @@ phases:
   phase_10_18a_volumetric_balance_diagnostic: completed
   phase_10_18b_initial_pressure_shutin_schedule: completed
   phase_10_18c_fracture_volume_balance_coupling: completed
+  phase_10_18d_sigma_theta_runtime_gate: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started

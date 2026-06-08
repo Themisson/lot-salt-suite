@@ -1290,3 +1290,55 @@ legado. Ela apenas estabelece o mecanismo opt-in necessário para fases futuras.
 Essa comparação é apenas diagnóstica. Ela não valida equivalência física, não
 compara `sigmaTheta`, `margin`, `opened`, dano ou ruptura, e não promove o
 Level 1 para comparação quantitativa.
+
+---
+
+## Fase 10.18D — gate sigma-theta para comparação runtime
+
+A Fase 10.18D auditou se a comparação seguinte poderia usar o diagnóstico
+sigma-theta moderno como gatilho de abertura em `volumetric_balance`.
+
+O contrato moderno já possui:
+
+```text
+sigma_theta_compression_positive_Pa
+margin_Pa
+opened
+legacy_algebra_opened
+```
+
+e a álgebra moderna preserva o critério legado:
+
+```text
+opened = pressure_Pa > sigma_theta_compression_positive_Pa
+```
+
+Para comparação com `LOT_Tese`, a pressão candidata correta seria
+`wellbore_pressure_Pa`, pois o legado usa `pw = pi + dP`. Entretanto, a
+auditoria classificou a rota como:
+
+```text
+SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY
+```
+
+Motivo: `sigma_theta_compression_positive_Pa` é produzido pelo driver
+experimental de `coupling/` a partir de `SaltCreepTimeBridge`, enquanto
+`lot-sim run --mode lot-pkn` executa apenas o caminho LOT/PKN. A fase não
+criou uma comparação 10.18D numérica nem gráficos `phase10_18d`, porque isso
+exigiria conectar sal/bridge ao runtime ou duplicar a lógica de diagnóstico.
+
+Assim, a comparação segue limitada a:
+
+- `10.18B`: pressão inicial + shut-in;
+- `10.18C`: sink volumétrico com threshold simplificado;
+- diagnósticos sigma-theta opt-in fora do runtime LOT/PKN.
+
+Uma comparação futura por sigma-theta deve primeiro criar uma rota explícita e
+testada para:
+
+```text
+CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
+         -> SigmaThetaInfluenceLayer -> volumetric_balance
+```
+
+sem tornar sigma-theta ou sal defaults globais.

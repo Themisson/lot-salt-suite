@@ -445,3 +445,63 @@ limiar abre a fratura cedo demais e faz com que praticamente todo o volume
 injetado seja consumido por `fracture_volume_m3`, mantendo a pressão moderna
 próxima de `initial_pressure_Pa`. Isso confirma o mecanismo, mas não constitui
 calibração nem equivalência física com o legado.
+
+### Gate sigma-theta para abertura de fratura — Fase 10.18D
+
+**Status:** `SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY`.
+
+A Fase 10.18D auditou se o critério legado:
+
+```text
+pw = pi + dP
+sigmaTheta = -getSigmaTheta()
+opened = pw > sigmaTheta
+```
+
+poderia substituir diretamente o placeholder
+`fracture.breakdown.pressure = 1 Pa` no modo `volumetric_balance`.
+
+O diagnóstico moderno já possui o campo:
+
+```text
+sigma_theta_compression_positive_Pa
+```
+
+e a função:
+
+```text
+evaluate_sigma_theta_breakdown_point(...)
+```
+
+que calcula:
+
+```text
+margin_Pa = pressure_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa > 0
+```
+
+Entretanto, essa rota está disponível apenas no diagnóstico experimental de
+`coupling/`, alimentado por `SaltCreepTimeBridge::wall_stress_diagnostics()`.
+O fluxo runtime `lot-sim run --mode lot-pkn` continua executando apenas:
+
+```text
+YAML -> CaseParser -> PknRunner -> PknModel -> ResultWriter
+```
+
+sem instanciar o bridge de sal, sem coletar `SaltWallStressDiagnostics` e sem
+selecionar um ponto de influência sigma-theta por profundidade.
+
+Por isso, a Fase 10.18D não conectou `sigma_theta_compression_positive_Pa` ao
+`PknModel`. Fazer isso agora exigiria redesenhar o acoplamento LOT/sal ou
+duplicar fora de `coupling/` a lógica já existente em
+`LotSaltSigmaThetaBreakdown`, o que foi explicitamente bloqueado pela fase.
+
+O modo `volumetric_balance` permanece usando somente o fallback explícito:
+
+```text
+fracture.breakdown.pressure
+```
+
+como limiar simplificado para habilitar sinks de fratura/leakoff. Casos com
+`fracture.breakdown.pressure = 0` ou sem pressão definida continuam sem abertura
+por esse critério. O default `pkn_direct` permanece inalterado.

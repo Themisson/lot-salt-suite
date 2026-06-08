@@ -181,16 +181,19 @@ unidades reais usadas no `LOT_APB_v5` antes de aceitar nomes ou dimensões.
 
 ### Ordem recomendada
 
-1. Revisar o diagnóstico 10.18C porque o desconto de
-   `fracture_volume_m3`/`leakoff_volume_m3` no balanço é apenas uma
-   aproximação por `fracture.breakdown.pressure`.
-2. Auditar se o critério legado
-   `|pi + dP| > |sigma_tangencial(altura_de_influencia)|` pode ser exposto por
-   um módulo moderno sem contaminar `PknModel` com dependências de sal/APB.
-3. Auditar a semântica de `dP` legado após abertura/leakoff.
-4. Criar `FluidModel` abstrato e `ConstantFluidModel` compatível com o estado atual.
-5. Auditar especificamente as unidades Zamora no `LOT_APB_v5`.
-6. Implementar `ZamoraFluidModel` experimental, opt-in e sem alterar defaults.
+1. Manter o diagnóstico 10.18C como rota de sink volumétrico por threshold
+   simplificado, sem declará-lo equivalente ao critério legado.
+2. Criar uma fase de arquitetura opt-in para fornecer
+   `SigmaThetaInfluenceLayer` ao balanço volumétrico sem fazer `lot/` depender
+   diretamente de `salt/` ou `coupling/`.
+3. Só depois reavaliar o critério legado
+   `|pi + dP| > |sigma_tangencial(altura_de_influencia)|` como rota runtime
+   experimental. O gate atual da Fase 10.18D é
+   `SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY`.
+4. Auditar a semântica de `dP` legado após abertura/leakoff.
+5. Criar `FluidModel` abstrato e `ConstantFluidModel` compatível com o estado atual.
+6. Auditar especificamente as unidades Zamora no `LOT_APB_v5`.
+7. Implementar `ZamoraFluidModel` experimental, opt-in e sem alterar defaults.
 
 ### Riscos
 
@@ -206,3 +209,5 @@ unidades reais usadas no `LOT_APB_v5` antes de aceitar nomes ou dimensões.
 - O critério legado por tensão tangencial não está reproduzido no `PknModel`;
   usar `fracture.breakdown.pressure` como proxy pode antecipar ou atrasar
   artificialmente o desconto de volume de fratura.
+- `sigma_theta_compression_positive_Pa` existe no diagnóstico moderno, mas
+  ainda não é fonte runtime para `lot-sim run --mode lot-pkn`.

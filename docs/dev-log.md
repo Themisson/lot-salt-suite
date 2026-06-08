@@ -57,6 +57,52 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.18D — gate sigma-theta para fratura runtime — Codex
+
+**Status:** Auditoria concluída; implementação runtime bloqueada pelo gate.
+
+**Gate:** `SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY`.
+
+**Resultado:** `sigma_theta_compression_positive_Pa` existe no diagnóstico
+moderno, mas ainda não é fonte runtime para `lot-sim run --mode lot-pkn`.
+
+**Origem confirmada:**
+
+```text
+external/saltcreep stress_utils::sigma_theta_compression_positive(sigma)
+  -> SaltWallStressDiagnostics::wall_samples
+  -> LotSaltSigmaThetaDiagnostic
+  -> SigmaThetaBreakdownPoint::sigma_theta_compression_positive_Pa
+```
+
+**Critério moderno existente:**
+
+```text
+margin_Pa = pressure_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa > 0
+```
+
+**Pressão correta para o critério legado:** `wellbore_pressure_Pa`, porque o
+legado compara `pw = pi + dP`, não `p_net`.
+
+**Bloqueio:** o runtime LOT/PKN atual executa
+`CaseParser -> PknRunner -> PknModel -> ResultWriter` sem instanciar
+`SaltCreepTimeBridge`, sem coletar `SaltWallStressDiagnostics` e sem mapear a
+altura de influência para um `wall_gp_*`.
+
+**Decisão:** não implementar `fracture.initiation.type = sigma_theta` nesta
+fase. Isso exigiria redesenho de coupling ou duplicação da álgebra de
+`LotSaltSigmaThetaBreakdown` dentro de `lot/`.
+
+**Escopo preservado:** nenhum código C++, parser, YAML, schema, `legacy/`,
+`legance/`, `external/saltcreep/`, baseline ou postprocess foi alterado.
+
+**Próxima etapa recomendada:** planejar um orquestrador opt-in que forneça
+`SigmaThetaInfluenceLayer` ao balanço volumétrico sem alterar o default
+`lot-sim run --mode lot-pkn`.
+
+---
+
 ### [2026-06-07] Fase 10.18C — fratura/leakoff no balanço volumétrico — Codex
 
 **Status:** Implementada, testada e pronta para commit/push conforme gate da fase.

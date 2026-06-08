@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">60/67</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">61/68</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -1018,6 +1018,42 @@ limiar abre a fratura cedo demais e faz com que praticamente todo o volume
 injetado seja consumido por <code>fracture_volume_m3</code>, mantendo a pressão moderna
 próxima de <code>initial_pressure_Pa</code>. Isso confirma o mecanismo, mas não constitui
 calibração nem equivalência física com o legado.</p>
+<h3 id="gate-sigma-theta-para-abertura-de-fratura-fase-1018d">Gate sigma-theta para abertura de fratura — Fase 10.18D</h3>
+<p><strong>Status:</strong> <code>SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY</code>.</p>
+<p>A Fase 10.18D auditou se o critério legado:</p>
+<pre><code class="language-text">pw = pi + dP
+sigmaTheta = -getSigmaTheta()
+opened = pw &gt; sigmaTheta
+</code></pre>
+<p>poderia substituir diretamente o placeholder
+<code>fracture.breakdown.pressure = 1 Pa</code> no modo <code>volumetric_balance</code>.</p>
+<p>O diagnóstico moderno já possui o campo:</p>
+<pre><code class="language-text">sigma_theta_compression_positive_Pa
+</code></pre>
+<p>e a função:</p>
+<pre><code class="language-text">evaluate_sigma_theta_breakdown_point(...)
+</code></pre>
+<p>que calcula:</p>
+<pre><code class="language-text">margin_Pa = pressure_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa &gt; 0
+</code></pre>
+<p>Entretanto, essa rota está disponível apenas no diagnóstico experimental de
+<code>coupling/</code>, alimentado por <code>SaltCreepTimeBridge::wall_stress_diagnostics()</code>.
+O fluxo runtime <code>lot-sim run --mode lot-pkn</code> continua executando apenas:</p>
+<pre><code class="language-text">YAML -&gt; CaseParser -&gt; PknRunner -&gt; PknModel -&gt; ResultWriter
+</code></pre>
+<p>sem instanciar o bridge de sal, sem coletar <code>SaltWallStressDiagnostics</code> e sem
+selecionar um ponto de influência sigma-theta por profundidade.</p>
+<p>Por isso, a Fase 10.18D não conectou <code>sigma_theta_compression_positive_Pa</code> ao
+<code>PknModel</code>. Fazer isso agora exigiria redesenhar o acoplamento LOT/sal ou
+duplicar fora de <code>coupling/</code> a lógica já existente em
+<code>LotSaltSigmaThetaBreakdown</code>, o que foi explicitamente bloqueado pela fase.</p>
+<p>O modo <code>volumetric_balance</code> permanece usando somente o fallback explícito:</p>
+<pre><code class="language-text">fracture.breakdown.pressure
+</code></pre>
+<p>como limiar simplificado para habilitar sinks de fratura/leakoff. Casos com
+<code>fracture.breakdown.pressure = 0</code> ou sem pressão definida continuam sem abertura
+por esse critério. O default <code>pkn_direct</code> permanece inalterado.</p>
 </div>
 </section>
 
@@ -2103,13 +2139,39 @@ pressão de fratura física a partir dessa rota.</p>
 <li>[x] <strong>R09:</strong> Fase 6.6 executou ensaio analitico controlado; mitigado para os dois PKN auditados (<code>idQ == 6</code>), ainda blocker para <code>idQ == 4</code> e regressao quantitativa ampla</li>
 <li>[x] <strong>R10:</strong> Fase 10.16 adicionou suporte diagnostico a volume anular com drill pipe no caso controlado BUZ67D, preservando a convencao per-radian do legado</li>
 <li>[x] <strong>R13:</strong> Fase 10.18C auditou o criterio legado de fratura por sigma tangencial e manteve a rota moderna como aproximacao opt-in por <code>fracture.breakdown.pressure</code></li>
-<li>[x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
-      — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code></li>
-<li>[ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
-      <code>LOT_APB_v5</code> como referencia numerica direta
-      — arquivo: <code>legance/LOT_APB_v5/include/apb/apb_salt_1d.h</code></li>
-<li>[ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)</li>
+<li>[x] <strong>R14:</strong> Fase 10.18D confirmou que <code>sigma_theta_compression_positive_Pa</code>
+  existe no diagnostico moderno, mas ainda nao e fonte runtime para
+  <code>lot-sim run --mode lot-pkn</code></li>
 </ul>
+<h3 id="r14-sigma-theta-disponivel-apenas-como-diagnostico">R14 — Sigma-theta disponivel apenas como diagnostico</h3>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado na Fase 10.18D</p>
+<p>A Fase 10.18D auditou o criterio legado:</p>
+<pre><code class="language-text">pw = pi + dP
+sigmaTheta = -getSigmaTheta()
+opened = pw &gt; sigmaTheta
+</code></pre>
+<p>O moderno ja possui <code>sigma_theta_compression_positive_Pa</code>,
+<code>margin_Pa</code>, <code>opened</code> e <code>legacy_algebra_opened</code> no diagnostico sigma-theta.
+Entretanto, esses campos sao gerados pelo caminho experimental:</p>
+<pre><code class="language-text">SaltCreepTimeBridge -&gt; SaltWallStressDiagnostics -&gt; LotSaltSigmaThetaDiagnostic
+</code></pre>
+<p>e nao pelo runtime:</p>
+<pre><code class="language-text">CaseParser -&gt; PknRunner -&gt; PknModel -&gt; ResultWriter
+</code></pre>
+<p>Portanto, <code>sigma_theta_compression_positive_Pa</code> nao deve ser usado como gatilho
+runtime de fratura no <code>volumetric_balance</code> enquanto nao houver uma fronteira
+opt-in que forneca, de forma testada, <code>SigmaThetaInfluenceLayer</code> ao calculo de
+pressao. O gate da fase e:</p>
+<pre><code class="language-text">SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY
+</code></pre>
+<p>Usar <code>first_wall_sample</code> ou ponto de Gauss mais proximo da parede como criterio
+fisico sem mapear a altura de influencia legada e risco de falso positivo.
+- [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
+      — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
+- [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
+      <code>LOT_APB_v5</code> como referencia numerica direta
+      — arquivo: <code>legance/LOT_APB_v5/include/apb/apb_salt_1d.h</code>
+- [ ] Comparar SESTSAL entre LOT_Tese e LOT_APB_v5 (risco R03)</p>
 </div>
 </section>
 
@@ -4625,6 +4687,134 @@ implementa acoplamento fisico completo.</p>
 anular real de parede no sal; o mapeamento fisico correto fica pendente.</p>
 <p>O caminho <code>lot-sim run --mode lot-pkn</code> segue desacoplado. <code>PknRunner</code>,
 <code>PknModel</code>, <code>CaseParser</code>, <code>ResultWriter</code> e <code>apps/lot-sim.cpp</code> nao foram alterados.</p>
+<h2 id="gate-runtime-para-criterio-sigma-theta-no-lotpkn-fase-1018d">Gate runtime para critério sigma-theta no LOT/PKN — Fase 10.18D</h2>
+<p><strong>Gate:</strong> <code>SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY</code>.</p>
+<p>A Fase 10.18D auditou se o critério sigma-theta moderno poderia ser usado como
+gatilho runtime de fratura no modo <code>volumetric_balance</code>, substituindo o
+placeholder <code>fracture.breakdown.pressure = 1 Pa</code> do caso BUZ67D controlado.</p>
+<p>O critério legado documentado é:</p>
+<pre><code class="language-text">pw = line_up[lu].pi(idAnnular) + line_up[lu].dP(idAnnular)
+sigmaTheta = -line_up[lu].mdl-&gt;getSigmaTheta()
+margin = pw - sigmaTheta
+opened = pw &gt; sigmaTheta
+</code></pre>
+<p>No contrato moderno, o campo equivalente de tensão é:</p>
+<pre><code class="language-text">sigma_theta_compression_positive_Pa
+</code></pre>
+<p>e o cálculo de margem/abertura já existe em
+<code>evaluate_sigma_theta_breakdown_point(...)</code>:</p>
+<pre><code class="language-text">margin_Pa = pressure_Pa - sigma_theta_compression_positive_Pa
+legacy_algebra_opened = margin_Pa &gt; 0
+opened = legacy_algebra_opened
+</code></pre>
+<h3 id="resultado-da-auditoria">Resultado da auditoria</h3>
+<table>
+<thead>
+<tr>
+<th>Campo/Função</th>
+<th>Arquivo</th>
+<th>Papel</th>
+<th>Pode ser reutilizado no runtime?</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stress_utils::sigma_theta_compression_positive(...)</code></td>
+<td><code>external/saltcreep/include/physics/stress_utils.hpp</code></td>
+<td>Converte <code>sigma[1]</code> para compressão positiva por <code>-sigma_theta</code>.</td>
+<td>Não diretamente; fica atrás do bridge/adapters.</td>
+<td><code>EXTRACTED</code></td>
+</tr>
+<tr>
+<td><code>SaltWallStressSample::sigma_theta_compression_positive_Pa</code></td>
+<td><code>include/salt/SaltWallStressDiagnostics.hpp</code></td>
+<td>DTO moderno da amostra de parede.</td>
+<td>Não pelo fluxo LOT/PKN atual.</td>
+<td><code>DIAGNOSTIC_ONLY</code></td>
+</tr>
+<tr>
+<td><code>SaltCreepTimeBridge::wall_stress_diagnostics()</code></td>
+<td><code>src/salt/SaltCreepTimeBridge.cpp</code></td>
+<td>Amostra pontos de Gauss próximos da parede a partir do estado do saltcreep.</td>
+<td>Não é chamado por <code>lot-sim run --mode lot-pkn</code>.</td>
+<td><code>DIAGNOSTIC_ONLY</code></td>
+</tr>
+<tr>
+<td><code>evaluate_sigma_theta_breakdown_point(...)</code></td>
+<td><code>src/coupling/LotSaltSigmaThetaBreakdown.cpp</code></td>
+<td>Calcula <code>margin_Pa</code>, <code>legacy_algebra_opened</code> e <code>opened</code>.</td>
+<td>Reutilizável conceitualmente, mas sem dados de tensão no runtime LOT/PKN.</td>
+<td><code>PARTIALLY_EXTRACTED</code></td>
+</tr>
+<tr>
+<td><code>run_lot_salt_sigma_theta_experimental(...)</code></td>
+<td><code>src/coupling/LotSaltSigmaThetaDriver.cpp</code></td>
+<td>Encadeia <code>CaseData</code>, bridge, PKN e diagnóstico sigma-theta.</td>
+<td>Apenas helper opt-in de teste/diagnóstico.</td>
+<td><code>DIAGNOSTIC_ONLY</code></td>
+</tr>
+<tr>
+<td><code>PknModel::apply_volumetric_balance(...)</code></td>
+<td><code>src/lot/PknModel.cpp</code></td>
+<td>Calcula <code>wellbore_pressure_Pa</code> e aplica sinks após abertura.</td>
+<td>Runtime LOT/PKN, mas não conhece sal/bridge/sigma-theta.</td>
+<td><code>RUNTIME_ACCESSIBLE</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="pressao-correta-para-o-criterio">Pressão correta para o critério</h3>
+<p>O legado compara <code>pw = pi + dP</code> contra <code>sigmaTheta</code>; portanto, no moderno a
+pressão candidata correta seria:</p>
+<pre><code class="language-text">wellbore_pressure_Pa
+</code></pre>
+<p>e não:</p>
+<pre><code class="language-text">net_pressure_Pa
+</code></pre>
+<p>No modo <code>volumetric_balance</code>, <code>wellbore_pressure_Pa</code> inclui
+<code>initial_pressure_Pa</code> mais o incremento acumulado do balanço anular. O
+diagnóstico sigma-theta experimental, porém, é construído a partir de
+<code>LotSaltPressureMap</code> e do <code>PknResult</code> em <code>coupling/</code>; ele não é parte do cálculo
+runtime de <code>PknModel</code>.</p>
+<h3 id="ponto-de-influencia">Ponto de influência</h3>
+<p>O legado usa a tensão tangencial na altura de influência da camada. O moderno
+possui metadados de amostra como:</p>
+<pre><code class="language-text">wall_gp_*
+gp_id
+element_id
+local_gp_id
+wall_stress_depth_m
+</code></pre>
+<p>mas o caminho runtime não possui uma regra validada para escolher, a cada passo,
+o ponto sigma-theta mais próximo de <code>profTeste = 4374 m</code> ou da altura de
+influência legada. A classificação da Fase 10.18D é:</p>
+<pre><code class="language-text">INFLUENCE_POINT_PARTIALLY_MAPPED
+</code></pre>
+<p>O fallback <code>first_wall_sample</code> existe apenas como padrão diagnóstico em testes
+e não deve ser usado silenciosamente como critério runtime de fratura.</p>
+<h3 id="decisao">Decisão</h3>
+<p>A implementação runtime foi bloqueada nesta fase. O motivo não é ausência do
+campo <code>sigma_theta_compression_positive_Pa</code>, mas ausência de uma fronteira
+runtime segura:</p>
+<pre><code class="language-text">lot-sim run --mode lot-pkn
+  nao instancia SaltCreepTimeBridge
+  nao coleta SaltWallStressDiagnostics
+  nao sincroniza estado de sal por passo
+  nao mapeia altura de influencia para wall_gp_*
+  nao fornece sigma-theta ao PknModel
+</code></pre>
+<p>Assim, conectar o critério agora exigiria uma das duas ações indesejadas:</p>
+<ol>
+<li>fazer <code>lot/</code> depender de <code>coupling/</code>/<code>salt/</code>; ou</li>
+<li>duplicar a álgebra de <code>LotSaltSigmaThetaBreakdown</code> dentro do solver LOT.</li>
+</ol>
+<p>Ambas foram rejeitadas. O status correto da Fase 10.18D é:</p>
+<pre><code class="language-text">SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY
+</code></pre>
+<p>Próxima etapa recomendada: criar uma fase de arquitetura opt-in para um
+orquestrador runtime LOT/sal que possa fornecer ao balanço volumétrico uma
+fonte explícita de <code>SigmaThetaInfluenceLayer</code>, sem alterar o default
+<code>lot-sim run --mode lot-pkn</code>.</p>
 <h2 id="volume-anular-buz67d-com-drill-pipe-fase-1016">Volume anular BUZ67D com drill pipe (Fase 10.16)</h2>
 <p>A Fase 10.16 adiciona suporte diagnostico para volume anular inicial com drill
 pipe no caso controlado <code>buz67d_pkn_legacy_aligned.yaml</code>.</p>

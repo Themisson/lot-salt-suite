@@ -446,3 +446,51 @@ Assim, `fracture.breakdown.pressure` continua sendo apenas uma aproximação
 simplificada opt-in para estudos controlados. Nenhum campo moderno desta fase
 deve ser interpretado como validação física de `sigmaTheta`, `margin`, `opened`,
 dano ou ruptura.
+
+## Fase 10.18D — normalização de `sigma_theta_compression_positive_Pa`
+
+A Fase 10.18D confirmou que o nome do campo moderno para o equivalente
+compressão-positiva de `sigmaTheta` é:
+
+```text
+sigma_theta_compression_positive_Pa
+```
+
+No `saltcreep`, a função conceitual é:
+
+```text
+stress_utils::sigma_theta_compression_positive(sigma)
+```
+
+com:
+
+```text
+sigma_theta_compression_positive = -sigma[1]
+```
+
+No contrato moderno do `lot-salt-suite`, o sufixo `_Pa` é parte do nome porque
+o campo exportado e consumido pelo diagnóstico está em SI:
+
+```text
+SaltWallStressSample::sigma_theta_compression_positive_Pa
+SigmaThetaInfluenceLayer::sigma_theta_compression_positive_Pa
+SigmaThetaBreakdownPoint::sigma_theta_compression_positive_Pa
+```
+
+O mapeamento legado permanece:
+
+| Legado | Moderno | Observação |
+|---|---|---|
+| `sigmaTheta = -getSigmaTheta()` | `sigma_theta_compression_positive_Pa` | Campo em Pa no diagnóstico moderno. |
+| `pw = pi + dP` | `wellbore_pressure_Pa` | Pressão candidata correta para o critério legado. |
+| `pw - sigmaTheta` | `margin_Pa` | Calculado por `evaluate_sigma_theta_breakdown_point(...)`. |
+| `pw > sigmaTheta` | `opened` / `legacy_algebra_opened` | Disponível apenas no diagnóstico opt-in. |
+
+O gate da Fase 10.18D é:
+
+```text
+SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY
+```
+
+Portanto, esses campos não são normalizados como saída runtime de
+`lot-sim run --mode lot-pkn` nesta fase.
