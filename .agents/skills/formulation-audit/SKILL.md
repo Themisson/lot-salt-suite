@@ -1,3 +1,8 @@
+---
+name: formulation-audit
+description: Audit mathematical, physical, dimensional, sign-convention, and SI-unit consistency across lot-salt-suite LOT, APB, salt creep, migration, and coupling formulations.
+---
+
 # SKILL: formulation-audit
 
 Audita formulações matemáticas, físicas e dimensionais no projeto lot-salt-suite.

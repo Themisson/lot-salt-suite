@@ -57,6 +57,38 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-08] Compatibilidade Codex skills — frontmatter YAML — Codex
+
+**Status:** Corrigido.
+
+O Codex CLI `v0.137.0` passou a recusar `SKILL.md` locais sem frontmatter YAML
+delimitado por `---`. O erro aparecia ao abrir o repositório:
+
+```text
+Skipped loading 7 skill(s) due to invalid SKILL.md files
+missing YAML frontmatter delimited by ---
+```
+
+**Causa:** os arquivos existiam e estavam versionados em `.agents/skills/`, mas
+sete deles usavam apenas o formato antigo com cabeçalho Markdown
+`# SKILL: ...`. Portanto, o problema não era `git pull` deixando de puxar
+arquivos; era incompatibilidade de formato com a versão nova do Codex.
+
+**Correção:** adicionados `name` e `description` em frontmatter YAML aos skills:
+
+- `.agents/skills/cpp-refactor/SKILL.md`;
+- `.agents/skills/docs-html-report/SKILL.md`;
+- `.agents/skills/formulation-audit/SKILL.md`;
+- `.agents/skills/lot-salt-integration/SKILL.md`;
+- `.agents/skills/postprocess-report/SKILL.md`;
+- `.agents/skills/update-devlog/SKILL.md`;
+- `.agents/skills/validation-benchmark/SKILL.md`.
+
+**Validação local:** todos os `SKILL.md` em `.agents/skills/` agora começam com
+`---` e contêm `name:` e `description:`.
+
+---
+
 ### [2026-06-07] Fase 10.18D — gate sigma-theta para fratura runtime — Codex
 
 **Status:** Auditoria concluída; implementação runtime bloqueada pelo gate.

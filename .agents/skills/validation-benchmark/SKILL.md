@@ -1,3 +1,8 @@
+---
+name: validation-benchmark
+description: Create, run, and review lot-salt-suite validation tests, regression benchmarks, legacy-modern comparisons, baselines, and documented validation metrics.
+---
+
 # SKILL: validation-benchmark
 
 Cria, executa e revisa testes de regressão e benchmarks para o lot-salt-suite.

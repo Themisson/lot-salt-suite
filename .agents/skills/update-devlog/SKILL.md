@@ -1,3 +1,8 @@
+---
+name: update-devlog
+description: Update docs/dev-log.md with the current lot-salt-suite project state, latest commits, phase entries, and status block using the repository dev-log workflow.
+---
+
 # SKILL: update-devlog
 
 Atualiza `docs/dev-log.md` com o estado atual do projeto e o último commit.

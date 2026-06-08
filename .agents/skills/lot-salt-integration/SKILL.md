@@ -1,3 +1,8 @@
+---
+name: lot-salt-integration
+description: Integrate LOT/APB workflows with salt creep interfaces, adapters, bridge diagnostics, wall-stress contracts, and salt coupling modules without copying external saltcreep source code.
+---
+
 # SKILL: lot-salt-integration
 
 Integra LOT/APB com modelos de fluência de sal do saltcreep.

@@ -1,3 +1,8 @@
+---
+name: docs-html-report
+description: Create and update lot-salt-suite technical Markdown documentation, docs/index.html, docs_status.yaml, validation notes, and project report pages after implementation or audit phases.
+---
+
 # SKILL: docs-html-report
 
 Cria e atualiza documentação técnica Markdown e o docs/index.html navegável.

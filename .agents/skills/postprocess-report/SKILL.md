@@ -1,3 +1,8 @@
+---
+name: postprocess-report
+description: Improve Python postprocessing and generate diagnostic plots, comparison reports, HTML summaries, and publication-ready figures from lot-salt-suite CSV and JSON outputs.
+---
+
 # SKILL: postprocess-report
 
 Melhora o pós-processamento Python e gera relatórios para o lot-salt-suite.

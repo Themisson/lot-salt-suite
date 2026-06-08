@@ -1,3 +1,8 @@
+---
+name: cpp-refactor
+description: Refactor C++ code in lot-salt-suite while preserving numerical behavior, separating solver, IO, and physics responsibilities, and keeping legacy and vendored saltcreep files untouched.
+---
+
 # SKILL: cpp-refactor
 
 Refatora código C++ do projeto lot-salt-suite preservando comportamento numérico.
