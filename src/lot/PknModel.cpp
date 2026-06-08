@@ -233,6 +233,18 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
     double fracture_increment_m3 = 0.0;
     double leakoff_increment_m3 = 0.0;
 
+    if (!fracture_opened && input.breakdown.pressure_Pa > 0.0) {
+      const double trial_delta_pressure_Pa =
+          injected_increment_m3 /
+          (input.fluid_compressibility_per_Pa * input.annular_volume_m3);
+      const double trial_pressure_Pa =
+          std::max(0.0, pressure_Pa + trial_delta_pressure_Pa);
+      if (trial_pressure_Pa - input.initial_pressure_Pa >=
+          input.breakdown.pressure_Pa) {
+        fracture_opened = true;
+      }
+    }
+
     if (fracture_opened) {
       fracture_increment_m3 =
           std::max(0.0, series.fracture_volume_series_m3[i] - previous_fracture_m3);
@@ -245,11 +257,6 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
         effective_increment_m3 /
         (input.fluid_compressibility_per_Pa * input.annular_volume_m3);
     pressure_Pa = std::max(0.0, pressure_Pa + delta_pressure_Pa);
-
-    if (!fracture_opened && input.breakdown.pressure_Pa > 0.0 &&
-        pressure_Pa - input.initial_pressure_Pa >= input.breakdown.pressure_Pa) {
-      fracture_opened = true;
-    }
 
     series.wellbore_pressure_series_Pa[i] = pressure_Pa;
     series.balance_delta_pressure_series_Pa[i] = delta_pressure_Pa;

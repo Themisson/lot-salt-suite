@@ -390,3 +390,58 @@ PRE_EXISTING_PRESSURE_FIX_PARTIAL_OTHER_FACTORS_REMAIN
 ```
 
 e não como validação física.
+
+### Acoplamento fratura/leakoff ao balanço volumétrico — Fase 10.18C
+
+**Status:** `PHASE10_18C_FRACTURE_VOLUME_BALANCE_DIAGNOSTIC_COMPLETE`.
+
+A auditoria da Fase 10.18C confirmou que o `PknModel` moderno calcula
+`fracture_volume_m3` e `leakoff_volume_m3` como séries acumuladas. O balanço
+volumétrico usa incrementos derivados dessas séries:
+
+```text
+dV_fracture_i = fracture_volume_i - fracture_volume_{i-1}
+dV_leakoff_i  = leakoff_volume_i  - leakoff_volume_{i-1}
+```
+
+No modo opt-in `pressure_model = volumetric_balance`, a rota de pressão passa a
+usar:
+
+```text
+dV_eff = dV_inj - dV_fracture - dV_leakoff
+dP     = dV_eff / (compressibility * annular_volume)
+```
+
+O acoplamento é sequencial e simplificado. O `PknModel` não recebe a pressão do
+balanço como entrada para recalcular a geometria PKN no mesmo passo; portanto,
+não há iteração pressão -> fratura -> pressão nesta fase.
+
+O critério legado auditado é:
+
+```text
+P_simulacao = line_up[lu].pi(idAnnular) + line_up[lu].dP(idAnnular)
+fratura inicia quando |P_simulacao| > |sigma_tangencial(altura_de_influencia)|
+```
+
+Esse critério foi classificado como:
+
+```text
+PARTIALLY_EXTRACTED_NOT_REPRODUCED_IN_PKN_MODEL
+```
+
+porque o `PknModel` não possui, nesta fase, a tensão tangencial no ponto nodal
+da altura de influência. A implementação moderna usa apenas a aproximação
+existente `fracture.breakdown.pressure` como limiar simplificado. Se esse campo
+estiver ausente ou for zero, a abertura por pressão permanece desativada e os
+volumes de fratura/leakoff não são descontados do balanço.
+
+Esta fase não implementa Zamora, complacência de casing, APB/sal feedback,
+novo critério geomecânico, dano, fechamento complexo de fratura ou nova
+formulação PKN.
+
+No BUZ67D controlado, o valor atual `fracture.breakdown.pressure = 1 Pa` é um
+placeholder herdado das fases de alinhamento. Com o sink volumétrico ativo, esse
+limiar abre a fratura cedo demais e faz com que praticamente todo o volume
+injetado seja consumido por `fracture_volume_m3`, mantendo a pressão moderna
+próxima de `initial_pressure_Pa`. Isso confirma o mecanismo, mas não constitui
+calibração nem equivalência física com o legado.

@@ -181,12 +181,16 @@ unidades reais usadas no `LOT_APB_v5` antes de aceitar nomes ou dimensões.
 
 ### Ordem recomendada
 
-1. Revisar o diagnóstico 10.18B porque `initial_pressure_Pa` somado ao balanço
-   moderno superestima a pressão máxima legada no BUZ67D controlado.
-2. Auditar a semântica de `dP` legado após abertura/leakoff.
-3. Criar `FluidModel` abstrato e `ConstantFluidModel` compatível com o estado atual.
-4. Auditar especificamente as unidades Zamora no `LOT_APB_v5`.
-5. Implementar `ZamoraFluidModel` experimental, opt-in e sem alterar defaults.
+1. Revisar o diagnóstico 10.18C porque o desconto de
+   `fracture_volume_m3`/`leakoff_volume_m3` no balanço é apenas uma
+   aproximação por `fracture.breakdown.pressure`.
+2. Auditar se o critério legado
+   `|pi + dP| > |sigma_tangencial(altura_de_influencia)|` pode ser exposto por
+   um módulo moderno sem contaminar `PknModel` com dependências de sal/APB.
+3. Auditar a semântica de `dP` legado após abertura/leakoff.
+4. Criar `FluidModel` abstrato e `ConstantFluidModel` compatível com o estado atual.
+5. Auditar especificamente as unidades Zamora no `LOT_APB_v5`.
+6. Implementar `ZamoraFluidModel` experimental, opt-in e sem alterar defaults.
 
 ### Riscos
 
@@ -199,3 +203,6 @@ unidades reais usadas no `LOT_APB_v5` antes de aceitar nomes ou dimensões.
   validação.
 - A pressão inicial absoluta ainda precisa de contrato próprio antes de comparar
   `pw` legado com `wellbore_pressure_Pa` moderno.
+- O critério legado por tensão tangencial não está reproduzido no `PknModel`;
+  usar `fracture.breakdown.pressure` como proxy pode antecipar ou atrasar
+  artificialmente o desconto de volume de fratura.

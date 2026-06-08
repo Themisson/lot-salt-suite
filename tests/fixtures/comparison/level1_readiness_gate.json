@@ -137,6 +137,27 @@
       "No Zamora, casing elasticity, APB/salt feedback, sigmaTheta, margin or opened comparison was performed."
     ]
   },
+  "phase10_18c_fracture_volume_balance_diagnostic": {
+    "status": "PHASE10_18C_FRACTURE_VOLUME_BALANCE_DIAGNOSTIC_COMPLETE",
+    "gate": "FRACTURE_VOLUME_BALANCE_IMPLEMENTATION_ALLOWED_PRESSURE_THRESHOLD_APPROXIMATION",
+    "legacy_sigma_theta_criterion_status": "PARTIALLY_EXTRACTED_NOT_REPRODUCED_IN_PKN_MODEL",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "pressure_semantic_equivalence": false,
+    "legacy_audit_csv": "results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv",
+    "modern_coupled_csv": "results/comparison/phase10_18c/modern_coupled/timeseries.csv",
+    "summary_csv": "results/comparison/phase10_18c/phase10_18c_summary.csv",
+    "metadata_json": "results/comparison/phase10_18c/phase10_18c_metadata.json",
+    "diagnostic_observation": "The modern volumetric_balance route can subtract fracture and leakoff increments after a simplified fracture.pressure threshold, but it does not reproduce the legacy sigma-theta influence-height criterion. In the controlled BUZ67D case, the placeholder 1 Pa threshold opens too early and does not improve numeric equivalence.",
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "Legacy fracture starts from |pi + dP| > |sigma tangential at influence height|.",
+      "Modern PknModel does not compute the legacy influence-height sigma tangential criterion.",
+      "fracture.breakdown.pressure is only a simplified opt-in approximation.",
+      "No Zamora, casing elasticity, APB/salt feedback, sigmaTheta, margin or opened comparison was performed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

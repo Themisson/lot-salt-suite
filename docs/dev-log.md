@@ -57,6 +57,53 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-07] Fase 10.18C — fratura/leakoff no balanço volumétrico — Codex
+
+**Status:** Implementada, testada e pronta para commit/push conforme gate da fase.
+
+**Gate:** `FRACTURE_VOLUME_BALANCE_IMPLEMENTATION_ALLOWED_PRESSURE_THRESHOLD_APPROXIMATION`.
+
+**Critério legado auditado:**
+
+```text
+P_simulacao = line_up[lu].pi(idAnnular) + line_up[lu].dP(idAnnular)
+fratura inicia quando |P_simulacao| > |sigma_tangencial(altura_de_influencia)|
+```
+
+**Classificação do critério legado:** `PARTIALLY_EXTRACTED_NOT_REPRODUCED_IN_PKN_MODEL`.
+
+**Implementação moderna:**
+- `volumetric_balance` passa a tratar `fracture.breakdown.pressure > 0` como
+  aproximação opt-in para habilitar sinks de fratura/leakoff.
+- No passo em que o limiar simplificado é cruzado, o balanço já pode descontar:
+  `dV_eff = dV_inj - dV_fracture_increment - dV_leakoff_increment`.
+- Se `fracture.breakdown.pressure` estiver ausente ou for zero, a abertura fica
+  desativada e os sinks de fratura/leakoff não entram no balanço.
+- `pkn_direct` permanece inalterado.
+
+**Diagnóstico BUZ67D controlado:**
+- legado auditado `max(pw_Pa) = 69.035836 MPa`;
+- reconstrução moderna sem sinks `max = 1411.657773 MPa`;
+- moderno 10.18C acoplado `max(wellbore_pressure_Pa) = 26.732215 MPa`;
+- sink total de fratura/leakoff no moderno 10.18C: `0.993671 m3`.
+
+**Conclusão:** a infraestrutura de sink volumétrico funciona, mas o placeholder
+`fracture.breakdown.pressure = 1 Pa` abre a fratura cedo demais. A fase não
+declara melhoria numérica nem validação física; apenas estabelece a rota opt-in
+para estudos futuros.
+
+**Diagnóstico local não versionado:**
+- `results/comparison/phase10_18c/phase10_18c_summary.csv`;
+- `results/comparison/phase10_18c/phase10_18c_metadata.json`;
+- `results/comparison/phase10_18c/pressure_vs_time_fracture_volume_coupling.png`;
+- `results/comparison/phase10_18c/pressure_vs_injected_volume_fracture_volume_coupling.png`.
+
+**Restrição:** não implementou Zamora, fluido composicional, casing elástico,
+APB/sal feedback, nova formulação PKN, dano, fechamento complexo ou critério
+moderno por `sigmaTheta`/`margin`/`opened`.
+
+---
+
 ### [2026-06-07] Fase 10.18B — pressão inicial e schedule com shut-in — Codex
 
 **Status:** Implementada, testada e pronta para commit/push conforme gate da fase.

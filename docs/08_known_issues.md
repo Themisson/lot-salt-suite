@@ -423,6 +423,35 @@ para calcular pressao, e nenhuma equivalencia fisica com o LOT_Tese e declarada.
 
 ---
 
+## R13 — Critério legado de fratura por sigma tangencial não está no PknModel
+
+**Severidade:** Alta | **Status:** PARTIALLY_EXTRACTED; MODERN_APPROXIMATION_ONLY
+
+**Evidência:** a auditoria da Fase 10.18C identificou que o legado usa a pressão
+da simulação:
+
+```text
+P_simulacao = line_up[lu].pi(idAnnular) + line_up[lu].dP(idAnnular)
+```
+
+e inicia fratura quando:
+
+```text
+|P_simulacao| > |sigma_tangencial(altura_de_influencia)|
+```
+
+O `PknModel` moderno não possui, nesta fase, a tensão tangencial nodal na
+altura de influência. Portanto, o critério não foi reproduzido no solver PKN.
+A rota moderna usa apenas `fracture.breakdown.pressure` como aproximação
+simplificada opt-in para habilitar o desconto de `fracture_volume_m3` e
+`leakoff_volume_m3` no balanço volumétrico.
+
+**Impacto:** a curva moderna com balanço de fratura/leakoff continua sendo
+diagnóstica. Não validar `sigmaTheta`, `margin`, `opened`, dano, ruptura ou
+pressão de fratura física a partir dessa rota.
+
+---
+
 ## Itens pendentes após auditoria
 
 - [x] Convenção de sinais → FA03 (compressão positiva)
@@ -432,6 +461,7 @@ para calcular pressao, e nenhuma equivalencia fisica com o LOT_Tese e declarada.
 - [x] **R08:** `dt` deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]
 - [x] **R09:** Fase 6.6 executou ensaio analitico controlado; mitigado para os dois PKN auditados (`idQ == 6`), ainda blocker para `idQ == 4` e regressao quantitativa ampla
 - [x] **R10:** Fase 10.16 adicionou suporte diagnostico a volume anular com drill pipe no caso controlado BUZ67D, preservando a convencao per-radian do legado
+- [x] **R13:** Fase 10.18C auditou o criterio legado de fratura por sigma tangencial e manteve a rota moderna como aproximacao opt-in por `fracture.breakdown.pressure`
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

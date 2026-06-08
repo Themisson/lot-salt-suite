@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">59/66</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">60/67</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -981,6 +981,43 @@ Portanto, a correção é classificada como:</p>
 <pre><code class="language-text">PRE_EXISTING_PRESSURE_FIX_PARTIAL_OTHER_FACTORS_REMAIN
 </code></pre>
 <p>e não como validação física.</p>
+<h3 id="acoplamento-fraturaleakoff-ao-balanco-volumetrico-fase-1018c">Acoplamento fratura/leakoff ao balanço volumétrico — Fase 10.18C</h3>
+<p><strong>Status:</strong> <code>PHASE10_18C_FRACTURE_VOLUME_BALANCE_DIAGNOSTIC_COMPLETE</code>.</p>
+<p>A auditoria da Fase 10.18C confirmou que o <code>PknModel</code> moderno calcula
+<code>fracture_volume_m3</code> e <code>leakoff_volume_m3</code> como séries acumuladas. O balanço
+volumétrico usa incrementos derivados dessas séries:</p>
+<pre><code class="language-text">dV_fracture_i = fracture_volume_i - fracture_volume_{i-1}
+dV_leakoff_i  = leakoff_volume_i  - leakoff_volume_{i-1}
+</code></pre>
+<p>No modo opt-in <code>pressure_model = volumetric_balance</code>, a rota de pressão passa a
+usar:</p>
+<pre><code class="language-text">dV_eff = dV_inj - dV_fracture - dV_leakoff
+dP     = dV_eff / (compressibility * annular_volume)
+</code></pre>
+<p>O acoplamento é sequencial e simplificado. O <code>PknModel</code> não recebe a pressão do
+balanço como entrada para recalcular a geometria PKN no mesmo passo; portanto,
+não há iteração pressão -&gt; fratura -&gt; pressão nesta fase.</p>
+<p>O critério legado auditado é:</p>
+<pre><code class="language-text">P_simulacao = line_up[lu].pi(idAnnular) + line_up[lu].dP(idAnnular)
+fratura inicia quando |P_simulacao| &gt; |sigma_tangencial(altura_de_influencia)|
+</code></pre>
+<p>Esse critério foi classificado como:</p>
+<pre><code class="language-text">PARTIALLY_EXTRACTED_NOT_REPRODUCED_IN_PKN_MODEL
+</code></pre>
+<p>porque o <code>PknModel</code> não possui, nesta fase, a tensão tangencial no ponto nodal
+da altura de influência. A implementação moderna usa apenas a aproximação
+existente <code>fracture.breakdown.pressure</code> como limiar simplificado. Se esse campo
+estiver ausente ou for zero, a abertura por pressão permanece desativada e os
+volumes de fratura/leakoff não são descontados do balanço.</p>
+<p>Esta fase não implementa Zamora, complacência de casing, APB/sal feedback,
+novo critério geomecânico, dano, fechamento complexo de fratura ou nova
+formulação PKN.</p>
+<p>No BUZ67D controlado, o valor atual <code>fracture.breakdown.pressure = 1 Pa</code> é um
+placeholder herdado das fases de alinhamento. Com o sink volumétrico ativo, esse
+limiar abre a fratura cedo demais e faz com que praticamente todo o volume
+injetado seja consumido por <code>fracture_volume_m3</code>, mantendo a pressão moderna
+próxima de <code>initial_pressure_Pa</code>. Isso confirma o mecanismo, mas não constitui
+calibração nem equivalência física com o legado.</p>
 </div>
 </section>
 
@@ -2038,6 +2075,24 @@ annular_volume_source
 <p>Essa mitigacao e diagnostica. O <code>PknModel</code> continua sem consumir volume anular
 para calcular pressao, e nenhuma equivalencia fisica com o LOT_Tese e declarada.</p>
 <hr />
+<h2 id="r13-criterio-legado-de-fratura-por-sigma-tangencial-nao-esta-no-pknmodel">R13 — Critério legado de fratura por sigma tangencial não está no PknModel</h2>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> PARTIALLY_EXTRACTED; MODERN_APPROXIMATION_ONLY</p>
+<p><strong>Evidência:</strong> a auditoria da Fase 10.18C identificou que o legado usa a pressão
+da simulação:</p>
+<pre><code class="language-text">P_simulacao = line_up[lu].pi(idAnnular) + line_up[lu].dP(idAnnular)
+</code></pre>
+<p>e inicia fratura quando:</p>
+<pre><code class="language-text">|P_simulacao| &gt; |sigma_tangencial(altura_de_influencia)|
+</code></pre>
+<p>O <code>PknModel</code> moderno não possui, nesta fase, a tensão tangencial nodal na
+altura de influência. Portanto, o critério não foi reproduzido no solver PKN.
+A rota moderna usa apenas <code>fracture.breakdown.pressure</code> como aproximação
+simplificada opt-in para habilitar o desconto de <code>fracture_volume_m3</code> e
+<code>leakoff_volume_m3</code> no balanço volumétrico.</p>
+<p><strong>Impacto:</strong> a curva moderna com balanço de fratura/leakoff continua sendo
+diagnóstica. Não validar <code>sigmaTheta</code>, <code>margin</code>, <code>opened</code>, dano, ruptura ou
+pressão de fratura física a partir dessa rota.</p>
+<hr />
 <h2 id="itens-pendentes-apos-auditoria">Itens pendentes após auditoria</h2>
 <ul>
 <li>[x] Convenção de sinais → FA03 (compressão positiva)</li>
@@ -2047,6 +2102,7 @@ para calcular pressao, e nenhuma equivalencia fisica com o LOT_Tese e declarada.
 <li>[x] <strong>R08:</strong> <code>dt</code> deve seguir a unidade temporal da taxa de fluência; no wrapper APB/SESTSAL do LOT_APB_v5 é [h]</li>
 <li>[x] <strong>R09:</strong> Fase 6.6 executou ensaio analitico controlado; mitigado para os dois PKN auditados (<code>idQ == 6</code>), ainda blocker para <code>idQ == 4</code> e regressao quantitativa ampla</li>
 <li>[x] <strong>R10:</strong> Fase 10.16 adicionou suporte diagnostico a volume anular com drill pipe no caso controlado BUZ67D, preservando a convencao per-radian do legado</li>
+<li>[x] <strong>R13:</strong> Fase 10.18C auditou o criterio legado de fratura por sigma tangencial e manteve a rota moderna como aproximacao opt-in por <code>fracture.breakdown.pressure</code></li>
 <li>[x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code></li>
 <li>[ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar

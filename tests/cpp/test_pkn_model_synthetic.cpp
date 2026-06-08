@@ -192,6 +192,45 @@ TEST_CASE("Volumetric balance pressure model increases pressure with injection")
   CHECK(result.balance_fracture_volume_increment_m3 == Catch::Approx(0.0));
 }
 
+TEST_CASE("Volumetric balance leaves fracture sinks inactive without breakdown pressure") {
+  const lss::lot::PknModel model;
+  auto input = synthetic_input();
+  input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  input.annular_volume_m3 = 10.0;
+  input.fluid_compressibility_per_Pa = 1.0e-9;
+  input.breakdown.pressure_Pa = 0.0;
+
+  const auto result = model.simulate(input);
+
+  check_finite_non_negative_series(result);
+  CHECK(result.fracture_volume_m3 > 0.0);
+  CHECK(result.balance_fracture_volume_increment_m3 == Catch::Approx(0.0));
+  for (const double increment : result.balance_fracture_volume_increment_series_m3) {
+    CHECK(increment == Catch::Approx(0.0));
+  }
+}
+
+TEST_CASE("Volumetric balance consumes fracture volume on threshold crossing step") {
+  const lss::lot::PknModel model;
+  auto closed_input = synthetic_input();
+  closed_input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  closed_input.annular_volume_m3 = 10.0;
+  closed_input.fluid_compressibility_per_Pa = 1.0e-9;
+  closed_input.breakdown.pressure_Pa = 1.0e12;
+
+  auto opened_input = closed_input;
+  opened_input.breakdown.pressure_Pa = 1.0;
+
+  const auto closed_result = model.simulate(closed_input);
+  const auto opened_result = model.simulate(opened_input);
+
+  check_finite_non_negative_series(opened_result);
+  CHECK(opened_result.balance_fracture_volume_increment_m3 > 0.0);
+  CHECK(opened_result.wellbore_pressure_Pa < closed_result.wellbore_pressure_Pa);
+  CHECK(opened_result.balance_effective_volume_increment_m3 <=
+        opened_result.balance_injected_volume_increment_m3);
+}
+
 TEST_CASE("Initial pressure shifts volumetric wellbore pressure") {
   const lss::lot::PknModel model;
   auto input = synthetic_input();

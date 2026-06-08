@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <fstream>
+#include <iterator>
 #include <string>
 
 #include <catch2/catch_approx.hpp>
@@ -93,6 +94,12 @@ std::filesystem::path write_temp_case(const std::string& name,
   std::ofstream out(path);
   out << contents;
   return path;
+}
+
+std::string read_text_file(const std::filesystem::path& path) {
+  std::ifstream in(path);
+  return {std::istreambuf_iterator<char>(in),
+          std::istreambuf_iterator<char>()};
 }
 
 }  // namespace
@@ -236,6 +243,28 @@ TEST_CASE("Minimal LOT PKN contract loads and converts schedule to SI") {
   CHECK(data.lot.fracture_fluid_viscosity_Pa_s == Catch::Approx(0.003));
   CHECK(data.lot.breakdown_pressure_Pa == Catch::Approx(45000000.0));
   CHECK(data.lot.detection_method == "derivative_drop");
+}
+
+TEST_CASE("LOT PKN contract without breakdown pressure keeps fracture start disabled") {
+  auto yaml = read_text_file(kPknMinimalCasePath);
+  const std::string breakdown_block =
+      "    breakdown:\n"
+      "      method: pressure_threshold\n"
+      "      pressure:\n"
+      "        value: 45000000.0\n"
+      "        unit: Pa\n";
+  const auto pos = yaml.find(breakdown_block);
+  REQUIRE(pos != std::string::npos);
+  yaml.erase(pos, breakdown_block.size());
+
+  const auto path = write_temp_case("lss_pkn_without_breakdown.yaml", yaml);
+  const auto data = lss::io::parse_yaml(path);
+
+  CHECK(data.mode == "lot-pkn");
+  CHECK(data.lot.breakdown_method.empty());
+  CHECK(data.lot.breakdown_pressure_Pa == Catch::Approx(0.0));
+
+  std::filesystem::remove(path);
 }
 
 TEST_CASE("LOT PKN leakoff case preserves SI and leakoff flags") {

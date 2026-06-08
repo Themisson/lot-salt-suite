@@ -439,8 +439,13 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
       data.lot.injection_total_time_s =
           data.lot.injection_accommodation_time_s + phase_total_s;
     }
-    if (data.lot.fracture_height_m <= 0.0 || data.lot.breakdown_pressure_Pa <= 0.0) {
-      throw std::runtime_error("Validacao falhou: LOT/PKN exige altura e pressao de breakdown > 0");
+    if (data.lot.fracture_height_m <= 0.0) {
+      throw std::runtime_error("Validacao falhou: LOT/PKN exige altura de fratura > 0");
+    }
+    if (!std::isfinite(data.lot.breakdown_pressure_Pa) ||
+        data.lot.breakdown_pressure_Pa < 0.0) {
+      throw std::runtime_error(
+          "Validacao falhou: LOT/PKN exige pressao de breakdown >= 0 quando definida");
     }
     if (data.lot.fracture_fluid_viscosity_Pa_s <= 0.0) {
       throw std::runtime_error("Validacao falhou: LOT/PKN exige viscosidade de fratura > 0");

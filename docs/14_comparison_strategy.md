@@ -1212,3 +1212,81 @@ permite implementar uma rota opcional `volumetric_balance`, mas não permite:
 - comparar `pw_Pa` com `net_pressure_Pa` como equivalentes;
 - declarar validação física de fratura;
 - promover Level 1 para equivalência quantitativa.
+
+---
+
+## Fase 10.18C — diagnóstico de fratura/leakoff no balanço volumétrico
+
+**Status:** `PHASE10_18C_FRACTURE_VOLUME_BALANCE_DIAGNOSTIC_COMPLETE`.
+
+**Gate:** `FRACTURE_VOLUME_BALANCE_IMPLEMENTATION_ALLOWED_PRESSURE_THRESHOLD_APPROXIMATION`.
+
+A Fase 10.18C audita o caminho legado e moderno para decidir se os volumes
+consumidos por fratura e leakoff podem ser descontados do balanço volumétrico
+LOT moderno. A conclusão é:
+
+```text
+legacy sigma-theta criterion:
+  PARTIALLY_EXTRACTED_NOT_REPRODUCED_IN_PKN_MODEL
+```
+
+O critério legado identificado permanece:
+
+```text
+P_simulacao = line_up[lu].pi(idAnnular) + line_up[lu].dP(idAnnular)
+fratura inicia quando |P_simulacao| > |sigma_tangencial(altura_de_influencia)|
+```
+
+Como a tensão tangencial no ponto nodal da altura de influência não está
+disponível dentro do `PknModel`, a fase não tenta reproduzir esse critério. A
+rota moderna fica limitada à aproximação simplificada e opt-in:
+
+```text
+fracture.breakdown.pressure > 0
+```
+
+Quando essa aproximação abre a fratura, o balanço usa:
+
+```text
+dV_eff = dV_inj - dV_fracture_increment - dV_leakoff_increment
+```
+
+Se `fracture.breakdown.pressure` estiver ausente ou for zero, a abertura fica
+desativada e o comportamento permanece equivalente a um balanço sem sinks de
+fratura/leakoff.
+
+O diagnóstico gera localmente em `results/comparison/phase10_18c/`, sem
+versionar:
+
+```text
+phase10_18c_summary.csv
+phase10_18c_metadata.json
+pressure_vs_time_fracture_volume_coupling.png
+pressure_vs_injected_volume_fracture_volume_coupling.png
+```
+
+A comparação inclui:
+
+- legado auditado `pw_Pa`;
+- reconstrução moderna sem subtrair fratura/leakoff;
+- moderno 10.18C com fratura/leakoff subtraídos.
+
+Resultado observado no caso BUZ67D controlado:
+
+| Métrica | Legado auditado | Moderno sem sinks reconstruído | Moderno 10.18C acoplado |
+|---|---:|---:|---:|
+| Campo de pressão | `pw_Pa` | reconstrução `initial + injected/(C*V)` | `wellbore_pressure_Pa` |
+| Máxima pressão | `69.035836 MPa` | `1411.657773 MPa` | `26.732215 MPa` |
+| Diferença relativa no máximo | — | `19.448` | `0.613` |
+| Volume injetado incremental total | — | `0.993671 m3` | `0.993671 m3` |
+| Sink fratura + leakoff total | — | `0.0 m3` | `0.993671 m3` |
+
+Esse resultado confirma que a rota de sink volumétrico está ativa, mas também
+mostra que o placeholder `fracture.breakdown.pressure = 1 Pa` do caso
+controlado abre a fratura cedo demais e consome praticamente todo o volume
+injetado. Portanto, a Fase 10.18C não melhora a equivalência numérica com o
+legado. Ela apenas estabelece o mecanismo opt-in necessário para fases futuras.
+
+Essa comparação é apenas diagnóstica. Ela não valida equivalência física, não
+compara `sigmaTheta`, `margin`, `opened`, dano ou ruptura, e não promove o
+Level 1 para comparação quantitativa.

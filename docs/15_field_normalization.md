@@ -419,3 +419,30 @@ deve definir:
 
 Até lá, a comparação Level 1 continua restrita aos campos já exportados e
 documentados.
+
+## Fase 10.18C — incrementos de fratura e leakoff no balanço
+
+**Status:** `FRACTURE_LEAKOFF_VOLUME_BALANCE_FIELDS_EXPORTED_OPT_IN`.
+
+Campos modernos usados pela rota `volumetric_balance`:
+
+| Campo | Unidade | Origem | Uso |
+|---|---|---|---|
+| `fracture_volume_m3` | m3 | `PknModel` | Volume acumulado simplificado da fratura PKN. |
+| `leakoff_volume_m3` | m3 | `LeakoffModel` via `PknModel` | Volume acumulado simplificado perdido por leakoff. |
+| `balance_fracture_volume_increment_m3` | m3 | Diferença temporal de `fracture_volume_m3` | Sink descontado de `dV_inj` quando a fratura está aberta. |
+| `balance_leakoff_volume_increment_m3` | m3 | Diferença temporal de `leakoff_volume_m3` | Sink descontado de `dV_inj` quando a fratura está aberta. |
+| `balance_effective_volume_increment_m3` | m3 | Balanço moderno | `dV_inj - dV_fracture - dV_leakoff`. |
+
+O critério legado de abertura por tensão tangencial foi auditado, mas não foi
+normalizado para um campo moderno de produção nesta fase. O mapeamento fica:
+
+```text
+legacy |pi + dP| > |sigma_tangencial(altura_de_influencia)|
+  -> PARTIALLY_EXTRACTED_NOT_REPRODUCED_IN_PKN_MODEL
+```
+
+Assim, `fracture.breakdown.pressure` continua sendo apenas uma aproximação
+simplificada opt-in para estudos controlados. Nenhum campo moderno desta fase
+deve ser interpretado como validação física de `sigmaTheta`, `margin`, `opened`,
+dano ou ruptura.
