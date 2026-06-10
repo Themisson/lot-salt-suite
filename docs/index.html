@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">70/77</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">71/78</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">242</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">92</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -1709,6 +1709,133 @@ coeficiente de variação de aproximadamente <code>24%</code>. A proxima fase de
 modelo <code>pressure_dependent</code>, <code>tabulated_pressure</code> ou calibracao opt-in
 explicita, sem promover <code>constant_geometric</code> ou <code>elastic_annular_simple</code> para
 validacao fisica.</p>
+<h3 id="auditoria-termica-e-compressibilidade-antes-da-tabela-adendo-1021b">Auditoria termica e compressibilidade antes da tabela — adendo 10.21B</h3>
+<p><strong>Gate:</strong> <code>PRESSURE_TABULATED_COMPLIANCE_BLOCKED_THERMAL_EFFECT_RELEVANT</code>.</p>
+<p>Antes de implementar qualquer modelo <code>pressure_tabulated_geometric</code>, a formula
+legada do balanco deve ser lida com o termo termico ativo:</p>
+<pre><code class="language-text">dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+</code></pre>
+<p>No caso BUZ67D PKN, o fluido principal e prescrito por:</p>
+<pre><code class="language-text">vfluids[0]-&gt;setPFluid(11.5, 8E-4, 6.40E-10)
+</code></pre>
+<p>Portanto, para esse fluido:</p>
+<pre><code class="language-text">alpha_legacy = 8.0e-4 1/degC
+k_legacy     = 6.4e-10 1/Pa
+</code></pre>
+<p>O moderno controlado usa <code>compressibility_per_Pa = 6.4e-10</code>, logo a
+compressibilidade do fluido esta consistente com o legado para o caso auditado:</p>
+<pre><code class="language-text">compressibility_difference_percent = 0.0
+compressibility_status = COMPRESSIBILITY_CONFIRMED_MATCHING_LEGACY
+</code></pre>
+<p>A auditoria do arquivo nativo legado
+<code>results/comparison/level1_buz67d/legacy_audit/legacy_native_output.dat</code>
+mostra que o layer 16 possui <code>dT</code>, <code>Compressibilidade</code> e <code>C_Exp</code> exportados.
+Para o ponto de influencia final do intervalo 4360-4374 m, a interpolacao
+cubica de <code>Temperature</code> implica aproximadamente:</p>
+<table>
+<thead>
+<tr>
+<th>Termo</th>
+<th style="text-align: right;">Valor</th>
+<th>Unidade</th>
+<th>Fonte</th>
+<th>Observacao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>T_initial</code></td>
+<td style="text-align: right;"><code>91.16029460257798</code></td>
+<td>degC</td>
+<td><code>Temperature::getTi</code>, layer 16</td>
+<td>valor no ponto de influencia legado</td>
+</tr>
+<tr>
+<td><code>T_final</code></td>
+<td style="text-align: right;"><code>94.53942838746772</code></td>
+<td>degC</td>
+<td><code>Temperature::getDT</code>, layer 16</td>
+<td><code>T_initial + DTmax</code></td>
+</tr>
+<tr>
+<td><code>DTmax</code></td>
+<td style="text-align: right;"><code>3.3791337848897456</code></td>
+<td>degC</td>
+<td><code>A0/Af</code> + spline legado</td>
+<td>diferenca final-inicial</td>
+</tr>
+<tr>
+<td><code>dT(t=8.5 min)</code></td>
+<td style="text-align: right;"><code>3.282587105</code></td>
+<td>degC</td>
+<td><code>legacy_native_output.dat</code></td>
+<td>no marcador de abertura legado</td>
+</tr>
+<tr>
+<td><code>alpha</code></td>
+<td style="text-align: right;"><code>8.0e-4</code></td>
+<td>1/degC</td>
+<td><code>setPFluid</code></td>
+<td>constante para fluido prescrito</td>
+</tr>
+<tr>
+<td><code>alpha*dT(t=8.5 min)</code></td>
+<td style="text-align: right;"><code>0.002626069684</code></td>
+<td>adimensional</td>
+<td>calculado</td>
+<td>termo termico ativo</td>
+</tr>
+<tr>
+<td><code>k_legacy</code></td>
+<td style="text-align: right;"><code>6.4e-10</code></td>
+<td>1/Pa</td>
+<td><code>setPFluid</code> e <code>.dat</code></td>
+<td>constante no fluido prescrito</td>
+</tr>
+<tr>
+<td><code>C_fluid_modern</code></td>
+<td style="text-align: right;"><code>6.4e-10</code></td>
+<td>1/Pa</td>
+<td>YAML controlado</td>
+<td>igual ao legado</td>
+</tr>
+</tbody>
+</table>
+<p>O equivalente de pressao termica no instante de abertura e:</p>
+<pre><code class="language-text">thermal_pressure_equivalent = alpha*dT/k
+                            ~= 4.10323388125e6 Pa
+</code></pre>
+<p>Comparado com <code>dP(8.5 min) = 8.131435236e6 Pa</code>, a fracao termica no marcador
+fica em aproximadamente <code>0.5046</code>. Na janela pre-abertura (<code>0.5 &lt;= t &lt; 8.5 min</code>,
+layer 16), as estatisticas extraidas do <code>.dat</code> sao:</p>
+<pre><code class="language-text">mean_thermal_fraction       = 0.8670835951244072
+median_thermal_fraction     = 0.7838609981108711
+max_abs_thermal_fraction    = 1.5259151388269308
+thermal_status              = THERMAL_EFFECT_DOMINANT
+</code></pre>
+<p>Essa leitura significa que a compliance aparente bruta da Fase 10.21A absorve
+efeitos termicos relevantes. Ela nao deve alimentar diretamente uma tabela
+<code>pressure_tabulated_geometric</code> enquanto a serie nao for corrigida pelo termo
+<code>alpha*dT</code> ou enquanto uma instrumentacao/extração mais completa nao separar:</p>
+<pre><code class="language-text">C_eff_apparent_raw_1_Pa
+C_geom_apparent_raw_1_Pa
+thermal_pressure_equivalent_Pa
+thermal_fraction
+C_eff_apparent_thermal_corrected_1_Pa
+C_geom_apparent_thermal_corrected_1_Pa
+</code></pre>
+<p>Gate composto para a proxima tentativa de implementacao:</p>
+<pre><code class="language-text">PRESSURE_TABULATED_COMPLIANCE_IMPLEMENTATION_ALLOWED_AFTER_THERMAL_AUDIT
+</code></pre>
+<p>Esse gate esta bloqueado nesta auditoria pelo status:</p>
+<pre><code class="language-text">THERMAL_EFFECT_NEEDS_CORRECTION_BEFORE_TABULATION
+COMPRESSIBILITY_CONFIRMED_MATCHING_LEGACY
+</code></pre>
+<p>Portanto, a proxima fase deve corrigir a ferramenta da 10.21A para ingerir
+<code>dT</code>, <code>C_Exp</code> e <code>Compressibilidade</code> do <code>.dat</code> nativo, ou reinstrumentar o
+<code>LOT_Tese</code> de modo temporario e restauravel para exportar os termos termicos e
+volumetricos faltantes. Nao implementar tabela de compliance bruta antes dessa
+correcao.</p>
 </div>
 </section>
 
@@ -2966,7 +3093,17 @@ trace auditado classificou a serie pre-abertura como
 <code>constant_geometric</code> da 10.19C e cerca de <code>503x</code> o <code>elastic_annular_simple</code> da
 10.20C. O trace disponivel ainda nao exporta <code>dV_geom</code>, <code>dMl</code> ou <code>k</code> por passo,
 portanto a estimativa e diagnostica/reduzida e nao deve ser usada como
-validacao fisica direta.
+validacao fisica direta.</p>
+<p><strong>Atualizacao adendo 10.21B:</strong> a auditoria termica/compressibilidade confirmou
+que a compressibilidade do fluido principal BUZ67D e consistente entre legado e
+moderno (<code>k_legacy = C_fluid_modern = 6.4e-10 1/Pa</code>), mas tambem confirmou que
+o termo <code>alpha*dT</code> da formula legada e relevante. No layer 16, pre-abertura, a
+fracao <code>thermal_pressure_equivalent/dP</code> tem media <code>0.8670835951244072</code> e maximo
+absoluto <code>1.5259151388269308</code>, classificando o efeito como
+<code>THERMAL_EFFECT_DOMINANT</code>. Assim, qualquer <code>pressure_tabulated_geometric</code>
+extraido da serie bruta da 10.21A fica bloqueado ate que haja correcao termica
+ou nova instrumentacao que separe <code>dT</code>, <code>alpha</code>, <code>k</code>, <code>dV_geom</code>, <code>dMl</code> e
+<code>dV_leakoff</code>.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -6043,6 +6180,36 @@ ratio_elastic_10_20C_to_pre_mean = 0.0019878729366281296
 nao representa toda a curva pre-abertura. A proxima fase deve planejar um
 modelo tabulado/dependente de pressao ou calibracao opt-in explicita, sem
 promover essa extracao reduzida a validacao fisica.</p>
+<h2 id="adendo-1021b-gate-termicocompressibilidade-para-compliance-tabulada">Adendo 10.21B — gate termico/compressibilidade para compliance tabulada</h2>
+<p>A rota <code>pressure_tabulated_geometric</code> nao deve ser implementada a partir da
+compliance aparente bruta da 10.21A antes de auditar o termo termico legado. O
+balanco ativo do <code>LOT_Tese</code> contem:</p>
+<pre><code class="language-text">dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+</code></pre>
+<p>No BUZ67D PKN, o fluido principal usa <code>alpha = 8.0e-4 1/degC</code> e
+<code>k = 6.4e-10 1/Pa</code>. O moderno controlado usa o mesmo valor de
+compressibilidade (<code>C_fluid_modern = 6.4e-10 1/Pa</code>), portanto nao foi
+identificado mismatch de compressibilidade.</p>
+<p>O <code>.dat</code> nativo auditado exporta <code>dT</code>, <code>Compressibilidade</code> e <code>C_Exp</code>. Para o
+layer 16, o ponto de abertura legado (<code>8.5 min</code>) possui:</p>
+<pre><code class="language-text">dT = 3.282587105 degC
+alpha*dT = 0.002626069684
+thermal_pressure_equivalent = alpha*dT/k = 4.10323388125e6 Pa
+dP = 8.131435236e6 Pa
+thermal_fraction = 0.5046137320363699
+</code></pre>
+<p>Na janela pre-abertura, a fracao termica media e <code>0.8670835951244072</code> e o
+maximo absoluto e <code>1.5259151388269308</code>. A classificacao e:</p>
+<pre><code class="language-text">THERMAL_EFFECT_DOMINANT
+THERMAL_EFFECT_NEEDS_CORRECTION_BEFORE_TABULATION
+COMPRESSIBILITY_CONFIRMED_MATCHING_LEGACY
+PRESSURE_TABULATED_COMPLIANCE_BLOCKED_THERMAL_EFFECT_RELEVANT
+</code></pre>
+<p>Consequencia: a 10.21B nao deve promover <code>pressure_tabulated_geometric</code> nesta
+forma. A proxima etapa deve produzir uma serie corrigida por termo termico, ou
+reinstrumentar temporariamente o legado para exportar <code>dT</code>, <code>alpha</code>, <code>k</code>,
+<code>dV_geom</code>, <code>dMl</code> e <code>dV_leakoff</code> em um trace unico. Ate la, a compliance
+aparente da 10.21A permanece diagnostica e bruta.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser

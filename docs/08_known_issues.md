@@ -722,6 +722,17 @@ trace auditado classificou a serie pre-abertura como
 10.20C. O trace disponivel ainda nao exporta `dV_geom`, `dMl` ou `k` por passo,
 portanto a estimativa e diagnostica/reduzida e nao deve ser usada como
 validacao fisica direta.
+
+**Atualizacao adendo 10.21B:** a auditoria termica/compressibilidade confirmou
+que a compressibilidade do fluido principal BUZ67D e consistente entre legado e
+moderno (`k_legacy = C_fluid_modern = 6.4e-10 1/Pa`), mas tambem confirmou que
+o termo `alpha*dT` da formula legada e relevante. No layer 16, pre-abertura, a
+fracao `thermal_pressure_equivalent/dP` tem media `0.8670835951244072` e maximo
+absoluto `1.5259151388269308`, classificando o efeito como
+`THERMAL_EFFECT_DOMINANT`. Assim, qualquer `pressure_tabulated_geometric`
+extraido da serie bruta da 10.21A fica bloqueado ate que haja correcao termica
+ou nova instrumentacao que separe `dT`, `alpha`, `k`, `dV_geom`, `dMl` e
+`dV_leakoff`.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

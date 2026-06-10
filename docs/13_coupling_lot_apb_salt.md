@@ -2414,6 +2414,48 @@ nao representa toda a curva pre-abertura. A proxima fase deve planejar um
 modelo tabulado/dependente de pressao ou calibracao opt-in explicita, sem
 promover essa extracao reduzida a validacao fisica.
 
+## Adendo 10.21B — gate termico/compressibilidade para compliance tabulada
+
+A rota `pressure_tabulated_geometric` nao deve ser implementada a partir da
+compliance aparente bruta da 10.21A antes de auditar o termo termico legado. O
+balanco ativo do `LOT_Tese` contem:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+No BUZ67D PKN, o fluido principal usa `alpha = 8.0e-4 1/degC` e
+`k = 6.4e-10 1/Pa`. O moderno controlado usa o mesmo valor de
+compressibilidade (`C_fluid_modern = 6.4e-10 1/Pa`), portanto nao foi
+identificado mismatch de compressibilidade.
+
+O `.dat` nativo auditado exporta `dT`, `Compressibilidade` e `C_Exp`. Para o
+layer 16, o ponto de abertura legado (`8.5 min`) possui:
+
+```text
+dT = 3.282587105 degC
+alpha*dT = 0.002626069684
+thermal_pressure_equivalent = alpha*dT/k = 4.10323388125e6 Pa
+dP = 8.131435236e6 Pa
+thermal_fraction = 0.5046137320363699
+```
+
+Na janela pre-abertura, a fracao termica media e `0.8670835951244072` e o
+maximo absoluto e `1.5259151388269308`. A classificacao e:
+
+```text
+THERMAL_EFFECT_DOMINANT
+THERMAL_EFFECT_NEEDS_CORRECTION_BEFORE_TABULATION
+COMPRESSIBILITY_CONFIRMED_MATCHING_LEGACY
+PRESSURE_TABULATED_COMPLIANCE_BLOCKED_THERMAL_EFFECT_RELEVANT
+```
+
+Consequencia: a 10.21B nao deve promover `pressure_tabulated_geometric` nesta
+forma. A proxima etapa deve produzir uma serie corrigida por termo termico, ou
+reinstrumentar temporariamente o legado para exportar `dT`, `alpha`, `k`,
+`dV_geom`, `dMl` e `dV_leakoff` em um trace unico. Ate la, a compliance
+aparente da 10.21A permanece diagnostica e bruta.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que

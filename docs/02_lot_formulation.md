@@ -1087,3 +1087,103 @@ coeficiente de variação de aproximadamente `24%`. A proxima fase deve avaliar
 modelo `pressure_dependent`, `tabulated_pressure` ou calibracao opt-in
 explicita, sem promover `constant_geometric` ou `elastic_annular_simple` para
 validacao fisica.
+
+### Auditoria termica e compressibilidade antes da tabela — adendo 10.21B
+
+**Gate:** `PRESSURE_TABULATED_COMPLIANCE_BLOCKED_THERMAL_EFFECT_RELEVANT`.
+
+Antes de implementar qualquer modelo `pressure_tabulated_geometric`, a formula
+legada do balanco deve ser lida com o termo termico ativo:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+No caso BUZ67D PKN, o fluido principal e prescrito por:
+
+```text
+vfluids[0]->setPFluid(11.5, 8E-4, 6.40E-10)
+```
+
+Portanto, para esse fluido:
+
+```text
+alpha_legacy = 8.0e-4 1/degC
+k_legacy     = 6.4e-10 1/Pa
+```
+
+O moderno controlado usa `compressibility_per_Pa = 6.4e-10`, logo a
+compressibilidade do fluido esta consistente com o legado para o caso auditado:
+
+```text
+compressibility_difference_percent = 0.0
+compressibility_status = COMPRESSIBILITY_CONFIRMED_MATCHING_LEGACY
+```
+
+A auditoria do arquivo nativo legado
+`results/comparison/level1_buz67d/legacy_audit/legacy_native_output.dat`
+mostra que o layer 16 possui `dT`, `Compressibilidade` e `C_Exp` exportados.
+Para o ponto de influencia final do intervalo 4360-4374 m, a interpolacao
+cubica de `Temperature` implica aproximadamente:
+
+| Termo | Valor | Unidade | Fonte | Observacao |
+|---|---:|---|---|---|
+| `T_initial` | `91.16029460257798` | degC | `Temperature::getTi`, layer 16 | valor no ponto de influencia legado |
+| `T_final` | `94.53942838746772` | degC | `Temperature::getDT`, layer 16 | `T_initial + DTmax` |
+| `DTmax` | `3.3791337848897456` | degC | `A0/Af` + spline legado | diferenca final-inicial |
+| `dT(t=8.5 min)` | `3.282587105` | degC | `legacy_native_output.dat` | no marcador de abertura legado |
+| `alpha` | `8.0e-4` | 1/degC | `setPFluid` | constante para fluido prescrito |
+| `alpha*dT(t=8.5 min)` | `0.002626069684` | adimensional | calculado | termo termico ativo |
+| `k_legacy` | `6.4e-10` | 1/Pa | `setPFluid` e `.dat` | constante no fluido prescrito |
+| `C_fluid_modern` | `6.4e-10` | 1/Pa | YAML controlado | igual ao legado |
+
+O equivalente de pressao termica no instante de abertura e:
+
+```text
+thermal_pressure_equivalent = alpha*dT/k
+                            ~= 4.10323388125e6 Pa
+```
+
+Comparado com `dP(8.5 min) = 8.131435236e6 Pa`, a fracao termica no marcador
+fica em aproximadamente `0.5046`. Na janela pre-abertura (`0.5 <= t < 8.5 min`,
+layer 16), as estatisticas extraidas do `.dat` sao:
+
+```text
+mean_thermal_fraction       = 0.8670835951244072
+median_thermal_fraction     = 0.7838609981108711
+max_abs_thermal_fraction    = 1.5259151388269308
+thermal_status              = THERMAL_EFFECT_DOMINANT
+```
+
+Essa leitura significa que a compliance aparente bruta da Fase 10.21A absorve
+efeitos termicos relevantes. Ela nao deve alimentar diretamente uma tabela
+`pressure_tabulated_geometric` enquanto a serie nao for corrigida pelo termo
+`alpha*dT` ou enquanto uma instrumentacao/extração mais completa nao separar:
+
+```text
+C_eff_apparent_raw_1_Pa
+C_geom_apparent_raw_1_Pa
+thermal_pressure_equivalent_Pa
+thermal_fraction
+C_eff_apparent_thermal_corrected_1_Pa
+C_geom_apparent_thermal_corrected_1_Pa
+```
+
+Gate composto para a proxima tentativa de implementacao:
+
+```text
+PRESSURE_TABULATED_COMPLIANCE_IMPLEMENTATION_ALLOWED_AFTER_THERMAL_AUDIT
+```
+
+Esse gate esta bloqueado nesta auditoria pelo status:
+
+```text
+THERMAL_EFFECT_NEEDS_CORRECTION_BEFORE_TABULATION
+COMPRESSIBILITY_CONFIRMED_MATCHING_LEGACY
+```
+
+Portanto, a proxima fase deve corrigir a ferramenta da 10.21A para ingerir
+`dT`, `C_Exp` e `Compressibilidade` do `.dat` nativo, ou reinstrumentar o
+`LOT_Tese` de modo temporario e restauravel para exportar os termos termicos e
+volumetricos faltantes. Nao implementar tabela de compliance bruta antes dessa
+correcao.

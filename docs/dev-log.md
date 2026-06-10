@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.21A extracao de compliance aparente legado; commit/push pendente
+Fase ativa  : 10.21B auditoria termica/compressibilidade antes de tabela; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
@@ -201,9 +201,77 @@ silenciosamente e nao declarar validacao fisica.
 
 ---
 
+### [2026-06-10] Fase 10.21B — auditoria termica/compressibilidade antes de tabela — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Objetivo:** executar o adendo obrigatorio antes de qualquer implementacao de
+`pressure_tabulated_geometric`, auditando se a compliance aparente da 10.21A
+absorve efeitos termicos e se a compressibilidade moderna bate com o legado.
+
+**Fonte auditada:** leitura read-only de:
+
+```text
+legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+legance/LOT_Tese/src/apb_code/APB1da.cpp
+legance/LOT_Tese/include/apb_code/APB1da.h
+results/comparison/level1_buz67d/legacy_audit/legacy_native_output.dat
+```
+
+**Formula legado ativa:**
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+**Resultado do caso BUZ67D PKN:**
+
+```text
+alpha_legacy = 8.0e-4 1/degC
+k_legacy = 6.4e-10 1/Pa
+C_fluid_modern = 6.4e-10 1/Pa
+compressibility_difference_percent = 0.0
+compressibility_status = COMPRESSIBILITY_CONFIRMED_MATCHING_LEGACY
+```
+
+Para o layer 16, ponto de influencia final do intervalo 4360-4374 m:
+
+```text
+T_initial = 91.16029460257798 degC
+T_final = 94.53942838746772 degC
+DTmax = 3.3791337848897456 degC
+dT_at_8_5_min = 3.282587105 degC
+thermal_pressure_equivalent_at_8_5_min = 4.10323388125e6 Pa
+dP_at_8_5_min = 8.131435236e6 Pa
+thermal_fraction_at_8_5_min = 0.5046137320363699
+```
+
+Estatisticas pre-abertura do layer 16:
+
+```text
+mean_thermal_fraction = 0.8670835951244072
+median_thermal_fraction = 0.7838609981108711
+max_abs_thermal_fraction = 1.5259151388269308
+thermal_status = THERMAL_EFFECT_DOMINANT
+```
+
+**Gate resultante:**
+
+```text
+THERMAL_EFFECT_NEEDS_CORRECTION_BEFORE_TABULATION
+PRESSURE_TABULATED_COMPLIANCE_BLOCKED_THERMAL_EFFECT_RELEVANT
+```
+
+**Decisao:** nao implementar `pressure_tabulated_geometric` com a serie bruta
+da 10.21A. A proxima fase deve produzir uma serie corrigida por termo termico
+ou reinstrumentar temporariamente o legado para exportar `dT`, `alpha`, `k`,
+`dV_geom`, `dMl` e `dV_leakoff` no mesmo trace.
+
+---
+
 ### [2026-06-10] Fase 10.21A — extracao da compliance aparente legado LOT_Tese — Codex
 
-**Status:** Implementada e validada localmente; commit/push pendente.
+**Status:** Commitada e enviada para `origin/main` em `d8759cc`.
 
 **Ferramenta criada:**
 

@@ -1836,3 +1836,41 @@ Interpretação para a matriz legado-moderno:
 Proxima fase recomendada: 10.21B deve escolher entre `tabulated_pressure`,
 `pressure_dependent` ou `elastic_scaled` opt-in, mantendo o gate Level 1 fechado
 para validacao fisica.
+
+## Adendo termico/compressibilidade para a Fase 10.21B
+
+A comparacao Level 1 nao pode usar a serie bruta da Fase 10.21A como tabela de
+compliance geometrica sem separar o termo termico do balanco legado. A formula
+ativa contem `alpha*dT`, e o `.dat` nativo auditado mostra que esse termo e
+grande para o layer 16 do BUZ67D.
+
+Resumo do gate:
+
+| Item | Resultado |
+|---|---|
+| `k_legacy` | `6.4e-10 1/Pa` |
+| `C_fluid_modern` | `6.4e-10 1/Pa` |
+| diferenca de compressibilidade | `0.0%` |
+| `compressibility_status` | `COMPRESSIBILITY_CONFIRMED_MATCHING_LEGACY` |
+| `mean_thermal_fraction` pre-abertura | `0.8670835951244072` |
+| `max_abs_thermal_fraction` pre-abertura | `1.5259151388269308` |
+| `thermal_status` | `THERMAL_EFFECT_DOMINANT` |
+| gate da tabela | `PRESSURE_TABULATED_COMPLIANCE_BLOCKED_THERMAL_EFFECT_RELEVANT` |
+
+Portanto, a proxima comparacao executavel deve ser uma comparacao estrutural da
+serie termica/corrigida, nao uma validacao fisica. Campos ainda bloqueados para
+validacao quantitativa:
+
+```text
+dV_geom_m3_rad
+dMl_term_m3_rad
+dV_leakoff_m3_rad
+opened
+C_eff_apparent_thermal_corrected_1_Pa
+C_geom_apparent_thermal_corrected_1_Pa
+```
+
+Qualquer YAML futuro com `pressure_tabulated_geometric` devera declarar se a
+serie usada e `raw_apparent_compliance` ou
+`thermal_corrected_apparent_compliance`. Com o gate atual, usar a serie bruta
+como rota fisica esta bloqueado.

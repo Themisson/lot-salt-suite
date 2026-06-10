@@ -420,6 +420,49 @@
       "Level 1 physical validation remains closed."
     ]
   },
+  "phase10_21b_thermal_compressibility_audit": {
+    "status": "PRESSURE_TABULATED_COMPLIANCE_BLOCKED_THERMAL_EFFECT_RELEVANT",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "legacy_sources": [
+      "legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp",
+      "legance/LOT_Tese/src/apb_code/APB1da.cpp",
+      "results/comparison/level1_buz67d/legacy_audit/legacy_native_output.dat"
+    ],
+    "legacy_balance_formula": "dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k",
+    "layer": 16,
+    "T_initial_degC": 91.16029460257798,
+    "T_final_degC": 94.53942838746772,
+    "DTmax_degC": 3.3791337848897456,
+    "dT_at_8_5_min_degC": 3.282587105,
+    "alpha_1_per_degC": 0.0008,
+    "alpha_dT_at_8_5_min": 0.002626069684,
+    "k_legacy_1_Pa": 6.4e-10,
+    "C_fluid_modern_1_Pa": 6.4e-10,
+    "compressibility_difference_percent": 0.0,
+    "compressibility_status": "COMPRESSIBILITY_CONFIRMED_MATCHING_LEGACY",
+    "thermal_pressure_equivalent_at_8_5_min_Pa": 4103233.8812500006,
+    "dP_at_8_5_min_Pa": 8131435.236,
+    "thermal_fraction_at_8_5_min": 0.5046137320363699,
+    "pre_opening": {
+      "mean_thermal_fraction": 0.8670835951244072,
+      "median_thermal_fraction": 0.7838609981108711,
+      "max_abs_thermal_fraction": 1.5259151388269308,
+      "thermal_status": "THERMAL_EFFECT_DOMINANT"
+    },
+    "gate": [
+      "THERMAL_EFFECT_NEEDS_CORRECTION_BEFORE_TABULATION",
+      "PRESSURE_TABULATED_COMPLIANCE_BLOCKED_THERMAL_EFFECT_RELEVANT"
+    ],
+    "caveats": [
+      "The Phase 10.21A apparent compliance series is raw and can absorb alpha*dT.",
+      "Do not implement pressure_tabulated_geometric from raw apparent compliance before thermal correction.",
+      "A future extraction should join dT, C_Exp and Compressibilidade with the apparent compliance trace.",
+      "Level 1 physical validation remains closed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

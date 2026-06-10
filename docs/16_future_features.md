@@ -264,3 +264,11 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   passo coincide com ele. Uma fase futura deve avaliar `tabulated_pressure`,
   `pressure_dependent` ou `elastic_scaled` opt-in, idealmente depois de exportar
   `dV_geom`, `dMl`, `dV_leakoff` e `k` diretamente do legado.
+- O adendo termico da 10.21B bloqueia a implementacao imediata de
+  `pressure_tabulated_geometric` a partir da serie bruta. Embora
+  `k_legacy = C_fluid_modern = 6.4e-10 1/Pa`, o termo `alpha*dT` e dominante
+  no layer 16 pre-abertura (`mean_thermal_fraction ~= 0.867`,
+  `max_abs_thermal_fraction ~= 1.526`). A proxima evolucao deve produzir uma
+  serie corrigida por termo termico ou reinstrumentar temporariamente o legado
+  para exportar `dT`, `alpha`, `k`, `dV_geom`, `dMl` e `dV_leakoff` no mesmo
+  trace.

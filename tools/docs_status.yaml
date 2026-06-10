@@ -84,6 +84,7 @@ phases:
   phase_10_20b_elastic_annular_compliance_model: completed
   phase_10_20c_buz67d_elastic_compliance_diagnostic: completed
   phase_10_21a_apparent_compliance_extraction: completed
+  phase_10_21b_thermal_compressibility_audit: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -185,5 +186,5 @@ test_counts:
 # Metadados
 # ============================================================
 last_updated: "2026-06-10"
-updated_by: "codex (Fase 10.21A apparent compliance extraction)"
+updated_by: "codex (Fase 10.21B thermal/compressibility audit)"
 project_version: "0.1.0"
