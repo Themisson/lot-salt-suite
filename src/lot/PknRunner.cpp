@@ -239,6 +239,22 @@ PknInput make_pkn_input(const lss::core::CaseData& data) {
       data.lot.volumetric_compliance.geometric_compressibility_per_Pa;
   input.volumetric_compliance.total_compressibility_per_Pa =
       data.lot.volumetric_compliance.total_compressibility_per_Pa;
+  input.volumetric_compliance.inner_radius_m =
+      data.lot.volumetric_compliance.inner_radius_m;
+  input.volumetric_compliance.outer_radius_m =
+      data.lot.volumetric_compliance.outer_radius_m;
+  input.volumetric_compliance.inner_wall_thickness_m =
+      data.lot.volumetric_compliance.inner_wall_thickness_m;
+  input.volumetric_compliance.inner_young_modulus_Pa =
+      data.lot.volumetric_compliance.inner_young_modulus_Pa;
+  input.volumetric_compliance.inner_poisson_ratio =
+      data.lot.volumetric_compliance.inner_poisson_ratio;
+  input.volumetric_compliance.formation_young_modulus_Pa =
+      data.lot.volumetric_compliance.formation_young_modulus_Pa;
+  input.volumetric_compliance.formation_poisson_ratio =
+      data.lot.volumetric_compliance.formation_poisson_ratio;
+  input.volumetric_compliance.mechanical_compliance_status =
+      data.lot.volumetric_compliance.mechanical_compliance_status;
   input.volumetric_compliance.source = data.lot.volumetric_compliance.source;
   input.volumetric_compliance.caveat = data.lot.volumetric_compliance.caveat;
   input.fracture_initiation =

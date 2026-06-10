@@ -322,11 +322,41 @@ properties:
                 type: boolean
               model:
                 type: string
-                enum: [constant_geometric]
+                enum: [constant_geometric, elastic_annular_simple]
               geometric_compressibility:
                 $ref: "#/$defs/compressibility_quantity"
               total_compressibility:
                 $ref: "#/$defs/compressibility_quantity"
+              inner_boundary:
+                type: object
+                required: [radius, wall_thickness, young_modulus, poisson_ratio]
+                additionalProperties: false
+                properties:
+                  radius:
+                    $ref: "#/$defs/length_quantity"
+                  wall_thickness:
+                    $ref: "#/$defs/length_quantity"
+                  young_modulus:
+                    $ref: "#/$defs/pressure_quantity"
+                  poisson_ratio:
+                    type: number
+                    minimum: 0
+                    exclusiveMaximum: 0.5
+              formation:
+                type: object
+                required: [radius, young_modulus, poisson_ratio]
+                additionalProperties: false
+                properties:
+                  radius:
+                    $ref: "#/$defs/length_quantity"
+                  young_modulus:
+                    $ref: "#/$defs/pressure_quantity"
+                  poisson_ratio:
+                    type: number
+                    minimum: 0
+                    exclusiveMaximum: 0.5
+              mechanical_compliance_status:
+                type: string
               source:
                 type: string
               caveat:
@@ -338,6 +368,12 @@ properties:
                       const: true
                 then:
                   required: [model, source]
+              - if:
+                  properties:
+                    model:
+                      const: elastic_annular_simple
+                then:
+                  required: [inner_boundary, formation]
               - not:
                   required: [geometric_compressibility, total_compressibility]
   apb:

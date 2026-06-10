@@ -699,6 +699,12 @@ Foi formulado o candidato `elastic_annular_simple`, mas o gate ficou
 BUZ67D (`C_geom ~= 1.7242805809704984e-10 1/Pa`) e muito menor que o proxy
 diagnostico da 10.19C. Assim, qualquer implementação deve continuar opt-in,
 experimental e sem declarar validacao fisica.
+
+**Atualizacao Fase 10.20B:** `elastic_annular_simple` foi implementado como
+modelo opt-in no `volumetric_balance`. Ele calcula `C_geom` por uma aproximacao
+radial elastica simples e exporta `mechanical_compliance_status`, mas permanece
+experimental. A rota padrao, `pkn_direct`, e casos sem compliance seguem
+inalterados.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

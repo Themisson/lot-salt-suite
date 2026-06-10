@@ -937,3 +937,53 @@ Portanto, a formulacao e implementavel, mas parcial: espera-se que o modelo
 elastico simples reduza a pressao em relacao a compressao pura do fluido, sem
 necessariamente reproduzir a compliance diagnostica do legado. Ele deve ser
 implementado apenas como rota opt-in/experimental.
+
+### Modelo `elastic_annular_simple` opt-in — Fase 10.20B
+
+**Status:** `PHASE10_20B_ELASTIC_ANNULAR_SIMPLE_IMPLEMENTED`.
+
+A Fase 10.20B implementou o candidato da 10.20A como rota experimental no
+`volumetric_balance`. O modelo calcula a compliance geometrica a partir de
+uma fronteira interna elastica e de uma formação elastica simplificada:
+
+```text
+c_inner = r_inner^2 / (E_inner * t_inner)
+c_outer = (1 + nu_formation) * r_outer / E_formation
+C_geom = 2 * (r_outer*c_outer + r_inner*c_inner) /
+         (r_outer^2 - r_inner^2)
+C_eff = C_fluid + C_geom
+dP = dV_eff / (C_eff * V_annular)
+```
+
+O YAML opt-in usa:
+
+```yaml
+lot:
+  volumetric_balance:
+    compliance:
+      enabled: true
+      model: elastic_annular_simple
+      inner_boundary:
+        radius: {value: 0.06985, unit: m}
+        wall_thickness: {value: 0.010541, unit: m}
+        young_modulus: {value: 210000000000.0, unit: Pa}
+        poisson_ratio: 0.3
+      formation:
+        radius: {value: 0.17145, unit: m}
+        young_modulus: {value: 20400000000.0, unit: Pa}
+        poisson_ratio: 0.36
+      source: mechanical_estimate
+```
+
+Campos exportados:
+
+- `geometric_compressibility_per_Pa`;
+- `effective_compressibility_per_Pa`;
+- `compliance_model`;
+- `compliance_source`;
+- `mechanical_compliance_status`.
+
+O modelo `constant_geometric` da 10.19C permanece suportado. Casos sem
+compliance continuam usando apenas `C_fluid`, e `pkn_direct` ignora qualquer
+bloco de compliance. A fase não implementa APB/sal acoplado, Zamora ou
+sigma-theta runtime.

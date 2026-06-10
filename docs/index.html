@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">67/74</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">237</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">68/75</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">242</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">84</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -1518,6 +1518,47 @@ predicted_first_dP_elastic_simple = 43639672.35675541 Pa
 elastico simples reduza a pressao em relacao a compressao pura do fluido, sem
 necessariamente reproduzir a compliance diagnostica do legado. Ele deve ser
 implementado apenas como rota opt-in/experimental.</p>
+<h3 id="modelo-elastic_annular_simple-opt-in-fase-1020b">Modelo <code>elastic_annular_simple</code> opt-in — Fase 10.20B</h3>
+<p><strong>Status:</strong> <code>PHASE10_20B_ELASTIC_ANNULAR_SIMPLE_IMPLEMENTED</code>.</p>
+<p>A Fase 10.20B implementou o candidato da 10.20A como rota experimental no
+<code>volumetric_balance</code>. O modelo calcula a compliance geometrica a partir de
+uma fronteira interna elastica e de uma formação elastica simplificada:</p>
+<pre><code class="language-text">c_inner = r_inner^2 / (E_inner * t_inner)
+c_outer = (1 + nu_formation) * r_outer / E_formation
+C_geom = 2 * (r_outer*c_outer + r_inner*c_inner) /
+         (r_outer^2 - r_inner^2)
+C_eff = C_fluid + C_geom
+dP = dV_eff / (C_eff * V_annular)
+</code></pre>
+<p>O YAML opt-in usa:</p>
+<pre><code class="language-yaml">lot:
+  volumetric_balance:
+    compliance:
+      enabled: true
+      model: elastic_annular_simple
+      inner_boundary:
+        radius: {value: 0.06985, unit: m}
+        wall_thickness: {value: 0.010541, unit: m}
+        young_modulus: {value: 210000000000.0, unit: Pa}
+        poisson_ratio: 0.3
+      formation:
+        radius: {value: 0.17145, unit: m}
+        young_modulus: {value: 20400000000.0, unit: Pa}
+        poisson_ratio: 0.36
+      source: mechanical_estimate
+</code></pre>
+<p>Campos exportados:</p>
+<ul>
+<li><code>geometric_compressibility_per_Pa</code>;</li>
+<li><code>effective_compressibility_per_Pa</code>;</li>
+<li><code>compliance_model</code>;</li>
+<li><code>compliance_source</code>;</li>
+<li><code>mechanical_compliance_status</code>.</li>
+</ul>
+<p>O modelo <code>constant_geometric</code> da 10.19C permanece suportado. Casos sem
+compliance continuam usando apenas <code>C_fluid</code>, e <code>pkn_direct</code> ignora qualquer
+bloco de compliance. A fase não implementa APB/sal acoplado, Zamora ou
+sigma-theta runtime.</p>
 </div>
 </section>
 
@@ -2755,7 +2796,12 @@ calculado por area anular deformada com deslocamentos <code>u(e)</code>/<code>u(
 <code>MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL</code>: a estimativa elastica simples para
 BUZ67D (<code>C_geom ~= 1.7242805809704984e-10 1/Pa</code>) e muito menor que o proxy
 diagnostico da 10.19C. Assim, qualquer implementação deve continuar opt-in,
-experimental e sem declarar validacao fisica.
+experimental e sem declarar validacao fisica.</p>
+<p><strong>Atualizacao Fase 10.20B:</strong> <code>elastic_annular_simple</code> foi implementado como
+modelo opt-in no <code>volumetric_balance</code>. Ele calcula <code>C_geom</code> por uma aproximacao
+radial elastica simples e exporta <code>mechanical_compliance_status</code>, mas permanece
+experimental. A rota padrao, <code>pkn_direct</code>, e casos sem compliance seguem
+inalterados.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -5758,6 +5804,20 @@ ou <code>lot-sim run --mode lot-pkn</code>. O gate ficou:</p>
 propriedades elasticas e geometria. Ele e deliberadamente reduzido e deve ser
 tratado como diagnostico, porque nao reproduz o sistema global legado nem a
 fluencia temporal do sal.</p>
+<h2 id="modelo-elastico-simples-de-compliance-anular-fase-1020b">Modelo elastico simples de compliance anular (Fase 10.20B)</h2>
+<p>A Fase 10.20B implementou <code>elastic_annular_simple</code> como rota opt-in no
+<code>volumetric_balance</code>. O modelo nao altera <code>LotSaltPressureMap</code>, nao chama
+<code>SaltCreepTimeBridge</code> e nao conecta APB/sal ao runtime padrão.</p>
+<p>Formula:</p>
+<pre><code class="language-text">c_inner = r_inner^2 / (E_inner * t_inner)
+c_outer = (1 + nu_outer) * r_outer / E_outer
+C_geom = 2 * (r_outer*c_outer + r_inner*c_inner) /
+         (r_outer^2 - r_inner^2)
+C_eff = C_fluid + C_geom
+</code></pre>
+<p><code>constant_geometric</code> continua disponível como baseline diagnostico da 10.19C.
+<code>elastic_annular_simple</code> e uma tentativa mecanica reduzida e deve ser comparado
+separadamente no BUZ67D antes de qualquer promoção de maturidade.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser

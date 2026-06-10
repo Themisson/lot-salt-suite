@@ -448,6 +448,40 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
                            "lot.volumetric_balance.compliance.total_compressibility",
                            "compressibility");
     }
+    if (compliance["inner_boundary"]) {
+      const YAML::Node inner = compliance["inner_boundary"];
+      data.lot.volumetric_compliance.inner_radius_m =
+          parse_value_unit(inner["radius"],
+                           "lot.volumetric_balance.compliance.inner_boundary.radius",
+                           "length");
+      data.lot.volumetric_compliance.inner_wall_thickness_m =
+          parse_value_unit(inner["wall_thickness"],
+                           "lot.volumetric_balance.compliance.inner_boundary.wall_thickness",
+                           "length");
+      data.lot.volumetric_compliance.inner_young_modulus_Pa =
+          parse_value_unit(inner["young_modulus"],
+                           "lot.volumetric_balance.compliance.inner_boundary.young_modulus",
+                           "pressure");
+      data.lot.volumetric_compliance.inner_poisson_ratio =
+          require_as<double>(inner["poisson_ratio"],
+                             "lot.volumetric_balance.compliance.inner_boundary.poisson_ratio");
+    }
+    if (compliance["formation"]) {
+      const YAML::Node formation = compliance["formation"];
+      data.lot.volumetric_compliance.outer_radius_m =
+          parse_value_unit(formation["radius"],
+                           "lot.volumetric_balance.compliance.formation.radius",
+                           "length");
+      data.lot.volumetric_compliance.formation_young_modulus_Pa =
+          parse_value_unit(formation["young_modulus"],
+                           "lot.volumetric_balance.compliance.formation.young_modulus",
+                           "pressure");
+      data.lot.volumetric_compliance.formation_poisson_ratio =
+          require_as<double>(formation["poisson_ratio"],
+                             "lot.volumetric_balance.compliance.formation.poisson_ratio");
+    }
+    data.lot.volumetric_compliance.mechanical_compliance_status =
+        optional_string(compliance, "mechanical_compliance_status");
   }
 
   const YAML::Node apb = require_node(root["apb"], "apb");
@@ -564,18 +598,50 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
         throw std::runtime_error(
             "Validacao falhou: compliance geometrica exige pressure_model volumetric_balance");
       }
-      if (compliance.model != "constant_geometric") {
+      if (compliance.model != "constant_geometric" &&
+          compliance.model != "elastic_annular_simple") {
         throw std::runtime_error(
-            "Validacao falhou: compliance geometrica suporta apenas constant_geometric");
-      }
-      if (!std::isfinite(compliance.geometric_compressibility_per_Pa) ||
-          compliance.geometric_compressibility_per_Pa < 0.0) {
-        throw std::runtime_error(
-            "Validacao falhou: geometric_compressibility deve ser >= 0");
+            "Validacao falhou: compliance geometrica suporta constant_geometric ou elastic_annular_simple");
       }
       if (compliance.total_compressibility_per_Pa != 0.0) {
         throw std::runtime_error(
-            "Validacao falhou: total_compressibility nao deve ser combinado com constant_geometric");
+            "Validacao falhou: total_compressibility nao e suportado nesta fase");
+      }
+      if (compliance.model == "constant_geometric") {
+        if (!std::isfinite(compliance.geometric_compressibility_per_Pa) ||
+            compliance.geometric_compressibility_per_Pa < 0.0) {
+          throw std::runtime_error(
+              "Validacao falhou: geometric_compressibility deve ser >= 0");
+        }
+      } else {
+        if (!std::isfinite(compliance.inner_radius_m) ||
+            !std::isfinite(compliance.outer_radius_m) ||
+            compliance.inner_radius_m <= 0.0 ||
+            compliance.outer_radius_m <= compliance.inner_radius_m) {
+          throw std::runtime_error(
+              "Validacao falhou: elastic_annular_simple exige outer_radius > inner_radius > 0");
+        }
+        if (!std::isfinite(compliance.inner_wall_thickness_m) ||
+            compliance.inner_wall_thickness_m <= 0.0) {
+          throw std::runtime_error(
+              "Validacao falhou: elastic_annular_simple exige inner wall_thickness > 0");
+        }
+        if (!std::isfinite(compliance.inner_young_modulus_Pa) ||
+            !std::isfinite(compliance.formation_young_modulus_Pa) ||
+            compliance.inner_young_modulus_Pa <= 0.0 ||
+            compliance.formation_young_modulus_Pa <= 0.0) {
+          throw std::runtime_error(
+              "Validacao falhou: elastic_annular_simple exige Young modulus > 0");
+        }
+        if (!std::isfinite(compliance.inner_poisson_ratio) ||
+            !std::isfinite(compliance.formation_poisson_ratio) ||
+            compliance.inner_poisson_ratio < 0.0 ||
+            compliance.formation_poisson_ratio < 0.0 ||
+            compliance.inner_poisson_ratio >= 0.5 ||
+            compliance.formation_poisson_ratio >= 0.5) {
+          throw std::runtime_error(
+              "Validacao falhou: elastic_annular_simple exige Poisson em [0, 0.5)");
+        }
       }
       if (compliance.source.empty()) {
         throw std::runtime_error(

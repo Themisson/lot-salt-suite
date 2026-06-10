@@ -328,6 +328,26 @@
       "Level 1 physical validation remains closed."
     ]
   },
+  "phase10_20b_elastic_annular_compliance_model": {
+    "status": "PHASE10_20B_ELASTIC_ANNULAR_SIMPLE_IMPLEMENTED",
+    "classification": "EXPERIMENTAL_OPT_IN_MECHANICAL_COMPLIANCE",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "model": "elastic_annular_simple",
+    "formula": "C_geom = 2 * (b*c_outer + a*c_inner) / (b^2 - a^2); C_eff = C_fluid + C_geom",
+    "yaml_contract": "lot.volumetric_balance.compliance.model = elastic_annular_simple",
+    "constant_geometric_preserved": true,
+    "pkn_direct_preserved": true,
+    "expected_buz67d_behavior": "The simple elastic model is expected to improve pressure scale less than constant_geometric and may classify as undercompliant in Phase 10.20C.",
+    "caveats": [
+      "Opt-in only; no default runtime change.",
+      "Not a full APB/salt coupled mechanics model.",
+      "No Zamora, sigma-theta runtime or temporal salt coupling was implemented.",
+      "Level 1 physical validation remains closed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

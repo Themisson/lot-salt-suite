@@ -2310,6 +2310,26 @@ propriedades elasticas e geometria. Ele e deliberadamente reduzido e deve ser
 tratado como diagnostico, porque nao reproduz o sistema global legado nem a
 fluencia temporal do sal.
 
+## Modelo elastico simples de compliance anular (Fase 10.20B)
+
+A Fase 10.20B implementou `elastic_annular_simple` como rota opt-in no
+`volumetric_balance`. O modelo nao altera `LotSaltPressureMap`, nao chama
+`SaltCreepTimeBridge` e nao conecta APB/sal ao runtime padrão.
+
+Formula:
+
+```text
+c_inner = r_inner^2 / (E_inner * t_inner)
+c_outer = (1 + nu_outer) * r_outer / E_outer
+C_geom = 2 * (r_outer*c_outer + r_inner*c_inner) /
+         (r_outer^2 - r_inner^2)
+C_eff = C_fluid + C_geom
+```
+
+`constant_geometric` continua disponível como baseline diagnostico da 10.19C.
+`elastic_annular_simple` e uma tentativa mecanica reduzida e deve ser comparado
+separadamente no BUZ67D antes de qualquer promoção de maturidade.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que

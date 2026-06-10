@@ -1712,3 +1712,33 @@ Conclusao: existe uma rota implementavel e testavel para
 diagnostica. Se implementada, a comparacao 10.20C deve classifica-la como
 efetiva, parcial, subcompliant, overcompliant ou inconclusiva, sem promover
 Level 1 para validacao fisica.
+
+---
+
+## Fase 10.20B — modelo `elastic_annular_simple`
+
+**Status:** `PHASE10_20B_ELASTIC_ANNULAR_SIMPLE_IMPLEMENTED`.
+
+A Fase 10.20B adicionou o modelo mecanico reduzido ao solver moderno, mas
+preservou o gate Level 1 fechado. A comparacao futura deve usar:
+
+```text
+legacy
+modern no compliance
+modern constant_geometric
+modern elastic_annular_simple
+```
+
+Campos novos de interesse:
+
+```text
+compliance_model
+geometric_compressibility_per_Pa
+effective_compressibility_per_Pa
+mechanical_compliance_status
+```
+
+A expectativa registrada pela 10.20A e que `elastic_annular_simple` possa ficar
+subcompliant para BUZ67D, pois sua estimativa inicial e muito menor que a
+compliance constante inferida do primeiro passo legado. A Fase 10.20C deve
+medir isso explicitamente.

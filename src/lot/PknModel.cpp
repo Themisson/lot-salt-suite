@@ -94,18 +94,28 @@ void validate_input(const PknInput& input) {
     }
     const auto& compliance = input.volumetric_compliance;
     if (compliance.enabled) {
-      if (compliance.model != "constant_geometric") {
+      if (compliance.model != "constant_geometric" &&
+          compliance.model != "elastic_annular_simple") {
         throw std::invalid_argument(
-            "PknModel: volumetric compliance supports constant_geometric only");
-      }
-      if (!std::isfinite(compliance.geometric_compressibility_per_Pa) ||
-          compliance.geometric_compressibility_per_Pa < 0.0) {
-        throw std::invalid_argument(
-            "PknModel: geometric_compressibility_per_Pa must be finite and non-negative");
+            "PknModel: unsupported volumetric compliance model");
       }
       if (compliance.total_compressibility_per_Pa != 0.0) {
         throw std::invalid_argument(
-            "PknModel: total_compressibility_per_Pa is not supported with constant_geometric");
+            "PknModel: total_compressibility_per_Pa is not supported");
+      }
+      if (compliance.model == "constant_geometric") {
+        if (!std::isfinite(compliance.geometric_compressibility_per_Pa) ||
+            compliance.geometric_compressibility_per_Pa < 0.0) {
+          throw std::invalid_argument(
+              "PknModel: geometric_compressibility_per_Pa must be finite and non-negative");
+        }
+      } else {
+        (void)elasticAnnularGeometricCompressibility(
+            compliance.inner_radius_m, compliance.outer_radius_m,
+            compliance.inner_wall_thickness_m,
+            compliance.inner_young_modulus_Pa, compliance.inner_poisson_ratio,
+            compliance.formation_young_modulus_Pa,
+            compliance.formation_poisson_ratio);
       }
     }
   }
@@ -304,10 +314,25 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
   double initiation_sigma_theta_Pa = 0.0;
   double initiation_margin_Pa = 0.0;
   double initiation_time_s = 0.0;
-  const double geometric_compressibility_per_Pa =
-      input.volumetric_compliance.enabled
-          ? input.volumetric_compliance.geometric_compressibility_per_Pa
-          : 0.0;
+  double geometric_compressibility_per_Pa = 0.0;
+  std::string mechanical_compliance_status = "none";
+  if (input.volumetric_compliance.enabled) {
+    if (input.volumetric_compliance.model == "elastic_annular_simple") {
+      geometric_compressibility_per_Pa = elasticAnnularGeometricCompressibility(
+          input.volumetric_compliance.inner_radius_m,
+          input.volumetric_compliance.outer_radius_m,
+          input.volumetric_compliance.inner_wall_thickness_m,
+          input.volumetric_compliance.inner_young_modulus_Pa,
+          input.volumetric_compliance.inner_poisson_ratio,
+          input.volumetric_compliance.formation_young_modulus_Pa,
+          input.volumetric_compliance.formation_poisson_ratio);
+      mechanical_compliance_status = "computed_elastic_annular_simple";
+    } else {
+      geometric_compressibility_per_Pa =
+          input.volumetric_compliance.geometric_compressibility_per_Pa;
+      mechanical_compliance_status = "constant_geometric_input";
+    }
+  }
   const double effective_compressibility_per_Pa =
       effectiveCompressibility(input.fluid_compressibility_per_Pa,
                                geometric_compressibility_per_Pa);
@@ -394,6 +419,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
   series.compliance_model =
       input.volumetric_compliance.enabled ? input.volumetric_compliance.model : "none";
   series.compliance_source = input.volumetric_compliance.source;
+  series.mechanical_compliance_status = mechanical_compliance_status;
   if (!series.time_series_s.empty()) {
     series.wellbore_pressure_Pa = series.wellbore_pressure_series_Pa.back();
     series.balance_delta_pressure_Pa = series.balance_delta_pressure_series_Pa.back();
@@ -434,6 +460,56 @@ double effectiveCompressibility(double fluid_compressibility,
   return effective;
 }
 
+double elasticAnnularGeometricCompressibility(
+    double inner_radius_m, double outer_radius_m,
+    double inner_wall_thickness_m, double inner_young_modulus_Pa,
+    double inner_poisson_ratio, double formation_young_modulus_Pa,
+    double formation_poisson_ratio) {
+  if (!std::isfinite(inner_radius_m) || inner_radius_m <= 0.0 ||
+      !std::isfinite(outer_radius_m) || outer_radius_m <= inner_radius_m) {
+    throw std::invalid_argument(
+        "PknModel: elastic_annular_simple requires outer_radius > inner_radius > 0");
+  }
+  if (!std::isfinite(inner_wall_thickness_m) ||
+      inner_wall_thickness_m <= 0.0) {
+    throw std::invalid_argument(
+        "PknModel: elastic_annular_simple requires positive inner_wall_thickness");
+  }
+  if (!std::isfinite(inner_young_modulus_Pa) ||
+      inner_young_modulus_Pa <= 0.0 ||
+      !std::isfinite(formation_young_modulus_Pa) ||
+      formation_young_modulus_Pa <= 0.0) {
+    throw std::invalid_argument(
+        "PknModel: elastic_annular_simple requires positive Young moduli");
+  }
+  if (!std::isfinite(inner_poisson_ratio) || inner_poisson_ratio < 0.0 ||
+      inner_poisson_ratio >= 0.5 || !std::isfinite(formation_poisson_ratio) ||
+      formation_poisson_ratio < 0.0 || formation_poisson_ratio >= 0.5) {
+    throw std::invalid_argument(
+        "PknModel: elastic_annular_simple requires Poisson ratios in [0, 0.5)");
+  }
+
+  const double inner_radial_compliance_m_per_Pa =
+      (inner_radius_m * inner_radius_m) /
+      (inner_young_modulus_Pa * inner_wall_thickness_m);
+  const double formation_radial_compliance_m_per_Pa =
+      ((1.0 + formation_poisson_ratio) * outer_radius_m) /
+      formation_young_modulus_Pa;
+  const double annular_area_factor =
+      outer_radius_m * outer_radius_m - inner_radius_m * inner_radius_m;
+  const double geometric_compressibility =
+      2.0 *
+      (inner_radius_m * inner_radial_compliance_m_per_Pa +
+       outer_radius_m * formation_radial_compliance_m_per_Pa) /
+      annular_area_factor;
+  if (!std::isfinite(geometric_compressibility) ||
+      geometric_compressibility < 0.0) {
+    throw std::invalid_argument(
+        "PknModel: elastic_annular_simple produced invalid compliance");
+  }
+  return geometric_compressibility;
+}
+
 double volumetricPressureIncrement(double dV_effective, double annular_volume,
                                    double effective_compressibility) {
   if (!std::isfinite(dV_effective)) {
@@ -460,12 +536,28 @@ PknResult PknModel::evaluate(const PknInput& input, double elapsed_time_s) const
   const bool uses_volumetric_compliance =
       input.pressure_model == PknPressureModel::VolumetricBalance &&
       input.volumetric_compliance.enabled;
+  double geometric_compressibility_per_Pa = 0.0;
+  std::string mechanical_compliance_status = "none";
+  if (uses_volumetric_compliance) {
+    if (input.volumetric_compliance.model == "elastic_annular_simple") {
+      geometric_compressibility_per_Pa = elasticAnnularGeometricCompressibility(
+          input.volumetric_compliance.inner_radius_m,
+          input.volumetric_compliance.outer_radius_m,
+          input.volumetric_compliance.inner_wall_thickness_m,
+          input.volumetric_compliance.inner_young_modulus_Pa,
+          input.volumetric_compliance.inner_poisson_ratio,
+          input.volumetric_compliance.formation_young_modulus_Pa,
+          input.volumetric_compliance.formation_poisson_ratio);
+      mechanical_compliance_status = "computed_elastic_annular_simple";
+    } else {
+      geometric_compressibility_per_Pa =
+          input.volumetric_compliance.geometric_compressibility_per_Pa;
+      mechanical_compliance_status = "constant_geometric_input";
+    }
+  }
   point.pressure_model = pressure_model_label(input.pressure_model);
   point.fluid_compressibility_per_Pa = input.fluid_compressibility_per_Pa;
-  point.geometric_compressibility_per_Pa =
-      uses_volumetric_compliance
-          ? input.volumetric_compliance.geometric_compressibility_per_Pa
-          : 0.0;
+  point.geometric_compressibility_per_Pa = geometric_compressibility_per_Pa;
   point.effective_compressibility_per_Pa =
       input.pressure_model == PknPressureModel::VolumetricBalance
           ? effectiveCompressibility(input.fluid_compressibility_per_Pa,
@@ -475,6 +567,7 @@ PknResult PknModel::evaluate(const PknInput& input, double elapsed_time_s) const
       uses_volumetric_compliance ? input.volumetric_compliance.model : "none";
   point.compliance_source =
       uses_volumetric_compliance ? input.volumetric_compliance.source : "";
+  point.mechanical_compliance_status = mechanical_compliance_status;
   return point;
 }
 

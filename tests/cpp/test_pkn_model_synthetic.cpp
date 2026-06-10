@@ -333,6 +333,67 @@ TEST_CASE("Diagnostic geometric compliance reproduces expected first-step dP") {
   CHECK(increment == Catch::Approx(1845413.7784679066));
 }
 
+TEST_CASE("Elastic annular compliance returns positive geometric compressibility") {
+  const double compliance = lss::lot::elasticAnnularGeometricCompressibility(
+      0.06985, 0.17145, 0.010541, 210.0e9, 0.30, 20.4e9, 0.36);
+
+  CHECK(compliance == Catch::Approx(1.7242805809704984e-10));
+}
+
+TEST_CASE("Higher Young modulus lowers elastic annular compliance") {
+  const double soft = lss::lot::elasticAnnularGeometricCompressibility(
+      0.06985, 0.17145, 0.010541, 100.0e9, 0.30, 10.0e9, 0.36);
+  const double stiff = lss::lot::elasticAnnularGeometricCompressibility(
+      0.06985, 0.17145, 0.010541, 210.0e9, 0.30, 20.4e9, 0.36);
+
+  CHECK(stiff < soft);
+}
+
+TEST_CASE("Elastic annular compliance lowers volumetric pressure increment") {
+  const lss::lot::PknModel model;
+  auto base = synthetic_input();
+  base.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  base.annular_volume_m3 = 10.0;
+  base.fluid_compressibility_per_Pa = 1.0e-9;
+  base.breakdown.pressure_Pa = 1.0e12;
+
+  auto elastic = base;
+  elastic.volumetric_compliance.enabled = true;
+  elastic.volumetric_compliance.model = "elastic_annular_simple";
+  elastic.volumetric_compliance.inner_radius_m = 0.06985;
+  elastic.volumetric_compliance.outer_radius_m = 0.17145;
+  elastic.volumetric_compliance.inner_wall_thickness_m = 0.010541;
+  elastic.volumetric_compliance.inner_young_modulus_Pa = 210.0e9;
+  elastic.volumetric_compliance.inner_poisson_ratio = 0.30;
+  elastic.volumetric_compliance.formation_young_modulus_Pa = 20.4e9;
+  elastic.volumetric_compliance.formation_poisson_ratio = 0.36;
+  elastic.volumetric_compliance.source = "test";
+
+  const auto base_result = model.simulate(base);
+  const auto elastic_result = model.simulate(elastic);
+
+  CHECK(elastic_result.compliance_model == "elastic_annular_simple");
+  CHECK(elastic_result.mechanical_compliance_status ==
+        "computed_elastic_annular_simple");
+  CHECK(elastic_result.geometric_compressibility_per_Pa > 0.0);
+  CHECK(elastic_result.effective_compressibility_per_Pa >
+        base_result.effective_compressibility_per_Pa);
+  CHECK(elastic_result.balance_delta_pressure_series_Pa[1] <
+        base_result.balance_delta_pressure_series_Pa[1]);
+}
+
+TEST_CASE("Elastic annular compliance rejects invalid geometry") {
+  CHECK_THROWS_AS(lss::lot::elasticAnnularGeometricCompressibility(
+                      0.2, 0.1, 0.01, 210.0e9, 0.30, 20.4e9, 0.36),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(lss::lot::elasticAnnularGeometricCompressibility(
+                      0.07, 0.17, 0.0, 210.0e9, 0.30, 20.4e9, 0.36),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(lss::lot::elasticAnnularGeometricCompressibility(
+                      0.07, 0.17, 0.01, 210.0e9, 0.50, 20.4e9, 0.36),
+                  std::invalid_argument);
+}
+
 TEST_CASE("Sigma theta static criterion opens when wellbore pressure exceeds sigma theta") {
   const lss::lot::PknModel model;
   auto input = sigma_theta_input(5.0e5);

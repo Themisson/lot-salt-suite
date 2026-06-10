@@ -248,3 +248,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   diagnostica inferida na 10.19C. A proxima implementacao pode prosseguir como
   rota experimental/opt-in, com expectativa de diagnosticar se o modelo e
   subcompliant em BUZ67D antes de adicionar calibracoes ou modelos mais ricos.
+- A Fase 10.20B implementou `elastic_annular_simple`. O proximo passo deve ser
+  diagnosticar BUZ67D contra legado/sem compliance/`constant_geometric`, sem
+  calibrar silenciosamente o modelo. Se o resultado for subcompliant, a
+  evolucao correta e formular um modelo mecanico mais completo ou uma
+  calibracao opt-in explicita, nao esconder um fator empirico no solver.

@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.20A compliance mecanica anular formulada; commit/push pendente
+Fase ativa  : 10.20B elastic_annular_simple implementado; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
-Testes C++  : 237/237 passaram em 2026-06-10
+Testes C++  : 242/242 passaram em 2026-06-10
 Testes Py   : 84/84 passaram em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -59,7 +59,7 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ### [2026-06-10] Fase 10.20A — auditoria e formulacao de compliance mecanica anular/wellbore — Codex
 
-**Status:** Implementada e validada localmente; commit/push pendente.
+**Status:** Commitada e enviada para `origin/main` em `c33801e`.
 
 **Gate:** `MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL`.
 
@@ -111,6 +111,45 @@ git diff --check: passou
 
 **Caveat:** nenhuma equacao legado foi alterada; `legance/LOT_Tese/` foi
 somente lido. O gate Level 1 permanece fechado para validacao fisica.
+
+---
+
+### [2026-06-10] Fase 10.20B — modelo `elastic_annular_simple` opt-in — Codex
+
+**Status:** Implementada e validada localmente; commit/push pendente.
+
+**Objetivo:** implementar o modelo mecanico reduzido escolhido na 10.20A como
+rota opt-in no `volumetric_balance`, preservando `constant_geometric`,
+`pkn_direct` e casos sem compliance.
+
+**Formula implementada:**
+
+```text
+c_inner = r_inner^2 / (E_inner * t_inner)
+c_outer = (1 + nu_outer) * r_outer / E_outer
+C_geom = 2 * (r_outer*c_outer + r_inner*c_inner) / (r_outer^2 - r_inner^2)
+C_eff = C_fluid + C_geom
+dP = dV_eff / (C_eff * V_annular)
+```
+
+**Campos adicionados ao contrato:**
+
+```text
+lot.volumetric_balance.compliance.model = elastic_annular_simple
+inner_boundary.radius
+inner_boundary.wall_thickness
+inner_boundary.young_modulus
+inner_boundary.poisson_ratio
+formation.radius
+formation.young_modulus
+formation.poisson_ratio
+mechanical_compliance_status
+```
+
+**Caveat:** o modelo e experimental/opt-in e nao representa APB/sal acoplado,
+Zamora, fluencia temporal ou sistema de rigidez completo do legado.
+
+**Testes executados:** pendente de fechamento antes do commit.
 
 ---
 

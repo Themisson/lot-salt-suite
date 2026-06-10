@@ -21,6 +21,7 @@ struct PknResult {
   double effective_compressibility_per_Pa = 0.0;
   std::string compliance_model = "none";
   std::string compliance_source;
+  std::string mechanical_compliance_status = "none";
   double balance_delta_pressure_Pa = 0.0;
   double balance_effective_volume_increment_m3 = 0.0;
   double balance_injected_volume_increment_m3 = 0.0;

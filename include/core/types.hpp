@@ -118,6 +118,14 @@ struct VolumetricComplianceData {
   std::string model;
   double geometric_compressibility_per_Pa = 0.0;
   double total_compressibility_per_Pa = 0.0;
+  double inner_radius_m = 0.0;
+  double outer_radius_m = 0.0;
+  double inner_wall_thickness_m = 0.0;
+  double inner_young_modulus_Pa = 0.0;
+  double inner_poisson_ratio = 0.0;
+  double formation_young_modulus_Pa = 0.0;
+  double formation_poisson_ratio = 0.0;
+  std::string mechanical_compliance_status;
   std::string source;
   std::string caveat;
 };

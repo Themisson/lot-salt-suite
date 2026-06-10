@@ -55,6 +55,8 @@ TEST_CASE("ResultWriter creates PKN CSV and JSON outputs") {
   CHECK(json.find("\"geometric_compressibility_per_Pa\"") != std::string::npos);
   CHECK(json.find("\"effective_compressibility_per_Pa\"") != std::string::npos);
   CHECK(json.find("\"compliance_model\": \"none\"") != std::string::npos);
+  CHECK(json.find("\"mechanical_compliance_status\": \"none\"") !=
+        std::string::npos);
   CHECK(json.find("\"final_balance_effective_volume_increment_m3\"") !=
         std::string::npos);
   CHECK(csv.find("fracture_initiated,fracture_initiation_pressure_Pa,"
@@ -62,7 +64,8 @@ TEST_CASE("ResultWriter creates PKN CSV and JSON outputs") {
                  "fracture_initiation_margin_Pa,"
                  "fluid_compressibility_1_Pa,"
                  "geometric_compressibility_1_Pa,"
-                 "effective_compressibility_1_Pa") != std::string::npos);
+                 "effective_compressibility_1_Pa,"
+                 "mechanical_compliance_status") != std::string::npos);
   CHECK(json.find("\"fracture_initiation_type\": \"constant_pressure\"") !=
         std::string::npos);
   CHECK(json.find("\"fracture_initiation_pressure_Pa\"") != std::string::npos);

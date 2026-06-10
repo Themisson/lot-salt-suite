@@ -45,6 +45,18 @@ std::string escape_json(const std::string& value) {
   return escaped;
 }
 
+std::string escape_csv(const std::string& value) {
+  if (value.find_first_of(",\"\n\r") == std::string::npos) {
+    return value;
+  }
+  std::string escaped = "\"";
+  for (const char ch : value) {
+    escaped += ch == '"' ? "\"\"" : std::string(1, ch);
+  }
+  escaped += '"';
+  return escaped;
+}
+
 void ensure_series_sizes(const lss::lot::PknResult& result) {
   const std::size_t size = result.time_series_s.size();
   if (result.injected_volume_series_m3.size() != size ||
@@ -174,7 +186,8 @@ void write_timeseries_csv(const std::filesystem::path& path,
          "fracture_initiation_margin_Pa,"
          "fluid_compressibility_1_Pa,"
          "geometric_compressibility_1_Pa,"
-         "effective_compressibility_1_Pa\n";
+         "effective_compressibility_1_Pa,"
+         "mechanical_compliance_status\n";
   for (std::size_t i = 0; i < result.time_series_s.size(); ++i) {
     out << result.time_series_s[i] << ',' << result.injected_volume_series_m3[i] << ','
         << result.fracture_length_series_m[i] << ','
@@ -195,7 +208,8 @@ void write_timeseries_csv(const std::filesystem::path& path,
         << result.fracture_initiation_margin_series_Pa[i] << ','
         << result.fluid_compressibility_per_Pa << ','
         << result.geometric_compressibility_per_Pa << ','
-        << result.effective_compressibility_per_Pa << '\n';
+        << result.effective_compressibility_per_Pa << ','
+        << escape_csv(result.mechanical_compliance_status) << '\n';
   }
 }
 
@@ -237,6 +251,8 @@ void write_summary_json(const std::filesystem::path& path, const std::string& ca
       << escape_json(result.compliance_model) << "\",\n";
   out << "    \"compliance_source\": \""
       << escape_json(result.compliance_source) << "\",\n";
+  out << "    \"mechanical_compliance_status\": \""
+      << escape_json(result.mechanical_compliance_status) << "\",\n";
   out << "    \"final_balance_delta_pressure_Pa\": "
       << result.balance_delta_pressure_Pa << ",\n";
   out << "    \"final_balance_effective_volume_increment_m3\": "

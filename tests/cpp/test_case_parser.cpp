@@ -349,3 +349,55 @@ TEST_CASE("BUZ67D compliance case loads opt-in geometric compliance") {
   CHECK(data.lot.volumetric_compliance.caveat.find("not a validated") !=
         std::string::npos);
 }
+
+TEST_CASE("Elastic annular simple compliance block loads mechanical fields") {
+  std::string yaml = valid_case_yaml();
+  const std::string block = R"(  pressure_model:
+    type: volumetric_balance
+  volumetric_balance:
+    compliance:
+      enabled: true
+      model: elastic_annular_simple
+      inner_boundary:
+        radius:
+          value: 0.06985
+          unit: m
+        wall_thickness:
+          value: 0.010541
+          unit: m
+        young_modulus:
+          value: 210000000000.0
+          unit: Pa
+        poisson_ratio: 0.3
+      formation:
+        radius:
+          value: 0.17145
+          unit: m
+        young_modulus:
+          value: 20400000000.0
+          unit: Pa
+        poisson_ratio: 0.36
+      source: mechanical_estimate
+      mechanical_compliance_status: experimental_opt_in
+)";
+  const auto pos = yaml.find("apb:");
+  REQUIRE(pos != std::string::npos);
+  yaml.insert(pos, block);
+  const auto path = write_temp_case("lss_elastic_annular_simple.yaml", yaml);
+
+  const auto data = lss::io::parse_yaml(path);
+
+  CHECK(data.lot.pressure_model == "volumetric_balance");
+  CHECK(data.lot.volumetric_compliance.enabled);
+  CHECK(data.lot.volumetric_compliance.model == "elastic_annular_simple");
+  CHECK(data.lot.volumetric_compliance.inner_radius_m == Catch::Approx(0.06985));
+  CHECK(data.lot.volumetric_compliance.outer_radius_m == Catch::Approx(0.17145));
+  CHECK(data.lot.volumetric_compliance.inner_wall_thickness_m ==
+        Catch::Approx(0.010541));
+  CHECK(data.lot.volumetric_compliance.inner_young_modulus_Pa ==
+        Catch::Approx(210000000000.0));
+  CHECK(data.lot.volumetric_compliance.formation_young_modulus_Pa ==
+        Catch::Approx(20400000000.0));
+  CHECK(data.lot.volumetric_compliance.mechanical_compliance_status ==
+        "experimental_opt_in");
+}
