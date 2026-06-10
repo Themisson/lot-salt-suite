@@ -348,6 +348,35 @@
       "Level 1 physical validation remains closed."
     ]
   },
+  "phase10_20c_buz67d_elastic_annular_compliance_diagnostic": {
+    "status": "PHASE10_20C_BUZ67D_ELASTIC_COMPLIANCE_DIAGNOSTIC_COMPLETE",
+    "classification": "ELASTIC_COMPLIANCE_UNDERCOMPLIANT",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "case": "cases/validation/buz67d_pkn_legacy_elastic_compliance.yaml",
+    "comparison_tool": "tools/compare_phase10_20c.py",
+    "legacy_first_dP_Pa": 1845413.7784679066,
+    "modern_first_dP_no_compliance_Pa": 55397022.29498486,
+    "modern_first_dP_constant_compliance_Pa": 1845417.2017930523,
+    "modern_first_dP_elastic_compliance_Pa": 43639672.35675542,
+    "max_pressure_legacy_Pa": 69035836.1743195,
+    "max_pressure_elastic_compliance_Pa": 70371887.52990527,
+    "relative_error_max_pressure": 0.019353011850427385,
+    "fracture_initiation_time_legacy_s": 510.0,
+    "fracture_initiation_time_elastic_s": 30.0,
+    "C_geom_constant_10_19C": 1.8571966938610005e-8,
+    "C_geom_elastic_10_20C": 1.7242805809704984e-10,
+    "C_eff_elastic_10_20C": 8.124280580970498e-10,
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "elastic_annular_simple remains opt-in and experimental.",
+      "The simple elastic compliance is undercompliant versus the audited legacy first-step dP.",
+      "No hidden calibration factor was added.",
+      "Level 1 physical validation remains closed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

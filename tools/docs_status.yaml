@@ -82,6 +82,7 @@ phases:
   phase_10_19c_geometric_compliance: completed
   phase_10_20a_mechanical_compliance_formulation: completed
   phase_10_20b_elastic_annular_compliance_model: completed
+  phase_10_20c_buz67d_elastic_compliance_diagnostic: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -174,14 +175,14 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 242        # Catch2 lot-salt-suite — 242/242 passaram na Fase 10.20B (2026-06-10)
+  cpp_tests: 242        # Catch2 lot-salt-suite — 242/242 passaram na Fase 10.20C (2026-06-10)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 84      # pytest lot-salt-suite — 84/84 passaram na Fase 10.20A (2026-06-10)
+  python_tests: 86      # pytest lot-salt-suite — 86/86 passaram na Fase 10.20C (2026-06-10)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-10"
-updated_by: "codex (Fase 10.20B elastic annular compliance)"
+updated_by: "codex (Fase 10.20C BUZ67D elastic compliance diagnostic)"
 project_version: "0.1.0"

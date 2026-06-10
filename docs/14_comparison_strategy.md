@@ -1742,3 +1742,48 @@ A expectativa registrada pela 10.20A e que `elastic_annular_simple` possa ficar
 subcompliant para BUZ67D, pois sua estimativa inicial e muito menor que a
 compliance constante inferida do primeiro passo legado. A Fase 10.20C deve
 medir isso explicitamente.
+
+---
+
+## Fase 10.20C — diagnostico BUZ67D com `elastic_annular_simple`
+
+**Classificacao:** `ELASTIC_COMPLIANCE_UNDERCOMPLIANT`.
+
+A comparacao 10.20C mediu quatro rotas:
+
+```text
+legacy audited
+modern no compliance
+modern constant_geometric
+modern elastic_annular_simple
+```
+
+Resumo das metricas:
+
+| Metrica | Valor |
+|---|---:|
+| `legacy_first_dP_Pa` | `1845413.7784679066` |
+| `modern_first_dP_no_compliance_Pa` | `55397022.29498486` |
+| `modern_first_dP_constant_compliance_Pa` | `1845417.2017930523` |
+| `modern_first_dP_elastic_compliance_Pa` | `43639672.35675542` |
+| `max_pressure_legacy_Pa` | `69035836.1743195` |
+| `max_pressure_elastic_compliance_Pa` | `70371887.52990527` |
+| `relative_error_max_pressure` | `0.019353011850427385` |
+| `fracture_initiation_time_legacy_s` | `510.0` |
+| `fracture_initiation_time_elastic_s` | `30.0` |
+
+O primeiro incremento do modelo elastico simples ainda e aproximadamente
+`23.65` vezes maior que o primeiro `dP` legado. Embora o pico diagnostico fique
+proximo por causa da abertura imediata, isso nao representa equivalencia fisica
+da curva. A matriz de comparacao deve manter:
+
+```text
+Level 1 physical validation = closed
+numeric equivalence = false
+fracture validation = false
+runtime default changed = false
+```
+
+Proximo caminho recomendado: formular um modelo mecanico mais completo ou uma
+calibracao opt-in explicita e rastreavel. Nao esconder fator empirico dentro de
+`elastic_annular_simple`.

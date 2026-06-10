@@ -253,3 +253,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   calibrar silenciosamente o modelo. Se o resultado for subcompliant, a
   evolucao correta e formular um modelo mecanico mais completo ou uma
   calibracao opt-in explicita, nao esconder um fator empirico no solver.
+- A Fase 10.20C confirmou `ELASTIC_COMPLIANCE_UNDERCOMPLIANT` para BUZ67D. O
+  primeiro `dP` elastico simples foi `43.64 MPa`, contra `1.845 MPa` no legado
+  e no proxy `constant_geometric`. O modelo deve permanecer experimental; fase
+  futura deve tratar casing/formacao/sal de modo mais completo ou criar
+  calibracao opt-in declarada.

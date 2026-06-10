@@ -705,6 +705,14 @@ modelo opt-in no `volumetric_balance`. Ele calcula `C_geom` por uma aproximacao
 radial elastica simples e exporta `mechanical_compliance_status`, mas permanece
 experimental. A rota padrao, `pkn_direct`, e casos sem compliance seguem
 inalterados.
+
+**Atualizacao Fase 10.20C:** o diagnostico BUZ67D classificou
+`elastic_annular_simple` como `ELASTIC_COMPLIANCE_UNDERCOMPLIANT`. O primeiro
+incremento diagnostico caiu de `55.397 MPa` sem compliance para `43.640 MPa`,
+mas segue muito acima do legado (`1.845 MPa`) e do proxy `constant_geometric`
+(`1.845 MPa`). A abertura diagnostica ocorre em `30 s`, contra `510 s` no
+legado auditado. Nao promover esse modelo para default, nao declarar validacao
+fisica e nao inserir fator empirico oculto.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

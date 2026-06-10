@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">68/75</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">69/76</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">242</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">84</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">86</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -1559,6 +1559,81 @@ dP = dV_eff / (C_eff * V_annular)
 compliance continuam usando apenas <code>C_fluid</code>, e <code>pkn_direct</code> ignora qualquer
 bloco de compliance. A fase não implementa APB/sal acoplado, Zamora ou
 sigma-theta runtime.</p>
+<h3 id="diagnostico-buz67d-com-elastic_annular_simple-fase-1020c">Diagnostico BUZ67D com <code>elastic_annular_simple</code> — Fase 10.20C</h3>
+<p><strong>Status:</strong> <code>ELASTIC_COMPLIANCE_UNDERCOMPLIANT</code>.</p>
+<p>A Fase 10.20C criou o caso controlado
+<code>cases/validation/buz67d_pkn_legacy_elastic_compliance.yaml</code> e comparou quatro
+rotas diagnosticas:</p>
+<pre><code class="language-text">legacy audited
+modern no compliance
+modern constant_geometric
+modern elastic_annular_simple
+</code></pre>
+<p>Metricas principais:</p>
+<table>
+<thead>
+<tr>
+<th>Metrica</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>legacy_first_dP_Pa</code></td>
+<td style="text-align: right;"><code>1845413.7784679066</code></td>
+</tr>
+<tr>
+<td><code>modern_first_dP_no_compliance_Pa</code></td>
+<td style="text-align: right;"><code>55397022.29498486</code></td>
+</tr>
+<tr>
+<td><code>modern_first_dP_constant_compliance_Pa</code></td>
+<td style="text-align: right;"><code>1845417.2017930523</code></td>
+</tr>
+<tr>
+<td><code>modern_first_dP_elastic_compliance_Pa</code></td>
+<td style="text-align: right;"><code>43639672.35675542</code></td>
+</tr>
+<tr>
+<td><code>max_pressure_legacy_Pa</code></td>
+<td style="text-align: right;"><code>69035836.1743195</code></td>
+</tr>
+<tr>
+<td><code>max_pressure_elastic_compliance_Pa</code></td>
+<td style="text-align: right;"><code>70371887.52990527</code></td>
+</tr>
+<tr>
+<td><code>relative_error_max_pressure</code></td>
+<td style="text-align: right;"><code>0.019353011850427385</code></td>
+</tr>
+<tr>
+<td><code>fracture_initiation_time_legacy_s</code></td>
+<td style="text-align: right;"><code>510.0</code></td>
+</tr>
+<tr>
+<td><code>fracture_initiation_time_elastic_s</code></td>
+<td style="text-align: right;"><code>30.0</code></td>
+</tr>
+<tr>
+<td><code>C_geom_constant_10_19C</code></td>
+<td style="text-align: right;"><code>1.8571966938610005e-8</code></td>
+</tr>
+<tr>
+<td><code>C_geom_elastic_10_20C</code></td>
+<td style="text-align: right;"><code>1.7242805809704984e-10</code></td>
+</tr>
+<tr>
+<td><code>C_eff_elastic_10_20C</code></td>
+<td style="text-align: right;"><code>8.124280580970498e-10</code></td>
+</tr>
+</tbody>
+</table>
+<p>O modelo elastico simples e mais complacente que a compressao pura do fluido,
+mas ainda e muito rigido frente ao proxy <code>constant_geometric</code> inferido do
+legado. A abertura diagnostica ocorre no primeiro passo (<code>30 s</code>), enquanto o
+marcador legado auditado ocorre em <code>510 s</code>. Portanto, <code>elastic_annular_simple</code>
+permanece opt-in/experimental e nao deve ser promovido a rota fisica validada
+nem calibrado silenciosamente.</p>
 </div>
 </section>
 
@@ -2801,7 +2876,14 @@ experimental e sem declarar validacao fisica.</p>
 modelo opt-in no <code>volumetric_balance</code>. Ele calcula <code>C_geom</code> por uma aproximacao
 radial elastica simples e exporta <code>mechanical_compliance_status</code>, mas permanece
 experimental. A rota padrao, <code>pkn_direct</code>, e casos sem compliance seguem
-inalterados.
+inalterados.</p>
+<p><strong>Atualizacao Fase 10.20C:</strong> o diagnostico BUZ67D classificou
+<code>elastic_annular_simple</code> como <code>ELASTIC_COMPLIANCE_UNDERCOMPLIANT</code>. O primeiro
+incremento diagnostico caiu de <code>55.397 MPa</code> sem compliance para <code>43.640 MPa</code>,
+mas segue muito acima do legado (<code>1.845 MPa</code>) e do proxy <code>constant_geometric</code>
+(<code>1.845 MPa</code>). A abertura diagnostica ocorre em <code>30 s</code>, contra <code>510 s</code> no
+legado auditado. Nao promover esse modelo para default, nao declarar validacao
+fisica e nao inserir fator empirico oculto.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -5818,6 +5900,33 @@ C_eff = C_fluid + C_geom
 <p><code>constant_geometric</code> continua disponível como baseline diagnostico da 10.19C.
 <code>elastic_annular_simple</code> e uma tentativa mecanica reduzida e deve ser comparado
 separadamente no BUZ67D antes de qualquer promoção de maturidade.</p>
+<h2 id="diagnostico-buz67d-com-compliance-elastica-simples-fase-1020c">Diagnostico BUZ67D com compliance elastica simples (Fase 10.20C)</h2>
+<p>A Fase 10.20C adicionou um caso BUZ67D controlado com
+<code>lot.volumetric_balance.compliance.model = elastic_annular_simple</code>:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_elastic_compliance.yaml
+</code></pre>
+<p>O caso foi comparado com:</p>
+<ul>
+<li>legado auditado em <code>results/comparison/level1_buz67d/legacy_audit/</code>;</li>
+<li>moderno sem compliance;</li>
+<li>moderno com <code>constant_geometric</code> da 10.19C;</li>
+<li>moderno com <code>elastic_annular_simple</code> da 10.20B.</li>
+</ul>
+<p>A ferramenta <code>tools/compare_phase10_20c.py</code> gerou <code>phase10_20c_summary.csv</code>,
+<code>phase10_20c_metadata.json</code> e figuras diagnosticas locais em
+<code>results/comparison/phase10_20c/</code>. Esses artefatos nao devem ser versionados.</p>
+<p>Resultado:</p>
+<pre><code class="language-text">classification = ELASTIC_COMPLIANCE_UNDERCOMPLIANT
+modern_first_dP_elastic_compliance_Pa = 43639672.35675542
+modern_first_dP_constant_compliance_Pa = 1845417.2017930523
+legacy_first_dP_Pa = 1845413.7784679066
+fracture_initiation_time_elastic_s = 30.0
+fracture_initiation_time_legacy_s = 510.0
+</code></pre>
+<p>Conclusao: o modelo elastico simples melhora a pressao frente a compressao pura
+do fluido, mas e insuficientemente complacente para reproduzir a escala de
+<code>dP</code> do legado. A fase nao altera o runtime padrao, nao conecta APB/sal, nao
+implementa Zamora e nao valida fratura fisica.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser

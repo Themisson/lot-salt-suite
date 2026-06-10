@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.20B elastic_annular_simple implementado; commit/push pendente
+Fase ativa  : 10.20C diagnostico BUZ67D elastic_annular_simple; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
@@ -116,7 +116,7 @@ somente lido. O gate Level 1 permanece fechado para validacao fisica.
 
 ### [2026-06-10] Fase 10.20B — modelo `elastic_annular_simple` opt-in — Codex
 
-**Status:** Implementada e validada localmente; commit/push pendente.
+**Status:** Commitada e enviada para `origin/main` em `b87e008`.
 
 **Objetivo:** implementar o modelo mecanico reduzido escolhido na 10.20A como
 rota opt-in no `volumetric_balance`, preservando `constant_geometric`,
@@ -149,7 +149,55 @@ mechanical_compliance_status
 **Caveat:** o modelo e experimental/opt-in e nao representa APB/sal acoplado,
 Zamora, fluencia temporal ou sistema de rigidez completo do legado.
 
-**Testes executados:** pendente de fechamento antes do commit.
+**Testes executados:** `ctest` 242/242, `pytest` 84/84, validacoes LOT/PKN
+controladas e runs de regressao `lot-pkn`.
+
+---
+
+### [2026-06-10] Fase 10.20C — diagnostico BUZ67D com `elastic_annular_simple` — Codex
+
+**Status:** Implementada e validada localmente; commit/push pendente.
+
+**Caso criado:**
+
+```text
+cases/validation/buz67d_pkn_legacy_elastic_compliance.yaml
+```
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase10_20c.py
+```
+
+**Objetivo:** comparar, no caso BUZ67D controlado, legado auditado, moderno sem
+compliance, moderno com `constant_geometric` da 10.19C e moderno com
+`elastic_annular_simple` da 10.20B.
+
+**Metricas observadas:**
+
+```text
+legacy_first_dP_Pa = 1845413.7784679066
+modern_first_dP_no_compliance_Pa = 55397022.29498486
+modern_first_dP_constant_compliance_Pa = 1845417.2017930523
+modern_first_dP_elastic_compliance_Pa = 43639672.35675542
+max_pressure_legacy_Pa = 69035836.1743195
+max_pressure_elastic_compliance_Pa = 70371887.52990527
+relative_error_max_pressure = 0.019353011850427385
+fracture_initiation_time_legacy_s = 510.0
+fracture_initiation_time_elastic_s = 30.0
+C_geom_constant_10_19C = 1.8571966938610005e-8
+C_geom_elastic_10_20C = 1.7242805809704984e-10
+C_eff_elastic_10_20C = 8.124280580970498e-10
+```
+
+**Classificacao:** `ELASTIC_COMPLIANCE_UNDERCOMPLIANT`.
+
+O modelo elastico simples melhora a escala frente a compressao pura de fluido,
+mas ainda e muito menos complacente que o proxy `constant_geometric` inferido
+do legado. Ele abre no primeiro passo (`30 s`) contra `510 s` no legado
+auditado. A conclusao e diagnostica: nao promover para default, nao calibrar
+silenciosamente e nao declarar validacao fisica.
 
 ---
 

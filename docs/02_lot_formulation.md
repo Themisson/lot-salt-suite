@@ -987,3 +987,42 @@ O modelo `constant_geometric` da 10.19C permanece suportado. Casos sem
 compliance continuam usando apenas `C_fluid`, e `pkn_direct` ignora qualquer
 bloco de compliance. A fase não implementa APB/sal acoplado, Zamora ou
 sigma-theta runtime.
+
+### Diagnostico BUZ67D com `elastic_annular_simple` — Fase 10.20C
+
+**Status:** `ELASTIC_COMPLIANCE_UNDERCOMPLIANT`.
+
+A Fase 10.20C criou o caso controlado
+`cases/validation/buz67d_pkn_legacy_elastic_compliance.yaml` e comparou quatro
+rotas diagnosticas:
+
+```text
+legacy audited
+modern no compliance
+modern constant_geometric
+modern elastic_annular_simple
+```
+
+Metricas principais:
+
+| Metrica | Valor |
+|---|---:|
+| `legacy_first_dP_Pa` | `1845413.7784679066` |
+| `modern_first_dP_no_compliance_Pa` | `55397022.29498486` |
+| `modern_first_dP_constant_compliance_Pa` | `1845417.2017930523` |
+| `modern_first_dP_elastic_compliance_Pa` | `43639672.35675542` |
+| `max_pressure_legacy_Pa` | `69035836.1743195` |
+| `max_pressure_elastic_compliance_Pa` | `70371887.52990527` |
+| `relative_error_max_pressure` | `0.019353011850427385` |
+| `fracture_initiation_time_legacy_s` | `510.0` |
+| `fracture_initiation_time_elastic_s` | `30.0` |
+| `C_geom_constant_10_19C` | `1.8571966938610005e-8` |
+| `C_geom_elastic_10_20C` | `1.7242805809704984e-10` |
+| `C_eff_elastic_10_20C` | `8.124280580970498e-10` |
+
+O modelo elastico simples e mais complacente que a compressao pura do fluido,
+mas ainda e muito rigido frente ao proxy `constant_geometric` inferido do
+legado. A abertura diagnostica ocorre no primeiro passo (`30 s`), enquanto o
+marcador legado auditado ocorre em `510 s`. Portanto, `elastic_annular_simple`
+permanece opt-in/experimental e nao deve ser promovido a rota fisica validada
+nem calibrado silenciosamente.

@@ -1,0 +1,215 @@
+# Phase 10.20C diagnostic case.
+# Uses opt-in mechanical annular/wellbore compliance.
+# This is not the default LOT/PKN runtime.
+# This is not a full APB/salt coupled mechanics model.
+# This file is a new controlled validation case and does not replace
+# cases/lot_tese_migrated/buz67d_pkn.yaml or previous BUZ67D validation cases.
+
+metadata:
+  name: buz67d_pkn_legacy_elastic_compliance
+  version: "0.1"
+  mode: lot-pkn
+  legacy_source: legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+  alignment_source: tests/fixtures/comparison/buz67d_legacy_parameters.json
+
+simulation:
+  mode: lot-pkn
+
+units:
+  length: m
+  pressure: Pa
+  temperature: degC
+  density: ppg
+  viscosity: cP
+
+wellbore:
+  airgap_m: 0.0
+  water_depth_m: 0.0
+  total_depth_m: 4374.0
+  shoe_depth_m: 4374.0
+  drill_pipe:
+    inner_diameter:
+      value: 4.67
+      unit: in
+    outer_diameter:
+      value: 5.5
+      unit: in
+    depth:
+      value: 4374.0
+      unit: m
+
+casings:
+  - id: production_casing
+    top_m: 1922.0
+    base_m: 4356.0
+    di_in: 12.376
+    de_in: 14.0
+    E_Pa: 210000000000.0
+    nu: 0.30
+
+cements:
+  - id: production_cement
+    top_m: 3879.14
+    base_m: 4356.0
+    di_in: 14.0
+    de_in: 16.0
+    E_Pa: 10350000000.0
+    nu: 0.21
+
+annulars:
+  - id: annulus_a
+    fluid: lot_fluid
+    top_m: 0.0
+    base_m: 4374.0
+
+fluids:
+  - id: lot_fluid
+    mode: constant
+    density_ppg: 11.5
+    viscosity_cP: 3.0
+    compressibility_per_Pa: 0.00000000064
+
+temperature:
+  mode: profile
+  data:
+    - depth_m: 0.0
+      temp_C: 26.66
+    - depth_m: 4374.0
+      temp_C: 86.0
+
+layers:
+  - id: legacy_aligned_halite_interval
+    top_m: 4356.0
+    base_m: 4374.0
+    rock: legacy_aligned_halite
+
+rocks:
+  - id: legacy_aligned_halite
+    model: double_mechanism
+    E_Pa: 20400000000.0
+    nu: 0.36
+    density_kg_m3: 2200.0
+    e0_per_h: 0.000000522
+    sig0_Pa: 9920000.0
+    T0_degC: 86.0
+    n1: 3.36
+    n2: 7.55
+
+lot:
+  enabled: true
+  shoe_depth_m: 4374.0
+  model: pkn
+  initial_pressure:
+    value: 26732215.17314985
+    unit: Pa
+  injection:
+    rate:
+      value: 0.5
+      unit: bbl_min
+    schedule:
+      total_time:
+        value: 22.0
+        unit: min
+      dt:
+        value: 0.5
+        unit: min
+      accommodation_time:
+        value: 0.0
+        unit: min
+      phases:
+        - name: injection
+          duration:
+            value: 12.5
+            unit: min
+          rate:
+            value: 0.5
+            unit: bbl_min
+        - name: shutin
+          duration:
+            value: 9.5
+            unit: min
+          rate:
+            value: 0.0
+            unit: bbl_min
+  fracture:
+    geometry: pkn
+    fluid_viscosity_cP: 3.0
+    height:
+      value: 1.0
+      unit: m
+    initial_width:
+      value: 0.0
+      unit: m
+    breakdown:
+      method: pressure_threshold
+      pressure:
+        value: 1.0
+        unit: Pa
+    initiation:
+      type: sigma_theta_static
+      source: diagnostic_static
+      pressure_source: wellbore_pressure_Pa
+      comparison: legacy_algebra
+      sigma_theta:
+        compression_positive:
+          value: 67342521.84592447
+          unit: Pa
+        layer_id: legacy_layer_16
+        influence_depth:
+          value: 4374.0
+          unit: m
+        mapping_status: STATIC_FROM_LEGACY_AUDIT
+  leakoff:
+    enabled: true
+    model: synthetic_constant
+  detection:
+    method: derivative_drop
+  pressure_model:
+    type: volumetric_balance
+  volumetric_balance:
+    compliance:
+      enabled: true
+      model: elastic_annular_simple
+      inner_boundary:
+        radius:
+          value: 0.06985
+          unit: m
+        wall_thickness:
+          value: 0.010541
+          unit: m
+        young_modulus:
+          value: 210000000000.0
+          unit: Pa
+        poisson_ratio: 0.30
+      formation:
+        radius:
+          value: 0.17145
+          unit: m
+        young_modulus:
+          value: 20400000000.0
+          unit: Pa
+        poisson_ratio: 0.36
+      source: MECHANICAL_ESTIMATE_PHASE_10_20B
+      mechanical_compliance_status: experimental_opt_in
+      caveat: "Opt-in simplified elastic annular compliance; not a full APB/salt mechanical solve and not calibrated to legacy dP."
+
+apb:
+  enabled: false
+  top_packer_m: 0.0
+  leakage_enabled: false
+  venting_enabled: false
+
+time:
+  total_h: 0.3666666667
+  dt_h: 0.0083333333
+  scheme: explicit
+  solver:
+    tol_pressure_bar: 0.1
+    tol_eq: 0.00000001
+    stabilization_h: 0.0
+
+output:
+  directory: output/buz67d_pkn_legacy_elastic_compliance
+  every_n_steps: 1
+  fields: [pressure, stress, temperature]
+  format: json

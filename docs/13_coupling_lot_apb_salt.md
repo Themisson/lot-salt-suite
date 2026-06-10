@@ -2330,6 +2330,42 @@ C_eff = C_fluid + C_geom
 `elastic_annular_simple` e uma tentativa mecanica reduzida e deve ser comparado
 separadamente no BUZ67D antes de qualquer promoção de maturidade.
 
+## Diagnostico BUZ67D com compliance elastica simples (Fase 10.20C)
+
+A Fase 10.20C adicionou um caso BUZ67D controlado com
+`lot.volumetric_balance.compliance.model = elastic_annular_simple`:
+
+```text
+cases/validation/buz67d_pkn_legacy_elastic_compliance.yaml
+```
+
+O caso foi comparado com:
+
+- legado auditado em `results/comparison/level1_buz67d/legacy_audit/`;
+- moderno sem compliance;
+- moderno com `constant_geometric` da 10.19C;
+- moderno com `elastic_annular_simple` da 10.20B.
+
+A ferramenta `tools/compare_phase10_20c.py` gerou `phase10_20c_summary.csv`,
+`phase10_20c_metadata.json` e figuras diagnosticas locais em
+`results/comparison/phase10_20c/`. Esses artefatos nao devem ser versionados.
+
+Resultado:
+
+```text
+classification = ELASTIC_COMPLIANCE_UNDERCOMPLIANT
+modern_first_dP_elastic_compliance_Pa = 43639672.35675542
+modern_first_dP_constant_compliance_Pa = 1845417.2017930523
+legacy_first_dP_Pa = 1845413.7784679066
+fracture_initiation_time_elastic_s = 30.0
+fracture_initiation_time_legacy_s = 510.0
+```
+
+Conclusao: o modelo elastico simples melhora a pressao frente a compressao pura
+do fluido, mas e insuficientemente complacente para reproduzir a escala de
+`dP` do legado. A fase nao altera o runtime padrao, nao conecta APB/sal, nao
+implementa Zamora e nao valida fratura fisica.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que
