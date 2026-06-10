@@ -875,3 +875,65 @@ Essa classificacao significa que o primeiro `dP` moderno se aproxima do legado
 e o pico de pressao fica dentro de `±10%`. Ela nao significa validacao fisica:
 a compliance e constante, inferida de um unico passo, e ainda nao representa um
 modelo mecanico explicito de casing/rocha.
+
+### Compliance mecanica candidata do anular/wellbore — Fase 10.20A
+
+**Gate:** `MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL`.
+
+A Fase 10.20A auditou a origem do termo geometrico `dV` no legado
+`APB1da`. O calculo ativo usa os raios do anular e os deslocamentos nodais
+das fronteiras:
+
+```text
+V_deformado = 0.5 * h * ((b + u_outer)^2 - (a + u_inner)^2)
+dV_geom = V_deformado - Vi
+```
+
+Esse `dV_geom` entra no balanco:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+Os deslocamentos `u` sao obtidos por equilibrio radial:
+
+- se a rocha externa e elastica, `getNodalDisplacement()` resolve o sistema
+  global montado com rigidez de solidos/rochas;
+- se a rocha externa e viscoelastica, o ultimo deslocamento vem de
+  `APBSalt1D::solveThermalViscoStep(dt)`;
+- o drill pipe entra geometricamente no volume anular BUZ67D, mas a auditoria
+  nao identificou uma rota moderna pronta para tratá-lo como elemento mecanico
+  acoplado ao `volumetric_balance`.
+
+Tres formulacoes foram classificadas:
+
+| Modelo | Status | Observacao |
+|---|---|---|
+| `constant_geometric` | Implementado na 10.19C | Baseline diagnostico inferido de um passo legado. |
+| `elastic_annular_simple` | Candidato 10.20B | Estimativa radial elastica simples, opt-in e experimental. |
+| `tabulated_or_trace_fit_compliance` | Futuro | Exigiria traço legado de `dV` vs `P`; nao implementar como fisico agora. |
+
+O candidato escolhido para a 10.20B e `elastic_annular_simple`, com a
+linearizacao:
+
+```text
+dV_geom / V ~= 2 * (b*u_outer_per_Pa + a*u_inner_per_Pa) * dP / (b^2 - a^2)
+C_geom_mech = 2 * (b*c_outer + a*c_inner) / (b^2 - a^2)
+C_eff = C_fluid + C_geom_mech
+```
+
+onde `c_inner` e `c_outer` sao compliances radiais positivas [m/Pa]. Para o
+BUZ67D diagnostico, a ferramenta `tools/audit_phase10_20a_mechanical_compliance.py`
+estimou:
+
+```text
+C_geom_diag_10_19C = 1.8571966938610005e-8 1/Pa
+C_geom_elastic_simple = 1.7242805809704984e-10 1/Pa
+ratio = 0.009284318600556103
+predicted_first_dP_elastic_simple = 43639672.35675541 Pa
+```
+
+Portanto, a formulacao e implementavel, mas parcial: espera-se que o modelo
+elastico simples reduza a pressao em relacao a compressao pura do fluido, sem
+necessariamente reproduzir a compliance diagnostica do legado. Ele deve ser
+implementado apenas como rota opt-in/experimental.

@@ -303,6 +303,31 @@
       "results/comparison/phase10_19c outputs are local diagnostics and must not be versioned."
     ]
   },
+  "phase10_20a_mechanical_compliance_formulation": {
+    "status": "PHASE10_20A_MECHANICAL_COMPLIANCE_FORMULATION_COMPLETE",
+    "gate": "MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL",
+    "classification": "ELASTIC_SIMPLE_FORMULATION_READY_AS_DIAGNOSTIC",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "audit_tool": "tools/audit_phase10_20a_mechanical_compliance.py",
+    "legacy_dV_formula": "dV = 0.5 * thickness * ((b + u_outer)^2 - (a + u_inner)^2) - Vi",
+    "legacy_pressure_balance": "dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k",
+    "candidate_model_for_10_20b": "elastic_annular_simple",
+    "fluid_compressibility_1_Pa": 6.4e-10,
+    "diagnostic_geometric_compressibility_1_Pa": 1.8571966938610005e-8,
+    "elastic_simple_geometric_compressibility_1_Pa": 1.7242805809704984e-10,
+    "elastic_simple_ratio_to_diagnostic": 0.009284318600556103,
+    "predicted_first_dP_elastic_simple_Pa": 43639672.35675541,
+    "diagnostic_observation": "The legacy dV term is computed from annular boundary displacements and enters the APB pressure balance before fracture/leakoff comparison. A simple elastic radial compliance can be formulated and tested, but it is expected to be much smaller than the constant diagnostic compliance inferred from one legacy step.",
+    "caveats": [
+      "Formulation only; no runtime solver correction in Phase 10.20A.",
+      "elastic_annular_simple is a reduced diagnostic model, not a full APB/salt mechanical solve.",
+      "The simple estimate does not include viscoelastic salt time stepping, multi-layer stiffness coupling or Zamora fluid updates.",
+      "Level 1 physical validation remains closed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

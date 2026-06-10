@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.19C compliance geometrica opt-in validada localmente; commit/push pendente
+Fase ativa  : 10.20A compliance mecanica anular formulada; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
 Testes C++  : 237/237 passaram em 2026-06-10
-Testes Py   : 81/81 passaram em 2026-06-10
+Testes Py   : 84/84 passaram em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -57,9 +57,66 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
-### [2026-06-10] Fase 10.19C — compliance geometrica opt-in no balanco volumetrico LOT — Codex
+### [2026-06-10] Fase 10.20A — auditoria e formulacao de compliance mecanica anular/wellbore — Codex
 
 **Status:** Implementada e validada localmente; commit/push pendente.
+
+**Gate:** `MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL`.
+
+**Objetivo:** auditar como o legado calcula `dV` geometrico e formular uma
+rota mecanica simples, opt-in e testavel para substituir gradualmente o proxy
+constante da Fase 10.19C.
+
+**Achado legado:**
+
+```text
+dV = 0.5 * thickness * ((b + u_outer)^2 - (a + u_inner)^2) - Vi
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+`u_inner` e `u_outer` vêm de `APB1da::getNodalDisplacement()`, que resolve o
+equilibrio radial do tier e, quando a rocha externa e sal viscoelastico, usa
+`APBSalt1D::solveThermalViscoStep(dt)` na fronteira externa.
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase10_20a_mechanical_compliance.py
+```
+
+**Resultado BUZ67D da estimativa simples:**
+
+```text
+C_geom_diag_10_19C = 1.8571966938610005e-8 1/Pa
+C_geom_elastic_simple = 1.7242805809704984e-10 1/Pa
+ratio_to_diagnostic = 0.009284318600556103
+predicted_first_dP_elastic_simple = 43639672.35675541 Pa
+```
+
+**Decisao:** prosseguir para 10.20B com `elastic_annular_simple`, mas apenas
+como rota experimental/opt-in. A expectativa e que o diagnostico 10.20C mostre
+se o modelo simples e subcompliant para BUZ67D.
+
+**Testes executados:**
+
+```text
+cmake -S . -B build: passou
+cmake --build build --config Debug -j: passou
+ctest --test-dir build -C Debug --output-on-failure: 237/237 passaram
+python -m pytest tests/python/: 84/84 passaram
+python tools/audit_phase10_20a_mechanical_compliance.py --help: passou
+python tools/generate_docs_index.py: passou
+git diff --check: passou
+```
+
+**Caveat:** nenhuma equacao legado foi alterada; `legance/LOT_Tese/` foi
+somente lido. O gate Level 1 permanece fechado para validacao fisica.
+
+---
+
+### [2026-06-10] Fase 10.19C — compliance geometrica opt-in no balanco volumetrico LOT — Codex
+
+**Status:** Commitada e enviada para `origin/main` em `d6ff741`.
 
 **Objetivo:** adicionar ao `volumetric_balance` uma compliance geometrica
 constante, opt-in e diagnostica, para testar a causa raiz identificada na

@@ -242,3 +242,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `GEOMETRIC_COMPLIANCE_DIAGNOSTIC_ONLY`. Fases futuras devem substituir esse
   equivalente constante por um modelo mecanico explícito de deformabilidade do
   anular/revestimento/formacao, mantendo o default sem compliance.
+- A Fase 10.20A formulou o candidato `elastic_annular_simple`. O gate ficou
+  `MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL`, porque a estimativa elastica
+  simples e testavel, mas produz apenas cerca de `0.93%` da compliance
+  diagnostica inferida na 10.19C. A proxima implementacao pode prosseguir como
+  rota experimental/opt-in, com expectativa de diagnosticar se o modelo e
+  subcompliant em BUZ67D antes de adicionar calibracoes ou modelos mais ricos.

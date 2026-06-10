@@ -686,6 +686,19 @@ deve planejar/implementar um modelo opt-in explícito de `annular_compliance` ou
 aproxima o primeiro `dP` e o pico de pressao, mas permanece um proxy constante.
 Ele nao substitui um modelo mecanico validado de casing/rocha e nao altera o
 default `pkn_direct`.
+
+**Atualizacao Fase 10.20A:** a auditoria confirmou que o `dV` legado e
+calculado por area anular deformada com deslocamentos `u(e)`/`u(e1)`:
+
+```text
+dV = 0.5 * h * ((b + u_outer)^2 - (a + u_inner)^2) - Vi
+```
+
+Foi formulado o candidato `elastic_annular_simple`, mas o gate ficou
+`MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL`: a estimativa elastica simples para
+BUZ67D (`C_geom ~= 1.7242805809704984e-10 1/Pa`) e muito menor que o proxy
+diagnostico da 10.19C. Assim, qualquer implementação deve continuar opt-in,
+experimental e sem declarar validacao fisica.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

@@ -2274,6 +2274,42 @@ O comportamento padrao permanece inalterado:
 - resultados locais em `results/comparison/phase10_19c/` sao artefatos de
   diagnostico e nao devem ser versionados.
 
+## Auditoria de compliance mecanica anular/wellbore (Fase 10.20A)
+
+A Fase 10.20A auditou a rota mecanica legada que alimenta o termo `dV` usado
+no balanco APB/LOT. No legado:
+
+```text
+APB1da::getNodalDisplacement(lu) -> line_up[lu].u
+APB1da::getdV(lu) -> line_up[lu].dV
+```
+
+e o volume anular deformado por radiano e:
+
+```text
+V_deformado = 0.5 * thickness * ((b + u_outer)^2 - (a + u_inner)^2)
+dV = V_deformado - Vi + dV_leakoff
+```
+
+Esse `dV` entra na formula de `dP` antes da avaliacao de fratura/leakoff:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+A auditoria nao alterou `legance/`, `external/saltcreep/`, `LotSaltPressureMap`
+ou `lot-sim run --mode lot-pkn`. O gate ficou:
+
+```text
+MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL
+```
+
+O modelo escolhido para uma proxima implementacao opt-in e
+`elastic_annular_simple`: uma compliance radial equivalente baseada em
+propriedades elasticas e geometria. Ele e deliberadamente reduzido e deve ser
+tratado como diagnostico, porque nao reproduz o sistema global legado nem a
+fluencia temporal do sal.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que

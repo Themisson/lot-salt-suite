@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">66/73</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">67/74</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">237</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">81</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">84</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -1452,6 +1452,72 @@ C_eff = 1.9211966938610006e-8 1/Pa
 e o pico de pressao fica dentro de <code>±10%</code>. Ela nao significa validacao fisica:
 a compliance e constante, inferida de um unico passo, e ainda nao representa um
 modelo mecanico explicito de casing/rocha.</p>
+<h3 id="compliance-mecanica-candidata-do-anularwellbore-fase-1020a">Compliance mecanica candidata do anular/wellbore — Fase 10.20A</h3>
+<p><strong>Gate:</strong> <code>MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL</code>.</p>
+<p>A Fase 10.20A auditou a origem do termo geometrico <code>dV</code> no legado
+<code>APB1da</code>. O calculo ativo usa os raios do anular e os deslocamentos nodais
+das fronteiras:</p>
+<pre><code class="language-text">V_deformado = 0.5 * h * ((b + u_outer)^2 - (a + u_inner)^2)
+dV_geom = V_deformado - Vi
+</code></pre>
+<p>Esse <code>dV_geom</code> entra no balanco:</p>
+<pre><code class="language-text">dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+</code></pre>
+<p>Os deslocamentos <code>u</code> sao obtidos por equilibrio radial:</p>
+<ul>
+<li>se a rocha externa e elastica, <code>getNodalDisplacement()</code> resolve o sistema
+  global montado com rigidez de solidos/rochas;</li>
+<li>se a rocha externa e viscoelastica, o ultimo deslocamento vem de
+  <code>APBSalt1D::solveThermalViscoStep(dt)</code>;</li>
+<li>o drill pipe entra geometricamente no volume anular BUZ67D, mas a auditoria
+  nao identificou uma rota moderna pronta para tratá-lo como elemento mecanico
+  acoplado ao <code>volumetric_balance</code>.</li>
+</ul>
+<p>Tres formulacoes foram classificadas:</p>
+<table>
+<thead>
+<tr>
+<th>Modelo</th>
+<th>Status</th>
+<th>Observacao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>constant_geometric</code></td>
+<td>Implementado na 10.19C</td>
+<td>Baseline diagnostico inferido de um passo legado.</td>
+</tr>
+<tr>
+<td><code>elastic_annular_simple</code></td>
+<td>Candidato 10.20B</td>
+<td>Estimativa radial elastica simples, opt-in e experimental.</td>
+</tr>
+<tr>
+<td><code>tabulated_or_trace_fit_compliance</code></td>
+<td>Futuro</td>
+<td>Exigiria traço legado de <code>dV</code> vs <code>P</code>; nao implementar como fisico agora.</td>
+</tr>
+</tbody>
+</table>
+<p>O candidato escolhido para a 10.20B e <code>elastic_annular_simple</code>, com a
+linearizacao:</p>
+<pre><code class="language-text">dV_geom / V ~= 2 * (b*u_outer_per_Pa + a*u_inner_per_Pa) * dP / (b^2 - a^2)
+C_geom_mech = 2 * (b*c_outer + a*c_inner) / (b^2 - a^2)
+C_eff = C_fluid + C_geom_mech
+</code></pre>
+<p>onde <code>c_inner</code> e <code>c_outer</code> sao compliances radiais positivas [m/Pa]. Para o
+BUZ67D diagnostico, a ferramenta <code>tools/audit_phase10_20a_mechanical_compliance.py</code>
+estimou:</p>
+<pre><code class="language-text">C_geom_diag_10_19C = 1.8571966938610005e-8 1/Pa
+C_geom_elastic_simple = 1.7242805809704984e-10 1/Pa
+ratio = 0.009284318600556103
+predicted_first_dP_elastic_simple = 43639672.35675541 Pa
+</code></pre>
+<p>Portanto, a formulacao e implementavel, mas parcial: espera-se que o modelo
+elastico simples reduza a pressao em relacao a compressao pura do fluido, sem
+necessariamente reproduzir a compliance diagnostica do legado. Ele deve ser
+implementado apenas como rota opt-in/experimental.</p>
 </div>
 </section>
 
@@ -2680,7 +2746,16 @@ deve planejar/implementar um modelo opt-in explícito de <code>annular_complianc
 <code>C_geom = 1.8571966938610005e-8 1/Pa</code> foi inferido do primeiro passo legado e
 aproxima o primeiro <code>dP</code> e o pico de pressao, mas permanece um proxy constante.
 Ele nao substitui um modelo mecanico validado de casing/rocha e nao altera o
-default <code>pkn_direct</code>.
+default <code>pkn_direct</code>.</p>
+<p><strong>Atualizacao Fase 10.20A:</strong> a auditoria confirmou que o <code>dV</code> legado e
+calculado por area anular deformada com deslocamentos <code>u(e)</code>/<code>u(e1)</code>:</p>
+<pre><code class="language-text">dV = 0.5 * h * ((b + u_outer)^2 - (a + u_inner)^2) - Vi
+</code></pre>
+<p>Foi formulado o candidato <code>elastic_annular_simple</code>, mas o gate ficou
+<code>MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL</code>: a estimativa elastica simples para
+BUZ67D (<code>C_geom ~= 1.7242805809704984e-10 1/Pa</code>) e muito menor que o proxy
+diagnostico da 10.19C. Assim, qualquer implementação deve continuar opt-in,
+experimental e sem declarar validacao fisica.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -5661,6 +5736,28 @@ controlado. Ela nao valida fratura fisica, nao valida <code>sigmaTheta</code>, n
 <li>resultados locais em <code>results/comparison/phase10_19c/</code> sao artefatos de
   diagnostico e nao devem ser versionados.</li>
 </ul>
+<h2 id="auditoria-de-compliance-mecanica-anularwellbore-fase-1020a">Auditoria de compliance mecanica anular/wellbore (Fase 10.20A)</h2>
+<p>A Fase 10.20A auditou a rota mecanica legada que alimenta o termo <code>dV</code> usado
+no balanco APB/LOT. No legado:</p>
+<pre><code class="language-text">APB1da::getNodalDisplacement(lu) -&gt; line_up[lu].u
+APB1da::getdV(lu) -&gt; line_up[lu].dV
+</code></pre>
+<p>e o volume anular deformado por radiano e:</p>
+<pre><code class="language-text">V_deformado = 0.5 * thickness * ((b + u_outer)^2 - (a + u_inner)^2)
+dV = V_deformado - Vi + dV_leakoff
+</code></pre>
+<p>Esse <code>dV</code> entra na formula de <code>dP</code> antes da avaliacao de fratura/leakoff:</p>
+<pre><code class="language-text">dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+</code></pre>
+<p>A auditoria nao alterou <code>legance/</code>, <code>external/saltcreep/</code>, <code>LotSaltPressureMap</code>
+ou <code>lot-sim run --mode lot-pkn</code>. O gate ficou:</p>
+<pre><code class="language-text">MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL
+</code></pre>
+<p>O modelo escolhido para uma proxima implementacao opt-in e
+<code>elastic_annular_simple</code>: uma compliance radial equivalente baseada em
+propriedades elasticas e geometria. Ele e deliberadamente reduzido e deve ser
+tratado como diagnostico, porque nao reproduz o sistema global legado nem a
+fluencia temporal do sal.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser

@@ -1678,3 +1678,37 @@ fisica de fratura, nao compara `sigmaTheta`, `pw`, `margin` ou `opened`, e nao
 altera o gate Level 1. O status de prontidao permanece fechado para validacao
 fisica ate existir um modelo mecanico de compliance e uma rota sigma-theta
 runtime fisicamente definida.
+
+---
+
+## Fase 10.20A — formulacao de compliance mecanica simples
+
+**Status:** `MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL`.
+
+A Fase 10.20A criou a ferramenta de auditoria:
+
+```text
+tools/audit_phase10_20a_mechanical_compliance.py
+```
+
+Ela registra a formula legada:
+
+```text
+dV = 0.5 * h * ((b + u_outer)^2 - (a + u_inner)^2) - Vi
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+e compara o proxy diagnostico da 10.19C com uma estimativa elastica simples:
+
+| Metrica | Valor |
+|---|---:|
+| `C_geom_diag_10_19C` | `1.8571966938610005e-8` |
+| `C_geom_elastic_simple` | `1.7242805809704984e-10` |
+| `elastic_simple_ratio_to_diagnostic` | `0.009284318600556103` |
+| `predicted_first_dP_elastic_simple_Pa` | `43639672.35675541` |
+
+Conclusao: existe uma rota implementavel e testavel para
+`elastic_annular_simple`, mas ela deve entrar na matriz como comparacao
+diagnostica. Se implementada, a comparacao 10.20C deve classifica-la como
+efetiva, parcial, subcompliant, overcompliant ou inconclusiva, sem promover
+Level 1 para validacao fisica.
