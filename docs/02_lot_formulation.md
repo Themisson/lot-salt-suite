@@ -556,3 +556,65 @@ caso 10.18E ocorreu em `30 s`, muito antes do marcador legado de `510 s`.
 Portanto, a fase confirma que `fracture.breakdown.pressure` continua sendo uma
 aproximação diagnóstica simplificada e não reproduz o critério legado
 sigma-theta por altura de influência.
+
+### Auditoria instrumentada do sink de fratura — Fase 10.18F
+
+**Status:** `PHASE10_18F_FRACTURE_TRACE_AUDIT_COMPLETE_NO_SOLVER_CORRECTION`.
+
+A Fase 10.18F instrumentou temporariamente o `LOT_Tese` para observar a ordem
+local do critério legado de fratura e do sink volumétrico. A instrumentação foi
+mantida apenas durante a auditoria, marcada com `// AUDIT: Phase 10.18F`, e foi
+removida antes do commit. Nenhum arquivo em `legance/` é versionado nesta fase.
+
+O traço legado gerado localmente fica em:
+
+```text
+results/comparison/phase10_18f/legacy_trace/buz67d_fracture_trace.csv
+```
+
+O primeiro ponto legado que satisfaz `pw > sigmaTheta` ocorreu em:
+
+| Campo | Valor |
+|---|---:|
+| `time_s` | `510.0` |
+| `pw_Pa` | `66769490.24425595` |
+| `sigmaTheta_Pa` | `66666624.79984049` |
+| `margin_Pa` | `102865.444415465` |
+| `fracture_volume_increment_m3` | `0.0` |
+
+O primeiro sink positivo observado no traço legado ocorreu no passo seguinte:
+
+| Campo | Valor |
+|---|---:|
+| `time_s` | `540.0` |
+| `fracture_volume_increment_m3` | `9.327456563839315e-05` |
+
+A classificação local do legado é:
+
+```text
+LEGACY_SINK_NEXT_STEP
+```
+
+Entretanto, a comparação com o traço moderno 10.18E mostrou que o moderno abre
+e aplica sink em `30 s`, muito antes do critério legado sigma-theta em `510 s`:
+
+| Campo | Legado | Moderno 10.18E |
+|---|---:|---:|
+| Primeiro `opened` | `510.0 s` | `30.0 s` |
+| Primeiro sink positivo | `540.0 s` | `30.0 s` |
+| Incremento de fratura no primeiro sink | `9.327456563839315e-05 m3` | `0.039746823732 m3` |
+
+Por isso, a causa raiz da divergência é classificada como:
+
+```text
+OTHER
+modern static threshold opens before the legacy sigma-theta criterion;
+this is a criterion mismatch, not a confirmed local C++ sink bug
+```
+
+Conclusão: não há evidência suficiente para corrigir a ordem do sink em
+`PknModel`. A divergência principal vem do critério de abertura simplificado
+`fracture.breakdown.pressure`, que ainda não reproduz o critério legado
+sigma-theta por altura de influência. A próxima correção deve ser arquitetural:
+fornecer uma rota opt-in testada para `SigmaThetaInfluenceLayer` alimentar o
+balanço volumétrico, sem promover essa rota a default runtime.

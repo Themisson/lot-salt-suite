@@ -234,7 +234,7 @@
   <div class="brand">
     <h1>lot-salt-suite<span class="dot">.</span></h1>
     <div class="sub">LOT · APB · Fluência de sal</div>
-    <span class="ver">v0.1.0 · atualizado 2026-06-08</span>
+    <span class="ver">v0.1.0 · atualizado 2026-06-10</span>
   </div>
   <div class="search-wrap">
     <input type="text" id="navSearch" placeholder="buscar na navegação..." autocomplete="off">
@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">62/69</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">63/70</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">221</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">67</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -1120,6 +1120,107 @@ caso 10.18E ocorreu em <code>30 s</code>, muito antes do marcador legado de <cod
 Portanto, a fase confirma que <code>fracture.breakdown.pressure</code> continua sendo uma
 aproximação diagnóstica simplificada e não reproduz o critério legado
 sigma-theta por altura de influência.</p>
+<h3 id="auditoria-instrumentada-do-sink-de-fratura-fase-1018f">Auditoria instrumentada do sink de fratura — Fase 10.18F</h3>
+<p><strong>Status:</strong> <code>PHASE10_18F_FRACTURE_TRACE_AUDIT_COMPLETE_NO_SOLVER_CORRECTION</code>.</p>
+<p>A Fase 10.18F instrumentou temporariamente o <code>LOT_Tese</code> para observar a ordem
+local do critério legado de fratura e do sink volumétrico. A instrumentação foi
+mantida apenas durante a auditoria, marcada com <code>// AUDIT: Phase 10.18F</code>, e foi
+removida antes do commit. Nenhum arquivo em <code>legance/</code> é versionado nesta fase.</p>
+<p>O traço legado gerado localmente fica em:</p>
+<pre><code class="language-text">results/comparison/phase10_18f/legacy_trace/buz67d_fracture_trace.csv
+</code></pre>
+<p>O primeiro ponto legado que satisfaz <code>pw &gt; sigmaTheta</code> ocorreu em:</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>time_s</code></td>
+<td style="text-align: right;"><code>510.0</code></td>
+</tr>
+<tr>
+<td><code>pw_Pa</code></td>
+<td style="text-align: right;"><code>66769490.24425595</code></td>
+</tr>
+<tr>
+<td><code>sigmaTheta_Pa</code></td>
+<td style="text-align: right;"><code>66666624.79984049</code></td>
+</tr>
+<tr>
+<td><code>margin_Pa</code></td>
+<td style="text-align: right;"><code>102865.444415465</code></td>
+</tr>
+<tr>
+<td><code>fracture_volume_increment_m3</code></td>
+<td style="text-align: right;"><code>0.0</code></td>
+</tr>
+</tbody>
+</table>
+<p>O primeiro sink positivo observado no traço legado ocorreu no passo seguinte:</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>time_s</code></td>
+<td style="text-align: right;"><code>540.0</code></td>
+</tr>
+<tr>
+<td><code>fracture_volume_increment_m3</code></td>
+<td style="text-align: right;"><code>9.327456563839315e-05</code></td>
+</tr>
+</tbody>
+</table>
+<p>A classificação local do legado é:</p>
+<pre><code class="language-text">LEGACY_SINK_NEXT_STEP
+</code></pre>
+<p>Entretanto, a comparação com o traço moderno 10.18E mostrou que o moderno abre
+e aplica sink em <code>30 s</code>, muito antes do critério legado sigma-theta em <code>510 s</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th style="text-align: right;">Legado</th>
+<th style="text-align: right;">Moderno 10.18E</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primeiro <code>opened</code></td>
+<td style="text-align: right;"><code>510.0 s</code></td>
+<td style="text-align: right;"><code>30.0 s</code></td>
+</tr>
+<tr>
+<td>Primeiro sink positivo</td>
+<td style="text-align: right;"><code>540.0 s</code></td>
+<td style="text-align: right;"><code>30.0 s</code></td>
+</tr>
+<tr>
+<td>Incremento de fratura no primeiro sink</td>
+<td style="text-align: right;"><code>9.327456563839315e-05 m3</code></td>
+<td style="text-align: right;"><code>0.039746823732 m3</code></td>
+</tr>
+</tbody>
+</table>
+<p>Por isso, a causa raiz da divergência é classificada como:</p>
+<pre><code class="language-text">OTHER
+modern static threshold opens before the legacy sigma-theta criterion;
+this is a criterion mismatch, not a confirmed local C++ sink bug
+</code></pre>
+<p>Conclusão: não há evidência suficiente para corrigir a ordem do sink em
+<code>PknModel</code>. A divergência principal vem do critério de abertura simplificado
+<code>fracture.breakdown.pressure</code>, que ainda não reproduz o critério legado
+sigma-theta por altura de influência. A próxima correção deve ser arquitetural:
+fornecer uma rota opt-in testada para <code>SigmaThetaInfluenceLayer</code> alimentar o
+balanço volumétrico, sem promover essa rota a default runtime.</p>
 </div>
 </section>
 
@@ -2208,6 +2309,10 @@ pressão de fratura física a partir dessa rota.</p>
 <li>[x] <strong>R14:</strong> Fase 10.18D confirmou que <code>sigma_theta_compression_positive_Pa</code>
   existe no diagnostico moderno, mas ainda nao e fonte runtime para
   <code>lot-sim run --mode lot-pkn</code></li>
+<li>[x] <strong>R15:</strong> Fase 10.18E confirmou que um threshold estatico extraido do
+  legado abre cedo demais no moderno e nao substitui o criterio sigma-theta</li>
+<li>[x] <strong>R16:</strong> Fase 10.18F confirmou que a divergencia nao e bug local
+  comprovado de ordem do sink; o moderno abre cedo por mismatch de criterio</li>
 </ul>
 <h3 id="r14-sigma-theta-disponivel-apenas-como-diagnostico">R14 — Sigma-theta disponivel apenas como diagnostico</h3>
 <p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado na Fase 10.18D</p>
@@ -2256,7 +2361,31 @@ max legado = 69.035836 MPa
 <p><strong>Impacto:</strong> <code>fracture.breakdown.pressure</code> não deve ser tratado como substituto
 físico do critério legado <code>pw &gt; sigmaTheta</code>. Ele permanece apenas ferramenta
 diagnóstica opt-in até que uma rota runtime forneça a tensão tangencial da
-altura de influência ao balanço volumétrico.
+altura de influência ao balanço volumétrico.</p>
+<hr />
+<h2 id="r16-auditoria-instrumentada-nao-autoriza-correcao-local-do-sink">R16 — Auditoria instrumentada não autoriza correção local do sink</h2>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado na Fase 10.18F</p>
+<p>A Fase 10.18F instrumentou temporariamente o <code>LOT_Tese</code> para observar a ordem
+entre abertura por:</p>
+<pre><code class="language-text">pw &gt; sigmaTheta
+</code></pre>
+<p>e entrada do sink volumétrico. No traço auditado, o primeiro <code>opened</code> ocorreu em
+<code>510 s</code> e o primeiro incremento positivo de fratura/leakoff ocorreu em <code>540 s</code>,
+classificando o legado como:</p>
+<pre><code class="language-text">LEGACY_SINK_NEXT_STEP
+</code></pre>
+<p>Apesar disso, o traço moderno do caso
+<code>cases/validation/buz67d_pkn_legacy_static_breakdown.yaml</code> abriu em <code>30 s</code>.
+A comparação foi classificada como:</p>
+<pre><code class="language-text">OTHER
+</code></pre>
+<p>porque o threshold estático moderno abre antes do critério legado sigma-theta.
+Isso indica mismatch de critério, não bug local comprovado na ordem do sink em
+<code>PknModel</code>.</p>
+<p><strong>Impacto:</strong> não alterar a ordem do balanço volumétrico para perseguir o
+marcador de <code>510 s</code>. A próxima evolução deve implementar uma rota explícita e
+opt-in para fornecer a tensão tangencial na altura de influência ao critério de
+abertura, ou manter <code>fracture.breakdown.pressure</code> como proxy diagnóstico.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar

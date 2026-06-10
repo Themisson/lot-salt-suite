@@ -1418,3 +1418,77 @@ results/comparison/phase10_18e/*.png
 
 Essa fase não compara `sigmaTheta`, `margin`, `opened`, dano, ruptura, sal ou
 equivalência física de fratura.
+
+---
+
+## Fase 10.18F — auditoria instrumentada do traço de fratura
+
+**Status:** `PHASE10_18F_FRACTURE_TRACE_AUDIT_COMPLETE_NO_SOLVER_CORRECTION`.
+
+A Fase 10.18F criou uma auditoria instrumentada e temporária do `LOT_Tese` para
+responder uma pergunta estreita: a divergência moderna decorre de um erro local
+na ordem em que o sink de fratura/leakoff entra no balanço, ou de um critério de
+abertura diferente?
+
+Artefatos locais gerados, não versionados:
+
+```text
+results/comparison/phase10_18f/legacy_trace/buz67d_fracture_trace.csv
+results/comparison/phase10_18f/legacy_trace/legacy_fracture_trace_summary.json
+results/comparison/phase10_18f/legacy_trace/legacy_fracture_trace_summary.csv
+results/comparison/phase10_18f/modern_trace/buz67d_modern_trace.csv
+results/comparison/phase10_18f/trace_comparison/trace_comparison.csv
+results/comparison/phase10_18f/trace_comparison/trace_comparison_metadata.json
+```
+
+A instrumentação legada foi removida antes do commit. O registro local das
+linhas instrumentadas fica apenas em:
+
+```text
+results/comparison/phase10_18f/legacy_trace/legacy_audit.patch
+```
+
+Resumo do traço legado:
+
+| Métrica | Valor |
+|---|---:|
+| Primeiro `opened` | `510.0 s` |
+| Primeiro `pw_Pa` aberto | `66769490.24425595` |
+| Primeiro `sigmaTheta_Pa` aberto | `66666624.79984049` |
+| Primeira margem aberta | `102865.444415465 Pa` |
+| Sink no primeiro `opened` | `0.0 m3` |
+| Primeiro sink positivo | `540.0 s` |
+| Classificação local | `LEGACY_SINK_NEXT_STEP` |
+
+Resumo do traço moderno reconstruído para o caso 10.18E:
+
+| Métrica | Valor |
+|---|---:|
+| Primeiro `fracture_initiated_after` | `30.0 s` |
+| `criterion_pressure_Pa` no primeiro `opened` | `82129237.46813472` |
+| `breakdown_threshold_Pa` | `8131435.236221395` |
+| Primeiro sink positivo | `30.0 s` |
+| `wellbore_pressure_after_Pa` | `26732215.17314985` |
+
+A comparação é classificada como:
+
+```text
+root_cause_classification = OTHER
+correction_allowed = false
+```
+
+Interpretação: o moderno abre antes do critério legado sigma-theta; portanto, a
+diferença principal é de critério de abertura, não uma falha local comprovada na
+ordem do sink. Nenhuma correção em C++ foi aplicada nesta fase.
+
+Essa fase continua sem validação física. Ela não compara dano, ruptura,
+equivalência quantitativa de fratura, `j2`, von Mises ou estado tensorial. O
+próximo passo recomendado é projetar uma rota opt-in:
+
+```text
+CaseData -> SaltCreepTimeBridge/SigmaThetaInfluenceLayer
+         -> volumetric_balance fracture-opening criterion
+```
+
+antes de qualquer tentativa de substituir `fracture.breakdown.pressure` por um
+critério runtime.

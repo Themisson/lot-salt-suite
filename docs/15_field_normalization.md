@@ -524,3 +524,46 @@ operacional, enquanto o contrato atual do `PknModel` aplica
 Esse mapeamento é diagnóstico. Ele não normaliza `sigmaTheta`, `margin` ou
 `opened` como campos runtime e não valida a equivalência física do critério de
 fratura.
+
+## Fase 10.18F — campos de traço instrumentado de fratura
+
+A Fase 10.18F adiciona normalização documental para os campos de traço usados
+na auditoria instrumentada, sem promovê-los a contrato runtime.
+
+Campos legados temporários:
+
+| Campo | Unidade | Significado |
+|---|---|---|
+| `pw_Pa` | Pa | Pressão legada `pi + dP` no anular avaliado. |
+| `sigmaTheta_Pa` | Pa | `sigmaTheta = -getSigmaTheta()` na convenção compressão-positiva. |
+| `margin_Pa` | Pa | `pw_Pa - sigmaTheta_Pa`. |
+| `opened` | booleano | Resultado legado de `pw > sigmaTheta`. |
+| `opened_before_step` | booleano | Estado de abertura antes da avaliação local. |
+| `opened_after_step` | booleano | Estado de abertura após a avaliação local. |
+| `fracture_volume_increment_m3` | m3 | Incremento do sink legado observado no traço instrumentado. |
+| `leakoff_volume_increment_m3` | m3 | Incremento de leakoff observado no traço instrumentado. |
+
+Campos modernos reconstruídos:
+
+| Campo | Unidade | Significado |
+|---|---|---|
+| `criterion_pressure_Pa` | Pa | Pressão de teste usada para avaliar o threshold simplificado moderno. |
+| `breakdown_threshold_Pa` | Pa | `fracture.breakdown.pressure` consumido pelo `PknModel`. |
+| `fracture_initiated_before` | booleano | Estado moderno antes da avaliação do passo. |
+| `fracture_initiated_after` | booleano | Estado moderno após a avaliação do passo. |
+| `fracture_volume_increment_m3` | m3 | Incremento moderno subtraído no balanço volumétrico. |
+| `wellbore_pressure_after_Pa` | Pa | Pressão moderna escrita pelo `ResultWriter` após o balanço do passo. |
+
+O resultado da fase é:
+
+```text
+legacy_first_open_time_s = 510.0
+legacy_first_positive_sink_time_s = 540.0
+modern_first_open_time_s = 30.0
+modern_first_positive_sink_time_s = 30.0
+root_cause_classification = OTHER
+```
+
+Esses campos são de auditoria. Eles não estabelecem equivalência física e não
+normalizam `sigmaTheta`, `margin` ou `opened` como saídas de produção do
+`lot-sim run --mode lot-pkn`.

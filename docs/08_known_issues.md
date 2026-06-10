@@ -465,6 +465,10 @@ pressão de fratura física a partir dessa rota.
 - [x] **R14:** Fase 10.18D confirmou que `sigma_theta_compression_positive_Pa`
   existe no diagnostico moderno, mas ainda nao e fonte runtime para
   `lot-sim run --mode lot-pkn`
+- [x] **R15:** Fase 10.18E confirmou que um threshold estatico extraido do
+  legado abre cedo demais no moderno e nao substitui o criterio sigma-theta
+- [x] **R16:** Fase 10.18F confirmou que a divergencia nao e bug local
+  comprovado de ordem do sink; o moderno abre cedo por mismatch de criterio
 
 ### R14 — Sigma-theta disponivel apenas como diagnostico
 
@@ -539,6 +543,44 @@ max legado = 69.035836 MPa
 físico do critério legado `pw > sigmaTheta`. Ele permanece apenas ferramenta
 diagnóstica opt-in até que uma rota runtime forneça a tensão tangencial da
 altura de influência ao balanço volumétrico.
+
+---
+
+## R16 — Auditoria instrumentada não autoriza correção local do sink
+
+**Severidade:** Alta | **Status:** Confirmado na Fase 10.18F
+
+A Fase 10.18F instrumentou temporariamente o `LOT_Tese` para observar a ordem
+entre abertura por:
+
+```text
+pw > sigmaTheta
+```
+
+e entrada do sink volumétrico. No traço auditado, o primeiro `opened` ocorreu em
+`510 s` e o primeiro incremento positivo de fratura/leakoff ocorreu em `540 s`,
+classificando o legado como:
+
+```text
+LEGACY_SINK_NEXT_STEP
+```
+
+Apesar disso, o traço moderno do caso
+`cases/validation/buz67d_pkn_legacy_static_breakdown.yaml` abriu em `30 s`.
+A comparação foi classificada como:
+
+```text
+OTHER
+```
+
+porque o threshold estático moderno abre antes do critério legado sigma-theta.
+Isso indica mismatch de critério, não bug local comprovado na ordem do sink em
+`PknModel`.
+
+**Impacto:** não alterar a ordem do balanço volumétrico para perseguir o
+marcador de `510 s`. A próxima evolução deve implementar uma rota explícita e
+opt-in para fornecer a tensão tangencial na altura de influência ao critério de
+abertura, ou manter `fracture.breakdown.pressure` como proxy diagnóstico.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

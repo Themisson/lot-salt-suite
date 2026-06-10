@@ -184,6 +184,36 @@
       "No sigmaTheta, margin, opened, damage, salt or rupture comparison was performed."
     ]
   },
+  "phase10_18f_fracture_trace_audit": {
+    "status": "PHASE10_18F_FRACTURE_TRACE_AUDIT_COMPLETE_NO_SOLVER_CORRECTION",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "pressure_semantic_equivalence": false,
+    "legacy_instrumented": true,
+    "legacy_instrumentation_committable": false,
+    "legacy_restored_before_commit": true,
+    "legacy_trace_csv": "results/comparison/phase10_18f/legacy_trace/buz67d_fracture_trace.csv",
+    "legacy_summary_json": "results/comparison/phase10_18f/legacy_trace/legacy_fracture_trace_summary.json",
+    "modern_trace_csv": "results/comparison/phase10_18f/modern_trace/buz67d_modern_trace.csv",
+    "trace_comparison_metadata_json": "results/comparison/phase10_18f/trace_comparison/trace_comparison_metadata.json",
+    "legacy_sink_classification": "LEGACY_SINK_NEXT_STEP",
+    "root_cause_classification": "OTHER",
+    "correction_allowed": false,
+    "solver_correction_applied": false,
+    "legacy_first_open_time_s": 510.0,
+    "legacy_first_positive_sink_time_s": 540.0,
+    "modern_first_open_time_s": 30.0,
+    "modern_first_positive_sink_time_s": 30.0,
+    "diagnostic_observation": "The legacy instrumented trace delays the first positive fracture/leakoff sink until the step after sigma-theta opening, but the modern static threshold opens at 30 s. The dominant divergence is therefore the opening criterion, not a confirmed local sink-order bug.",
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "Legacy trace rows include nonlinear iteration samples.",
+      "Modern trace is reconstructed from ResultWriter CSV, not a runtime debug hook.",
+      "No C++ solver correction was authorized by the trace evidence.",
+      "No sigma-theta runtime criterion was implemented in this phase."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.18E implementada, em verificacao/commit
+Fase ativa  : 10.18F auditoria instrumentada concluida, sem correcao C++
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
-Último push : 2026-06-08
+Último push : 2026-06-10
 Testes C++  : 203/203 passaram em 2026-06-07
-Testes Py   : em execução para Fase 10.18E
+Testes Py   : 67/67 passaram em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -57,9 +57,85 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-10] Fase 10.18F — auditoria instrumentada do traço de fratura — Codex
+
+**Status:** Implementada e validada localmente; commit/push pendente.
+
+**Objetivo:** instrumentar temporariamente o `LOT_Tese` para observar a ordem
+entre `pw > sigmaTheta` e a entrada do sink de fratura/leakoff, reconstruir o
+traço moderno do caso estático 10.18E e decidir se havia evidência para uma
+correção local no `PknModel`.
+
+**Instrumentação legada temporária:**
+
+```text
+legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+legance/LOT_Tese/src/apb_code/APB1da.cpp
+```
+
+As linhas adicionadas foram marcadas com `// AUDIT: Phase 10.18F` durante a
+auditoria e removidas antes do commit. `legance/` permanece sem diff
+versionável.
+
+**Artefatos locais, não versionados:**
+
+```text
+results/comparison/phase10_18f/legacy_trace/buz67d_fracture_trace.csv
+results/comparison/phase10_18f/legacy_trace/legacy_fracture_trace_summary.json
+results/comparison/phase10_18f/legacy_trace/legacy_fracture_trace_summary.csv
+results/comparison/phase10_18f/modern_trace/buz67d_modern_trace.csv
+results/comparison/phase10_18f/trace_comparison/trace_comparison.csv
+results/comparison/phase10_18f/trace_comparison/trace_comparison_metadata.json
+```
+
+**Resultado legado:**
+
+- primeiro `opened`: `510 s`;
+- `pw_Pa`: `66769490.24425595`;
+- `sigmaTheta_Pa`: `66666624.79984049`;
+- `margin_Pa`: `102865.444415465`;
+- sink no primeiro `opened`: `0.0 m3`;
+- primeiro sink positivo: `540 s`;
+- classificação local: `LEGACY_SINK_NEXT_STEP`.
+
+**Resultado moderno 10.18E:**
+
+- primeiro `fracture_initiated_after`: `30 s`;
+- primeiro sink positivo: `30 s`;
+- `criterion_pressure_Pa`: `82129237.46813472`;
+- `breakdown_threshold_Pa`: `8131435.236221395`;
+- `wellbore_pressure_after_Pa`: `26732215.17314985`.
+
+**Classificação:**
+
+```text
+root_cause_classification = OTHER
+correction_allowed = false
+```
+
+O moderno abre antes do critério legado sigma-theta. Portanto, a divergência é
+classificada como mismatch de critério, não como bug local comprovado na ordem
+do sink. Nenhuma correção C++ foi implementada nesta fase.
+
+**Ferramentas adicionadas:**
+
+```text
+tools/analyze_legacy_fracture_trace.py
+tools/trace_modern_fracture_balance.py
+tools/compare_fracture_traces.py
+tests/python/test_fracture_trace_tools.py
+```
+
+**Próximo passo recomendado:** projetar uma rota opt-in para
+`SigmaThetaInfluenceLayer` alimentar o critério de abertura do
+`volumetric_balance`, preservando `lot-sim run --mode lot-pkn` sem acoplamento
+implícito.
+
+---
+
 ### [2026-06-08] Fase 10.18E — calibração diagnóstica do threshold estático de breakdown — Codex
 
-**Status:** Implementada, aguardando commit/push após verificações finais.
+**Status:** Publicada em `b8c887a`.
 
 **Objetivo:** extrair do audit legado um threshold rastreável de início de
 fratura e testar se `fracture.breakdown.pressure` calibrado melhora o modo
