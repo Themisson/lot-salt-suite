@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.19B auditoria de vazao/balanco volumetrico validada localmente; commit/push pendente
+Fase ativa  : 10.19C compliance geometrica opt-in validada localmente; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
-Testes C++  : 229/229 passaram em 2026-06-10
-Testes Py   : 78/78 passaram em 2026-06-10
+Testes C++  : 237/237 passaram em 2026-06-10
+Testes Py   : 81/81 passaram em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,82 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-10] Fase 10.19C — compliance geometrica opt-in no balanco volumetrico LOT — Codex
+
+**Status:** Implementada e validada localmente; commit/push pendente.
+
+**Objetivo:** adicionar ao `volumetric_balance` uma compliance geometrica
+constante, opt-in e diagnostica, para testar a causa raiz identificada na
+Fase 10.19B sem alterar `pkn_direct`, sem conectar APB/sal e sem tornar a rota
+default.
+
+**Caso criado:**
+
+```text
+cases/validation/buz67d_pkn_legacy_compliance.yaml
+```
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase10_19c.py
+```
+
+**Formula implementada:**
+
+```text
+C_eff = C_fluid + C_geom
+dP = dV_eff / (C_eff * V_annular)
+```
+
+**Valores diagnosticos:**
+
+```text
+C_fluid = 6.4e-10 1/Pa
+C_geom = 1.8571966938610005e-8 1/Pa
+C_eff = 1.9211966938610006e-8 1/Pa
+```
+
+**Resultado local:**
+
+```text
+classification = COMPLIANCE_EFFECTIVE
+legacy_first_dP_Pa = 1845413.7784679066
+modern_first_dP_no_compliance_Pa = 55397022.29498486
+modern_first_dP_with_compliance_Pa = 1845417.2017930523
+max_pressure_legacy_Pa = 69035836.1743195
+max_pressure_with_compliance_Pa = 67331393.612597
+relative_error_max_pressure = -0.02468924338685035
+fracture_initiation_time_s = 690.0
+```
+
+**Testes executados:**
+
+```text
+cmake --build build --config Debug -j: passou
+ctest --test-dir build -C Debug --output-on-failure: 237/237 passaram
+python -m pytest tests/python/: 81/81 passaram
+python tools/compare_phase10_19c.py --help: passou
+python tools/compare_phase10_19c.py ...: COMPLIANCE_EFFECTIVE
+```
+
+**Validacoes manuais:**
+
+```text
+lot_pkn_minimal.yaml: OK
+lot_pkn_with_leakoff.yaml: OK
+buz67d_pkn.yaml: OK
+buz67d_pkn_legacy_aligned.yaml: OK
+buz67d_pkn_legacy_sigma_theta_static.yaml: OK
+buz67d_pkn_legacy_compliance.yaml: OK
+```
+
+**Caveat:** a rota e `GEOMETRIC_COMPLIANCE_DIAGNOSTIC_ONLY`. O valor foi
+inferido do primeiro passo legado e nao representa ainda um modelo mecanico
+validado de revestimento, formacao, sal ou APB.
 
 ---
 

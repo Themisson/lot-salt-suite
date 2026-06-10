@@ -113,6 +113,15 @@ struct SigmaThetaFractureCriterionData {
   std::string mapping_status;
 };
 
+struct VolumetricComplianceData {
+  bool enabled = false;
+  std::string model;
+  double geometric_compressibility_per_Pa = 0.0;
+  double total_compressibility_per_Pa = 0.0;
+  std::string source;
+  std::string caveat;
+};
+
 struct LotConfig {
   bool enabled = false;
   double shoe_depth_m = 0.0;
@@ -131,6 +140,7 @@ struct LotConfig {
   std::string breakdown_method;
   double breakdown_pressure_Pa = 0.0;
   SigmaThetaFractureCriterionData sigma_theta_fracture;
+  VolumetricComplianceData volumetric_compliance;
   bool leakoff_enabled = false;
   std::string leakoff_model;
   double leakoff_coefficient_m_sqrt_s = 0.0;

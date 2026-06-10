@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">65/72</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">229</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">78</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">66/73</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">237</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">81</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -1359,6 +1359,99 @@ diagnostica foi classificada como:</p>
 <p>Nenhuma correcao C++ foi aplicada nesta fase. Uma correcao fisica deve ser fase
 separada, com modelo explicito de <code>annular_compliance</code> ou
 <code>wellbore_compliance</code>, sem fator empirico de pressao.</p>
+<h3 id="compliance-geometrica-opt-in-no-volumetric_balance-fase-1019c">Compliance geometrica opt-in no <code>volumetric_balance</code> — Fase 10.19C</h3>
+<p><strong>Status:</strong> <code>PHASE10_19C_GEOMETRIC_COMPLIANCE_DIAGNOSTIC_COMPLETE</code>.</p>
+<p>A Fase 10.19C adicionou um modelo opt-in e constante de compliance geometrica
+equivalente para o modo <code>volumetric_balance</code>. A formulacao moderna passa a
+permitir:</p>
+<pre><code class="language-text">C_eff = C_fluid + C_geom
+dP = dV_eff / (C_eff * V_annular)
+</code></pre>
+<p>onde:</p>
+<ul>
+<li><code>C_fluid</code> e a compressibilidade do fluido lida do caso;</li>
+<li><code>C_geom</code> e uma compliance geometrica equivalente [1/Pa];</li>
+<li><code>C_eff</code> e a compressibilidade efetiva usada apenas quando o bloco opt-in
+  esta habilitado;</li>
+<li><code>V_annular</code> segue a convencao moderna total no solver.</li>
+</ul>
+<p>Quando o bloco de compliance esta ausente ou desabilitado, o comportamento
+anterior permanece:</p>
+<pre><code class="language-text">C_eff = C_fluid
+</code></pre>
+<p>O YAML opt-in usa:</p>
+<pre><code class="language-yaml">lot:
+  volumetric_balance:
+    compliance:
+      enabled: true
+      model: constant_geometric
+      geometric_compressibility:
+        value: 1.8571966938610005e-8
+        unit: &quot;1/Pa&quot;
+      source: DIAGNOSTIC_FROM_LEGACY_FIRST_STEP
+</code></pre>
+<p>O valor diagnostico foi inferido do primeiro passo legado:</p>
+<pre><code class="language-text">C_total_apparent = dV_inj / (V_annular * dP_legacy)
+C_geom_apparent = C_total_apparent - C_fluid
+</code></pre>
+<p>com:</p>
+<pre><code class="language-text">C_fluid = 6.4e-10 1/Pa
+C_geom = 1.8571966938610005e-8 1/Pa
+C_eff = 1.9211966938610006e-8 1/Pa
+</code></pre>
+<p>Caso criado:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_compliance.yaml
+</code></pre>
+<p>Resultado diagnostico local:</p>
+<table>
+<thead>
+<tr>
+<th>Metrica</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>legacy_first_dP_Pa</code></td>
+<td style="text-align: right;"><code>1845413.7784679066</code></td>
+</tr>
+<tr>
+<td><code>modern_first_dP_no_compliance_Pa</code></td>
+<td style="text-align: right;"><code>55397022.29498486</code></td>
+</tr>
+<tr>
+<td><code>modern_first_dP_with_compliance_Pa</code></td>
+<td style="text-align: right;"><code>1845417.2017930523</code></td>
+</tr>
+<tr>
+<td><code>max_pressure_legacy_Pa</code></td>
+<td style="text-align: right;"><code>69035836.1743195</code></td>
+</tr>
+<tr>
+<td><code>max_pressure_with_compliance_Pa</code></td>
+<td style="text-align: right;"><code>67331393.612597</code></td>
+</tr>
+<tr>
+<td><code>relative_error_max_pressure</code></td>
+<td style="text-align: right;"><code>-0.02468924338685035</code></td>
+</tr>
+<tr>
+<td><code>fracture_initiation_time_s</code></td>
+<td style="text-align: right;"><code>690.0</code></td>
+</tr>
+<tr>
+<td><code>fracture_initiation_pressure_Pa</code></td>
+<td style="text-align: right;"><code>69176810.81439006</code></td>
+</tr>
+</tbody>
+</table>
+<p>Classificacao:</p>
+<pre><code class="language-text">COMPLIANCE_EFFECTIVE
+</code></pre>
+<p>Essa classificacao significa que o primeiro <code>dP</code> moderno se aproxima do legado
+e o pico de pressao fica dentro de <code>±10%</code>. Ela nao significa validacao fisica:
+a compliance e constante, inferida de um unico passo, e ainda nao representa um
+modelo mecanico explicito de casing/rocha.</p>
 </div>
 </section>
 
@@ -2581,7 +2674,13 @@ legacy_first_dP / dP_theoretical = 0.03331256651017148
 10.19B ainda usa apenas compressão de fluido menos sinks de fratura/leakoff.</p>
 <p><strong>Impacto:</strong> não corrigir isso com fator empírico de pressão. A próxima fase
 deve planejar/implementar um modelo opt-in explícito de <code>annular_compliance</code> ou
-<code>wellbore_compliance</code>, preservando <code>pkn_direct</code> e casos padrão.
+<code>wellbore_compliance</code>, preservando <code>pkn_direct</code> e casos padrão.</p>
+<p><strong>Atualizacao Fase 10.19C:</strong> foi criado um modelo opt-in
+<code>constant_geometric</code> que usa <code>C_eff = C_fluid + C_geom</code>. O valor diagnostico
+<code>C_geom = 1.8571966938610005e-8 1/Pa</code> foi inferido do primeiro passo legado e
+aproxima o primeiro <code>dP</code> e o pico de pressao, mas permanece um proxy constante.
+Ele nao substitui um modelo mecanico validado de casing/rocha e nao altera o
+default <code>pkn_direct</code>.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -5464,6 +5563,104 @@ com <code>pw_Pa</code> legado.</p>
 <p>Para a configuracao BUZ67D controlada atual, o volume moderno diagnostico cai
 de <code>1.39698074804365 m3</code> para <code>1.12107852567506 m3</code> total ao descontar o drill
 pipe de <code>5.5 in</code> OD.</p>
+<h2 id="compliance-geometrica-opt-in-no-balanco-volumetrico-lot-fase-1019c">Compliance geometrica opt-in no balanco volumetrico LOT (Fase 10.19C)</h2>
+<p>A Fase 10.19C adiciona uma rota opt-in e diagnostica para testar a hipotese
+levantada na Fase 10.19B: a escala de pressurizacao moderna estava dominada por
+compressao pura de fluido, enquanto o legado possui um termo geometrico <code>dV</code> no
+balanco anular.</p>
+<p>O modelo novo e limitado a <code>lot.pressure_model = volumetric_balance</code> e so atua
+quando o YAML declara explicitamente:</p>
+<pre><code class="language-yaml">lot:
+  volumetric_balance:
+    compliance:
+      enabled: true
+      model: constant_geometric
+      geometric_compressibility:
+        value: 1.8571966938610005e-8
+        unit: &quot;1/Pa&quot;
+      source: DIAGNOSTIC_FROM_LEGACY_FIRST_STEP
+</code></pre>
+<p>A formula usada no balanco e:</p>
+<pre><code class="language-text">C_eff = C_fluid + C_geom
+dP = dV_eff / (C_eff * V_annular)
+</code></pre>
+<p>onde <code>C_geom</code> e uma compressibilidade geometrica equivalente, constante e
+inferida do primeiro passo legado. Ela nao representa ainda rigidez mecanica de
+revestimento, formacao, cimentacao, sal ou APB.</p>
+<p>Caso diagnostico:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_compliance.yaml
+</code></pre>
+<p>Comparacao local gerada por:</p>
+<pre><code class="language-text">tools/compare_phase10_19c.py
+</code></pre>
+<p>Resultados observados:</p>
+<table>
+<thead>
+<tr>
+<th>Metrica</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C_fluid_1_Pa</code></td>
+<td style="text-align: right;"><code>6.4e-10</code></td>
+</tr>
+<tr>
+<td><code>C_geom_1_Pa</code></td>
+<td style="text-align: right;"><code>1.8571966938610005e-8</code></td>
+</tr>
+<tr>
+<td><code>C_eff_1_Pa</code></td>
+<td style="text-align: right;"><code>1.9211966938610006e-8</code></td>
+</tr>
+<tr>
+<td><code>legacy_first_dP_Pa</code></td>
+<td style="text-align: right;"><code>1845413.7784679066</code></td>
+</tr>
+<tr>
+<td><code>modern_first_dP_no_compliance_Pa</code></td>
+<td style="text-align: right;"><code>55397022.29498486</code></td>
+</tr>
+<tr>
+<td><code>modern_first_dP_with_compliance_Pa</code></td>
+<td style="text-align: right;"><code>1845417.2017930523</code></td>
+</tr>
+<tr>
+<td><code>max_pressure_legacy_Pa</code></td>
+<td style="text-align: right;"><code>69035836.1743195</code></td>
+</tr>
+<tr>
+<td><code>max_pressure_with_compliance_Pa</code></td>
+<td style="text-align: right;"><code>67331393.612597</code></td>
+</tr>
+<tr>
+<td><code>relative_error_max_pressure</code></td>
+<td style="text-align: right;"><code>-0.02468924338685035</code></td>
+</tr>
+<tr>
+<td><code>fracture_initiation_time_s</code></td>
+<td style="text-align: right;"><code>690.0</code></td>
+</tr>
+</tbody>
+</table>
+<p>Classificacao:</p>
+<pre><code class="language-text">COMPLIANCE_EFFECTIVE
+GEOMETRIC_COMPLIANCE_DIAGNOSTIC_ONLY
+</code></pre>
+<p>Essa classificacao significa apenas que a compliance equivalente explica a
+escala do primeiro incremento e aproxima a faixa maxima de pressao no caso
+controlado. Ela nao valida fratura fisica, nao valida <code>sigmaTheta</code>, nao compara
+<code>opened</code> legado e nao torna o acoplamento sal/APB ativo.</p>
+<p>O comportamento padrao permanece inalterado:</p>
+<ul>
+<li>casos sem <code>lot.volumetric_balance.compliance.enabled: true</code> continuam usando
+  apenas <code>C_fluid</code>;</li>
+<li><code>pkn_direct</code> ignora a compliance volumetrica;</li>
+<li><code>lot-sim run --mode lot-pkn</code> segue desacoplado de sal/APB;</li>
+<li>resultados locais em <code>results/comparison/phase10_19c/</code> sao artefatos de
+  diagnostico e nao devem ser versionados.</li>
+</ul>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser

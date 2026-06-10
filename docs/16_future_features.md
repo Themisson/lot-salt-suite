@@ -234,3 +234,11 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   geométrico `dV` no balanço. Antes de avançar para sigma-theta runtime como
   validação física, deve existir uma fase opt-in para `annular_compliance` ou
   `wellbore_compliance`, sem fator empírico.
+- A Fase 10.19C implementou uma compliance geométrica constante e opt-in no
+  `volumetric_balance`. O resultado foi classificado como
+  `COMPLIANCE_EFFECTIVE` para o caso BUZ67D controlado porque reproduziu a
+  escala do primeiro `dP` e aproximou a faixa maxima de pressao. Ainda assim,
+  o valor foi inferido de um unico passo legado e permanece
+  `GEOMETRIC_COMPLIANCE_DIAGNOSTIC_ONLY`. Fases futuras devem substituir esse
+  equivalente constante por um modelo mecanico explícito de deformabilidade do
+  anular/revestimento/formacao, mantendo o default sem compliance.

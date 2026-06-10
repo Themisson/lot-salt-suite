@@ -309,6 +309,37 @@ properties:
           type:
             type: string
             enum: [pkn_direct, volumetric_balance]
+      volumetric_balance:
+        type: object
+        additionalProperties: false
+        properties:
+          compliance:
+            type: object
+            required: [enabled]
+            additionalProperties: false
+            properties:
+              enabled:
+                type: boolean
+              model:
+                type: string
+                enum: [constant_geometric]
+              geometric_compressibility:
+                $ref: "#/$defs/compressibility_quantity"
+              total_compressibility:
+                $ref: "#/$defs/compressibility_quantity"
+              source:
+                type: string
+              caveat:
+                type: string
+            allOf:
+              - if:
+                  properties:
+                    enabled:
+                      const: true
+                then:
+                  required: [model, source]
+              - not:
+                  required: [geometric_compressibility, total_compressibility]
   apb:
     type: object
     required: [enabled, top_packer_m, leakage_enabled, venting_enabled]
@@ -374,3 +405,10 @@ $defs:
     properties:
       value: {type: number}
       unit: {type: string, enum: [Pa, bar, psi]}
+  compressibility_quantity:
+    type: object
+    required: [value, unit]
+    additionalProperties: false
+    properties:
+      value: {type: number}
+      unit: {type: string, enum: ["1/Pa"]}

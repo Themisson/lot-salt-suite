@@ -272,6 +272,37 @@
       "results/comparison/phase10_19b outputs are local diagnostics and must not be versioned."
     ]
   },
+  "phase10_19c_geometric_compliance": {
+    "status": "PHASE10_19C_GEOMETRIC_COMPLIANCE_DIAGNOSTIC_COMPLETE",
+    "classification": "COMPLIANCE_EFFECTIVE",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "case": "cases/validation/buz67d_pkn_legacy_compliance.yaml",
+    "comparison_tool": "tools/compare_phase10_19c.py",
+    "run_output_dir": "results/comparison/phase10_19c/modern_compliance",
+    "summary_csv": "results/comparison/phase10_19c/phase10_19c_summary.csv",
+    "metadata_json": "results/comparison/phase10_19c/phase10_19c_metadata.json",
+    "fluid_compressibility_1_Pa": 6.4e-10,
+    "geometric_compressibility_1_Pa": 1.8571966938610005e-8,
+    "effective_compressibility_1_Pa": 1.9211966938610006e-8,
+    "legacy_first_dP_Pa": 1845413.7784679066,
+    "modern_first_dP_no_compliance_Pa": 55397022.29498486,
+    "modern_first_dP_with_compliance_Pa": 1845417.2017930523,
+    "max_pressure_legacy_Pa": 69035836.1743195,
+    "max_pressure_with_compliance_Pa": 67331393.612597,
+    "relative_error_max_pressure": -0.02468924338685035,
+    "fracture_initiation_time_s": 690.0,
+    "fracture_initiation_pressure_Pa": 69176810.81439006,
+    "diagnostic_observation": "A constant opt-in geometric compliance inferred from the first legacy step fixes the first-step pressure scale and brings the maximum modern pressure within 10%, but it is not a validated casing/formation mechanics model and does not match the legacy opening time.",
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "Compliance is constant and inferred from first-step legacy dP.",
+      "No Zamora, sigma-theta runtime, casing mechanics model or APB/salt coupling was implemented.",
+      "results/comparison/phase10_19c outputs are local diagnostics and must not be versioned."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

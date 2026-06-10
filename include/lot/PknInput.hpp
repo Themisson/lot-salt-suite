@@ -30,6 +30,15 @@ struct SigmaThetaFractureCriterion {
   std::string mapping_status;
 };
 
+struct VolumetricComplianceConfig {
+  bool enabled = false;
+  std::string model = "none";
+  double geometric_compressibility_per_Pa = 0.0;
+  double total_compressibility_per_Pa = 0.0;
+  std::string source;
+  std::string caveat;
+};
+
 struct PknInput {
   InjectionSchedule injection;
   LeakoffConfig leakoff;
@@ -44,6 +53,7 @@ struct PknInput {
   PknPressureModel pressure_model = PknPressureModel::PknDirect;
   double annular_volume_m3 = 0.0;
   double fluid_compressibility_per_Pa = 0.0;
+  VolumetricComplianceConfig volumetric_compliance;
   double initial_pressure_Pa = 0.0;
   FractureInitiationCriterion fracture_initiation =
       FractureInitiationCriterion::ConstantPressure;

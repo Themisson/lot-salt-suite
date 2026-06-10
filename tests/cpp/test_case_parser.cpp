@@ -20,6 +20,8 @@ constexpr const char* kBuz67dLegacyAlignedCasePath =
     "cases/validation/buz67d_pkn_legacy_aligned.yaml";
 constexpr const char* kBuz67dSigmaThetaStaticCasePath =
     "cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml";
+constexpr const char* kBuz67dComplianceCasePath =
+    "cases/validation/buz67d_pkn_legacy_compliance.yaml";
 
 std::string valid_case_yaml() {
   return R"(metadata:
@@ -329,4 +331,21 @@ TEST_CASE("BUZ67D sigma theta static case loads diagnostic fracture initiation")
         Catch::Approx(67342521.84592447));
   CHECK(data.lot.sigma_theta_fracture.mapping_status ==
         "STATIC_FROM_LEGACY_AUDIT");
+}
+
+TEST_CASE("BUZ67D compliance case loads opt-in geometric compliance") {
+  const auto data = lss::io::parse_yaml(kBuz67dComplianceCasePath);
+
+  CHECK(data.name == "buz67d_pkn_legacy_compliance");
+  CHECK(data.lot.pressure_model == "volumetric_balance");
+  CHECK(data.lot.volumetric_compliance.enabled);
+  CHECK(data.lot.volumetric_compliance.model == "constant_geometric");
+  CHECK(data.lot.volumetric_compliance.geometric_compressibility_per_Pa ==
+        Catch::Approx(1.8571966938610005e-8));
+  CHECK(data.lot.volumetric_compliance.total_compressibility_per_Pa ==
+        Catch::Approx(0.0));
+  CHECK(data.lot.volumetric_compliance.source ==
+        "DIAGNOSTIC_FROM_LEGACY_FIRST_STEP");
+  CHECK(data.lot.volumetric_compliance.caveat.find("not a validated") !=
+        std::string::npos);
 }

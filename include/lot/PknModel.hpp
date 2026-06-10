@@ -5,6 +5,13 @@
 
 namespace lss::lot {
 
+[[nodiscard]] double effectiveCompressibility(double fluid_compressibility,
+                                              double geometric_compressibility);
+
+[[nodiscard]] double volumetricPressureIncrement(double dV_effective,
+                                                 double annular_volume,
+                                                 double effective_compressibility);
+
 class PknModel {
  public:
   [[nodiscard]] PknResult evaluate(const PknInput& input, double elapsed_time_s) const;

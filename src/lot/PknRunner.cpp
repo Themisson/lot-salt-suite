@@ -232,6 +232,15 @@ PknInput make_pkn_input(const lss::core::CaseData& data) {
   input.leakoff_constant_rate_m3_s = data.lot.leakoff_constant_rate_m3_s;
   input.pressure_model = parse_pressure_model(data.lot.pressure_model);
   input.initial_pressure_Pa = data.lot.initial_pressure_Pa;
+  input.volumetric_compliance.enabled =
+      data.lot.volumetric_compliance.enabled;
+  input.volumetric_compliance.model = data.lot.volumetric_compliance.model;
+  input.volumetric_compliance.geometric_compressibility_per_Pa =
+      data.lot.volumetric_compliance.geometric_compressibility_per_Pa;
+  input.volumetric_compliance.total_compressibility_per_Pa =
+      data.lot.volumetric_compliance.total_compressibility_per_Pa;
+  input.volumetric_compliance.source = data.lot.volumetric_compliance.source;
+  input.volumetric_compliance.caveat = data.lot.volumetric_compliance.caveat;
   input.fracture_initiation =
       parse_fracture_initiation(data.lot.sigma_theta_fracture);
   input.sigma_theta_fracture.enabled = data.lot.sigma_theta_fracture.enabled;

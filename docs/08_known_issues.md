@@ -679,6 +679,13 @@ e `dV` vem de deslocamentos geométricos do anular (`u(e)`, `u(e1)`). O moderno
 **Impacto:** não corrigir isso com fator empírico de pressão. A próxima fase
 deve planejar/implementar um modelo opt-in explícito de `annular_compliance` ou
 `wellbore_compliance`, preservando `pkn_direct` e casos padrão.
+
+**Atualizacao Fase 10.19C:** foi criado um modelo opt-in
+`constant_geometric` que usa `C_eff = C_fluid + C_geom`. O valor diagnostico
+`C_geom = 1.8571966938610005e-8 1/Pa` foi inferido do primeiro passo legado e
+aproxima o primeiro `dP` e o pico de pressao, mas permanece um proxy constante.
+Ele nao substitui um modelo mecanico validado de casing/rocha e nao altera o
+default `pkn_direct`.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

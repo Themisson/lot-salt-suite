@@ -86,6 +86,10 @@ void ensure_finite_values(const lss::lot::PknResult& result) {
   require_finite(result.wellbore_pressure_Pa, "summary.wellbore_pressure_Pa");
   require_finite(result.fluid_compressibility_per_Pa,
                  "summary.fluid_compressibility_per_Pa");
+  require_finite(result.geometric_compressibility_per_Pa,
+                 "summary.geometric_compressibility_per_Pa");
+  require_finite(result.effective_compressibility_per_Pa,
+                 "summary.effective_compressibility_per_Pa");
   require_finite(result.balance_delta_pressure_Pa,
                  "summary.balance_delta_pressure_Pa");
   require_finite(result.balance_effective_volume_increment_m3,
@@ -167,7 +171,10 @@ void write_timeseries_csv(const std::filesystem::path& path,
          "fracture_initiated,"
          "fracture_initiation_pressure_Pa,"
          "fracture_initiation_sigma_theta_Pa,"
-         "fracture_initiation_margin_Pa\n";
+         "fracture_initiation_margin_Pa,"
+         "fluid_compressibility_1_Pa,"
+         "geometric_compressibility_1_Pa,"
+         "effective_compressibility_1_Pa\n";
   for (std::size_t i = 0; i < result.time_series_s.size(); ++i) {
     out << result.time_series_s[i] << ',' << result.injected_volume_series_m3[i] << ','
         << result.fracture_length_series_m[i] << ','
@@ -185,7 +192,10 @@ void write_timeseries_csv(const std::filesystem::path& path,
         << result.fracture_initiated_series[i] << ','
         << result.fracture_initiation_pressure_series_Pa[i] << ','
         << result.fracture_initiation_sigma_theta_series_Pa[i] << ','
-        << result.fracture_initiation_margin_series_Pa[i] << '\n';
+        << result.fracture_initiation_margin_series_Pa[i] << ','
+        << result.fluid_compressibility_per_Pa << ','
+        << result.geometric_compressibility_per_Pa << ','
+        << result.effective_compressibility_per_Pa << '\n';
   }
 }
 
@@ -219,6 +229,14 @@ void write_summary_json(const std::filesystem::path& path, const std::string& ca
   out << "    \"final_wellbore_pressure_Pa\": " << result.wellbore_pressure_Pa << ",\n";
   out << "    \"fluid_compressibility_per_Pa\": "
       << result.fluid_compressibility_per_Pa << ",\n";
+  out << "    \"geometric_compressibility_per_Pa\": "
+      << result.geometric_compressibility_per_Pa << ",\n";
+  out << "    \"effective_compressibility_per_Pa\": "
+      << result.effective_compressibility_per_Pa << ",\n";
+  out << "    \"compliance_model\": \""
+      << escape_json(result.compliance_model) << "\",\n";
+  out << "    \"compliance_source\": \""
+      << escape_json(result.compliance_source) << "\",\n";
   out << "    \"final_balance_delta_pressure_Pa\": "
       << result.balance_delta_pressure_Pa << ",\n";
   out << "    \"final_balance_effective_volume_increment_m3\": "

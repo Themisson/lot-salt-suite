@@ -23,6 +23,8 @@ constexpr const char* kBuz67dLegacyAlignedCasePath =
     "cases/validation/buz67d_pkn_legacy_aligned.yaml";
 constexpr const char* kBuz67dSigmaThetaStaticCasePath =
     "cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml";
+constexpr const char* kBuz67dComplianceCasePath =
+    "cases/validation/buz67d_pkn_legacy_compliance.yaml";
 
 void check_finite_series(const lss::lot::PknResult& result) {
   REQUIRE_FALSE(result.time_series_s.empty());
@@ -205,6 +207,27 @@ TEST_CASE("PknRunner enables opt-in sigma theta static criterion") {
   CHECK(run.result.fracture_initiation_pressure_Pa >
         run.result.fracture_initiation_sigma_theta_Pa);
   CHECK(run.result.fracture_initiation_margin_Pa > 0.0);
+}
+
+TEST_CASE("PknRunner enables opt-in geometric compliance") {
+  const auto data = lss::io::parse_yaml(kBuz67dComplianceCasePath);
+  const auto run = lss::lot::run_pkn_case(data);
+
+  CHECK(data.name == "buz67d_pkn_legacy_compliance");
+  CHECK(data.lot.volumetric_compliance.enabled);
+  CHECK(data.lot.volumetric_compliance.model == "constant_geometric");
+  CHECK(run.input.pressure_model == lss::lot::PknPressureModel::VolumetricBalance);
+  CHECK(run.input.volumetric_compliance.geometric_compressibility_per_Pa ==
+        Catch::Approx(1.8571966938610005e-8));
+  CHECK(run.result.compliance_model == "constant_geometric");
+  CHECK(run.result.compliance_source == "DIAGNOSTIC_FROM_LEGACY_FIRST_STEP");
+  CHECK(run.result.geometric_compressibility_per_Pa ==
+        Catch::Approx(1.8571966938610005e-8));
+  CHECK(run.result.effective_compressibility_per_Pa ==
+        Catch::Approx(1.9211966938610006e-8));
+  REQUIRE(run.result.balance_delta_pressure_series_Pa.size() > 1);
+  CHECK(run.result.balance_delta_pressure_series_Pa[1] ==
+        Catch::Approx(1845417.2017930523).epsilon(1.0e-6));
 }
 
 #if LSS_ENABLE_CLI_SUBPROCESS_TESTS

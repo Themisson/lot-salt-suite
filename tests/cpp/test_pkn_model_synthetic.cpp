@@ -261,6 +261,78 @@ TEST_CASE("Volumetric balance consumes fracture volume on threshold crossing ste
         opened_result.balance_injected_volume_increment_m3);
 }
 
+TEST_CASE("Effective compressibility includes geometric compliance") {
+  CHECK(lss::lot::effectiveCompressibility(6.4e-10, 1.8571966938610005e-8) ==
+        Catch::Approx(1.9211966938610006e-8));
+  CHECK_THROWS_AS(lss::lot::effectiveCompressibility(0.0, 0.0),
+                  std::invalid_argument);
+  CHECK_THROWS_AS(lss::lot::effectiveCompressibility(6.4e-10, -1.0e-9),
+                  std::invalid_argument);
+}
+
+TEST_CASE("Zero geometric compliance preserves previous pressure increment") {
+  const double dV_m3 = 0.01;
+  const double annular_volume_m3 = 2.0;
+  const double fluid_compressibility = 1.0e-9;
+
+  const double increment = lss::lot::volumetricPressureIncrement(
+      dV_m3, annular_volume_m3,
+      lss::lot::effectiveCompressibility(fluid_compressibility, 0.0));
+
+  CHECK(increment == Catch::Approx(dV_m3 /
+                                   (fluid_compressibility * annular_volume_m3)));
+}
+
+TEST_CASE("Higher geometric compliance lowers pressure increment") {
+  const double dV_m3 = 0.01;
+  const double annular_volume_m3 = 2.0;
+  const double fluid_compressibility = 1.0e-9;
+  const double no_compliance = lss::lot::volumetricPressureIncrement(
+      dV_m3, annular_volume_m3,
+      lss::lot::effectiveCompressibility(fluid_compressibility, 0.0));
+  const double with_compliance = lss::lot::volumetricPressureIncrement(
+      dV_m3, annular_volume_m3,
+      lss::lot::effectiveCompressibility(fluid_compressibility, 5.0e-9));
+
+  CHECK(with_compliance < no_compliance);
+}
+
+TEST_CASE("Cases without enabled compliance preserve previous behavior") {
+  const lss::lot::PknModel model;
+  auto base = synthetic_input();
+  base.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  base.annular_volume_m3 = 10.0;
+  base.fluid_compressibility_per_Pa = 1.0e-9;
+  base.breakdown.pressure_Pa = 1.0e12;
+
+  auto disabled = base;
+  disabled.volumetric_compliance.enabled = false;
+  disabled.volumetric_compliance.model = "constant_geometric";
+  disabled.volumetric_compliance.geometric_compressibility_per_Pa = 1.0e-6;
+
+  const auto base_result = model.simulate(base);
+  const auto disabled_result = model.simulate(disabled);
+
+  CHECK(disabled_result.wellbore_pressure_series_Pa ==
+        base_result.wellbore_pressure_series_Pa);
+  CHECK(disabled_result.effective_compressibility_per_Pa ==
+        Catch::Approx(base_result.effective_compressibility_per_Pa));
+}
+
+TEST_CASE("Diagnostic geometric compliance reproduces expected first-step dP") {
+  const double dV_rad_m3 = 0.00632589173433779;
+  const double annular_volume_rad_m3 = 0.17842518895535997;
+  const double fluid_compressibility = 6.4e-10;
+  const double geometric_compressibility = 1.8571966938610005e-8;
+
+  const double increment = lss::lot::volumetricPressureIncrement(
+      dV_rad_m3, annular_volume_rad_m3,
+      lss::lot::effectiveCompressibility(fluid_compressibility,
+                                         geometric_compressibility));
+
+  CHECK(increment == Catch::Approx(1845413.7784679066));
+}
+
 TEST_CASE("Sigma theta static criterion opens when wellbore pressure exceeds sigma theta") {
   const lss::lot::PknModel model;
   auto input = sigma_theta_input(5.0e5);
@@ -364,6 +436,26 @@ TEST_CASE("pkn_direct behavior is preserved with sigma theta input present") {
   CHECK(sigma_result.net_pressure_series_Pa == direct_result.net_pressure_series_Pa);
   CHECK(sigma_result.fracture_volume_series_m3 ==
         direct_result.fracture_volume_series_m3);
+}
+
+TEST_CASE("pkn_direct ignores volumetric compliance") {
+  const lss::lot::PknModel model;
+  auto direct = synthetic_input();
+  auto with_compliance = direct;
+  with_compliance.volumetric_compliance.enabled = true;
+  with_compliance.volumetric_compliance.model = "constant_geometric";
+  with_compliance.volumetric_compliance.geometric_compressibility_per_Pa = 1.0e-6;
+  with_compliance.volumetric_compliance.source = "test";
+
+  const auto direct_result = model.simulate(direct);
+  const auto compliance_result = model.simulate(with_compliance);
+
+  CHECK(compliance_result.pressure_model == "pkn_direct");
+  CHECK(compliance_result.net_pressure_series_Pa ==
+        direct_result.net_pressure_series_Pa);
+  CHECK(compliance_result.fracture_volume_series_m3 ==
+        direct_result.fracture_volume_series_m3);
+  CHECK(compliance_result.effective_compressibility_per_Pa == Catch::Approx(0.0));
 }
 
 TEST_CASE("Initial pressure shifts volumetric wellbore pressure") {

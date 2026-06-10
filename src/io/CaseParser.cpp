@@ -119,6 +119,12 @@ double parse_value_unit(const YAML::Node& node, const std::string& path,
     }
   }
 
+  if (quantity == "compressibility") {
+    if (unit == "1/Pa") {
+      return value;
+    }
+  }
+
   throw std::runtime_error("Unidade invalida em " + path + ": " + unit);
 }
 
@@ -418,6 +424,31 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
         require_as<std::string>(lot["pressure_model"]["type"],
                                 "lot.pressure_model.type");
   }
+  if (lot["volumetric_balance"] &&
+      lot["volumetric_balance"]["compliance"]) {
+    const YAML::Node compliance = lot["volumetric_balance"]["compliance"];
+    data.lot.volumetric_compliance.enabled =
+        require_as<bool>(compliance["enabled"],
+                         "lot.volumetric_balance.compliance.enabled");
+    data.lot.volumetric_compliance.model =
+        optional_string(compliance, "model", "none");
+    data.lot.volumetric_compliance.source =
+        optional_string(compliance, "source");
+    data.lot.volumetric_compliance.caveat =
+        optional_string(compliance, "caveat");
+    if (compliance["geometric_compressibility"]) {
+      data.lot.volumetric_compliance.geometric_compressibility_per_Pa =
+          parse_value_unit(compliance["geometric_compressibility"],
+                           "lot.volumetric_balance.compliance.geometric_compressibility",
+                           "compressibility");
+    }
+    if (compliance["total_compressibility"]) {
+      data.lot.volumetric_compliance.total_compressibility_per_Pa =
+          parse_value_unit(compliance["total_compressibility"],
+                           "lot.volumetric_balance.compliance.total_compressibility",
+                           "compressibility");
+    }
+  }
 
   const YAML::Node apb = require_node(root["apb"], "apb");
   data.apb.enabled = require_as<bool>(apb["enabled"], "apb.enabled");
@@ -526,6 +557,30 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
         data.lot.pressure_model != "volumetric_balance") {
       throw std::runtime_error(
           "Validacao falhou: LOT/PKN exige pressure_model.type pkn_direct ou volumetric_balance");
+    }
+    if (data.lot.volumetric_compliance.enabled) {
+      const auto& compliance = data.lot.volumetric_compliance;
+      if (data.lot.pressure_model != "volumetric_balance") {
+        throw std::runtime_error(
+            "Validacao falhou: compliance geometrica exige pressure_model volumetric_balance");
+      }
+      if (compliance.model != "constant_geometric") {
+        throw std::runtime_error(
+            "Validacao falhou: compliance geometrica suporta apenas constant_geometric");
+      }
+      if (!std::isfinite(compliance.geometric_compressibility_per_Pa) ||
+          compliance.geometric_compressibility_per_Pa < 0.0) {
+        throw std::runtime_error(
+            "Validacao falhou: geometric_compressibility deve ser >= 0");
+      }
+      if (compliance.total_compressibility_per_Pa != 0.0) {
+        throw std::runtime_error(
+            "Validacao falhou: total_compressibility nao deve ser combinado com constant_geometric");
+      }
+      if (compliance.source.empty()) {
+        throw std::runtime_error(
+            "Validacao falhou: compliance geometrica exige source");
+      }
     }
   }
   validate_nonempty(!data.casings.empty(), "casings");

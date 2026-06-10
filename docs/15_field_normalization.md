@@ -650,3 +650,51 @@ FLOWRATE_CONVENTION_MATCHES_LEGACY
 e portanto nao promoveu nenhuma correcao de unidade/conversao de vazao.
 Permanece bloqueada a equivalencia fisica porque o legado tambem possui o termo
 geometrico `dV` de complacencia anular.
+
+## Fase 10.19C — normalizacao de compliance geometrica opt-in
+
+A Fase 10.19C introduz campos normalizados em SI para uma compliance
+geometrica constante e opt-in no modo `volumetric_balance`.
+
+Entrada YAML:
+
+| Campo YAML | Campo C++ | Unidade | Observacao |
+|---|---|---|---|
+| `lot.volumetric_balance.compliance.enabled` | `LotConfig::volumetric_compliance.enabled` | booleano | Deve ser `true` para ativar a rota. |
+| `lot.volumetric_balance.compliance.model` | `model` | texto | Apenas `constant_geometric` e aceito nesta fase. |
+| `geometric_compressibility.value` | `geometric_compressibility_per_Pa` | 1/Pa | Valor constante somado a `C_fluid`. |
+| `geometric_compressibility.unit` | parser | texto | Deve ser `"1/Pa"`. |
+| `source` | `source` | texto | Origem rastreavel do valor diagnostico. |
+| `caveat` | `caveat` | texto | Limite fisico/documental do valor. |
+
+Formula normalizada:
+
+```text
+C_eff = C_fluid + C_geom
+dP = dV_eff / (C_eff * V_annular)
+```
+
+Saidas modernas adicionadas pelo `ResultWriter`:
+
+| Campo | Unidade | Onde aparece | Significado |
+|---|---|---|---|
+| `fluid_compressibility_1_Pa` | 1/Pa | CSV `timeseries.csv` | Compressibilidade do fluido usada no balanço. |
+| `geometric_compressibility_1_Pa` | 1/Pa | CSV `timeseries.csv` | Compliance geometrica equivalente usada no passo. |
+| `effective_compressibility_1_Pa` | 1/Pa | CSV `timeseries.csv` | Soma `C_fluid + C_geom`. |
+| `geometric_compressibility_per_Pa` | 1/Pa | JSON `summary` | Valor escalar do resultado. |
+| `effective_compressibility_per_Pa` | 1/Pa | JSON `summary` | Compressibilidade efetiva escalar. |
+| `compliance_model` | texto | JSON `summary` | `constant_geometric` ou `none`. |
+| `compliance_source` | texto | JSON `summary` | Origem rastreavel do valor. |
+
+Para a fase diagnostica BUZ67D:
+
+```text
+C_fluid = 6.4e-10 1/Pa
+C_geom = 1.8571966938610005e-8 1/Pa
+C_eff = 1.9211966938610006e-8 1/Pa
+```
+
+O campo e estruturalmente comparavel com a hipotese de complacencia do legado,
+mas ainda nao e comparavel como parametro mecanico validado de revestimento,
+rocha, sal ou APB. Casos sem o bloco opt-in preservam a pressurizacao anterior
+por compressao pura de fluido.

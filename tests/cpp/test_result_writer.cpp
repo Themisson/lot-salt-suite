@@ -52,11 +52,17 @@ TEST_CASE("ResultWriter creates PKN CSV and JSON outputs") {
   CHECK(json.find("\"pressure_model\": \"pkn_direct\"") != std::string::npos);
   CHECK(json.find("\"initial_pressure_Pa\"") != std::string::npos);
   CHECK(json.find("\"final_wellbore_pressure_Pa\"") != std::string::npos);
+  CHECK(json.find("\"geometric_compressibility_per_Pa\"") != std::string::npos);
+  CHECK(json.find("\"effective_compressibility_per_Pa\"") != std::string::npos);
+  CHECK(json.find("\"compliance_model\": \"none\"") != std::string::npos);
   CHECK(json.find("\"final_balance_effective_volume_increment_m3\"") !=
         std::string::npos);
   CHECK(csv.find("fracture_initiated,fracture_initiation_pressure_Pa,"
                  "fracture_initiation_sigma_theta_Pa,"
-                 "fracture_initiation_margin_Pa") != std::string::npos);
+                 "fracture_initiation_margin_Pa,"
+                 "fluid_compressibility_1_Pa,"
+                 "geometric_compressibility_1_Pa,"
+                 "effective_compressibility_1_Pa") != std::string::npos);
   CHECK(json.find("\"fracture_initiation_type\": \"constant_pressure\"") !=
         std::string::npos);
   CHECK(json.find("\"fracture_initiation_pressure_Pa\"") != std::string::npos);

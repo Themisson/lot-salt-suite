@@ -1613,3 +1613,68 @@ dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
 Esta fase nao altera solver C++ e nao promove o Level 1 para validacao fisica.
 O proximo passo deve ser uma fase de desenho/implementacao opt-in para
 `annular_compliance`/`wellbore_compliance`, sem fator empirico.
+
+---
+
+## Fase 10.19C — comparacao diagnostica com compliance geometrica opt-in
+
+**Status:** `PHASE10_19C_GEOMETRIC_COMPLIANCE_DIAGNOSTIC_COMPLETE`.
+
+A Fase 10.19C criou uma comparacao diagnostica para o caso:
+
+```text
+cases/validation/buz67d_pkn_legacy_compliance.yaml
+```
+
+Esse caso habilita `lot.volumetric_balance.compliance` com:
+
+```text
+C_fluid = 6.4e-10 1/Pa
+C_geom = 1.8571966938610005e-8 1/Pa
+C_eff = 1.9211966938610006e-8 1/Pa
+```
+
+A ferramenta:
+
+```text
+tools/compare_phase10_19c.py
+```
+
+compara o traço legado auditado, o resultado moderno com compliance e,
+opcionalmente, o resultado moderno sem compliance da Fase 10.19A.
+
+Saidas locais nao versionadas:
+
+```text
+results/comparison/phase10_19c/phase10_19c_summary.csv
+results/comparison/phase10_19c/phase10_19c_metadata.json
+results/comparison/phase10_19c/pressure_vs_time_compliance.png
+results/comparison/phase10_19c/injected_volume_vs_pressure_compliance.png
+results/comparison/phase10_19c/first_steps_pressure_increment.png
+results/comparison/phase10_19c/compliance_diagnostics.png
+```
+
+Metricas observadas:
+
+| Metrica | Valor |
+|---|---:|
+| `legacy_first_dP_Pa` | `1845413.7784679066` |
+| `modern_first_dP_no_compliance_Pa` | `55397022.29498486` |
+| `modern_first_dP_with_compliance_Pa` | `1845417.2017930523` |
+| `max_pressure_legacy_Pa` | `69035836.1743195` |
+| `max_pressure_with_compliance_Pa` | `67331393.612597` |
+| `relative_error_max_pressure` | `-0.02468924338685035` |
+| `fracture_initiation_time_s` | `690.0` |
+
+Classificacao:
+
+```text
+COMPLIANCE_EFFECTIVE
+```
+
+Essa classificacao e diagnostica. Ela indica que a escala de pressao melhora
+ao incluir uma compliance geometrica equivalente, mas nao valida equivalencia
+fisica de fratura, nao compara `sigmaTheta`, `pw`, `margin` ou `opened`, e nao
+altera o gate Level 1. O status de prontidao permanece fechado para validacao
+fisica ate existir um modelo mecanico de compliance e uma rota sigma-theta
+runtime fisicamente definida.

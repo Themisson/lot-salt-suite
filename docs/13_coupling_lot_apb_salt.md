@@ -2193,6 +2193,87 @@ Para a configuracao BUZ67D controlada atual, o volume moderno diagnostico cai
 de `1.39698074804365 m3` para `1.12107852567506 m3` total ao descontar o drill
 pipe de `5.5 in` OD.
 
+## Compliance geometrica opt-in no balanco volumetrico LOT (Fase 10.19C)
+
+A Fase 10.19C adiciona uma rota opt-in e diagnostica para testar a hipotese
+levantada na Fase 10.19B: a escala de pressurizacao moderna estava dominada por
+compressao pura de fluido, enquanto o legado possui um termo geometrico `dV` no
+balanco anular.
+
+O modelo novo e limitado a `lot.pressure_model = volumetric_balance` e so atua
+quando o YAML declara explicitamente:
+
+```yaml
+lot:
+  volumetric_balance:
+    compliance:
+      enabled: true
+      model: constant_geometric
+      geometric_compressibility:
+        value: 1.8571966938610005e-8
+        unit: "1/Pa"
+      source: DIAGNOSTIC_FROM_LEGACY_FIRST_STEP
+```
+
+A formula usada no balanco e:
+
+```text
+C_eff = C_fluid + C_geom
+dP = dV_eff / (C_eff * V_annular)
+```
+
+onde `C_geom` e uma compressibilidade geometrica equivalente, constante e
+inferida do primeiro passo legado. Ela nao representa ainda rigidez mecanica de
+revestimento, formacao, cimentacao, sal ou APB.
+
+Caso diagnostico:
+
+```text
+cases/validation/buz67d_pkn_legacy_compliance.yaml
+```
+
+Comparacao local gerada por:
+
+```text
+tools/compare_phase10_19c.py
+```
+
+Resultados observados:
+
+| Metrica | Valor |
+|---|---:|
+| `C_fluid_1_Pa` | `6.4e-10` |
+| `C_geom_1_Pa` | `1.8571966938610005e-8` |
+| `C_eff_1_Pa` | `1.9211966938610006e-8` |
+| `legacy_first_dP_Pa` | `1845413.7784679066` |
+| `modern_first_dP_no_compliance_Pa` | `55397022.29498486` |
+| `modern_first_dP_with_compliance_Pa` | `1845417.2017930523` |
+| `max_pressure_legacy_Pa` | `69035836.1743195` |
+| `max_pressure_with_compliance_Pa` | `67331393.612597` |
+| `relative_error_max_pressure` | `-0.02468924338685035` |
+| `fracture_initiation_time_s` | `690.0` |
+
+Classificacao:
+
+```text
+COMPLIANCE_EFFECTIVE
+GEOMETRIC_COMPLIANCE_DIAGNOSTIC_ONLY
+```
+
+Essa classificacao significa apenas que a compliance equivalente explica a
+escala do primeiro incremento e aproxima a faixa maxima de pressao no caso
+controlado. Ela nao valida fratura fisica, nao valida `sigmaTheta`, nao compara
+`opened` legado e nao torna o acoplamento sal/APB ativo.
+
+O comportamento padrao permanece inalterado:
+
+- casos sem `lot.volumetric_balance.compliance.enabled: true` continuam usando
+  apenas `C_fluid`;
+- `pkn_direct` ignora a compliance volumetrica;
+- `lot-sim run --mode lot-pkn` segue desacoplado de sal/APB;
+- resultados locais em `results/comparison/phase10_19c/` sao artefatos de
+  diagnostico e nao devem ser versionados.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que

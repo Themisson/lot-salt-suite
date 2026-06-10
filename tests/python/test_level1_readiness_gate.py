@@ -124,3 +124,17 @@ def test_phase10_19b_flowrate_audit_keeps_physical_gate_closed() -> None:
     assert audit["numeric_equivalence"] is False
     assert audit["solver_correction_applied"] is False
     assert audit["legacy_first_dP_over_theoretical"] < 0.04
+
+
+def test_phase10_19c_compliance_diagnostic_keeps_physical_gate_closed() -> None:
+    data = load_gate()
+    diagnostic = data["phase10_19c_geometric_compliance"]
+
+    assert diagnostic["status"] == "PHASE10_19C_GEOMETRIC_COMPLIANCE_DIAGNOSTIC_COMPLETE"
+    assert diagnostic["classification"] == "COMPLIANCE_EFFECTIVE"
+    assert diagnostic["physical_validation"] is False
+    assert diagnostic["numeric_equivalence"] is False
+    assert diagnostic["runtime_default_changed"] is False
+    assert diagnostic["modern_first_dP_with_compliance_Pa"] == 1845417.2017930523
+    assert abs(diagnostic["relative_error_max_pressure"]) < 0.10
+    assert diagnostic["fracture_initiation_time_s"] != 510.0

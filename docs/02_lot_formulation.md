@@ -788,3 +788,90 @@ ROOT_CAUSE_MISSING_GEOMETRIC_COMPLIANCE
 Nenhuma correcao C++ foi aplicada nesta fase. Uma correcao fisica deve ser fase
 separada, com modelo explicito de `annular_compliance` ou
 `wellbore_compliance`, sem fator empirico de pressao.
+
+### Compliance geometrica opt-in no `volumetric_balance` — Fase 10.19C
+
+**Status:** `PHASE10_19C_GEOMETRIC_COMPLIANCE_DIAGNOSTIC_COMPLETE`.
+
+A Fase 10.19C adicionou um modelo opt-in e constante de compliance geometrica
+equivalente para o modo `volumetric_balance`. A formulacao moderna passa a
+permitir:
+
+```text
+C_eff = C_fluid + C_geom
+dP = dV_eff / (C_eff * V_annular)
+```
+
+onde:
+
+- `C_fluid` e a compressibilidade do fluido lida do caso;
+- `C_geom` e uma compliance geometrica equivalente [1/Pa];
+- `C_eff` e a compressibilidade efetiva usada apenas quando o bloco opt-in
+  esta habilitado;
+- `V_annular` segue a convencao moderna total no solver.
+
+Quando o bloco de compliance esta ausente ou desabilitado, o comportamento
+anterior permanece:
+
+```text
+C_eff = C_fluid
+```
+
+O YAML opt-in usa:
+
+```yaml
+lot:
+  volumetric_balance:
+    compliance:
+      enabled: true
+      model: constant_geometric
+      geometric_compressibility:
+        value: 1.8571966938610005e-8
+        unit: "1/Pa"
+      source: DIAGNOSTIC_FROM_LEGACY_FIRST_STEP
+```
+
+O valor diagnostico foi inferido do primeiro passo legado:
+
+```text
+C_total_apparent = dV_inj / (V_annular * dP_legacy)
+C_geom_apparent = C_total_apparent - C_fluid
+```
+
+com:
+
+```text
+C_fluid = 6.4e-10 1/Pa
+C_geom = 1.8571966938610005e-8 1/Pa
+C_eff = 1.9211966938610006e-8 1/Pa
+```
+
+Caso criado:
+
+```text
+cases/validation/buz67d_pkn_legacy_compliance.yaml
+```
+
+Resultado diagnostico local:
+
+| Metrica | Valor |
+|---|---:|
+| `legacy_first_dP_Pa` | `1845413.7784679066` |
+| `modern_first_dP_no_compliance_Pa` | `55397022.29498486` |
+| `modern_first_dP_with_compliance_Pa` | `1845417.2017930523` |
+| `max_pressure_legacy_Pa` | `69035836.1743195` |
+| `max_pressure_with_compliance_Pa` | `67331393.612597` |
+| `relative_error_max_pressure` | `-0.02468924338685035` |
+| `fracture_initiation_time_s` | `690.0` |
+| `fracture_initiation_pressure_Pa` | `69176810.81439006` |
+
+Classificacao:
+
+```text
+COMPLIANCE_EFFECTIVE
+```
+
+Essa classificacao significa que o primeiro `dP` moderno se aproxima do legado
+e o pico de pressao fica dentro de `±10%`. Ela nao significa validacao fisica:
+a compliance e constante, inferida de um unico passo, e ainda nao representa um
+modelo mecanico explicito de casing/rocha.

@@ -92,6 +92,22 @@ void validate_input(const PknInput& input) {
       throw std::invalid_argument(
           "PknModel: volumetric_balance requires positive fluid_compressibility_per_Pa");
     }
+    const auto& compliance = input.volumetric_compliance;
+    if (compliance.enabled) {
+      if (compliance.model != "constant_geometric") {
+        throw std::invalid_argument(
+            "PknModel: volumetric compliance supports constant_geometric only");
+      }
+      if (!std::isfinite(compliance.geometric_compressibility_per_Pa) ||
+          compliance.geometric_compressibility_per_Pa < 0.0) {
+        throw std::invalid_argument(
+            "PknModel: geometric_compressibility_per_Pa must be finite and non-negative");
+      }
+      if (compliance.total_compressibility_per_Pa != 0.0) {
+        throw std::invalid_argument(
+            "PknModel: total_compressibility_per_Pa is not supported with constant_geometric");
+      }
+    }
   }
   if (input.fracture_initiation ==
       FractureInitiationCriterion::SigmaThetaStatic) {
@@ -288,6 +304,13 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
   double initiation_sigma_theta_Pa = 0.0;
   double initiation_margin_Pa = 0.0;
   double initiation_time_s = 0.0;
+  const double geometric_compressibility_per_Pa =
+      input.volumetric_compliance.enabled
+          ? input.volumetric_compliance.geometric_compressibility_per_Pa
+          : 0.0;
+  const double effective_compressibility_per_Pa =
+      effectiveCompressibility(input.fluid_compressibility_per_Pa,
+                               geometric_compressibility_per_Pa);
 
   for (std::size_t i = 0; i < series.time_series_s.size(); ++i) {
     const double injected_increment_m3 =
@@ -296,8 +319,9 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
     double leakoff_increment_m3 = 0.0;
 
     const double trial_delta_pressure_Pa =
-        injected_increment_m3 /
-        (input.fluid_compressibility_per_Pa * input.annular_volume_m3);
+        volumetricPressureIncrement(injected_increment_m3,
+                                    input.annular_volume_m3,
+                                    effective_compressibility_per_Pa);
     const double trial_pressure_Pa =
         std::max(0.0, pressure_Pa + trial_delta_pressure_Pa);
 
@@ -335,8 +359,9 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
     const double effective_increment_m3 =
         injected_increment_m3 - fracture_increment_m3 - leakoff_increment_m3;
     const double delta_pressure_Pa =
-        effective_increment_m3 /
-        (input.fluid_compressibility_per_Pa * input.annular_volume_m3);
+        volumetricPressureIncrement(effective_increment_m3,
+                                    input.annular_volume_m3,
+                                    effective_compressibility_per_Pa);
     pressure_Pa = std::max(0.0, pressure_Pa + delta_pressure_Pa);
 
     series.wellbore_pressure_series_Pa[i] = pressure_Pa;
@@ -364,6 +389,11 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
       input.sigma_theta_fracture.influence_depth_m;
   series.fracture_initiation_source = input.sigma_theta_fracture.source;
   series.fluid_compressibility_per_Pa = input.fluid_compressibility_per_Pa;
+  series.geometric_compressibility_per_Pa = geometric_compressibility_per_Pa;
+  series.effective_compressibility_per_Pa = effective_compressibility_per_Pa;
+  series.compliance_model =
+      input.volumetric_compliance.enabled ? input.volumetric_compliance.model : "none";
+  series.compliance_source = input.volumetric_compliance.source;
   if (!series.time_series_s.empty()) {
     series.wellbore_pressure_Pa = series.wellbore_pressure_series_Pa.back();
     series.balance_delta_pressure_Pa = series.balance_delta_pressure_series_Pa.back();
@@ -385,14 +415,66 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
 
 }  // namespace
 
+double effectiveCompressibility(double fluid_compressibility,
+                                double geometric_compressibility) {
+  if (!std::isfinite(fluid_compressibility) || fluid_compressibility <= 0.0) {
+    throw std::invalid_argument(
+        "PknModel: fluid_compressibility must be finite and positive");
+  }
+  if (!std::isfinite(geometric_compressibility) ||
+      geometric_compressibility < 0.0) {
+    throw std::invalid_argument(
+        "PknModel: geometric_compressibility must be finite and non-negative");
+  }
+  const double effective = fluid_compressibility + geometric_compressibility;
+  if (!std::isfinite(effective) || effective <= 0.0) {
+    throw std::invalid_argument(
+        "PknModel: effective compressibility must be finite and positive");
+  }
+  return effective;
+}
+
+double volumetricPressureIncrement(double dV_effective, double annular_volume,
+                                   double effective_compressibility) {
+  if (!std::isfinite(dV_effective)) {
+    throw std::invalid_argument("PknModel: dV_effective must be finite");
+  }
+  if (!std::isfinite(annular_volume) || annular_volume <= 0.0) {
+    throw std::invalid_argument(
+        "PknModel: annular_volume must be finite and positive");
+  }
+  if (!std::isfinite(effective_compressibility) ||
+      effective_compressibility <= 0.0) {
+    throw std::invalid_argument(
+        "PknModel: effective_compressibility must be finite and positive");
+  }
+  return dV_effective / (effective_compressibility * annular_volume);
+}
+
 PknResult PknModel::evaluate(const PknInput& input, double elapsed_time_s) const {
   if (elapsed_time_s < 0.0) {
     throw std::invalid_argument("PknModel: elapsed_time_s must be non-negative");
   }
   validate_input(input);
   PknResult point = make_point(input, elapsed_time_s);
+  const bool uses_volumetric_compliance =
+      input.pressure_model == PknPressureModel::VolumetricBalance &&
+      input.volumetric_compliance.enabled;
   point.pressure_model = pressure_model_label(input.pressure_model);
   point.fluid_compressibility_per_Pa = input.fluid_compressibility_per_Pa;
+  point.geometric_compressibility_per_Pa =
+      uses_volumetric_compliance
+          ? input.volumetric_compliance.geometric_compressibility_per_Pa
+          : 0.0;
+  point.effective_compressibility_per_Pa =
+      input.pressure_model == PknPressureModel::VolumetricBalance
+          ? effectiveCompressibility(input.fluid_compressibility_per_Pa,
+                                     point.geometric_compressibility_per_Pa)
+          : 0.0;
+  point.compliance_model =
+      uses_volumetric_compliance ? input.volumetric_compliance.model : "none";
+  point.compliance_source =
+      uses_volumetric_compliance ? input.volumetric_compliance.source : "";
   return point;
 }
 
