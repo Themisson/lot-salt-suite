@@ -234,7 +234,7 @@
   <div class="brand">
     <h1>lot-salt-suite<span class="dot">.</span></h1>
     <div class="sub">LOT · APB · Fluência de sal</div>
-    <span class="ver">v0.1.0 · atualizado 2026-06-07</span>
+    <span class="ver">v0.1.0 · atualizado 2026-06-08</span>
   </div>
   <div class="search-wrap">
     <input type="text" id="navSearch" placeholder="buscar na navegação..." autocomplete="off">
@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">61/68</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">62/69</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">203</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">31</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -1054,6 +1054,72 @@ duplicar fora de <code>coupling/</code> a lógica já existente em
 <p>como limiar simplificado para habilitar sinks de fratura/leakoff. Casos com
 <code>fracture.breakdown.pressure = 0</code> ou sem pressão definida continuam sem abertura
 por esse critério. O default <code>pkn_direct</code> permanece inalterado.</p>
+<h3 id="calibracao-diagnostica-do-threshold-estatico-fase-1018e">Calibração diagnóstica do threshold estático — Fase 10.18E</h3>
+<p><strong>Status:</strong> <code>PHASE10_18E_STATIC_LEGACY_BREAKDOWN_DIAGNOSTIC_COMPLETE</code>.</p>
+<p>A Fase 10.18E extraiu um threshold estático rastreável a partir do audit CSV do
+<code>LOT_Tese</code> e do marcador nativo:</p>
+<pre><code class="language-text">results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+results/comparison/level1_buz67d/legacy_audit/legacy_native_output.dat
+Momento da quebra: 8.5
+</code></pre>
+<p>O evento legado corresponde a <code>8.5 min = 510 s</code>. A linha selecionada no CSV é a
+linha de maior <code>pw_Pa</code> nesse instante, com <code>layer = 16</code> e <code>annular_index = 1</code>:</p>
+<pre><code class="language-text">pw_Pa = 67342521.84592447 Pa
+dP    = 8131435.236221395 Pa
+</code></pre>
+<p>O valor absoluto <code>pw_Pa = 67.342522 MPa</code> é mantido no relatório diagnóstico. No
+entanto, o <code>PknModel</code> moderno consome <code>fracture.breakdown.pressure</code> como
+threshold incremental acima de <code>initial_pressure_Pa</code>, portanto o caso
+diagnóstico usa o delta legado:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_static_breakdown.yaml
+fracture.breakdown.pressure = 8131435.236221395 Pa
+</code></pre>
+<p>Esse caso não substitui <code>cases/validation/buz67d_pkn_legacy_aligned.yaml</code> e não
+é um novo default. Ele existe apenas para testar o efeito de um threshold
+estático calibrado por evidência legada.</p>
+<p>Resultado observado:</p>
+<table>
+<thead>
+<tr>
+<th>Modo</th>
+<th style="text-align: right;">Pressão máxima</th>
+<th style="text-align: right;">Erro relativo contra legado</th>
+<th>Classificação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Legado auditado <code>pw_Pa</code></td>
+<td style="text-align: right;"><code>69.035836 MPa</code></td>
+<td style="text-align: right;"><code>0.000</code></td>
+<td>referência</td>
+</tr>
+<tr>
+<td>10.18B</td>
+<td style="text-align: right;"><code>82.129237 MPa</code></td>
+<td style="text-align: right;"><code>+0.190</code></td>
+<td>referência diagnóstica</td>
+</tr>
+<tr>
+<td>10.18C</td>
+<td style="text-align: right;"><code>26.732215 MPa</code></td>
+<td style="text-align: right;"><code>-0.613</code></td>
+<td>referência diagnóstica</td>
+</tr>
+<tr>
+<td>10.18E</td>
+<td style="text-align: right;"><code>26.732215 MPa</code></td>
+<td style="text-align: right;"><code>-0.613</code></td>
+<td><code>STATIC_BREAKDOWN_OPENED_TOO_EARLY</code></td>
+</tr>
+</tbody>
+</table>
+<p>Conclusão: o threshold estático extraído é rastreável, mas não resolve a
+abertura prematura no modelo moderno. O primeiro sink de fratura/leakoff no
+caso 10.18E ocorreu em <code>30 s</code>, muito antes do marcador legado de <code>510 s</code>.
+Portanto, a fase confirma que <code>fracture.breakdown.pressure</code> continua sendo uma
+aproximação diagnóstica simplificada e não reproduz o critério legado
+sigma-theta por altura de influência.</p>
 </div>
 </section>
 
@@ -2165,7 +2231,32 @@ pressao. O gate da fase e:</p>
 <pre><code class="language-text">SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY
 </code></pre>
 <p>Usar <code>first_wall_sample</code> ou ponto de Gauss mais proximo da parede como criterio
-fisico sem mapear a altura de influencia legada e risco de falso positivo.
+fisico sem mapear a altura de influencia legada e risco de falso positivo.</p>
+<hr />
+<h2 id="r15-threshold-estatico-legado-nao-reproduz-o-criterio-sigma-theta">R15 — Threshold estático legado não reproduz o critério sigma-theta</h2>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado na Fase 10.18E</p>
+<p>A Fase 10.18E extraiu do audit legado um marcador rastreável de início de
+fratura:</p>
+<pre><code class="language-text">Momento da quebra = 8.5 min = 510 s
+pw_Pa             = 67342521.84592447 Pa
+dP                = 8131435.236221395 Pa
+</code></pre>
+<p>Como o <code>PknModel</code> moderno interpreta <code>fracture.breakdown.pressure</code> como limiar
+incremental acima de <code>initial_pressure_Pa</code>, o caso diagnóstico
+<code>buz67d_pkn_legacy_static_breakdown.yaml</code> usa o delta <code>dP</code>, não a pressão
+absoluta <code>pw_Pa</code>.</p>
+<p>Mesmo com essa calibração, o modo moderno <code>volumetric_balance</code> abre a rota de
+sink cedo demais:</p>
+<pre><code class="language-text">classificacao = STATIC_BREAKDOWN_OPENED_TOO_EARLY
+primeiro sink moderno = 30 s
+marcador legado = 510 s
+max moderno 10.18E = 26.732215 MPa
+max legado = 69.035836 MPa
+</code></pre>
+<p><strong>Impacto:</strong> <code>fracture.breakdown.pressure</code> não deve ser tratado como substituto
+físico do critério legado <code>pw &gt; sigmaTheta</code>. Ele permanece apenas ferramenta
+diagnóstica opt-in até que uma rota runtime forneça a tensão tangencial da
+altura de influência ao balanço volumétrico.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -4815,6 +4906,113 @@ runtime segura:</p>
 orquestrador runtime LOT/sal que possa fornecer ao balanço volumétrico uma
 fonte explícita de <code>SigmaThetaInfluenceLayer</code>, sem alterar o default
 <code>lot-sim run --mode lot-pkn</code>.</p>
+<h2 id="threshold-estatico-legado-para-breakdown-fase-1018e">Threshold estático legado para breakdown — Fase 10.18E</h2>
+<p>A Fase 10.18E calibra de forma diagnóstica o valor de
+<code>fracture.breakdown.pressure</code> usando o audit legado existente. O objetivo foi
+testar se um threshold estático extraído do <code>LOT_Tese</code> melhoraria o modo
+<code>volumetric_balance</code>, sem conectar <code>sigma_theta_compression_positive_Pa</code> ao
+runtime e sem alterar o default <code>pkn_direct</code>.</p>
+<p>Fonte da evidência:</p>
+<pre><code class="language-text">results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+results/comparison/level1_buz67d/legacy_audit/legacy_native_output.dat
+Momento da quebra: 8.5
+</code></pre>
+<p>O marcador legado indica <code>8.5 min = 510 s</code>. A linha usada no CSV foi a de maior
+<code>pw_Pa</code> no instante do evento:</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>layer</code></td>
+<td style="text-align: right;"><code>16</code></td>
+</tr>
+<tr>
+<td><code>annular_index</code></td>
+<td style="text-align: right;"><code>1</code></td>
+</tr>
+<tr>
+<td><code>pw_Pa</code> absoluto</td>
+<td style="text-align: right;"><code>67342521.84592447 Pa</code></td>
+</tr>
+<tr>
+<td><code>dP</code> legado</td>
+<td style="text-align: right;"><code>8131435.236221395 Pa</code></td>
+</tr>
+<tr>
+<td>volume injetado</td>
+<td style="text-align: right;"><code>0.67569475 m3</code></td>
+</tr>
+</tbody>
+</table>
+<p>O artefato de extração registra ambos os valores:</p>
+<pre><code class="language-text">breakdown_pressure_Pa       = 67342521.84592447
+breakdown_delta_pressure_Pa = 8131435.236221395
+modern_static_threshold_Pa  = 8131435.236221395
+</code></pre>
+<p>O caso moderno criado é:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_static_breakdown.yaml
+</code></pre>
+<p>Ele usa <code>fracture.breakdown.pressure = 8131435.236221395 Pa</code> porque o
+<code>PknModel</code> atual interpreta esse campo como limiar incremental acima de
+<code>initial_pressure_Pa</code>. Usar o <code>pw_Pa</code> absoluto diretamente mudaria a semântica
+do campo e misturaria pressão absoluta legada com o contrato incremental
+moderno.</p>
+<p>Resultado da comparação diagnóstica:</p>
+<table>
+<thead>
+<tr>
+<th>Modo</th>
+<th style="text-align: right;">Máxima pressão</th>
+<th style="text-align: right;">Diferença contra legado</th>
+<th>Observação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LOT_Tese</code> auditado</td>
+<td style="text-align: right;"><code>69.035836 MPa</code></td>
+<td style="text-align: right;"><code>0.000</code></td>
+<td>referência <code>pw_Pa</code></td>
+</tr>
+<tr>
+<td>10.18B</td>
+<td style="text-align: right;"><code>82.129237 MPa</code></td>
+<td style="text-align: right;"><code>+0.190</code></td>
+<td>pressão inicial + shut-in</td>
+</tr>
+<tr>
+<td>10.18C</td>
+<td style="text-align: right;"><code>26.732215 MPa</code></td>
+<td style="text-align: right;"><code>-0.613</code></td>
+<td>sink com placeholder simplificado</td>
+</tr>
+<tr>
+<td>10.18E</td>
+<td style="text-align: right;"><code>26.732215 MPa</code></td>
+<td style="text-align: right;"><code>-0.613</code></td>
+<td><code>STATIC_BREAKDOWN_OPENED_TOO_EARLY</code></td>
+</tr>
+</tbody>
+</table>
+<p>A primeira abertura/sink no moderno ocorreu em <code>30 s</code>, enquanto o marcador
+legado de quebra está em <code>510 s</code>. Portanto, a Fase 10.18E demonstra que uma
+calibração estática de <code>fracture.breakdown.pressure</code> não é suficiente para
+reproduzir o critério legado por <code>sigmaTheta</code>.</p>
+<p>Status correto:</p>
+<pre><code class="language-text">PHASE10_18E_STATIC_LEGACY_BREAKDOWN_DIAGNOSTIC_COMPLETE
+physical_validation: false
+sigma_theta_runtime: false
+classification: STATIC_BREAKDOWN_OPENED_TOO_EARLY
+</code></pre>
+<p>Essa fase não valida fratura, dano, ruptura, sal ou equivalência quantitativa.
+Ela apenas documenta um threshold rastreável e confirma que a próxima evolução
+deve tratar a rota sigma-theta/influence-height, não apenas ajustar um número
+estático no YAML.</p>
 <h2 id="volume-anular-buz67d-com-drill-pipe-fase-1016">Volume anular BUZ67D com drill pipe (Fase 10.16)</h2>
 <p>A Fase 10.16 adiciona suporte diagnostico para volume anular inicial com drill
 pipe no caso controlado <code>buz67d_pkn_legacy_aligned.yaml</code>.</p>
@@ -6624,7 +6822,7 @@ provado.</p>
 
   </div>
 </main>
-<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-08 por <span class="mono">generate_docs_index.py</span></footer>
+<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-10 por <span class="mono">generate_docs_index.py</span></footer>
 <script>
   const sidebar = document.getElementById('sidebar');
   const menuBtn = document.getElementById('menuBtn');

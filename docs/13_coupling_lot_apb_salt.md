@@ -1960,6 +1960,81 @@ orquestrador runtime LOT/sal que possa fornecer ao balanço volumétrico uma
 fonte explícita de `SigmaThetaInfluenceLayer`, sem alterar o default
 `lot-sim run --mode lot-pkn`.
 
+## Threshold estático legado para breakdown — Fase 10.18E
+
+A Fase 10.18E calibra de forma diagnóstica o valor de
+`fracture.breakdown.pressure` usando o audit legado existente. O objetivo foi
+testar se um threshold estático extraído do `LOT_Tese` melhoraria o modo
+`volumetric_balance`, sem conectar `sigma_theta_compression_positive_Pa` ao
+runtime e sem alterar o default `pkn_direct`.
+
+Fonte da evidência:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+results/comparison/level1_buz67d/legacy_audit/legacy_native_output.dat
+Momento da quebra: 8.5
+```
+
+O marcador legado indica `8.5 min = 510 s`. A linha usada no CSV foi a de maior
+`pw_Pa` no instante do evento:
+
+| Campo | Valor |
+|---|---:|
+| `layer` | `16` |
+| `annular_index` | `1` |
+| `pw_Pa` absoluto | `67342521.84592447 Pa` |
+| `dP` legado | `8131435.236221395 Pa` |
+| volume injetado | `0.67569475 m3` |
+
+O artefato de extração registra ambos os valores:
+
+```text
+breakdown_pressure_Pa       = 67342521.84592447
+breakdown_delta_pressure_Pa = 8131435.236221395
+modern_static_threshold_Pa  = 8131435.236221395
+```
+
+O caso moderno criado é:
+
+```text
+cases/validation/buz67d_pkn_legacy_static_breakdown.yaml
+```
+
+Ele usa `fracture.breakdown.pressure = 8131435.236221395 Pa` porque o
+`PknModel` atual interpreta esse campo como limiar incremental acima de
+`initial_pressure_Pa`. Usar o `pw_Pa` absoluto diretamente mudaria a semântica
+do campo e misturaria pressão absoluta legada com o contrato incremental
+moderno.
+
+Resultado da comparação diagnóstica:
+
+| Modo | Máxima pressão | Diferença contra legado | Observação |
+|---|---:|---:|---|
+| `LOT_Tese` auditado | `69.035836 MPa` | `0.000` | referência `pw_Pa` |
+| 10.18B | `82.129237 MPa` | `+0.190` | pressão inicial + shut-in |
+| 10.18C | `26.732215 MPa` | `-0.613` | sink com placeholder simplificado |
+| 10.18E | `26.732215 MPa` | `-0.613` | `STATIC_BREAKDOWN_OPENED_TOO_EARLY` |
+
+A primeira abertura/sink no moderno ocorreu em `30 s`, enquanto o marcador
+legado de quebra está em `510 s`. Portanto, a Fase 10.18E demonstra que uma
+calibração estática de `fracture.breakdown.pressure` não é suficiente para
+reproduzir o critério legado por `sigmaTheta`.
+
+Status correto:
+
+```text
+PHASE10_18E_STATIC_LEGACY_BREAKDOWN_DIAGNOSTIC_COMPLETE
+physical_validation: false
+sigma_theta_runtime: false
+classification: STATIC_BREAKDOWN_OPENED_TOO_EARLY
+```
+
+Essa fase não valida fratura, dano, ruptura, sal ou equivalência quantitativa.
+Ela apenas documenta um threshold rastreável e confirma que a próxima evolução
+deve tratar a rota sigma-theta/influence-height, não apenas ajustar um número
+estático no YAML.
+
 ## Volume anular BUZ67D com drill pipe (Fase 10.16)
 
 A Fase 10.16 adiciona suporte diagnostico para volume anular inicial com drill

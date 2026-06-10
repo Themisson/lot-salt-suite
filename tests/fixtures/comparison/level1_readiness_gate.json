@@ -158,6 +158,32 @@
       "No Zamora, casing elasticity, APB/salt feedback, sigmaTheta, margin or opened comparison was performed."
     ]
   },
+  "phase10_18e_static_legacy_breakdown_diagnostic": {
+    "status": "PHASE10_18E_STATIC_LEGACY_BREAKDOWN_DIAGNOSTIC_COMPLETE",
+    "classification": "STATIC_BREAKDOWN_OPENED_TOO_EARLY",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "pressure_semantic_equivalence": false,
+    "sigma_theta_runtime": false,
+    "legacy_audit_csv": "results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv",
+    "controlled_case": "cases/validation/buz67d_pkn_legacy_static_breakdown.yaml",
+    "threshold_json": "results/comparison/phase10_18e/breakdown_threshold.json",
+    "modern_static_breakdown_csv": "results/comparison/phase10_18e/modern_static_breakdown/timeseries.csv",
+    "summary_csv": "results/comparison/phase10_18e/phase10_18e_summary.csv",
+    "metadata_json": "results/comparison/phase10_18e/phase10_18e_metadata.json",
+    "breakdown_time_s": 510.0,
+    "breakdown_pressure_Pa": 67342521.84592447,
+    "breakdown_delta_pressure_Pa": 8131435.236221395,
+    "modern_static_threshold_Pa": 8131435.236221395,
+    "diagnostic_observation": "A traceable static threshold was extracted from the legacy marker, but the modern volumetric_balance route still opens too early and remains close to the 10.18C pressure response.",
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "Legacy absolute pw_Pa is recorded separately from the delta pressure consumed by the current PknModel threshold.",
+      "Static fracture.breakdown.pressure does not reproduce the legacy sigma-theta influence-height criterion.",
+      "No sigmaTheta, margin, opened, damage, salt or rupture comparison was performed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

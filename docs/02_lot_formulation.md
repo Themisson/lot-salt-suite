@@ -505,3 +505,54 @@ fracture.breakdown.pressure
 como limiar simplificado para habilitar sinks de fratura/leakoff. Casos com
 `fracture.breakdown.pressure = 0` ou sem pressão definida continuam sem abertura
 por esse critério. O default `pkn_direct` permanece inalterado.
+
+### Calibração diagnóstica do threshold estático — Fase 10.18E
+
+**Status:** `PHASE10_18E_STATIC_LEGACY_BREAKDOWN_DIAGNOSTIC_COMPLETE`.
+
+A Fase 10.18E extraiu um threshold estático rastreável a partir do audit CSV do
+`LOT_Tese` e do marcador nativo:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+results/comparison/level1_buz67d/legacy_audit/legacy_native_output.dat
+Momento da quebra: 8.5
+```
+
+O evento legado corresponde a `8.5 min = 510 s`. A linha selecionada no CSV é a
+linha de maior `pw_Pa` nesse instante, com `layer = 16` e `annular_index = 1`:
+
+```text
+pw_Pa = 67342521.84592447 Pa
+dP    = 8131435.236221395 Pa
+```
+
+O valor absoluto `pw_Pa = 67.342522 MPa` é mantido no relatório diagnóstico. No
+entanto, o `PknModel` moderno consome `fracture.breakdown.pressure` como
+threshold incremental acima de `initial_pressure_Pa`, portanto o caso
+diagnóstico usa o delta legado:
+
+```text
+cases/validation/buz67d_pkn_legacy_static_breakdown.yaml
+fracture.breakdown.pressure = 8131435.236221395 Pa
+```
+
+Esse caso não substitui `cases/validation/buz67d_pkn_legacy_aligned.yaml` e não
+é um novo default. Ele existe apenas para testar o efeito de um threshold
+estático calibrado por evidência legada.
+
+Resultado observado:
+
+| Modo | Pressão máxima | Erro relativo contra legado | Classificação |
+|---|---:|---:|---|
+| Legado auditado `pw_Pa` | `69.035836 MPa` | `0.000` | referência |
+| 10.18B | `82.129237 MPa` | `+0.190` | referência diagnóstica |
+| 10.18C | `26.732215 MPa` | `-0.613` | referência diagnóstica |
+| 10.18E | `26.732215 MPa` | `-0.613` | `STATIC_BREAKDOWN_OPENED_TOO_EARLY` |
+
+Conclusão: o threshold estático extraído é rastreável, mas não resolve a
+abertura prematura no modelo moderno. O primeiro sink de fratura/leakoff no
+caso 10.18E ocorreu em `30 s`, muito antes do marcador legado de `510 s`.
+Portanto, a fase confirma que `fracture.breakdown.pressure` continua sendo uma
+aproximação diagnóstica simplificada e não reproduz o critério legado
+sigma-theta por altura de influência.

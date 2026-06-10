@@ -494,3 +494,33 @@ SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY
 
 Portanto, esses campos não são normalizados como saída runtime de
 `lot-sim run --mode lot-pkn` nesta fase.
+
+## Fase 10.18E — normalização do threshold estático de breakdown
+
+A Fase 10.18E introduz dois campos diagnósticos distintos na extração do
+marcador legado:
+
+| Campo | Unidade | Significado |
+|---|---|---|
+| `breakdown_pressure_Pa` | Pa | Pressão absoluta legada `pw_Pa = pi + dP` no instante `Momento da quebra`. |
+| `breakdown_delta_pressure_Pa` | Pa | Incremento legado `dP` no mesmo instante. |
+| `modern_static_threshold_Pa` | Pa | Valor usado em `fracture.breakdown.pressure` para o `PknModel` atual. |
+
+No caso BUZ67D auditado:
+
+```text
+breakdown_time_s = 510.0
+breakdown_pressure_Pa = 67342521.84592447
+breakdown_delta_pressure_Pa = 8131435.236221395
+modern_static_threshold_Pa = 8131435.236221395
+```
+
+A distinção é obrigatória porque `pw_Pa` legado é uma pressão absoluta
+operacional, enquanto o contrato atual do `PknModel` aplica
+`fracture.breakdown.pressure` como limiar incremental acima de
+`initial_pressure_Pa`. Assim, o YAML diagnóstico
+`cases/validation/buz67d_pkn_legacy_static_breakdown.yaml` usa o delta legado.
+
+Esse mapeamento é diagnóstico. Ele não normaliza `sigmaTheta`, `margin` ou
+`opened` como campos runtime e não valida a equivalência física do critério de
+fratura.

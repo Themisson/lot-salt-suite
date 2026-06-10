@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.10 implementada, aguardando revisao/commit
+Fase ativa  : 10.18E implementada, em verificacao/commit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
-Último push : 2026-06-04
-Testes C++  : 203/203 passaram em 2026-06-04
-Testes Py   : 3 unittest (3 passaram em 2026-06-01)
+Último push : 2026-06-08
+Testes C++  : 203/203 passaram em 2026-06-07
+Testes Py   : em execução para Fase 10.18E
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,82 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-08] Fase 10.18E — calibração diagnóstica do threshold estático de breakdown — Codex
+
+**Status:** Implementada, aguardando commit/push após verificações finais.
+
+**Objetivo:** extrair do audit legado um threshold rastreável de início de
+fratura e testar se `fracture.breakdown.pressure` calibrado melhora o modo
+`volumetric_balance`.
+
+**Fonte legada:**
+
+```text
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+results/comparison/level1_buz67d/legacy_audit/legacy_native_output.dat
+Momento da quebra: 8.5
+```
+
+**Extração:**
+
+- `breakdown_time_s = 510.0`;
+- `breakdown_pressure_Pa = 67342521.84592447` (`pw_Pa` absoluto legado);
+- `breakdown_delta_pressure_Pa = 8131435.236221395`;
+- `modern_static_threshold_Pa = 8131435.236221395`;
+- linha selecionada: `layer = 16`, `annular_index = 1`, maior `pw_Pa` no
+  instante do evento.
+
+**Caso criado:**
+
+```text
+cases/validation/buz67d_pkn_legacy_static_breakdown.yaml
+```
+
+O caso usa o delta legado em `fracture.breakdown.pressure`, porque o
+`PknModel` atual interpreta esse campo como threshold incremental acima de
+`initial_pressure_Pa`.
+
+**Resultado diagnóstico:**
+
+| Modo | Max pressure | Erro relativo contra legado |
+|---|---:|---:|
+| Legado auditado | `69.035836 MPa` | `0.000` |
+| 10.18B | `82.129237 MPa` | `+0.190` |
+| 10.18C | `26.732215 MPa` | `-0.613` |
+| 10.18E | `26.732215 MPa` | `-0.613` |
+
+Classificação:
+
+```text
+STATIC_BREAKDOWN_OPENED_TOO_EARLY
+```
+
+O primeiro sink moderno em 10.18E ocorre em `30 s`, antes do marcador legado de
+`510 s`. A fase confirma que calibrar apenas `fracture.breakdown.pressure` não
+reproduz o critério legado `pw > sigmaTheta`.
+
+**Artefatos locais gerados, não versionados:**
+
+```text
+results/comparison/phase10_18e/breakdown_threshold.json
+results/comparison/phase10_18e/breakdown_threshold.csv
+results/comparison/phase10_18e/phase10_18e_summary.csv
+results/comparison/phase10_18e/phase10_18e_metadata.json
+results/comparison/phase10_18e/*.png
+```
+
+**Arquivos novos versionáveis:**
+
+- `tools/extract_phase10_18e_breakdown_threshold.py`;
+- `tools/compare_phase10_18e.py`;
+- `tests/python/test_phase10_18e_breakdown_threshold.py`;
+- `cases/validation/buz67d_pkn_legacy_static_breakdown.yaml`.
+
+**Não alterado:** legado, saltcreep, parser, CaseData, C++ solver, CLI,
+baselines e postprocess.
 
 ---
 

@@ -211,3 +211,9 @@ unidades reais usadas no `LOT_APB_v5` antes de aceitar nomes ou dimensões.
   artificialmente o desconto de volume de fratura.
 - `sigma_theta_compression_positive_Pa` existe no diagnóstico moderno, mas
   ainda não é fonte runtime para `lot-sim run --mode lot-pkn`.
+- A Fase 10.18E confirmou que calibrar `fracture.breakdown.pressure` com o
+  `dP` legado em `Momento da quebra = 8.5 min` ainda abre a rota moderna cedo
+  demais (`30 s` contra `510 s`). Portanto, fases futuras não devem insistir
+  apenas em ajuste escalar do threshold; o caminho recomendado é uma rota
+  opt-in que forneça `SigmaThetaInfluenceLayer`/altura de influência ao balanço
+  volumétrico, mantendo `lot-sim run --mode lot-pkn` desacoplado por default.

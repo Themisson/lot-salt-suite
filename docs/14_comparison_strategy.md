@@ -1342,3 +1342,79 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 ```
 
 sem tornar sigma-theta ou sal defaults globais.
+
+---
+
+## Fase 10.18E — threshold estático legado para breakdown
+
+**Status:** `PHASE10_18E_STATIC_LEGACY_BREAKDOWN_DIAGNOSTIC_COMPLETE`.
+
+A Fase 10.18E executa uma calibração diagnóstica de
+`fracture.breakdown.pressure` a partir dos outputs auditados do `LOT_Tese`.
+Ela não altera o critério físico moderno e não promove a comparação para
+equivalência quantitativa.
+
+Entradas usadas:
+
+```text
+legacy CSV:
+  results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+
+legacy marker:
+  results/comparison/level1_buz67d/legacy_audit/legacy_native_output.dat
+  Momento da quebra: 8.5
+
+modern case:
+  cases/validation/buz67d_pkn_legacy_static_breakdown.yaml
+```
+
+O marcador legado `Momento da quebra: 8.5` é interpretado como minutos, de
+acordo com a normalização temporal já estabelecida. A linha do CSV selecionada
+no instante `510 s` é a de maior `pw_Pa`:
+
+| Campo | Valor |
+|---|---:|
+| `breakdown_time_s` | `510.0` |
+| `breakdown_pressure_Pa` absoluto | `67342521.84592447` |
+| `breakdown_delta_pressure_Pa` | `8131435.236221395` |
+| `selected_layer` | `16` |
+| `selected_annular_index` | `1` |
+
+Como o `PknModel` atual interpreta `fracture.breakdown.pressure` como threshold
+incremental acima de `initial_pressure_Pa`, a entrada moderna usa
+`breakdown_delta_pressure_Pa`, não o `pw_Pa` absoluto.
+
+Resultado comparativo:
+
+| Modo | Campo | Máximo | Erro relativo contra legado | Classificação |
+|---|---|---:|---:|---|
+| Legado | `pw_Pa` | `69.035836 MPa` | `0.000` | referência |
+| 10.18B | `wellbore_pressure_Pa` | `82.129237 MPa` | `+0.190` | `known_reference` |
+| 10.18C | `wellbore_pressure_Pa` | `26.732215 MPa` | `-0.613` | `known_reference` |
+| 10.18E | `wellbore_pressure_Pa` | `26.732215 MPa` | `-0.613` | `STATIC_BREAKDOWN_OPENED_TOO_EARLY` |
+
+A classificação da fase é:
+
+```text
+STATIC_BREAKDOWN_OPENED_TOO_EARLY
+```
+
+O primeiro sink de fratura/leakoff da rota moderna 10.18E ocorre em `30 s`,
+enquanto o marcador legado é `510 s`. Portanto, a comparação mostra que o
+threshold estático calibrado por `dP` não resolve a divergência. A conclusão
+permanece: o próximo avanço precisa modelar explicitamente a rota sigma-theta
+por altura de influência, ou manter `fracture.breakdown.pressure` como proxy
+diagnóstico.
+
+Artefatos locais gerados, não versionados:
+
+```text
+results/comparison/phase10_18e/breakdown_threshold.json
+results/comparison/phase10_18e/breakdown_threshold.csv
+results/comparison/phase10_18e/phase10_18e_summary.csv
+results/comparison/phase10_18e/phase10_18e_metadata.json
+results/comparison/phase10_18e/*.png
+```
+
+Essa fase não compara `sigmaTheta`, `margin`, `opened`, dano, ruptura, sal ou
+equivalência física de fratura.

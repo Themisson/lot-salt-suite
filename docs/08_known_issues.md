@@ -503,6 +503,42 @@ SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY
 
 Usar `first_wall_sample` ou ponto de Gauss mais proximo da parede como criterio
 fisico sem mapear a altura de influencia legada e risco de falso positivo.
+
+---
+
+## R15 — Threshold estático legado não reproduz o critério sigma-theta
+
+**Severidade:** Alta | **Status:** Confirmado na Fase 10.18E
+
+A Fase 10.18E extraiu do audit legado um marcador rastreável de início de
+fratura:
+
+```text
+Momento da quebra = 8.5 min = 510 s
+pw_Pa             = 67342521.84592447 Pa
+dP                = 8131435.236221395 Pa
+```
+
+Como o `PknModel` moderno interpreta `fracture.breakdown.pressure` como limiar
+incremental acima de `initial_pressure_Pa`, o caso diagnóstico
+`buz67d_pkn_legacy_static_breakdown.yaml` usa o delta `dP`, não a pressão
+absoluta `pw_Pa`.
+
+Mesmo com essa calibração, o modo moderno `volumetric_balance` abre a rota de
+sink cedo demais:
+
+```text
+classificacao = STATIC_BREAKDOWN_OPENED_TOO_EARLY
+primeiro sink moderno = 30 s
+marcador legado = 510 s
+max moderno 10.18E = 26.732215 MPa
+max legado = 69.035836 MPa
+```
+
+**Impacto:** `fracture.breakdown.pressure` não deve ser tratado como substituto
+físico do critério legado `pw > sigmaTheta`. Ele permanece apenas ferramenta
+diagnóstica opt-in até que uma rota runtime forneça a tensão tangencial da
+altura de influência ao balanço volumétrico.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar
