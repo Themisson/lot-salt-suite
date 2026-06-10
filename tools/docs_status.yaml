@@ -77,6 +77,7 @@ phases:
   phase_10_18d_sigma_theta_runtime_gate: completed
   phase_10_18e_static_legacy_breakdown_diagnostic: completed
   phase_10_18f_fracture_trace_audit: completed
+  phase_10_19a_sigma_theta_static_provider: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -169,14 +170,14 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 221        # Catch2 lot-salt-suite — 221/221 passaram na Fase 10.18F (2026-06-10)
+  cpp_tests: 229        # Catch2 lot-salt-suite — 229/229 passaram na Fase 10.19A (2026-06-10)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 67      # pytest lot-salt-suite — 67/67 passaram na Fase 10.18F (2026-06-10)
+  python_tests: 70      # pytest lot-salt-suite — 70/70 passaram na Fase 10.19A (2026-06-10)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-10"
-updated_by: "codex (Fase 10.18F fracture trace audit)"
+updated_by: "codex (Fase 10.19A sigma theta static provider)"
 project_version: "0.1.0"

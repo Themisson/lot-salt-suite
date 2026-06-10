@@ -1492,3 +1492,63 @@ CaseData -> SaltCreepTimeBridge/SigmaThetaInfluenceLayer
 
 antes de qualquer tentativa de substituir `fracture.breakdown.pressure` por um
 critério runtime.
+
+---
+
+## Fase 10.19A — comparação diagnóstica com `sigma_theta_static`
+
+**Status:** `PHASE10_19A_SIGMA_THETA_STATIC_DIAGNOSTIC_COMPLETE`.
+
+A Fase 10.19A adicionou uma comparação diagnóstica para o novo caso:
+
+```text
+cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml
+```
+
+A comparação é gerada por:
+
+```text
+tools/compare_phase10_19a.py
+```
+
+Entradas locais usadas:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+results/comparison/phase10_19a/modern_sigma_theta_static/timeseries.csv
+```
+
+Saídas locais não versionadas:
+
+```text
+results/comparison/phase10_19a/phase10_19a_summary.csv
+results/comparison/phase10_19a/phase10_19a_metadata.json
+results/comparison/phase10_19a/pressure_vs_time_sigma_theta_static.png
+results/comparison/phase10_19a/injected_volume_vs_pressure_sigma_theta_static.png
+results/comparison/phase10_19a/sigma_theta_margin_static.png
+results/comparison/phase10_19a/volume_balance_sigma_theta_static.png
+```
+
+Métricas observadas:
+
+| Métrica | Valor |
+|---|---:|
+| `max_pressure_legacy_Pa` | `69035836.1743195` |
+| `max_pressure_10_19A_Pa` | `26732215.17314985` |
+| `relative_error_max_10_19A` | `-0.6127777013426845` |
+| `fracture_initiation_time_s` | `30.0` |
+| `fracture_initiation_pressure_Pa` | `82129237.46813472` |
+| `fracture_initiation_sigma_theta_Pa` | `67342521.84592447` |
+| `fracture_initiation_margin_Pa` | `14786715.62221025` |
+| `max_fracture_volume_m3` | `0.9936705933` |
+
+Classificação:
+
+```text
+SIGMA_THETA_STATIC_OPENED_TOO_EARLY
+```
+
+A fase não valida fratura física nem equivalência numérica. Ela estabelece que
+o contrato estrutural funciona e que o próximo bloqueio é a fonte física de
+`sigma_theta_compression_positive_Pa`, não o transporte de dados até o
+`PknModel`.

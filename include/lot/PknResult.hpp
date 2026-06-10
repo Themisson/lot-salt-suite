@@ -22,6 +22,15 @@ struct PknResult {
   double balance_injected_volume_increment_m3 = 0.0;
   double balance_fracture_volume_increment_m3 = 0.0;
   double balance_leakoff_volume_increment_m3 = 0.0;
+  bool fracture_initiated = false;
+  double fracture_initiation_time_s = 0.0;
+  double fracture_initiation_pressure_Pa = 0.0;
+  double fracture_initiation_sigma_theta_Pa = 0.0;
+  double fracture_initiation_margin_Pa = 0.0;
+  std::string fracture_initiation_type = "constant_pressure";
+  std::string fracture_initiation_layer_id;
+  double fracture_initiation_depth_m = 0.0;
+  std::string fracture_initiation_source;
   double initial_annular_volume_per_radian_m3 = 0.0;
   double initial_annular_volume_m3 = 0.0;
   double annular_outer_radius_m = 0.0;
@@ -49,6 +58,10 @@ struct PknResult {
   std::vector<double> balance_injected_volume_increment_series_m3;
   std::vector<double> balance_fracture_volume_increment_series_m3;
   std::vector<double> balance_leakoff_volume_increment_series_m3;
+  std::vector<double> fracture_initiation_pressure_series_Pa;
+  std::vector<double> fracture_initiation_sigma_theta_series_Pa;
+  std::vector<double> fracture_initiation_margin_series_Pa;
+  std::vector<int> fracture_initiated_series;
 };
 
 }  // namespace lss::lot

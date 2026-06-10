@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.18F auditoria instrumentada concluida, sem correcao C++
+Fase ativa  : 10.19A sigma-theta static opt-in validada localmente; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
-Testes C++  : 203/203 passaram em 2026-06-07
-Testes Py   : 67/67 passaram em 2026-06-10
+Testes C++  : 229/229 passaram em 2026-06-10
+Testes Py   : 70/70 passaram em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,71 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-10] Fase 10.19A — arquitetura opt-in para sigma-theta runtime no LOT/PKN — Codex
+
+**Status:** Implementada e validada localmente; commit/push pendente.
+
+**Gate:** `SIGMA_THETA_STATIC_PROVIDER_IMPLEMENTATION_ALLOWED`.
+
+**Objetivo:** criar uma rota opt-in para fornecer
+`sigma_theta_compression_positive_Pa` ao `volumetric_balance` sem fazer
+`PknModel` depender de `saltcreep`, `SaltCreepTimeBridge` ou `coupling/`.
+
+**Arquitetura:**
+
+```text
+YAML -> CaseParser -> CaseData -> PknRunner -> PknInput -> PknModel
+```
+
+**Novo YAML opt-in:**
+
+```text
+lot.fracture.initiation.type = sigma_theta_static
+pressure_source = wellbore_pressure_Pa
+comparison = legacy_algebra
+```
+
+**Algebra:**
+
+```text
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa > 0
+```
+
+**Caso diagnóstico criado:**
+
+```text
+cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml
+```
+
+**Ferramenta diagnóstica criada:**
+
+```text
+tools/compare_phase10_19a.py
+```
+
+**Resultado BUZ67D 10.19A:**
+
+```text
+classification = SIGMA_THETA_STATIC_OPENED_TOO_EARLY
+fracture_initiation_time_s = 30.0
+fracture_initiation_pressure_Pa = 82129237.46813472
+fracture_initiation_sigma_theta_Pa = 67342521.84592447
+fracture_initiation_margin_Pa = 14786715.62221025
+max_pressure_10_19A = 26732215.17314985 Pa
+relative_error_max_10_19A = -0.6127777013426845
+```
+
+**Caveat:** `sigma_theta_static` prova o contrato de provider, mas ainda nao e
+validacao fisica. O proxy estatico nao substitui `SaltWallStressDiagnostics`
+runtime e nao reproduz a altura de influencia legada.
+
+**Proximo passo recomendado:** Fase 10.19B em modo auditoria/planejamento para
+definir um provider runtime opt-in de `SigmaThetaInfluenceLayer`, sem alterar o
+default `lot-sim run --mode lot-pkn`.
 
 ---
 

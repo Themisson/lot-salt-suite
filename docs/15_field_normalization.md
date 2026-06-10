@@ -567,3 +567,54 @@ root_cause_classification = OTHER
 Esses campos são de auditoria. Eles não estabelecem equivalência física e não
 normalizam `sigmaTheta`, `margin` ou `opened` como saídas de produção do
 `lot-sim run --mode lot-pkn`.
+
+## Fase 10.19A — normalização de `sigma_theta_static`
+
+A Fase 10.19A adiciona campos modernos de iniciação de fratura para o modo
+`volumetric_balance` quando o YAML opt-in define:
+
+```text
+lot.fracture.initiation.type = sigma_theta_static
+```
+
+Campos de entrada:
+
+| Campo YAML | Campo C++ | Unidade | Observação |
+|---|---|---|---|
+| `pressure_source` | `pressure_source` | texto | Deve ser `wellbore_pressure_Pa`. |
+| `comparison` | `comparison` | texto | Deve ser `legacy_algebra`. |
+| `sigma_theta.compression_positive` | `sigma_theta_compression_positive_Pa` | Pa | Valor estático/diagnóstico. |
+| `sigma_theta.layer_id` | `layer_id` | texto | Identificador rastreável, não mapeamento físico pleno. |
+| `sigma_theta.influence_depth` | `influence_depth_m` | m | Profundidade de influência documentada. |
+
+Campos de saída:
+
+| Campo | Unidade | Significado |
+|---|---|---|
+| `fracture_initiated` | booleano | Estado acumulado de abertura. |
+| `fracture_initiation_type` | texto | `constant_pressure` ou `sigma_theta_static`. |
+| `fracture_initiation_time_s` | s | Primeiro passo em que o critério abriu. |
+| `fracture_initiation_pressure_Pa` | Pa | Pressão trial de poço usada no critério. |
+| `fracture_initiation_sigma_theta_Pa` | Pa | Sigma-theta estático usado no critério. |
+| `fracture_initiation_margin_Pa` | Pa | `pressure - sigma_theta`. |
+| `fracture_initiation_layer_id` | texto | Camada/identificador de influência. |
+| `fracture_initiation_depth_m` | m | Profundidade de influência. |
+
+O campo moderno usa pressão de poço, não `net_pressure_Pa`:
+
+```text
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+```
+
+No BUZ67D 10.19A, o resultado foi:
+
+```text
+fracture_initiation_time_s = 30.0
+fracture_initiation_pressure_Pa = 82129237.46813472
+fracture_initiation_sigma_theta_Pa = 67342521.84592447
+fracture_initiation_margin_Pa = 14786715.62221025
+classification = SIGMA_THETA_STATIC_OPENED_TOO_EARLY
+```
+
+Essa normalização é diagnóstica. Ela não declara `sigma_theta_static` como
+equivalente ao `getSigmaTheta()` legado nem como tensão runtime de saltcreep.

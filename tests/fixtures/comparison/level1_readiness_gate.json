@@ -214,6 +214,35 @@
       "No sigma-theta runtime criterion was implemented in this phase."
     ]
   },
+  "phase10_19a_sigma_theta_static_provider": {
+    "status": "PHASE10_19A_SIGMA_THETA_STATIC_DIAGNOSTIC_COMPLETE",
+    "gate": "SIGMA_THETA_STATIC_PROVIDER_IMPLEMENTATION_ALLOWED",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "pressure_semantic_equivalence": false,
+    "runtime_default_changed": false,
+    "saltcreep_runtime_connected": false,
+    "case": "cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml",
+    "comparison_tool": "tools/compare_phase10_19a.py",
+    "run_output_dir": "results/comparison/phase10_19a/modern_sigma_theta_static",
+    "summary_csv": "results/comparison/phase10_19a/phase10_19a_summary.csv",
+    "metadata_json": "results/comparison/phase10_19a/phase10_19a_metadata.json",
+    "classification": "SIGMA_THETA_STATIC_OPENED_TOO_EARLY",
+    "fracture_initiation_time_s": 30.0,
+    "fracture_initiation_pressure_Pa": 82129237.46813472,
+    "fracture_initiation_sigma_theta_Pa": 67342521.84592447,
+    "fracture_initiation_margin_Pa": 14786715.62221025,
+    "max_pressure_10_19A_Pa": 26732215.17314985,
+    "relative_error_max_10_19A": -0.6127777013426845,
+    "diagnostic_observation": "The sigma_theta_static provider reaches PknModel through YAML/CaseData/PknRunner, but the static proxy still opens at 30 s and is not a physical replacement for runtime SaltWallStressDiagnostics.",
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "sigma_theta_static is a YAML-supplied static proxy.",
+      "No saltcreep runtime stress was connected.",
+      "No Zamora, casing compliance, compositional fluid or temporal salt coupling was implemented."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

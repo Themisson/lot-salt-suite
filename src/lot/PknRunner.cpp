@@ -127,6 +127,18 @@ PknPressureModel parse_pressure_model(const std::string& model) {
   throw std::runtime_error("PknRunner: unsupported pressure model: " + model);
 }
 
+FractureInitiationCriterion parse_fracture_initiation(
+    const lss::core::SigmaThetaFractureCriterionData& criterion) {
+  if (!criterion.enabled) {
+    return FractureInitiationCriterion::ConstantPressure;
+  }
+  if (criterion.type == "sigma_theta_static") {
+    return FractureInitiationCriterion::SigmaThetaStatic;
+  }
+  throw std::runtime_error("PknRunner: unsupported fracture initiation type: " +
+                           criterion.type);
+}
+
 double plane_strain_modulus(const lss::core::RockData& rock) {
   const double denominator = 1.0 - rock.nu * rock.nu;
   if (rock.E_Pa <= 0.0 || denominator <= 0.0 || !std::isfinite(denominator)) {
@@ -220,6 +232,21 @@ PknInput make_pkn_input(const lss::core::CaseData& data) {
   input.leakoff_constant_rate_m3_s = data.lot.leakoff_constant_rate_m3_s;
   input.pressure_model = parse_pressure_model(data.lot.pressure_model);
   input.initial_pressure_Pa = data.lot.initial_pressure_Pa;
+  input.fracture_initiation =
+      parse_fracture_initiation(data.lot.sigma_theta_fracture);
+  input.sigma_theta_fracture.enabled = data.lot.sigma_theta_fracture.enabled;
+  input.sigma_theta_fracture.layer_id = data.lot.sigma_theta_fracture.layer_id;
+  input.sigma_theta_fracture.influence_depth_m =
+      data.lot.sigma_theta_fracture.influence_depth_m;
+  input.sigma_theta_fracture.sigma_theta_compression_positive_Pa =
+      data.lot.sigma_theta_fracture.sigma_theta_compression_positive_Pa;
+  input.sigma_theta_fracture.source = data.lot.sigma_theta_fracture.source;
+  input.sigma_theta_fracture.pressure_source =
+      data.lot.sigma_theta_fracture.pressure_source;
+  input.sigma_theta_fracture.comparison =
+      data.lot.sigma_theta_fracture.comparison;
+  input.sigma_theta_fracture.mapping_status =
+      data.lot.sigma_theta_fracture.mapping_status;
   if (input.pressure_model == PknPressureModel::VolumetricBalance) {
     const auto annular_context = make_annular_volume_context(data);
     if (!annular_context.available || annular_context.total_m3 <= 0.0) {

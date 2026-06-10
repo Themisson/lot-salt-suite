@@ -217,3 +217,14 @@ unidades reais usadas no `LOT_APB_v5` antes de aceitar nomes ou dimensões.
   apenas em ajuste escalar do threshold; o caminho recomendado é uma rota
   opt-in que forneça `SigmaThetaInfluenceLayer`/altura de influência ao balanço
   volumétrico, mantendo `lot-sim run --mode lot-pkn` desacoplado por default.
+- A Fase 10.19A criou o contrato opt-in `sigma_theta_static`, mas o proxy
+  escalar ainda abriu cedo demais. A próxima evolução deve trocar o valor
+  estático por um provider runtime explícito, provavelmente:
+
+```text
+CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
+         -> SigmaThetaInfluenceLayer -> volumetric_balance
+```
+
+  Essa rota futura deve continuar opt-in, sem tornar sal/sigma-theta default
+  para `lot-sim run --mode lot-pkn`.

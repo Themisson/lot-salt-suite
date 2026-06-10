@@ -469,6 +469,8 @@ pressão de fratura física a partir dessa rota.
   legado abre cedo demais no moderno e nao substitui o criterio sigma-theta
 - [x] **R16:** Fase 10.18F confirmou que a divergencia nao e bug local
   comprovado de ordem do sink; o moderno abre cedo por mismatch de criterio
+- [x] **R17:** Fase 10.19A criou `sigma_theta_static` opt-in, mas o proxy
+  estatico ainda abre cedo demais e nao e validacao fisica
 
 ### R14 — Sigma-theta disponivel apenas como diagnostico
 
@@ -581,6 +583,48 @@ Isso indica mismatch de critério, não bug local comprovado na ordem do sink em
 marcador de `510 s`. A próxima evolução deve implementar uma rota explícita e
 opt-in para fornecer a tensão tangencial na altura de influência ao critério de
 abertura, ou manter `fracture.breakdown.pressure` como proxy diagnóstico.
+
+---
+
+## R17 — `sigma_theta_static` é arquitetura opt-in, não validação física
+
+**Severidade:** Alta | **Status:** Confirmado na Fase 10.19A
+
+A Fase 10.19A adicionou o critério opt-in:
+
+```text
+lot.fracture.initiation.type = sigma_theta_static
+```
+
+O critério usa:
+
+```text
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa > 0
+```
+
+e mantém `constant_pressure` e `pkn_direct` preservados. Essa arquitetura evita
+que `PknModel` dependa de `saltcreep`; o valor de sigma-theta é fornecido de
+forma estática/diagnóstica pelo YAML.
+
+No caso `buz67d_pkn_legacy_sigma_theta_static.yaml`, usando o proxy estático:
+
+```text
+sigma_theta_compression_positive_Pa = 67342521.84592447 Pa
+```
+
+o moderno ainda abriu em `30 s`, com:
+
+```text
+fracture_initiation_pressure_Pa = 82129237.46813472
+fracture_initiation_margin_Pa   = 14786715.62221025
+classificacao                   = SIGMA_THETA_STATIC_OPENED_TOO_EARLY
+```
+
+**Impacto:** `sigma_theta_static` prova a arquitetura de provider, mas não deve
+ser tratado como critério físico validado. A próxima evolução precisa de uma
+fonte runtime de `SigmaThetaInfluenceLayer`/altura de influência, provavelmente
+via rota opt-in de `SaltCreepTimeBridge`/`SaltWallStressDiagnostics`.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

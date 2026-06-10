@@ -54,6 +54,12 @@ TEST_CASE("ResultWriter creates PKN CSV and JSON outputs") {
   CHECK(json.find("\"final_wellbore_pressure_Pa\"") != std::string::npos);
   CHECK(json.find("\"final_balance_effective_volume_increment_m3\"") !=
         std::string::npos);
+  CHECK(csv.find("fracture_initiated,fracture_initiation_pressure_Pa,"
+                 "fracture_initiation_sigma_theta_Pa,"
+                 "fracture_initiation_margin_Pa") != std::string::npos);
+  CHECK(json.find("\"fracture_initiation_type\": \"constant_pressure\"") !=
+        std::string::npos);
+  CHECK(json.find("\"fracture_initiation_pressure_Pa\"") != std::string::npos);
 
   std::filesystem::remove_all(output_dir);
 }

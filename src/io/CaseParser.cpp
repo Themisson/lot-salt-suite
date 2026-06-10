@@ -323,6 +323,47 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
     data.lot.breakdown_pressure_Pa = parse_value_unit(
         breakdown["pressure"], "lot.fracture.breakdown.pressure", "pressure");
   }
+  if (fracture["initiation"]) {
+    const YAML::Node initiation = fracture["initiation"];
+    data.lot.sigma_theta_fracture.type =
+        require_as<std::string>(initiation["type"], "lot.fracture.initiation.type");
+    if (data.lot.sigma_theta_fracture.type == "sigma_theta_static") {
+      data.lot.sigma_theta_fracture.enabled = true;
+      data.lot.sigma_theta_fracture.source =
+          require_as<std::string>(initiation["source"],
+                                  "lot.fracture.initiation.source");
+      data.lot.sigma_theta_fracture.pressure_source =
+          require_as<std::string>(initiation["pressure_source"],
+                                  "lot.fracture.initiation.pressure_source");
+      data.lot.sigma_theta_fracture.comparison =
+          require_as<std::string>(initiation["comparison"],
+                                  "lot.fracture.initiation.comparison");
+      const YAML::Node sigma_theta =
+          require_node(initiation["sigma_theta"],
+                       "lot.fracture.initiation.sigma_theta");
+      const YAML::Node compression_positive =
+          require_node(sigma_theta["compression_positive"],
+                       "lot.fracture.initiation.sigma_theta.compression_positive");
+      data.lot.sigma_theta_fracture.sigma_theta_compression_positive_Pa =
+          parse_value_unit(compression_positive,
+                           "lot.fracture.initiation.sigma_theta.compression_positive",
+                           "pressure");
+      data.lot.sigma_theta_fracture.layer_id =
+          require_as<std::string>(sigma_theta["layer_id"],
+                                  "lot.fracture.initiation.sigma_theta.layer_id");
+      data.lot.sigma_theta_fracture.influence_depth_m =
+          parse_value_unit(sigma_theta["influence_depth"],
+                           "lot.fracture.initiation.sigma_theta.influence_depth",
+                           "length");
+      data.lot.sigma_theta_fracture.mapping_status =
+          require_as<std::string>(sigma_theta["mapping_status"],
+                                  "lot.fracture.initiation.sigma_theta.mapping_status");
+    } else if (data.lot.sigma_theta_fracture.type != "constant_pressure") {
+      throw std::runtime_error(
+          "lot.fracture.initiation.type invalido: " +
+          data.lot.sigma_theta_fracture.type);
+    }
+  }
   if (lot["injection"]) {
     const YAML::Node injection = lot["injection"];
     data.lot.injection_rate_m3_s =
@@ -446,6 +487,31 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
         data.lot.breakdown_pressure_Pa < 0.0) {
       throw std::runtime_error(
           "Validacao falhou: LOT/PKN exige pressao de breakdown >= 0 quando definida");
+    }
+    if (data.lot.sigma_theta_fracture.enabled) {
+      const auto& criterion = data.lot.sigma_theta_fracture;
+      if (criterion.pressure_source != "wellbore_pressure_Pa") {
+        throw std::runtime_error(
+            "Validacao falhou: sigma_theta_static exige pressure_source wellbore_pressure_Pa");
+      }
+      if (criterion.comparison != "legacy_algebra") {
+        throw std::runtime_error(
+            "Validacao falhou: sigma_theta_static exige comparison legacy_algebra");
+      }
+      if (criterion.layer_id.empty()) {
+        throw std::runtime_error(
+            "Validacao falhou: sigma_theta_static exige layer_id nao vazio");
+      }
+      if (!std::isfinite(criterion.influence_depth_m) ||
+          criterion.influence_depth_m <= 0.0) {
+        throw std::runtime_error(
+            "Validacao falhou: sigma_theta_static exige influence_depth > 0");
+      }
+      if (!std::isfinite(criterion.sigma_theta_compression_positive_Pa) ||
+          criterion.sigma_theta_compression_positive_Pa <= 0.0) {
+        throw std::runtime_error(
+            "Validacao falhou: sigma_theta_static exige sigma_theta > 0");
+      }
     }
     if (data.lot.fracture_fluid_viscosity_Pa_s <= 0.0) {
       throw std::runtime_error("Validacao falhou: LOT/PKN exige viscosidade de fratura > 0");

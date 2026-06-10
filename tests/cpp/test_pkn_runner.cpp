@@ -21,6 +21,8 @@ constexpr const char* kPknLeakoffCasePath = "cases/validation/lot_pkn_with_leako
 constexpr const char* kBuz67dPknCasePath = "cases/lot_tese_migrated/buz67d_pkn.yaml";
 constexpr const char* kBuz67dLegacyAlignedCasePath =
     "cases/validation/buz67d_pkn_legacy_aligned.yaml";
+constexpr const char* kBuz67dSigmaThetaStaticCasePath =
+    "cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml";
 
 void check_finite_series(const lss::lot::PknResult& result) {
   REQUIRE_FALSE(result.time_series_s.empty());
@@ -41,6 +43,13 @@ void check_finite_series(const lss::lot::PknResult& result) {
           result.balance_fracture_volume_increment_series_m3.size());
   REQUIRE(result.time_series_s.size() ==
           result.balance_leakoff_volume_increment_series_m3.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.fracture_initiation_pressure_series_Pa.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.fracture_initiation_sigma_theta_series_Pa.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.fracture_initiation_margin_series_Pa.size());
+  REQUIRE(result.time_series_s.size() == result.fracture_initiated_series.size());
 
   for (std::size_t i = 0; i < result.time_series_s.size(); ++i) {
     CHECK(std::isfinite(result.time_series_s[i]));
@@ -56,6 +65,9 @@ void check_finite_series(const lss::lot::PknResult& result) {
     CHECK(std::isfinite(result.balance_injected_volume_increment_series_m3[i]));
     CHECK(std::isfinite(result.balance_fracture_volume_increment_series_m3[i]));
     CHECK(std::isfinite(result.balance_leakoff_volume_increment_series_m3[i]));
+    CHECK(std::isfinite(result.fracture_initiation_pressure_series_Pa[i]));
+    CHECK(std::isfinite(result.fracture_initiation_sigma_theta_series_Pa[i]));
+    CHECK(std::isfinite(result.fracture_initiation_margin_series_Pa[i]));
   }
 }
 
@@ -171,6 +183,28 @@ TEST_CASE("PknRunner enables opt-in volumetric balance for legacy-aligned case")
   CHECK(run.result.time_series_s.back() == Catch::Approx(1320.0));
   CHECK(run.result.wellbore_pressure_series_Pa.back() ==
         Catch::Approx(run.result.wellbore_pressure_Pa));
+}
+
+TEST_CASE("PknRunner enables opt-in sigma theta static criterion") {
+  const auto data = lss::io::parse_yaml(kBuz67dSigmaThetaStaticCasePath);
+  const auto run = lss::lot::run_pkn_case(data);
+
+  CHECK(data.lot.sigma_theta_fracture.enabled);
+  CHECK(run.input.pressure_model == lss::lot::PknPressureModel::VolumetricBalance);
+  CHECK(run.input.fracture_initiation ==
+        lss::lot::FractureInitiationCriterion::SigmaThetaStatic);
+  CHECK(run.input.sigma_theta_fracture.pressure_source == "wellbore_pressure_Pa");
+  CHECK(run.input.sigma_theta_fracture.comparison == "legacy_algebra");
+  CHECK(run.input.sigma_theta_fracture.sigma_theta_compression_positive_Pa ==
+        Catch::Approx(67342521.84592447));
+  CHECK(run.result.pressure_model == "volumetric_balance");
+  CHECK(run.result.fracture_initiation_type == "sigma_theta_static");
+  CHECK(run.result.fracture_initiation_layer_id == "legacy_layer_16");
+  CHECK(run.result.fracture_initiation_sigma_theta_Pa ==
+        Catch::Approx(67342521.84592447));
+  CHECK(run.result.fracture_initiation_pressure_Pa >
+        run.result.fracture_initiation_sigma_theta_Pa);
+  CHECK(run.result.fracture_initiation_margin_Pa > 0.0);
 }
 
 #if LSS_ENABLE_CLI_SUBPROCESS_TESTS

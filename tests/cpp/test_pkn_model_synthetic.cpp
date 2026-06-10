@@ -51,6 +51,13 @@ void check_finite_non_negative_series(const lss::lot::PknResult& result) {
           result.balance_fracture_volume_increment_series_m3.size());
   REQUIRE(result.time_series_s.size() ==
           result.balance_leakoff_volume_increment_series_m3.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.fracture_initiation_pressure_series_Pa.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.fracture_initiation_sigma_theta_series_Pa.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.fracture_initiation_margin_series_Pa.size());
+  REQUIRE(result.time_series_s.size() == result.fracture_initiated_series.size());
 
   for (std::size_t i = 0; i < result.time_series_s.size(); ++i) {
     CHECK(std::isfinite(result.time_series_s[i]));
@@ -67,6 +74,9 @@ void check_finite_non_negative_series(const lss::lot::PknResult& result) {
     CHECK(std::isfinite(result.balance_injected_volume_increment_series_m3[i]));
     CHECK(std::isfinite(result.balance_fracture_volume_increment_series_m3[i]));
     CHECK(std::isfinite(result.balance_leakoff_volume_increment_series_m3[i]));
+    CHECK(std::isfinite(result.fracture_initiation_pressure_series_Pa[i]));
+    CHECK(std::isfinite(result.fracture_initiation_sigma_theta_series_Pa[i]));
+    CHECK(std::isfinite(result.fracture_initiation_margin_series_Pa[i]));
     CHECK(result.injected_volume_series_m3[i] >= 0.0);
     CHECK(result.fracture_length_series_m[i] >= 0.0);
     CHECK(result.fracture_width_series_m[i] >= 0.0);
@@ -76,6 +86,26 @@ void check_finite_non_negative_series(const lss::lot::PknResult& result) {
     CHECK(result.initial_pressure_series_Pa[i] >= 0.0);
     CHECK(result.wellbore_pressure_series_Pa[i] >= 0.0);
   }
+}
+
+lss::lot::PknInput sigma_theta_input(double sigma_theta_Pa) {
+  auto input = synthetic_input();
+  input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  input.annular_volume_m3 = 10.0;
+  input.fluid_compressibility_per_Pa = 1.0e-9;
+  input.breakdown.pressure_Pa = 1.0e12;
+  input.fracture_initiation =
+      lss::lot::FractureInitiationCriterion::SigmaThetaStatic;
+  input.sigma_theta_fracture.enabled = true;
+  input.sigma_theta_fracture.layer_id = "legacy_layer_16";
+  input.sigma_theta_fracture.influence_depth_m = 4374.0;
+  input.sigma_theta_fracture.sigma_theta_compression_positive_Pa =
+      sigma_theta_Pa;
+  input.sigma_theta_fracture.source = "diagnostic_static";
+  input.sigma_theta_fracture.pressure_source = "wellbore_pressure_Pa";
+  input.sigma_theta_fracture.comparison = "legacy_algebra";
+  input.sigma_theta_fracture.mapping_status = "STATIC_FROM_LEGACY_AUDIT";
+  return input;
 }
 
 }  // namespace
@@ -229,6 +259,111 @@ TEST_CASE("Volumetric balance consumes fracture volume on threshold crossing ste
   CHECK(opened_result.wellbore_pressure_Pa < closed_result.wellbore_pressure_Pa);
   CHECK(opened_result.balance_effective_volume_increment_m3 <=
         opened_result.balance_injected_volume_increment_m3);
+}
+
+TEST_CASE("Sigma theta static criterion opens when wellbore pressure exceeds sigma theta") {
+  const lss::lot::PknModel model;
+  auto input = sigma_theta_input(5.0e5);
+
+  const auto result = model.simulate(input);
+
+  check_finite_non_negative_series(result);
+  CHECK(result.fracture_initiated);
+  CHECK(result.fracture_initiation_type == "sigma_theta_static");
+  CHECK(result.fracture_initiation_layer_id == "legacy_layer_16");
+  CHECK(result.fracture_initiation_depth_m == Catch::Approx(4374.0));
+  CHECK(result.fracture_initiation_sigma_theta_Pa == Catch::Approx(5.0e5));
+  CHECK(result.fracture_initiation_pressure_Pa > 5.0e5);
+  CHECK(result.fracture_initiation_margin_Pa ==
+        Catch::Approx(result.fracture_initiation_pressure_Pa - 5.0e5));
+  CHECK(result.balance_fracture_volume_increment_m3 > 0.0);
+}
+
+TEST_CASE("Sigma theta static criterion remains closed below sigma theta") {
+  const lss::lot::PknModel model;
+  auto input = sigma_theta_input(1.0e12);
+
+  const auto result = model.simulate(input);
+
+  check_finite_non_negative_series(result);
+  CHECK_FALSE(result.fracture_initiated);
+  CHECK(result.fracture_initiation_type == "sigma_theta_static");
+  CHECK(result.fracture_initiation_pressure_Pa == Catch::Approx(0.0));
+  CHECK(result.fracture_initiation_sigma_theta_Pa == Catch::Approx(0.0));
+  CHECK(result.balance_fracture_volume_increment_m3 == Catch::Approx(0.0));
+}
+
+TEST_CASE("Sigma theta static criterion uses wellbore pressure") {
+  const lss::lot::PknModel model;
+  auto input = sigma_theta_input(1.5e6);
+  input.initial_pressure_Pa = 1.0e6;
+  input.injection.total_time_s = 10.0;
+
+  const auto result = model.simulate(input);
+
+  REQUIRE(result.fracture_initiated);
+  CHECK(result.fracture_initiation_pressure_Pa == Catch::Approx(2.0e6));
+  CHECK(result.fracture_initiation_margin_Pa == Catch::Approx(5.0e5));
+  CHECK(result.net_pressure_series_Pa.front() !=
+        Catch::Approx(result.fracture_initiation_pressure_Pa));
+}
+
+TEST_CASE("Sigma theta static criterion is opt-in") {
+  const lss::lot::PknModel model;
+  auto input = synthetic_input();
+  input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  input.annular_volume_m3 = 10.0;
+  input.fluid_compressibility_per_Pa = 1.0e-9;
+  input.breakdown.pressure_Pa = 0.0;
+  input.sigma_theta_fracture.enabled = true;
+  input.sigma_theta_fracture.sigma_theta_compression_positive_Pa = 1.0;
+
+  const auto result = model.simulate(input);
+
+  CHECK_FALSE(result.fracture_initiated);
+  CHECK(result.fracture_initiation_type == "constant_pressure");
+  CHECK(result.balance_fracture_volume_increment_m3 == Catch::Approx(0.0));
+}
+
+TEST_CASE("Constant pressure criterion remains supported") {
+  const lss::lot::PknModel model;
+  auto input = synthetic_input();
+  input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  input.annular_volume_m3 = 10.0;
+  input.fluid_compressibility_per_Pa = 1.0e-9;
+  input.breakdown.pressure_Pa = 1.0;
+
+  const auto result = model.simulate(input);
+
+  CHECK(result.fracture_initiated);
+  CHECK(result.fracture_initiation_type == "constant_pressure");
+  CHECK(result.fracture_initiation_sigma_theta_Pa == Catch::Approx(0.0));
+  CHECK(result.balance_fracture_volume_increment_m3 > 0.0);
+}
+
+TEST_CASE("pkn_direct behavior is preserved with sigma theta input present") {
+  const lss::lot::PknModel model;
+  auto direct = synthetic_input();
+  auto with_sigma = direct;
+  with_sigma.fracture_initiation =
+      lss::lot::FractureInitiationCriterion::SigmaThetaStatic;
+  with_sigma.sigma_theta_fracture.enabled = true;
+  with_sigma.sigma_theta_fracture.layer_id = "legacy_layer_16";
+  with_sigma.sigma_theta_fracture.influence_depth_m = 4374.0;
+  with_sigma.sigma_theta_fracture.sigma_theta_compression_positive_Pa = 5.0e5;
+  with_sigma.sigma_theta_fracture.source = "diagnostic_static";
+  with_sigma.sigma_theta_fracture.pressure_source = "wellbore_pressure_Pa";
+  with_sigma.sigma_theta_fracture.comparison = "legacy_algebra";
+
+  const auto direct_result = model.simulate(direct);
+  const auto sigma_result = model.simulate(with_sigma);
+
+  CHECK(sigma_result.pressure_model == "pkn_direct");
+  CHECK(sigma_result.injected_volume_series_m3 ==
+        direct_result.injected_volume_series_m3);
+  CHECK(sigma_result.net_pressure_series_Pa == direct_result.net_pressure_series_Pa);
+  CHECK(sigma_result.fracture_volume_series_m3 ==
+        direct_result.fracture_volume_series_m3);
 }
 
 TEST_CASE("Initial pressure shifts volumetric wellbore pressure") {

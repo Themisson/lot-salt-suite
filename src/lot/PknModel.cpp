@@ -21,6 +21,16 @@ const char* pressure_model_label(PknPressureModel model) {
   throw std::invalid_argument("PknModel: unsupported pressure model");
 }
 
+const char* fracture_initiation_label(FractureInitiationCriterion criterion) {
+  switch (criterion) {
+    case FractureInitiationCriterion::ConstantPressure:
+      return "constant_pressure";
+    case FractureInitiationCriterion::SigmaThetaStatic:
+      return "sigma_theta_static";
+  }
+  throw std::invalid_argument("PknModel: unsupported fracture initiation criterion");
+}
+
 void validate_input(const PknInput& input) {
   if (input.fracture_height_m <= 0.0) {
     throw std::invalid_argument("PknModel: fracture_height_m must be positive");
@@ -81,6 +91,36 @@ void validate_input(const PknInput& input) {
         !std::isfinite(input.fluid_compressibility_per_Pa)) {
       throw std::invalid_argument(
           "PknModel: volumetric_balance requires positive fluid_compressibility_per_Pa");
+    }
+  }
+  if (input.fracture_initiation ==
+      FractureInitiationCriterion::SigmaThetaStatic) {
+    const auto& criterion = input.sigma_theta_fracture;
+    if (!criterion.enabled) {
+      throw std::invalid_argument(
+          "PknModel: sigma_theta_static requires enabled criterion");
+    }
+    if (criterion.layer_id.empty()) {
+      throw std::invalid_argument(
+          "PknModel: sigma_theta_static requires layer_id");
+    }
+    if (!std::isfinite(criterion.influence_depth_m) ||
+        criterion.influence_depth_m <= 0.0) {
+      throw std::invalid_argument(
+          "PknModel: sigma_theta_static requires positive influence_depth_m");
+    }
+    if (!std::isfinite(criterion.sigma_theta_compression_positive_Pa) ||
+        criterion.sigma_theta_compression_positive_Pa <= 0.0) {
+      throw std::invalid_argument(
+          "PknModel: sigma_theta_static requires positive sigma theta");
+    }
+    if (criterion.pressure_source != "wellbore_pressure_Pa") {
+      throw std::invalid_argument(
+          "PknModel: sigma_theta_static requires wellbore_pressure_Pa source");
+    }
+    if (criterion.comparison != "legacy_algebra") {
+      throw std::invalid_argument(
+          "PknModel: sigma_theta_static requires legacy_algebra comparison");
     }
   }
 }
@@ -192,6 +232,13 @@ void append_point(PknResult& series, const PknResult& point) {
       point.balance_fracture_volume_increment_m3);
   series.balance_leakoff_volume_increment_series_m3.push_back(
       point.balance_leakoff_volume_increment_m3);
+  series.fracture_initiation_pressure_series_Pa.push_back(
+      point.fracture_initiation_pressure_Pa);
+  series.fracture_initiation_sigma_theta_series_Pa.push_back(
+      point.fracture_initiation_sigma_theta_Pa);
+  series.fracture_initiation_margin_series_Pa.push_back(
+      point.fracture_initiation_margin_Pa);
+  series.fracture_initiated_series.push_back(point.fracture_initiated ? 1 : 0);
 }
 
 void copy_scalar_result(PknResult& target, const PknResult& point) {
@@ -218,6 +265,17 @@ void copy_scalar_result(PknResult& target, const PknResult& point) {
       point.balance_fracture_volume_increment_m3;
   target.balance_leakoff_volume_increment_m3 =
       point.balance_leakoff_volume_increment_m3;
+  target.fracture_initiated = point.fracture_initiated;
+  target.fracture_initiation_time_s = point.fracture_initiation_time_s;
+  target.fracture_initiation_pressure_Pa =
+      point.fracture_initiation_pressure_Pa;
+  target.fracture_initiation_sigma_theta_Pa =
+      point.fracture_initiation_sigma_theta_Pa;
+  target.fracture_initiation_margin_Pa = point.fracture_initiation_margin_Pa;
+  target.fracture_initiation_type = point.fracture_initiation_type;
+  target.fracture_initiation_layer_id = point.fracture_initiation_layer_id;
+  target.fracture_initiation_depth_m = point.fracture_initiation_depth_m;
+  target.fracture_initiation_source = point.fracture_initiation_source;
 }
 
 void apply_volumetric_balance(const PknInput& input, PknResult& series) {
@@ -226,6 +284,10 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
   double previous_leakoff_m3 = 0.0;
   double pressure_Pa = input.initial_pressure_Pa;
   bool fracture_opened = false;
+  double initiation_pressure_Pa = 0.0;
+  double initiation_sigma_theta_Pa = 0.0;
+  double initiation_margin_Pa = 0.0;
+  double initiation_time_s = 0.0;
 
   for (std::size_t i = 0; i < series.time_series_s.size(); ++i) {
     const double injected_increment_m3 =
@@ -233,15 +295,34 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
     double fracture_increment_m3 = 0.0;
     double leakoff_increment_m3 = 0.0;
 
-    if (!fracture_opened && input.breakdown.pressure_Pa > 0.0) {
-      const double trial_delta_pressure_Pa =
-          injected_increment_m3 /
-          (input.fluid_compressibility_per_Pa * input.annular_volume_m3);
-      const double trial_pressure_Pa =
-          std::max(0.0, pressure_Pa + trial_delta_pressure_Pa);
-      if (trial_pressure_Pa - input.initial_pressure_Pa >=
-          input.breakdown.pressure_Pa) {
+    const double trial_delta_pressure_Pa =
+        injected_increment_m3 /
+        (input.fluid_compressibility_per_Pa * input.annular_volume_m3);
+    const double trial_pressure_Pa =
+        std::max(0.0, pressure_Pa + trial_delta_pressure_Pa);
+
+    if (!fracture_opened) {
+      if (input.fracture_initiation ==
+          FractureInitiationCriterion::SigmaThetaStatic) {
+        const double sigma_theta_Pa =
+            input.sigma_theta_fracture.sigma_theta_compression_positive_Pa;
+        const double margin_Pa = trial_pressure_Pa - sigma_theta_Pa;
+        if (margin_Pa > 0.0) {
+          fracture_opened = true;
+          initiation_pressure_Pa = trial_pressure_Pa;
+          initiation_sigma_theta_Pa = sigma_theta_Pa;
+          initiation_margin_Pa = margin_Pa;
+          initiation_time_s = series.time_series_s[i];
+        }
+      } else if (input.breakdown.pressure_Pa > 0.0 &&
+                 trial_pressure_Pa - input.initial_pressure_Pa >=
+                     input.breakdown.pressure_Pa) {
         fracture_opened = true;
+        initiation_pressure_Pa = trial_pressure_Pa;
+        initiation_margin_Pa =
+            trial_pressure_Pa - input.initial_pressure_Pa -
+            input.breakdown.pressure_Pa;
+        initiation_time_s = series.time_series_s[i];
       }
     }
 
@@ -264,6 +345,11 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
     series.balance_injected_volume_increment_series_m3[i] = injected_increment_m3;
     series.balance_fracture_volume_increment_series_m3[i] = fracture_increment_m3;
     series.balance_leakoff_volume_increment_series_m3[i] = leakoff_increment_m3;
+    series.fracture_initiated_series[i] = fracture_opened ? 1 : 0;
+    series.fracture_initiation_pressure_series_Pa[i] = initiation_pressure_Pa;
+    series.fracture_initiation_sigma_theta_series_Pa[i] =
+        initiation_sigma_theta_Pa;
+    series.fracture_initiation_margin_series_Pa[i] = initiation_margin_Pa;
 
     previous_injected_m3 = series.injected_volume_series_m3[i];
     previous_fracture_m3 = series.fracture_volume_series_m3[i];
@@ -271,6 +357,12 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
   }
 
   series.pressure_model = pressure_model_label(input.pressure_model);
+  series.fracture_initiation_type =
+      fracture_initiation_label(input.fracture_initiation);
+  series.fracture_initiation_layer_id = input.sigma_theta_fracture.layer_id;
+  series.fracture_initiation_depth_m =
+      input.sigma_theta_fracture.influence_depth_m;
+  series.fracture_initiation_source = input.sigma_theta_fracture.source;
   series.fluid_compressibility_per_Pa = input.fluid_compressibility_per_Pa;
   if (!series.time_series_s.empty()) {
     series.wellbore_pressure_Pa = series.wellbore_pressure_series_Pa.back();
@@ -283,6 +375,11 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
         series.balance_fracture_volume_increment_series_m3.back();
     series.balance_leakoff_volume_increment_m3 =
         series.balance_leakoff_volume_increment_series_m3.back();
+    series.fracture_initiated = fracture_opened;
+    series.fracture_initiation_time_s = initiation_time_s;
+    series.fracture_initiation_pressure_Pa = initiation_pressure_Pa;
+    series.fracture_initiation_sigma_theta_Pa = initiation_sigma_theta_Pa;
+    series.fracture_initiation_margin_Pa = initiation_margin_Pa;
   }
 }
 

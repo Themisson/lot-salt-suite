@@ -2035,6 +2035,72 @@ Ela apenas documenta um threshold rastreável e confirma que a próxima evoluç�
 deve tratar a rota sigma-theta/influence-height, não apenas ajustar um número
 estático no YAML.
 
+## Arquitetura opt-in `sigma_theta_static` no LOT/PKN — Fase 10.19A
+
+A Fase 10.19A criou uma ponte arquitetural mínima para que o runtime LOT/PKN
+possa receber um valor estático de `sigma_theta_compression_positive_Pa` sem
+instanciar `SaltCreepTimeBridge` e sem fazer `PknModel` depender de
+`saltcreep`.
+
+O gate da auditoria foi:
+
+```text
+SIGMA_THETA_STATIC_PROVIDER_IMPLEMENTATION_ALLOWED
+```
+
+A nova rota é:
+
+```text
+YAML -> CaseParser -> CaseData -> PknRunner -> PknInput -> PknModel
+```
+
+Ela é explícita e opt-in:
+
+```yaml
+lot:
+  fracture:
+    initiation:
+      type: sigma_theta_static
+      pressure_source: wellbore_pressure_Pa
+      comparison: legacy_algebra
+```
+
+A álgebra é compatível com o diagnóstico em `LotSaltSigmaThetaBreakdown`:
+
+```text
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa > 0
+```
+
+Diferença entre modos:
+
+| Modo | Fonte | Status |
+|---|---|---|
+| `constant_pressure` | `fracture.breakdown.pressure` | fallback existente |
+| `sigma_theta_static` | valor YAML estático | diagnóstico opt-in |
+| `sigma_theta_runtime` | futuro bridge/salt wall stress | não implementado |
+
+Essa fase não conecta `SaltWallStressDiagnostics` real ao runtime, não cria
+acoplamento temporal sal/LOT e não altera `lot-sim run --mode lot-pkn` sem
+opção explícita no YAML.
+
+Diagnóstico BUZ67D:
+
+```text
+case: cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml
+classification: SIGMA_THETA_STATIC_OPENED_TOO_EARLY
+fracture_initiation_time_s: 30.0
+fracture_initiation_pressure_Pa: 82129237.46813472
+fracture_initiation_sigma_theta_Pa: 67342521.84592447
+fracture_initiation_margin_Pa: 14786715.62221025
+```
+
+O resultado confirma que a arquitetura está pronta para receber uma fonte
+sigma-theta, mas o proxy estático de abertura ainda não reproduz a altura de
+influência legada. A próxima fase deve substituir o valor estático por uma
+fonte opt-in runtime de `SigmaThetaInfluenceLayer`, ainda sem tornar isso
+default global.
+
 ## Volume anular BUZ67D com drill pipe (Fase 10.16)
 
 A Fase 10.16 adiciona suporte diagnostico para volume anular inicial com drill

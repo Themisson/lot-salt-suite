@@ -18,6 +18,8 @@ constexpr const char* kPknLeakoffCasePath = "cases/validation/lot_pkn_with_leako
 constexpr const char* kBuz67dPknCasePath = "cases/lot_tese_migrated/buz67d_pkn.yaml";
 constexpr const char* kBuz67dLegacyAlignedCasePath =
     "cases/validation/buz67d_pkn_legacy_aligned.yaml";
+constexpr const char* kBuz67dSigmaThetaStaticCasePath =
+    "cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml";
 
 std::string valid_case_yaml() {
   return R"(metadata:
@@ -309,4 +311,22 @@ TEST_CASE("Legacy-aligned BUZ67D case loads initial pressure and shutin phases")
   CHECK(data.lot.injection_phases[1].name == "shutin");
   CHECK(data.lot.injection_phases[1].duration_s == Catch::Approx(570.0));
   CHECK(data.lot.injection_phases[1].rate_m3_s == Catch::Approx(0.0));
+}
+
+TEST_CASE("BUZ67D sigma theta static case loads diagnostic fracture initiation") {
+  const auto data = lss::io::parse_yaml(kBuz67dSigmaThetaStaticCasePath);
+
+  CHECK(data.name == "buz67d_pkn_legacy_sigma_theta_static");
+  CHECK(data.lot.pressure_model == "volumetric_balance");
+  CHECK(data.lot.sigma_theta_fracture.enabled);
+  CHECK(data.lot.sigma_theta_fracture.type == "sigma_theta_static");
+  CHECK(data.lot.sigma_theta_fracture.source == "diagnostic_static");
+  CHECK(data.lot.sigma_theta_fracture.pressure_source == "wellbore_pressure_Pa");
+  CHECK(data.lot.sigma_theta_fracture.comparison == "legacy_algebra");
+  CHECK(data.lot.sigma_theta_fracture.layer_id == "legacy_layer_16");
+  CHECK(data.lot.sigma_theta_fracture.influence_depth_m == Catch::Approx(4374.0));
+  CHECK(data.lot.sigma_theta_fracture.sigma_theta_compression_positive_Pa ==
+        Catch::Approx(67342521.84592447));
+  CHECK(data.lot.sigma_theta_fracture.mapping_status ==
+        "STATIC_FROM_LEGACY_AUDIT");
 }

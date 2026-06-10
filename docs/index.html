@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">63/70</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">221</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">67</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">64/71</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">229</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">70</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -1221,6 +1221,103 @@ this is a criterion mismatch, not a confirmed local C++ sink bug
 sigma-theta por altura de influência. A próxima correção deve ser arquitetural:
 fornecer uma rota opt-in testada para <code>SigmaThetaInfluenceLayer</code> alimentar o
 balanço volumétrico, sem promover essa rota a default runtime.</p>
+<h3 id="criterio-sigma_theta_static-opt-in-fase-1019a">Critério <code>sigma_theta_static</code> opt-in — Fase 10.19A</h3>
+<p><strong>Status:</strong> <code>SIGMA_THETA_STATIC_PROVIDER_IMPLEMENTATION_ALLOWED</code>.</p>
+<p>A Fase 10.19A criou a primeira arquitetura runtime opt-in para que o modo
+<code>volumetric_balance</code> receba uma fonte estática de:</p>
+<pre><code class="language-text">sigma_theta_compression_positive_Pa
+</code></pre>
+<p>sem fazer <code>PknModel</code> depender de <code>saltcreep</code>, <code>SaltCreepTimeBridge</code> ou
+<code>coupling/</code>. O contrato é YAML -&gt; <code>CaseParser</code> -&gt; <code>CaseData</code> -&gt; <code>PknRunner</code> -&gt;
+<code>PknInput</code> -&gt; <code>PknModel</code>.</p>
+<p>O formato aceito é:</p>
+<pre><code class="language-yaml">lot:
+  fracture:
+    initiation:
+      type: sigma_theta_static
+      source: diagnostic_static
+      pressure_source: wellbore_pressure_Pa
+      comparison: legacy_algebra
+      sigma_theta:
+        compression_positive:
+          value: 67342521.84592447
+          unit: Pa
+        layer_id: legacy_layer_16
+        influence_depth:
+          value: 4374.0
+          unit: m
+        mapping_status: STATIC_FROM_LEGACY_AUDIT
+</code></pre>
+<p>Com esse critério, a pressão usada é a pressão trial de poço do balanço
+volumétrico:</p>
+<pre><code class="language-text">wellbore_pressure_trial_Pa
+</code></pre>
+<p>A álgebra espelha o diagnóstico moderno de <code>LotSaltSigmaThetaBreakdown</code>:</p>
+<pre><code class="language-text">margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa &gt; 0
+</code></pre>
+<p>Quando abre, o resultado passa a registrar:</p>
+<pre><code class="language-text">fracture_initiation_type = sigma_theta_static
+fracture_initiation_time_s
+fracture_initiation_pressure_Pa
+fracture_initiation_sigma_theta_Pa
+fracture_initiation_margin_Pa
+fracture_initiation_layer_id
+fracture_initiation_depth_m
+</code></pre>
+<p>O fallback antigo continua:</p>
+<pre><code class="language-text">constant_pressure -&gt; fracture.breakdown.pressure
+</code></pre>
+<p>e <code>pkn_direct</code> permanece sem alteração de comportamento.</p>
+<p>O caso diagnóstico criado é:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml
+</code></pre>
+<p>Ele usa como proxy estático:</p>
+<pre><code class="language-text">sigma_theta_compression_positive_Pa = 67342521.84592447 Pa
+</code></pre>
+<p>Esse valor vem da auditoria legada e não é uma tensão runtime calculada por
+saltcreep. O resultado do diagnóstico 10.19A foi:</p>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fracture_initiation_time_s</code></td>
+<td style="text-align: right;"><code>30.0</code></td>
+</tr>
+<tr>
+<td><code>fracture_initiation_pressure_Pa</code></td>
+<td style="text-align: right;"><code>82129237.46813472</code></td>
+</tr>
+<tr>
+<td><code>fracture_initiation_sigma_theta_Pa</code></td>
+<td style="text-align: right;"><code>67342521.84592447</code></td>
+</tr>
+<tr>
+<td><code>fracture_initiation_margin_Pa</code></td>
+<td style="text-align: right;"><code>14786715.62221025</code></td>
+</tr>
+<tr>
+<td><code>max_pressure_10_19A</code></td>
+<td style="text-align: right;"><code>26.732215 MPa</code></td>
+</tr>
+<tr>
+<td>erro relativo contra legado</td>
+<td style="text-align: right;"><code>-0.6128</code></td>
+</tr>
+</tbody>
+</table>
+<p>Classificação:</p>
+<pre><code class="language-text">SIGMA_THETA_STATIC_OPENED_TOO_EARLY
+</code></pre>
+<p>Conclusão: a arquitetura opt-in foi estabelecida, mas o proxy estático ainda
+abre cedo demais. A próxima etapa deve alimentar o critério com uma fonte
+runtime por altura de influência (<code>SigmaThetaInfluenceLayer</code>), não apenas com
+um valor escalar estático extraído do legado.</p>
 </div>
 </section>
 
@@ -2313,6 +2410,8 @@ pressão de fratura física a partir dessa rota.</p>
   legado abre cedo demais no moderno e nao substitui o criterio sigma-theta</li>
 <li>[x] <strong>R16:</strong> Fase 10.18F confirmou que a divergencia nao e bug local
   comprovado de ordem do sink; o moderno abre cedo por mismatch de criterio</li>
+<li>[x] <strong>R17:</strong> Fase 10.19A criou <code>sigma_theta_static</code> opt-in, mas o proxy
+  estatico ainda abre cedo demais e nao e validacao fisica</li>
 </ul>
 <h3 id="r14-sigma-theta-disponivel-apenas-como-diagnostico">R14 — Sigma-theta disponivel apenas como diagnostico</h3>
 <p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado na Fase 10.18D</p>
@@ -2385,7 +2484,32 @@ Isso indica mismatch de critério, não bug local comprovado na ordem do sink em
 <p><strong>Impacto:</strong> não alterar a ordem do balanço volumétrico para perseguir o
 marcador de <code>510 s</code>. A próxima evolução deve implementar uma rota explícita e
 opt-in para fornecer a tensão tangencial na altura de influência ao critério de
-abertura, ou manter <code>fracture.breakdown.pressure</code> como proxy diagnóstico.
+abertura, ou manter <code>fracture.breakdown.pressure</code> como proxy diagnóstico.</p>
+<hr />
+<h2 id="r17-sigma_theta_static-e-arquitetura-opt-in-nao-validacao-fisica">R17 — <code>sigma_theta_static</code> é arquitetura opt-in, não validação física</h2>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado na Fase 10.19A</p>
+<p>A Fase 10.19A adicionou o critério opt-in:</p>
+<pre><code class="language-text">lot.fracture.initiation.type = sigma_theta_static
+</code></pre>
+<p>O critério usa:</p>
+<pre><code class="language-text">margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa &gt; 0
+</code></pre>
+<p>e mantém <code>constant_pressure</code> e <code>pkn_direct</code> preservados. Essa arquitetura evita
+que <code>PknModel</code> dependa de <code>saltcreep</code>; o valor de sigma-theta é fornecido de
+forma estática/diagnóstica pelo YAML.</p>
+<p>No caso <code>buz67d_pkn_legacy_sigma_theta_static.yaml</code>, usando o proxy estático:</p>
+<pre><code class="language-text">sigma_theta_compression_positive_Pa = 67342521.84592447 Pa
+</code></pre>
+<p>o moderno ainda abriu em <code>30 s</code>, com:</p>
+<pre><code class="language-text">fracture_initiation_pressure_Pa = 82129237.46813472
+fracture_initiation_margin_Pa   = 14786715.62221025
+classificacao                   = SIGMA_THETA_STATIC_OPENED_TOO_EARLY
+</code></pre>
+<p><strong>Impacto:</strong> <code>sigma_theta_static</code> prova a arquitetura de provider, mas não deve
+ser tratado como critério físico validado. A próxima evolução precisa de uma
+fonte runtime de <code>SigmaThetaInfluenceLayer</code>/altura de influência, provavelmente
+via rota opt-in de <code>SaltCreepTimeBridge</code>/<code>SaltWallStressDiagnostics</code>.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -5142,6 +5266,72 @@ classification: STATIC_BREAKDOWN_OPENED_TOO_EARLY
 Ela apenas documenta um threshold rastreável e confirma que a próxima evolução
 deve tratar a rota sigma-theta/influence-height, não apenas ajustar um número
 estático no YAML.</p>
+<h2 id="arquitetura-opt-in-sigma_theta_static-no-lotpkn-fase-1019a">Arquitetura opt-in <code>sigma_theta_static</code> no LOT/PKN — Fase 10.19A</h2>
+<p>A Fase 10.19A criou uma ponte arquitetural mínima para que o runtime LOT/PKN
+possa receber um valor estático de <code>sigma_theta_compression_positive_Pa</code> sem
+instanciar <code>SaltCreepTimeBridge</code> e sem fazer <code>PknModel</code> depender de
+<code>saltcreep</code>.</p>
+<p>O gate da auditoria foi:</p>
+<pre><code class="language-text">SIGMA_THETA_STATIC_PROVIDER_IMPLEMENTATION_ALLOWED
+</code></pre>
+<p>A nova rota é:</p>
+<pre><code class="language-text">YAML -&gt; CaseParser -&gt; CaseData -&gt; PknRunner -&gt; PknInput -&gt; PknModel
+</code></pre>
+<p>Ela é explícita e opt-in:</p>
+<pre><code class="language-yaml">lot:
+  fracture:
+    initiation:
+      type: sigma_theta_static
+      pressure_source: wellbore_pressure_Pa
+      comparison: legacy_algebra
+</code></pre>
+<p>A álgebra é compatível com o diagnóstico em <code>LotSaltSigmaThetaBreakdown</code>:</p>
+<pre><code class="language-text">margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa &gt; 0
+</code></pre>
+<p>Diferença entre modos:</p>
+<table>
+<thead>
+<tr>
+<th>Modo</th>
+<th>Fonte</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>constant_pressure</code></td>
+<td><code>fracture.breakdown.pressure</code></td>
+<td>fallback existente</td>
+</tr>
+<tr>
+<td><code>sigma_theta_static</code></td>
+<td>valor YAML estático</td>
+<td>diagnóstico opt-in</td>
+</tr>
+<tr>
+<td><code>sigma_theta_runtime</code></td>
+<td>futuro bridge/salt wall stress</td>
+<td>não implementado</td>
+</tr>
+</tbody>
+</table>
+<p>Essa fase não conecta <code>SaltWallStressDiagnostics</code> real ao runtime, não cria
+acoplamento temporal sal/LOT e não altera <code>lot-sim run --mode lot-pkn</code> sem
+opção explícita no YAML.</p>
+<p>Diagnóstico BUZ67D:</p>
+<pre><code class="language-text">case: cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml
+classification: SIGMA_THETA_STATIC_OPENED_TOO_EARLY
+fracture_initiation_time_s: 30.0
+fracture_initiation_pressure_Pa: 82129237.46813472
+fracture_initiation_sigma_theta_Pa: 67342521.84592447
+fracture_initiation_margin_Pa: 14786715.62221025
+</code></pre>
+<p>O resultado confirma que a arquitetura está pronta para receber uma fonte
+sigma-theta, mas o proxy estático de abertura ainda não reproduz a altura de
+influência legada. A próxima fase deve substituir o valor estático por uma
+fonte opt-in runtime de <code>SigmaThetaInfluenceLayer</code>, ainda sem tornar isso
+default global.</p>
 <h2 id="volume-anular-buz67d-com-drill-pipe-fase-1016">Volume anular BUZ67D com drill pipe (Fase 10.16)</h2>
 <p>A Fase 10.16 adiciona suporte diagnostico para volume anular inicial com drill
 pipe no caso controlado <code>buz67d_pkn_legacy_aligned.yaml</code>.</p>

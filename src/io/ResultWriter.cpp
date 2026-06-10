@@ -59,7 +59,11 @@ void ensure_series_sizes(const lss::lot::PknResult& result) {
       result.balance_effective_volume_increment_series_m3.size() != size ||
       result.balance_injected_volume_increment_series_m3.size() != size ||
       result.balance_fracture_volume_increment_series_m3.size() != size ||
-      result.balance_leakoff_volume_increment_series_m3.size() != size) {
+      result.balance_leakoff_volume_increment_series_m3.size() != size ||
+      result.fracture_initiation_pressure_series_Pa.size() != size ||
+      result.fracture_initiation_sigma_theta_series_Pa.size() != size ||
+      result.fracture_initiation_margin_series_Pa.size() != size ||
+      result.fracture_initiated_series.size() != size) {
     throw std::runtime_error("ResultWriter: PKN result series have different sizes");
   }
 }
@@ -92,6 +96,16 @@ void ensure_finite_values(const lss::lot::PknResult& result) {
                  "summary.balance_fracture_volume_increment_m3");
   require_finite(result.balance_leakoff_volume_increment_m3,
                  "summary.balance_leakoff_volume_increment_m3");
+  require_finite(result.fracture_initiation_time_s,
+                 "summary.fracture_initiation_time_s");
+  require_finite(result.fracture_initiation_pressure_Pa,
+                 "summary.fracture_initiation_pressure_Pa");
+  require_finite(result.fracture_initiation_sigma_theta_Pa,
+                 "summary.fracture_initiation_sigma_theta_Pa");
+  require_finite(result.fracture_initiation_margin_Pa,
+                 "summary.fracture_initiation_margin_Pa");
+  require_finite(result.fracture_initiation_depth_m,
+                 "summary.fracture_initiation_depth_m");
   require_finite(result.initial_annular_volume_per_radian_m3,
                  "summary.initial_annular_volume_per_radian_m3");
   require_finite(result.initial_annular_volume_m3,
@@ -124,6 +138,12 @@ void ensure_finite_values(const lss::lot::PknResult& result) {
                    "series.balance_fracture_volume_increment_m3");
     require_finite(result.balance_leakoff_volume_increment_series_m3[i],
                    "series.balance_leakoff_volume_increment_m3");
+    require_finite(result.fracture_initiation_pressure_series_Pa[i],
+                   "series.fracture_initiation_pressure_Pa");
+    require_finite(result.fracture_initiation_sigma_theta_series_Pa[i],
+                   "series.fracture_initiation_sigma_theta_Pa");
+    require_finite(result.fracture_initiation_margin_series_Pa[i],
+                   "series.fracture_initiation_margin_Pa");
   }
 }
 
@@ -143,7 +163,11 @@ void write_timeseries_csv(const std::filesystem::path& path,
          "balance_effective_volume_increment_m3,"
          "balance_injected_volume_increment_m3,"
          "balance_fracture_volume_increment_m3,"
-         "balance_leakoff_volume_increment_m3\n";
+         "balance_leakoff_volume_increment_m3,"
+         "fracture_initiated,"
+         "fracture_initiation_pressure_Pa,"
+         "fracture_initiation_sigma_theta_Pa,"
+         "fracture_initiation_margin_Pa\n";
   for (std::size_t i = 0; i < result.time_series_s.size(); ++i) {
     out << result.time_series_s[i] << ',' << result.injected_volume_series_m3[i] << ','
         << result.fracture_length_series_m[i] << ','
@@ -157,7 +181,11 @@ void write_timeseries_csv(const std::filesystem::path& path,
         << result.balance_effective_volume_increment_series_m3[i] << ','
         << result.balance_injected_volume_increment_series_m3[i] << ','
         << result.balance_fracture_volume_increment_series_m3[i] << ','
-        << result.balance_leakoff_volume_increment_series_m3[i] << '\n';
+        << result.balance_leakoff_volume_increment_series_m3[i] << ','
+        << result.fracture_initiated_series[i] << ','
+        << result.fracture_initiation_pressure_series_Pa[i] << ','
+        << result.fracture_initiation_sigma_theta_series_Pa[i] << ','
+        << result.fracture_initiation_margin_series_Pa[i] << '\n';
   }
 }
 
@@ -201,6 +229,24 @@ void write_summary_json(const std::filesystem::path& path, const std::string& ca
       << result.balance_fracture_volume_increment_m3 << ",\n";
   out << "    \"final_balance_leakoff_volume_increment_m3\": "
       << result.balance_leakoff_volume_increment_m3 << ",\n";
+  out << "    \"fracture_initiated\": "
+      << (result.fracture_initiated ? "true" : "false") << ",\n";
+  out << "    \"fracture_initiation_type\": \""
+      << escape_json(result.fracture_initiation_type) << "\",\n";
+  out << "    \"fracture_initiation_time_s\": "
+      << result.fracture_initiation_time_s << ",\n";
+  out << "    \"fracture_initiation_pressure_Pa\": "
+      << result.fracture_initiation_pressure_Pa << ",\n";
+  out << "    \"fracture_initiation_sigma_theta_Pa\": "
+      << result.fracture_initiation_sigma_theta_Pa << ",\n";
+  out << "    \"fracture_initiation_margin_Pa\": "
+      << result.fracture_initiation_margin_Pa << ",\n";
+  out << "    \"fracture_initiation_layer_id\": \""
+      << escape_json(result.fracture_initiation_layer_id) << "\",\n";
+  out << "    \"fracture_initiation_depth_m\": "
+      << result.fracture_initiation_depth_m << ",\n";
+  out << "    \"fracture_initiation_source\": \""
+      << escape_json(result.fracture_initiation_source) << "\",\n";
   out << "    \"initial_annular_volume_per_radian_m3\": "
       << result.initial_annular_volume_per_radian_m3 << ",\n";
   out << "    \"initial_annular_volume_m3\": " << result.initial_annular_volume_m3 << ",\n";

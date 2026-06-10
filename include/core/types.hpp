@@ -101,6 +101,18 @@ struct InjectionPhaseData {
   double rate_m3_s = 0.0;
 };
 
+struct SigmaThetaFractureCriterionData {
+  bool enabled = false;
+  std::string type;
+  std::string layer_id;
+  double influence_depth_m = 0.0;
+  double sigma_theta_compression_positive_Pa = 0.0;
+  std::string source;
+  std::string pressure_source;
+  std::string comparison;
+  std::string mapping_status;
+};
+
 struct LotConfig {
   bool enabled = false;
   double shoe_depth_m = 0.0;
@@ -118,6 +130,7 @@ struct LotConfig {
   double fracture_initial_width_m = 0.0;
   std::string breakdown_method;
   double breakdown_pressure_Pa = 0.0;
+  SigmaThetaFractureCriterionData sigma_theta_fracture;
   bool leakoff_enabled = false;
   std::string leakoff_model;
   double leakoff_coefficient_m_sqrt_s = 0.0;

@@ -242,6 +242,46 @@ properties:
                 enum: [pressure_threshold, derivative_drop]
               pressure:
                 $ref: "#/$defs/pressure_quantity"
+          initiation:
+            type: object
+            required: [type]
+            additionalProperties: false
+            properties:
+              type:
+                type: string
+                enum: [constant_pressure, sigma_theta_static]
+              source:
+                type: string
+              pressure_source:
+                type: string
+                enum: [wellbore_pressure_Pa]
+              comparison:
+                type: string
+                enum: [legacy_algebra]
+              sigma_theta:
+                type: object
+                required:
+                  - compression_positive
+                  - layer_id
+                  - influence_depth
+                  - mapping_status
+                additionalProperties: false
+                properties:
+                  compression_positive:
+                    $ref: "#/$defs/pressure_quantity"
+                  layer_id:
+                    type: string
+                  influence_depth:
+                    $ref: "#/$defs/length_quantity"
+                  mapping_status:
+                    type: string
+            allOf:
+              - if:
+                  properties:
+                    type:
+                      const: sigma_theta_static
+                then:
+                  required: [source, pressure_source, comparison, sigma_theta]
       leakoff:
         type: object
         required: [enabled, model]
