@@ -2366,6 +2366,54 @@ do fluido, mas e insuficientemente complacente para reproduzir a escala de
 `dP` do legado. A fase nao altera o runtime padrao, nao conecta APB/sal, nao
 implementa Zamora e nao valida fratura fisica.
 
+## Extracao da compliance aparente legado (Fase 10.21A)
+
+A Fase 10.21A criou `tools/extract_phase10_21a_apparent_compliance.py` para
+extrair uma serie incremental de compliance aparente a partir do trace auditado
+do LOT_Tese. A rota nao modifica `legance/LOT_Tese/` e nao altera o solver
+moderno.
+
+Formula legado auditada:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+Formula reduzida usada com o trace disponivel:
+
+```text
+C_eff_apparent = delta_Vq_m3_rad / (Vi_m3_rad * delta_dP_Pa)
+C_geom_apparent = C_eff_apparent - k
+```
+
+Campos ausentes no trace usado:
+
+```text
+dV_geom_m3_rad
+dV_leakoff_m3_rad
+dMl_term_m3_rad
+Vi_m3_rad
+k_1_Pa
+opened
+```
+
+Resultado BUZ67D:
+
+```text
+classification = APPARENT_COMPLIANCE_PRESSURE_DEPENDENT
+mean_C_eff_apparent_pre_opening = 8.737997966365286e-8 1/Pa
+mean_C_geom_apparent_pre_opening = 8.673997966365285e-8 1/Pa
+cv_C_eff_apparent = 0.24223657359536746
+correlation_vs_pressure = 0.7678090262667732
+ratio_pre_mean_to_constant_10_19C = 4.670478897058859
+ratio_elastic_10_20C_to_pre_mean = 0.0019878729366281296
+```
+
+Conclusao: o proxy `constant_geometric` da 10.19C captura o primeiro passo, mas
+nao representa toda a curva pre-abertura. A proxima fase deve planejar um
+modelo tabulado/dependente de pressao ou calibracao opt-in explicita, sem
+promover essa extracao reduzida a validacao fisica.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que

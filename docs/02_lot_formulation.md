@@ -1026,3 +1026,64 @@ legado. A abertura diagnostica ocorre no primeiro passo (`30 s`), enquanto o
 marcador legado auditado ocorre em `510 s`. Portanto, `elastic_annular_simple`
 permanece opt-in/experimental e nao deve ser promovido a rota fisica validada
 nem calibrado silenciosamente.
+
+### Compliance aparente legado ao longo da curva LOT — Fase 10.21A
+
+**Status:** `APPARENT_COMPLIANCE_PRESSURE_DEPENDENT`.
+
+A Fase 10.21A extraiu uma serie temporal de compliance aparente a partir do
+trace auditado do LOT_Tese:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+```
+
+Nenhum arquivo em `legance/LOT_Tese/` foi modificado. A ferramenta
+`tools/extract_phase10_21a_apparent_compliance.py` agregou um ponto por
+`time_s` e usou a linha de maior `dP` por tempo para evitar duplicatas por
+camada no trace auditado.
+
+A formula legada ativa segue:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+Como o trace disponivel nao exporta `dV_geom_m3_rad`, `dMl_term_m3_rad` nem
+`dV_leakoff_m3_rad` diretamente, a fase usa uma estimativa reduzida:
+
+```text
+C_eff_apparent = delta_Vq_m3_rad / (Vi_m3_rad * delta_dP_Pa)
+C_geom_apparent = C_eff_apparent - k
+```
+
+Estatisticas pre-abertura:
+
+| Metrica | Valor |
+|---|---:|
+| `mean_C_eff_apparent_1_Pa` | `8.737997966365286e-8` |
+| `median_C_eff_apparent_1_Pa` | `9.689922710105396e-8` |
+| `std_C_eff_apparent_1_Pa` | `2.1166626874556158e-8` |
+| `cv_C_eff_apparent` | `0.24223657359536746` |
+| `min_C_eff_apparent_1_Pa` | `1.9211966938609834e-8` |
+| `max_C_eff_apparent_1_Pa` | `1.0000066303924978e-7` |
+| `correlation_vs_pressure` | `0.7678090262667732` |
+| `correlation_vs_time` | `0.7435993542398455` |
+
+Comparacao:
+
+```text
+C_eff_constant_10_19C = 1.9211966938610006e-8 1/Pa
+C_geom_constant_10_19C = 1.8571966938610005e-8 1/Pa
+C_geom_elastic_10_20C = 1.7242805809704984e-10 1/Pa
+mean_C_geom_apparent_pre_opening = 8.673997966365285e-8 1/Pa
+ratio_pre_mean_to_constant_10_19C = 4.670478897058859
+ratio_elastic_10_20C_to_pre_mean = 0.0019878729366281296
+```
+
+Conclusao: o primeiro passo da 10.19C e representativo apenas localmente. A
+serie pre-abertura indica compliance aparente crescente com pressão/tempo, com
+coeficiente de variação de aproximadamente `24%`. A proxima fase deve avaliar
+modelo `pressure_dependent`, `tabulated_pressure` ou calibracao opt-in
+explicita, sem promover `constant_geometric` ou `elastic_annular_simple` para
+validacao fisica.

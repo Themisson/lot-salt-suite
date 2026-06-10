@@ -1787,3 +1787,52 @@ runtime default changed = false
 Proximo caminho recomendado: formular um modelo mecanico mais completo ou uma
 calibracao opt-in explicita e rastreavel. Nao esconder fator empirico dentro de
 `elastic_annular_simple`.
+
+---
+
+## Fase 10.21A — compliance aparente ao longo da curva legado
+
+A Fase 10.21A extraiu uma serie reduzida de compliance aparente do trace
+auditado existente, sem reinstrumentar nem modificar `legance/LOT_Tese/`.
+
+Arquivo de origem:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+```
+
+Arquivo/ferramenta moderna:
+
+```text
+tools/extract_phase10_21a_apparent_compliance.py
+```
+
+Classificacao:
+
+```text
+APPARENT_COMPLIANCE_PRESSURE_DEPENDENT
+```
+
+Resumo pre-abertura:
+
+| Campo | Valor |
+|---|---:|
+| `mean_C_eff_apparent_1_Pa` | `8.737997966365286e-8` |
+| `median_C_eff_apparent_1_Pa` | `9.689922710105396e-8` |
+| `coefficient_of_variation` | `0.24223657359536746` |
+| `correlation_vs_pressure` | `0.7678090262667732` |
+| `correlation_vs_time` | `0.7435993542398455` |
+| `ratio_pre_mean_to_constant_10_19C` | `4.670478897058859` |
+
+Interpretação para a matriz legado-moderno:
+
+- o primeiro passo sustenta o proxy `constant_geometric` da 10.19C;
+- a curva pre-abertura nao parece estritamente constante;
+- o modelo `elastic_annular_simple` permanece subcompliant por ordens de
+  grandeza frente a media aparente;
+- os campos `dV_geom`, `dMl`, `dV_leakoff`, `k` e `opened` ainda precisam de
+  trace legado mais completo para uma reconstrução fisica do balanço.
+
+Proxima fase recomendada: 10.21B deve escolher entre `tabulated_pressure`,
+`pressure_dependent` ou `elastic_scaled` opt-in, mantendo o gate Level 1 fechado
+para validacao fisica.

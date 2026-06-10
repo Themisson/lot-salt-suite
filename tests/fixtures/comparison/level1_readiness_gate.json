@@ -377,6 +377,49 @@
       "Level 1 physical validation remains closed."
     ]
   },
+  "phase10_21a_apparent_compliance_extraction": {
+    "status": "PHASE10_21A_APPARENT_COMPLIANCE_EXTRACTED",
+    "classification": "APPARENT_COMPLIANCE_PRESSURE_DEPENDENT",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "tool": "tools/extract_phase10_21a_apparent_compliance.py",
+    "legacy_trace": "results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv",
+    "formula": "C_eff_apparent = delta_Vq_m3_rad / (Vi_m3_rad * delta_dP_Pa); C_geom_apparent = C_eff_apparent - k",
+    "missing_trace_fields": [
+      "dV_geom_m3_rad",
+      "dV_leakoff_m3_rad",
+      "dMl_term_m3_rad",
+      "Vi_m3_rad",
+      "k_1_Pa",
+      "opened"
+    ],
+    "pre_opening": {
+      "mean_C_eff_apparent_1_Pa": 8.737997966365286e-8,
+      "median_C_eff_apparent_1_Pa": 9.689922710105396e-8,
+      "std_C_eff_apparent_1_Pa": 2.1166626874556158e-8,
+      "coefficient_of_variation": 0.24223657359536746,
+      "min_C_eff_apparent_1_Pa": 1.9211966938609834e-8,
+      "max_C_eff_apparent_1_Pa": 1.0000066303924978e-7,
+      "correlation_vs_pressure": 0.7678090262667732,
+      "correlation_vs_time": 0.7435993542398455
+    },
+    "comparison": {
+      "C_geom_constant_10_19C": 1.8571966938610005e-8,
+      "C_eff_constant_10_19C": 1.9211966938610006e-8,
+      "C_geom_elastic_10_20C": 1.7242805809704984e-10,
+      "mean_C_geom_apparent_pre_opening_1_Pa": 8.673997966365285e-8,
+      "ratio_pre_mean_to_constant_10_19C": 4.670478897058859,
+      "ratio_elastic_10_20C_to_pre_mean": 0.0019878729366281296
+    },
+    "caveats": [
+      "Diagnostic reduced extraction only; not physical validation.",
+      "The available legacy trace does not export dV_geom or dMl directly.",
+      "The first-step constant compliance is local and not representative of the full pre-opening curve.",
+      "Level 1 physical validation remains closed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

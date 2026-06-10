@@ -258,3 +258,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   e no proxy `constant_geometric`. O modelo deve permanecer experimental; fase
   futura deve tratar casing/formacao/sal de modo mais completo ou criar
   calibracao opt-in declarada.
+- A Fase 10.21A extraiu uma compliance aparente reduzida do trace auditado e
+  classificou a serie como `APPARENT_COMPLIANCE_PRESSURE_DEPENDENT`. A media
+  pre-abertura ficou acima do proxy constante da 10.19C, enquanto o primeiro
+  passo coincide com ele. Uma fase futura deve avaliar `tabulated_pressure`,
+  `pressure_dependent` ou `elastic_scaled` opt-in, idealmente depois de exportar
+  `dV_geom`, `dMl`, `dV_leakoff` e `k` diretamente do legado.

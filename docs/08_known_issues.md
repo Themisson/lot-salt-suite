@@ -713,6 +713,15 @@ mas segue muito acima do legado (`1.845 MPa`) e do proxy `constant_geometric`
 (`1.845 MPa`). A abertura diagnostica ocorre em `30 s`, contra `510 s` no
 legado auditado. Nao promover esse modelo para default, nao declarar validacao
 fisica e nao inserir fator empirico oculto.
+
+**Atualizacao Fase 10.21A:** a extracao reduzida da compliance aparente do
+trace auditado classificou a serie pre-abertura como
+`APPARENT_COMPLIANCE_PRESSURE_DEPENDENT`. A media pre-abertura de
+`C_geom_apparent` foi `8.673997966365285e-8 1/Pa`, cerca de `4.67x` o proxy
+`constant_geometric` da 10.19C e cerca de `503x` o `elastic_annular_simple` da
+10.20C. O trace disponivel ainda nao exporta `dV_geom`, `dMl` ou `k` por passo,
+portanto a estimativa e diagnostica/reduzida e nao deve ser usada como
+validacao fisica direta.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

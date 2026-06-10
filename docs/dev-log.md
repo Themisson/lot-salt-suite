@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.20C diagnostico BUZ67D elastic_annular_simple; commit/push pendente
+Fase ativa  : 10.21A extracao de compliance aparente legado; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
 Testes C++  : 242/242 passaram em 2026-06-10
-Testes Py   : 84/84 passaram em 2026-06-10
+Testes Py   : 92/92 esperados apos Fase 10.21A em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -156,7 +156,7 @@ controladas e runs de regressao `lot-pkn`.
 
 ### [2026-06-10] Fase 10.20C — diagnostico BUZ67D com `elastic_annular_simple` — Codex
 
-**Status:** Implementada e validada localmente; commit/push pendente.
+**Status:** Commitada e enviada para `origin/main` em `aad0a9c`.
 
 **Caso criado:**
 
@@ -198,6 +198,59 @@ mas ainda e muito menos complacente que o proxy `constant_geometric` inferido
 do legado. Ele abre no primeiro passo (`30 s`) contra `510 s` no legado
 auditado. A conclusao e diagnostica: nao promover para default, nao calibrar
 silenciosamente e nao declarar validacao fisica.
+
+---
+
+### [2026-06-10] Fase 10.21A — extracao da compliance aparente legado LOT_Tese — Codex
+
+**Status:** Implementada e validada localmente; commit/push pendente.
+
+**Ferramenta criada:**
+
+```text
+tools/extract_phase10_21a_apparent_compliance.py
+```
+
+**Fonte usada:** `results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv`.
+`legance/LOT_Tese/` nao foi modificado; a extracao usa o trace auditado ja
+existente e registra os campos ausentes em metadata.
+
+**Formula legada auditada:**
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+**Formula reduzida usada na extracao:**
+
+```text
+C_eff_apparent = delta_Vq_m3_rad / (Vi_m3_rad * delta_dP_Pa)
+C_geom_apparent = C_eff_apparent - k
+```
+
+Como o trace auditado nao exporta `dV_geom_m3_rad`, `dMl_term_m3_rad`,
+`dV_leakoff_m3_rad`, `k_1_Pa` ou `opened`, a fase classifica a serie como
+estimativa reduzida, nao como reconstrução completa do balanço legado.
+
+**Resultado BUZ67D pre-abertura:**
+
+```text
+classification = APPARENT_COMPLIANCE_PRESSURE_DEPENDENT
+mean_C_eff_apparent = 8.737997966365286e-8 1/Pa
+median_C_eff_apparent = 9.689922710105396e-8 1/Pa
+std_C_eff_apparent = 2.1166626874556158e-8 1/Pa
+cv_C_eff_apparent = 0.24223657359536746
+min_C_eff_apparent = 1.9211966938609834e-8 1/Pa
+max_C_eff_apparent = 1.0000066303924978e-7 1/Pa
+correlation_vs_pressure = 0.7678090262667732
+correlation_vs_time = 0.7435993542398455
+```
+
+O primeiro passo reproduz a compliance efetiva da 10.19C, mas a media
+pre-abertura e cerca de `4.67x` maior que o proxy constante da 10.19C. O modelo
+`elastic_annular_simple` da 10.20C representa apenas cerca de `0.20%` dessa
+media aparente. Recomendacao para 10.21B: formular rota tabulada/pressure-
+dependent ou calibracao opt-in explicita, sem alterar o default.
 
 ---
 

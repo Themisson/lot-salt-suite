@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">69/76</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">70/77</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">242</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">86</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">92</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -1634,6 +1634,81 @@ legado. A abertura diagnostica ocorre no primeiro passo (<code>30 s</code>), enq
 marcador legado auditado ocorre em <code>510 s</code>. Portanto, <code>elastic_annular_simple</code>
 permanece opt-in/experimental e nao deve ser promovido a rota fisica validada
 nem calibrado silenciosamente.</p>
+<h3 id="compliance-aparente-legado-ao-longo-da-curva-lot-fase-1021a">Compliance aparente legado ao longo da curva LOT — Fase 10.21A</h3>
+<p><strong>Status:</strong> <code>APPARENT_COMPLIANCE_PRESSURE_DEPENDENT</code>.</p>
+<p>A Fase 10.21A extraiu uma serie temporal de compliance aparente a partir do
+trace auditado do LOT_Tese:</p>
+<pre><code class="language-text">results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+</code></pre>
+<p>Nenhum arquivo em <code>legance/LOT_Tese/</code> foi modificado. A ferramenta
+<code>tools/extract_phase10_21a_apparent_compliance.py</code> agregou um ponto por
+<code>time_s</code> e usou a linha de maior <code>dP</code> por tempo para evitar duplicatas por
+camada no trace auditado.</p>
+<p>A formula legada ativa segue:</p>
+<pre><code class="language-text">dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+</code></pre>
+<p>Como o trace disponivel nao exporta <code>dV_geom_m3_rad</code>, <code>dMl_term_m3_rad</code> nem
+<code>dV_leakoff_m3_rad</code> diretamente, a fase usa uma estimativa reduzida:</p>
+<pre><code class="language-text">C_eff_apparent = delta_Vq_m3_rad / (Vi_m3_rad * delta_dP_Pa)
+C_geom_apparent = C_eff_apparent - k
+</code></pre>
+<p>Estatisticas pre-abertura:</p>
+<table>
+<thead>
+<tr>
+<th>Metrica</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mean_C_eff_apparent_1_Pa</code></td>
+<td style="text-align: right;"><code>8.737997966365286e-8</code></td>
+</tr>
+<tr>
+<td><code>median_C_eff_apparent_1_Pa</code></td>
+<td style="text-align: right;"><code>9.689922710105396e-8</code></td>
+</tr>
+<tr>
+<td><code>std_C_eff_apparent_1_Pa</code></td>
+<td style="text-align: right;"><code>2.1166626874556158e-8</code></td>
+</tr>
+<tr>
+<td><code>cv_C_eff_apparent</code></td>
+<td style="text-align: right;"><code>0.24223657359536746</code></td>
+</tr>
+<tr>
+<td><code>min_C_eff_apparent_1_Pa</code></td>
+<td style="text-align: right;"><code>1.9211966938609834e-8</code></td>
+</tr>
+<tr>
+<td><code>max_C_eff_apparent_1_Pa</code></td>
+<td style="text-align: right;"><code>1.0000066303924978e-7</code></td>
+</tr>
+<tr>
+<td><code>correlation_vs_pressure</code></td>
+<td style="text-align: right;"><code>0.7678090262667732</code></td>
+</tr>
+<tr>
+<td><code>correlation_vs_time</code></td>
+<td style="text-align: right;"><code>0.7435993542398455</code></td>
+</tr>
+</tbody>
+</table>
+<p>Comparacao:</p>
+<pre><code class="language-text">C_eff_constant_10_19C = 1.9211966938610006e-8 1/Pa
+C_geom_constant_10_19C = 1.8571966938610005e-8 1/Pa
+C_geom_elastic_10_20C = 1.7242805809704984e-10 1/Pa
+mean_C_geom_apparent_pre_opening = 8.673997966365285e-8 1/Pa
+ratio_pre_mean_to_constant_10_19C = 4.670478897058859
+ratio_elastic_10_20C_to_pre_mean = 0.0019878729366281296
+</code></pre>
+<p>Conclusao: o primeiro passo da 10.19C e representativo apenas localmente. A
+serie pre-abertura indica compliance aparente crescente com pressão/tempo, com
+coeficiente de variação de aproximadamente <code>24%</code>. A proxima fase deve avaliar
+modelo <code>pressure_dependent</code>, <code>tabulated_pressure</code> ou calibracao opt-in
+explicita, sem promover <code>constant_geometric</code> ou <code>elastic_annular_simple</code> para
+validacao fisica.</p>
 </div>
 </section>
 
@@ -2883,7 +2958,15 @@ incremento diagnostico caiu de <code>55.397 MPa</code> sem compliance para <code
 mas segue muito acima do legado (<code>1.845 MPa</code>) e do proxy <code>constant_geometric</code>
 (<code>1.845 MPa</code>). A abertura diagnostica ocorre em <code>30 s</code>, contra <code>510 s</code> no
 legado auditado. Nao promover esse modelo para default, nao declarar validacao
-fisica e nao inserir fator empirico oculto.
+fisica e nao inserir fator empirico oculto.</p>
+<p><strong>Atualizacao Fase 10.21A:</strong> a extracao reduzida da compliance aparente do
+trace auditado classificou a serie pre-abertura como
+<code>APPARENT_COMPLIANCE_PRESSURE_DEPENDENT</code>. A media pre-abertura de
+<code>C_geom_apparent</code> foi <code>8.673997966365285e-8 1/Pa</code>, cerca de <code>4.67x</code> o proxy
+<code>constant_geometric</code> da 10.19C e cerca de <code>503x</code> o <code>elastic_annular_simple</code> da
+10.20C. O trace disponivel ainda nao exporta <code>dV_geom</code>, <code>dMl</code> ou <code>k</code> por passo,
+portanto a estimativa e diagnostica/reduzida e nao deve ser usada como
+validacao fisica direta.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -5927,6 +6010,39 @@ fracture_initiation_time_legacy_s = 510.0
 do fluido, mas e insuficientemente complacente para reproduzir a escala de
 <code>dP</code> do legado. A fase nao altera o runtime padrao, nao conecta APB/sal, nao
 implementa Zamora e nao valida fratura fisica.</p>
+<h2 id="extracao-da-compliance-aparente-legado-fase-1021a">Extracao da compliance aparente legado (Fase 10.21A)</h2>
+<p>A Fase 10.21A criou <code>tools/extract_phase10_21a_apparent_compliance.py</code> para
+extrair uma serie incremental de compliance aparente a partir do trace auditado
+do LOT_Tese. A rota nao modifica <code>legance/LOT_Tese/</code> e nao altera o solver
+moderno.</p>
+<p>Formula legado auditada:</p>
+<pre><code class="language-text">dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+</code></pre>
+<p>Formula reduzida usada com o trace disponivel:</p>
+<pre><code class="language-text">C_eff_apparent = delta_Vq_m3_rad / (Vi_m3_rad * delta_dP_Pa)
+C_geom_apparent = C_eff_apparent - k
+</code></pre>
+<p>Campos ausentes no trace usado:</p>
+<pre><code class="language-text">dV_geom_m3_rad
+dV_leakoff_m3_rad
+dMl_term_m3_rad
+Vi_m3_rad
+k_1_Pa
+opened
+</code></pre>
+<p>Resultado BUZ67D:</p>
+<pre><code class="language-text">classification = APPARENT_COMPLIANCE_PRESSURE_DEPENDENT
+mean_C_eff_apparent_pre_opening = 8.737997966365286e-8 1/Pa
+mean_C_geom_apparent_pre_opening = 8.673997966365285e-8 1/Pa
+cv_C_eff_apparent = 0.24223657359536746
+correlation_vs_pressure = 0.7678090262667732
+ratio_pre_mean_to_constant_10_19C = 4.670478897058859
+ratio_elastic_10_20C_to_pre_mean = 0.0019878729366281296
+</code></pre>
+<p>Conclusao: o proxy <code>constant_geometric</code> da 10.19C captura o primeiro passo, mas
+nao representa toda a curva pre-abertura. A proxima fase deve planejar um
+modelo tabulado/dependente de pressao ou calibracao opt-in explicita, sem
+promover essa extracao reduzida a validacao fisica.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser
