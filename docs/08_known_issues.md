@@ -733,6 +733,26 @@ absoluto `1.5259151388269308`, classificando o efeito como
 extraido da serie bruta da 10.21A fica bloqueado ate que haja correcao termica
 ou nova instrumentacao que separe `dT`, `alpha`, `k`, `dV_geom`, `dMl` e
 `dV_leakoff`.
+
+**Atualizacao 10.21C:** a serie corrigida pelo perfil termico linear no
+`profTeste = 4374 m` foi extraida com
+`tools/extract_phase10_21c_thermal_corrected_compliance.py`. O perfil usado foi
+`T_initial = 89.17547550432276 degC`, `T_final = 92.31236311239194 degC` e
+`DTmax = 3.1368876080691734 degC`. A correcao compatível com a formula legada
+ativa (`dP_mech = dP - alpha*dT/k`) produziu quatro pontos pre-abertura com
+pressao mecanica negativa e um incremento de pressao mecanica nao positivo. A
+classificacao final ficou:
+
+```text
+THERMAL_CORRECTED_COMPLIANCE_SIGN_AMBIGUOUS
+PRESSURE_TABULATED_STILL_BLOCKED_MISSING_BALANCE_TERMS
+PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS
+```
+
+Portanto, mesmo apos a correcao termica diagnostica, a tabela
+`pressure_tabulated_geometric` continua bloqueada. A proxima tentativa precisa
+exportar no mesmo trace `dV_geom`, `dMl`, `dV_leakoff`, `k`, `dT` e `opened`,
+ou resolver explicitamente a convencao de sinal do termo mecanico corrigido.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

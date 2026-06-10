@@ -272,3 +272,13 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   serie corrigida por termo termico ou reinstrumentar temporariamente o legado
   para exportar `dT`, `alpha`, `k`, `dV_geom`, `dMl` e `dV_leakoff` no mesmo
   trace.
+- A Fase 10.21C produziu essa primeira serie corrigida por perfil termico, mas
+  nao liberou `pressure_tabulated_geometric`. A correcao principal
+  `dP_mech = dP - alpha*dT/k` ficou
+  `THERMAL_CORRECTED_COMPLIANCE_SIGN_AMBIGUOUS`, com quatro pontos
+  pre-abertura de pressao mecanica negativa e um incremento mecanico nao
+  positivo. O gate futuro permanece:
+  `PRESSURE_TABULATED_STILL_BLOCKED_MISSING_BALANCE_TERMS` e
+  `PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS`. Uma evolucao
+  futura deve instrumentar ou extrair `dV_geom`, `dMl`, `dV_leakoff`, `k`,
+  `dT` e `opened` no mesmo trace antes de qualquer tabela de compliance.

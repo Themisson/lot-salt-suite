@@ -85,6 +85,7 @@ phases:
   phase_10_20c_buz67d_elastic_compliance_diagnostic: completed
   phase_10_21a_apparent_compliance_extraction: completed
   phase_10_21b_thermal_compressibility_audit: completed
+  phase_10_21c_thermal_corrected_apparent_compliance: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -179,12 +180,12 @@ validation:
 test_counts:
   cpp_tests: 242        # Catch2 lot-salt-suite — 242/242 passaram na Fase 10.21A (2026-06-10)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 92      # pytest lot-salt-suite — 92/92 passaram na Fase 10.21A (2026-06-10)
+  python_tests: 103     # pytest lot-salt-suite — 103/103 esperados apos Fase 10.21C (2026-06-10)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-10"
-updated_by: "codex (Fase 10.21B thermal/compressibility audit)"
+updated_by: "codex (Fase 10.21C thermal-corrected compliance extraction)"
 project_version: "0.1.0"

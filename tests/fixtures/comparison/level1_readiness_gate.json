@@ -463,6 +463,68 @@
       "Level 1 physical validation remains closed."
     ]
   },
+  "phase10_21c_thermal_corrected_apparent_compliance": {
+    "status": "PHASE10_21C_THERMAL_CORRECTED_APPARENT_COMPLIANCE_EXTRACTED",
+    "classification": "THERMAL_CORRECTED_COMPLIANCE_SIGN_AMBIGUOUS",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "pressure_tabulated_geometric_allowed": false,
+    "tool": "tools/extract_phase10_21c_thermal_corrected_compliance.py",
+    "legacy_case": "legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp",
+    "legacy_audit_csv": "results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv",
+    "thermal_profile": {
+      "profile_source": "linear_interpolation_dA_A0_Af_annular_A",
+      "depth_m": 4374.0,
+      "T_initial_degC": 89.17547550432276,
+      "T_final_degC": 92.31236311239194,
+      "DTmax_degC": 3.1368876080691734,
+      "alpha_1_C": 0.0008,
+      "compressibility_1_Pa": 6.4e-10,
+      "thermal_limit_min": 0.25
+    },
+    "pre_opening": {
+      "raw_mean_C_eff_apparent_1_Pa": 8.737997966365286e-8,
+      "raw_median_C_eff_apparent_1_Pa": 9.689922710105396e-8,
+      "raw_cv_C_eff_apparent": 0.24223657359536746,
+      "thermal_subtract_mean_C_eff_apparent_1_Pa": 1.1972273085205066e-7,
+      "thermal_subtract_median_C_eff_apparent_1_Pa": 1.0434903008590042e-7,
+      "thermal_subtract_std_C_eff_apparent_1_Pa": 4.400544383923113e-8,
+      "thermal_subtract_cv_C_eff_apparent": 0.36756131042159057,
+      "thermal_subtract_mean_C_geom_apparent_1_Pa": 1.1908273085205067e-7,
+      "thermal_subtract_median_C_geom_apparent_1_Pa": 1.0370903008590043e-7,
+      "thermal_subtract_std_C_geom_apparent_1_Pa": 4.4005443839231133e-8,
+      "thermal_subtract_cv_C_geom_apparent": 0.36953673739565013,
+      "thermal_fraction_mean": 0.8049233791307697,
+      "thermal_fraction_max": 1.4165240539682842,
+      "negative_mechanical_pressure_n": 4,
+      "non_positive_delta_pressure_n": 1
+    },
+    "correlations": {
+      "subtract_vs_pressure": -0.5906712267376746,
+      "subtract_vs_time": -0.5671142417359523,
+      "add_vs_pressure": 0.8782493038247868,
+      "add_vs_time": 0.8496690689215298
+    },
+    "comparison": {
+      "C_geom_constant_10_19C": 1.8571966938610005e-8,
+      "thermal_subtract_mean_C_geom_to_constant_ratio": 6.411961169523989,
+      "raw_mean_C_geom_to_constant_ratio": 4.670478897058859
+    },
+    "gate": [
+      "THERMAL_CORRECTION_EXTRACTED_DIAGNOSTIC_ONLY",
+      "PRESSURE_TABULATED_STILL_BLOCKED_MISSING_BALANCE_TERMS",
+      "PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS"
+    ],
+    "caveats": [
+      "Diagnostic extraction only; not physical validation.",
+      "The subtract convention follows dP_mech = dP - alpha*dT/k from the active legacy balance.",
+      "The add convention is reported only as sign sensitivity.",
+      "dV_geom, dMl, dV_leakoff and opened are still absent from the audit CSV.",
+      "Do not implement pressure_tabulated_geometric from this series."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

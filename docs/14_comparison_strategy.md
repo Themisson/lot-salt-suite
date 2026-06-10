@@ -1874,3 +1874,61 @@ Qualquer YAML futuro com `pressure_tabulated_geometric` devera declarar se a
 serie usada e `raw_apparent_compliance` ou
 `thermal_corrected_apparent_compliance`. Com o gate atual, usar a serie bruta
 como rota fisica esta bloqueado.
+
+## Fase 10.21C — serie corrigida por perfil termico
+
+A Fase 10.21C implementou uma extracao diagnostica da compliance aparente
+corrigida pelo termo termico do balanco legado, usando fixtures e o trace
+auditado ja existente. A fase nao executa comparacao fisica Level 1 e nao
+altera o runtime.
+
+Ferramenta:
+
+```text
+tools/extract_phase10_21c_thermal_corrected_compliance.py
+```
+
+Fonte:
+
+```text
+legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+```
+
+Perfil reconstruido por interpolacao linear em `profTeste = 4374 m`:
+
+| Campo | Valor |
+|---|---:|
+| `T_initial_degC` | `89.17547550432276` |
+| `T_final_degC` | `92.31236311239194` |
+| `DTmax_degC` | `3.1368876080691734` |
+| `alpha_1_C` | `8.0e-4` |
+| `k_1_Pa` | `6.4e-10` |
+
+A correcao principal usa:
+
+```text
+dP_mech_subtract = dP - alpha*dT/k
+```
+
+Resultados pre-abertura:
+
+| Serie | `mean_C_eff` [1/Pa] | `cv_C_eff` | Status |
+|---|---:|---:|---|
+| Bruta | `8.737997966365286e-8` | `0.24223657359536746` | pressure-dependent |
+| Corrigida por subtracao | `1.1972273085205066e-7` | `0.36756131042159057` | sign ambiguous |
+| Sensibilidade por adicao | `7.793012068107723e-8` | `0.3326728131235428` | pressure-dependent |
+
+O gate Level 1 permanece fechado:
+
+```text
+THERMAL_CORRECTION_EXTRACTED_DIAGNOSTIC_ONLY
+PRESSURE_TABULATED_STILL_BLOCKED_MISSING_BALANCE_TERMS
+PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS
+```
+
+Motivo: a serie corrigida por subtracao ainda tem pressao mecanica negativa em
+parte da janela pre-abertura e nao contem os termos volumetricos completos do
+legado (`dV_geom`, `dMl`, `dV_leakoff`, `opened`). Portanto, a proxima fase de
+comparacao deve continuar sendo auditoria/instrumentacao de termos, nao
+validacao fisica nem implementacao de tabela no solver.

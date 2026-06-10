@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">71/78</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">72/79</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">242</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">92</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">103</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -1836,6 +1836,74 @@ COMPRESSIBILITY_CONFIRMED_MATCHING_LEGACY
 <code>LOT_Tese</code> de modo temporario e restauravel para exportar os termos termicos e
 volumetricos faltantes. Nao implementar tabela de compliance bruta antes dessa
 correcao.</p>
+<h3 id="compliance-aparente-corrigida-por-perfil-termico-fase-1021c">Compliance aparente corrigida por perfil termico — Fase 10.21C</h3>
+<p><strong>Status:</strong> <code>THERMAL_CORRECTED_COMPLIANCE_SIGN_AMBIGUOUS</code>.</p>
+<p>A Fase 10.21C adicionou
+<code>tools/extract_phase10_21c_thermal_corrected_compliance.py</code> para produzir uma
+serie diagnostica corrigida pelo termo termico, ainda fora do runtime C++.
+Nenhum arquivo legado foi modificado.</p>
+<p>O perfil termico usado nesta fase e a interpolacao linear dos vetores <code>dA</code>,
+<code>A0</code> e <code>Af</code> do caso BUZ67D PKN no <code>profTeste = 4374 m</code>:</p>
+<pre><code class="language-text">T_initial_degC = 89.17547550432276
+T_final_degC = 92.31236311239194
+DTmax_degC = 3.1368876080691734
+alpha = 8.0e-4 1/degC
+k = 6.4e-10 1/Pa
+</code></pre>
+<p>A evolucao temporal segue:</p>
+<pre><code class="language-text">dT(t) = DTmax * t / (0.25 + t)
+thermal_pressure_equivalent = alpha*dT/k
+</code></pre>
+<p>A leitura compatível com a formula legada ativa subtrai o termo termico:</p>
+<pre><code class="language-text">dP_mech_subtract = dP - alpha*dT/k
+</code></pre>
+<p>Resultado pre-abertura:</p>
+<table>
+<thead>
+<tr>
+<th>Serie</th>
+<th style="text-align: right;">Media <code>C_eff</code> [1/Pa]</th>
+<th style="text-align: right;">Mediana <code>C_eff</code> [1/Pa]</th>
+<th style="text-align: right;">CV</th>
+<th>Classificacao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bruta</td>
+<td style="text-align: right;"><code>8.737997966365286e-8</code></td>
+<td style="text-align: right;"><code>9.689922710105396e-8</code></td>
+<td style="text-align: right;"><code>0.24223657359536746</code></td>
+<td>pressure-dependent</td>
+</tr>
+<tr>
+<td>Corrigida por subtracao</td>
+<td style="text-align: right;"><code>1.1972273085205066e-7</code></td>
+<td style="text-align: right;"><code>1.0434903008590042e-7</code></td>
+<td style="text-align: right;"><code>0.36756131042159057</code></td>
+<td>sign ambiguous</td>
+</tr>
+<tr>
+<td>Sensibilidade por adicao</td>
+<td style="text-align: right;"><code>7.793012068107723e-8</code></td>
+<td style="text-align: right;"><code>9.013453455649825e-8</code></td>
+<td style="text-align: right;"><code>0.3326728131235428</code></td>
+<td>pressure-dependent</td>
+</tr>
+</tbody>
+</table>
+<p>O resultado corrigido por subtracao gerou quatro pontos pre-abertura com
+<code>dP_mech_subtract &lt; 0</code> e um incremento de pressao mecanica nao positivo. Por
+isso, a serie corrigida ainda nao pode alimentar uma tabela de compliance:</p>
+<pre><code class="language-text">PRESSURE_TABULATED_STILL_BLOCKED_MISSING_BALANCE_TERMS
+PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS
+</code></pre>
+<p>A comparacao com o proxy constante da 10.19C tambem nao autoriza promocao:</p>
+<pre><code class="language-text">mean_C_geom_corrected_subtract / C_geom_constant_10_19C = 6.411961169523989
+</code></pre>
+<p>Conclusao: a 10.21C transforma o bloqueio termico em evidencia quantitativa
+mais precisa, mas mantem <code>pressure_tabulated_geometric</code> bloqueado. Ainda faltam
+<code>dV_geom</code>, <code>dMl</code>, <code>dV_leakoff</code> e <code>opened</code> no mesmo trace.</p>
 </div>
 </section>
 
@@ -3103,7 +3171,23 @@ absoluto <code>1.5259151388269308</code>, classificando o efeito como
 <code>THERMAL_EFFECT_DOMINANT</code>. Assim, qualquer <code>pressure_tabulated_geometric</code>
 extraido da serie bruta da 10.21A fica bloqueado ate que haja correcao termica
 ou nova instrumentacao que separe <code>dT</code>, <code>alpha</code>, <code>k</code>, <code>dV_geom</code>, <code>dMl</code> e
-<code>dV_leakoff</code>.
+<code>dV_leakoff</code>.</p>
+<p><strong>Atualizacao 10.21C:</strong> a serie corrigida pelo perfil termico linear no
+<code>profTeste = 4374 m</code> foi extraida com
+<code>tools/extract_phase10_21c_thermal_corrected_compliance.py</code>. O perfil usado foi
+<code>T_initial = 89.17547550432276 degC</code>, <code>T_final = 92.31236311239194 degC</code> e
+<code>DTmax = 3.1368876080691734 degC</code>. A correcao compatível com a formula legada
+ativa (<code>dP_mech = dP - alpha*dT/k</code>) produziu quatro pontos pre-abertura com
+pressao mecanica negativa e um incremento de pressao mecanica nao positivo. A
+classificacao final ficou:</p>
+<pre><code class="language-text">THERMAL_CORRECTED_COMPLIANCE_SIGN_AMBIGUOUS
+PRESSURE_TABULATED_STILL_BLOCKED_MISSING_BALANCE_TERMS
+PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS
+</code></pre>
+<p>Portanto, mesmo apos a correcao termica diagnostica, a tabela
+<code>pressure_tabulated_geometric</code> continua bloqueada. A proxima tentativa precisa
+exportar no mesmo trace <code>dV_geom</code>, <code>dMl</code>, <code>dV_leakoff</code>, <code>k</code>, <code>dT</code> e <code>opened</code>,
+ou resolver explicitamente a convencao de sinal do termo mecanico corrigido.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -6210,6 +6294,105 @@ forma. A proxima etapa deve produzir uma serie corrigida por termo termico, ou
 reinstrumentar temporariamente o legado para exportar <code>dT</code>, <code>alpha</code>, <code>k</code>,
 <code>dV_geom</code>, <code>dMl</code> e <code>dV_leakoff</code> em um trace unico. Ate la, a compliance
 aparente da 10.21A permanece diagnostica e bruta.</p>
+<h2 id="compliance-aparente-corrigida-por-perfil-termico-fase-1021c">Compliance aparente corrigida por perfil termico (Fase 10.21C)</h2>
+<p>A Fase 10.21C criou
+<code>tools/extract_phase10_21c_thermal_corrected_compliance.py</code> para reconstruir,
+sem modificar <code>legance/LOT_Tese/</code>, uma serie diagnostica de compliance aparente
+corrigida pelo termo termico do balanco legado.</p>
+<p>A ferramenta usa o caso legado:</p>
+<pre><code class="language-text">legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+</code></pre>
+<p>e o trace auditado existente:</p>
+<pre><code class="language-text">results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+</code></pre>
+<p>Para o anular A, no <code>profTeste = 4374 m</code>, a interpolacao linear dos vetores
+<code>dA</code>, <code>A0</code> e <code>Af</code> resulta em:</p>
+<pre><code class="language-text">T_initial_degC = 89.17547550432276
+T_final_degC   = 92.31236311239194
+DTmax_degC     = 3.1368876080691734
+alpha          = 8.0e-4 1/degC
+k              = 6.4e-10 1/Pa
+</code></pre>
+<p>A evolucao temporal segue a forma legada:</p>
+<pre><code class="language-text">dT(t) = DTmax * t / (Tlimit + t)
+Tlimit = 0.25 min
+thermal_pressure_equivalent = alpha*dT/k
+</code></pre>
+<p>A correcao compatível com a formula ativa:</p>
+<pre><code class="language-text">dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+</code></pre>
+<p>foi avaliada como:</p>
+<pre><code class="language-text">dP_mech_subtract = dP - alpha*dT/k
+</code></pre>
+<p>Tambem foi gerada uma rota de sensibilidade de sinal:</p>
+<pre><code class="language-text">dP_mech_add = dP + alpha*dT/k
+</code></pre>
+<p>Essa segunda rota e apenas diagnostica; ela nao substitui a leitura da formula
+legada.</p>
+<p>Resultado BUZ67D pre-abertura:</p>
+<table>
+<thead>
+<tr>
+<th>Serie</th>
+<th style="text-align: right;">Media <code>C_eff</code> [1/Pa]</th>
+<th style="text-align: right;">Mediana <code>C_eff</code> [1/Pa]</th>
+<th style="text-align: right;">CV</th>
+<th>Observacao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bruta 10.21A</td>
+<td style="text-align: right;"><code>8.737997966365286e-8</code></td>
+<td style="text-align: right;"><code>9.689922710105396e-8</code></td>
+<td style="text-align: right;"><code>0.24223657359536746</code></td>
+<td>pressure-dependent</td>
+</tr>
+<tr>
+<td>Corrigida <code>dP - alpha*dT/k</code></td>
+<td style="text-align: right;"><code>1.1972273085205066e-7</code></td>
+<td style="text-align: right;"><code>1.0434903008590042e-7</code></td>
+<td style="text-align: right;"><code>0.36756131042159057</code></td>
+<td>sinal ambiguo</td>
+</tr>
+<tr>
+<td>Sensibilidade <code>dP + alpha*dT/k</code></td>
+<td style="text-align: right;"><code>7.793012068107723e-8</code></td>
+<td style="text-align: right;"><code>9.013453455649825e-8</code></td>
+<td style="text-align: right;"><code>0.3326728131235428</code></td>
+<td>pressure-dependent</td>
+</tr>
+</tbody>
+</table>
+<p>Para <code>C_geom</code> corrigido por subtracao:</p>
+<pre><code class="language-text">mean_C_geom_apparent_thermal_corrected_subtract = 1.1908273085205067e-7 1/Pa
+median_C_geom_apparent_thermal_corrected_subtract = 1.0370903008590043e-7 1/Pa
+std_C_geom_apparent_thermal_corrected_subtract = 4.4005443839231133e-8 1/Pa
+cv_C_geom_apparent_thermal_corrected_subtract = 0.36953673739565013
+ratio_to_C_geom_constant_10_19C = 6.411961169523989
+</code></pre>
+<p>O ponto decisivo e que a correcao por subtracao produziu:</p>
+<pre><code class="language-text">negative_mechanical_pressure_n = 4
+non_positive_delta_pressure_n = 1
+classification = THERMAL_CORRECTED_COMPLIANCE_SIGN_AMBIGUOUS
+</code></pre>
+<p>Portanto, a Fase 10.21C melhora a rastreabilidade da serie, mas nao libera a
+implementacao de <code>pressure_tabulated_geometric</code>. O gate permanece fechado:</p>
+<pre><code class="language-text">THERMAL_CORRECTION_EXTRACTED_DIAGNOSTIC_ONLY
+PRESSURE_TABULATED_STILL_BLOCKED_MISSING_BALANCE_TERMS
+PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS
+</code></pre>
+<p>Campos ainda ausentes para fechar a reconstrucao fisica:</p>
+<pre><code class="language-text">dV_geom_m3_rad
+dMl_term_m3_rad
+dV_leakoff_m3_rad
+opened
+</code></pre>
+<p>Conclusao: nao usar a serie corrigida como modelo solver, nao versionar os
+artefatos em <code>results/</code> e nao promover <code>pressure_tabulated_geometric</code>. A proxima
+fase deve reinstrumentar temporariamente o legado, ou criar uma extracao que
+una explicitamente <code>dT</code>, <code>dV_geom</code>, <code>dMl</code>, <code>dV_leakoff</code>, <code>k</code> e <code>opened</code> no mesmo
+trace.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser

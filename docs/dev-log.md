@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.21B auditoria termica/compressibilidade antes de tabela; commit/push pendente
+Fase ativa  : 10.21C compliance aparente corrigida por perfil termico; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
@@ -54,6 +54,82 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-10] Fase 10.21C — compliance aparente corrigida por perfil termico — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Objetivo:** extrair uma serie diagnostica de compliance aparente corrigida
+pelo termo termico `alpha*dT/k`, sem alterar runtime C++, sem modificar
+`legance/LOT_Tese/` e sem implementar `pressure_tabulated_geometric`.
+
+**Ferramenta criada:**
+
+```text
+tools/extract_phase10_21c_thermal_corrected_compliance.py
+```
+
+**Teste criado:**
+
+```text
+tests/python/test_extract_phase10_21c_thermal_corrected_compliance.py
+```
+
+**Fonte usada:**
+
+```text
+legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+```
+
+**Perfil termico reconstruido por interpolacao linear em `profTeste = 4374 m`:**
+
+```text
+T_initial_degC = 89.17547550432276
+T_final_degC = 92.31236311239194
+DTmax_degC = 3.1368876080691734
+alpha = 8.0e-4 1/degC
+k = 6.4e-10 1/Pa
+```
+
+**Classificacao final:**
+
+```text
+THERMAL_CORRECTED_COMPLIANCE_SIGN_AMBIGUOUS
+```
+
+**Valores pre-abertura principais:**
+
+```text
+raw mean C_eff = 8.737997966365286e-8 1/Pa
+thermal-subtract mean C_eff = 1.1972273085205066e-7 1/Pa
+thermal-subtract median C_eff = 1.0434903008590042e-7 1/Pa
+thermal-subtract std C_eff = 4.400544383923113e-8 1/Pa
+thermal-subtract CV C_eff = 0.36756131042159057
+thermal-subtract mean C_geom = 1.1908273085205067e-7 1/Pa
+thermal-subtract median C_geom = 1.0370903008590043e-7 1/Pa
+thermal-subtract std C_geom = 4.4005443839231133e-8 1/Pa
+thermal-subtract CV C_geom = 0.36953673739565013
+subtract_vs_pressure correlation = -0.5906712267376746
+subtract_vs_time correlation = -0.5671142417359523
+ratio to C_geom constant 10.19C = 6.411961169523989
+negative mechanical pressure points = 4
+non-positive mechanical pressure increments = 1
+```
+
+**Gate:**
+
+```text
+THERMAL_CORRECTION_EXTRACTED_DIAGNOSTIC_ONLY
+PRESSURE_TABULATED_STILL_BLOCKED_MISSING_BALANCE_TERMS
+PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS
+```
+
+**Decisao:** nao implementar `pressure_tabulated_geometric`. A serie corrigida
+e util para auditoria, mas ainda depende da resolucao da convencao de sinal e
+da exportacao conjunta de `dV_geom`, `dMl`, `dV_leakoff`, `k`, `dT` e `opened`.
 
 ---
 

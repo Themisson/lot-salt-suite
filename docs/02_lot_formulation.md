@@ -1187,3 +1187,63 @@ Portanto, a proxima fase deve corrigir a ferramenta da 10.21A para ingerir
 `LOT_Tese` de modo temporario e restauravel para exportar os termos termicos e
 volumetricos faltantes. Nao implementar tabela de compliance bruta antes dessa
 correcao.
+
+### Compliance aparente corrigida por perfil termico — Fase 10.21C
+
+**Status:** `THERMAL_CORRECTED_COMPLIANCE_SIGN_AMBIGUOUS`.
+
+A Fase 10.21C adicionou
+`tools/extract_phase10_21c_thermal_corrected_compliance.py` para produzir uma
+serie diagnostica corrigida pelo termo termico, ainda fora do runtime C++.
+Nenhum arquivo legado foi modificado.
+
+O perfil termico usado nesta fase e a interpolacao linear dos vetores `dA`,
+`A0` e `Af` do caso BUZ67D PKN no `profTeste = 4374 m`:
+
+```text
+T_initial_degC = 89.17547550432276
+T_final_degC = 92.31236311239194
+DTmax_degC = 3.1368876080691734
+alpha = 8.0e-4 1/degC
+k = 6.4e-10 1/Pa
+```
+
+A evolucao temporal segue:
+
+```text
+dT(t) = DTmax * t / (0.25 + t)
+thermal_pressure_equivalent = alpha*dT/k
+```
+
+A leitura compatível com a formula legada ativa subtrai o termo termico:
+
+```text
+dP_mech_subtract = dP - alpha*dT/k
+```
+
+Resultado pre-abertura:
+
+| Serie | Media `C_eff` [1/Pa] | Mediana `C_eff` [1/Pa] | CV | Classificacao |
+|---|---:|---:|---:|---|
+| Bruta | `8.737997966365286e-8` | `9.689922710105396e-8` | `0.24223657359536746` | pressure-dependent |
+| Corrigida por subtracao | `1.1972273085205066e-7` | `1.0434903008590042e-7` | `0.36756131042159057` | sign ambiguous |
+| Sensibilidade por adicao | `7.793012068107723e-8` | `9.013453455649825e-8` | `0.3326728131235428` | pressure-dependent |
+
+O resultado corrigido por subtracao gerou quatro pontos pre-abertura com
+`dP_mech_subtract < 0` e um incremento de pressao mecanica nao positivo. Por
+isso, a serie corrigida ainda nao pode alimentar uma tabela de compliance:
+
+```text
+PRESSURE_TABULATED_STILL_BLOCKED_MISSING_BALANCE_TERMS
+PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS
+```
+
+A comparacao com o proxy constante da 10.19C tambem nao autoriza promocao:
+
+```text
+mean_C_geom_corrected_subtract / C_geom_constant_10_19C = 6.411961169523989
+```
+
+Conclusao: a 10.21C transforma o bloqueio termico em evidencia quantitativa
+mais precisa, mas mantem `pressure_tabulated_geometric` bloqueado. Ainda faltam
+`dV_geom`, `dMl`, `dV_leakoff` e `opened` no mesmo trace.

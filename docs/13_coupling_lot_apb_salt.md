@@ -2456,6 +2456,115 @@ reinstrumentar temporariamente o legado para exportar `dT`, `alpha`, `k`,
 `dV_geom`, `dMl` e `dV_leakoff` em um trace unico. Ate la, a compliance
 aparente da 10.21A permanece diagnostica e bruta.
 
+## Compliance aparente corrigida por perfil termico (Fase 10.21C)
+
+A Fase 10.21C criou
+`tools/extract_phase10_21c_thermal_corrected_compliance.py` para reconstruir,
+sem modificar `legance/LOT_Tese/`, uma serie diagnostica de compliance aparente
+corrigida pelo termo termico do balanco legado.
+
+A ferramenta usa o caso legado:
+
+```text
+legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+```
+
+e o trace auditado existente:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+```
+
+Para o anular A, no `profTeste = 4374 m`, a interpolacao linear dos vetores
+`dA`, `A0` e `Af` resulta em:
+
+```text
+T_initial_degC = 89.17547550432276
+T_final_degC   = 92.31236311239194
+DTmax_degC     = 3.1368876080691734
+alpha          = 8.0e-4 1/degC
+k              = 6.4e-10 1/Pa
+```
+
+A evolucao temporal segue a forma legada:
+
+```text
+dT(t) = DTmax * t / (Tlimit + t)
+Tlimit = 0.25 min
+thermal_pressure_equivalent = alpha*dT/k
+```
+
+A correcao compatível com a formula ativa:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+foi avaliada como:
+
+```text
+dP_mech_subtract = dP - alpha*dT/k
+```
+
+Tambem foi gerada uma rota de sensibilidade de sinal:
+
+```text
+dP_mech_add = dP + alpha*dT/k
+```
+
+Essa segunda rota e apenas diagnostica; ela nao substitui a leitura da formula
+legada.
+
+Resultado BUZ67D pre-abertura:
+
+| Serie | Media `C_eff` [1/Pa] | Mediana `C_eff` [1/Pa] | CV | Observacao |
+|---|---:|---:|---:|---|
+| Bruta 10.21A | `8.737997966365286e-8` | `9.689922710105396e-8` | `0.24223657359536746` | pressure-dependent |
+| Corrigida `dP - alpha*dT/k` | `1.1972273085205066e-7` | `1.0434903008590042e-7` | `0.36756131042159057` | sinal ambiguo |
+| Sensibilidade `dP + alpha*dT/k` | `7.793012068107723e-8` | `9.013453455649825e-8` | `0.3326728131235428` | pressure-dependent |
+
+Para `C_geom` corrigido por subtracao:
+
+```text
+mean_C_geom_apparent_thermal_corrected_subtract = 1.1908273085205067e-7 1/Pa
+median_C_geom_apparent_thermal_corrected_subtract = 1.0370903008590043e-7 1/Pa
+std_C_geom_apparent_thermal_corrected_subtract = 4.4005443839231133e-8 1/Pa
+cv_C_geom_apparent_thermal_corrected_subtract = 0.36953673739565013
+ratio_to_C_geom_constant_10_19C = 6.411961169523989
+```
+
+O ponto decisivo e que a correcao por subtracao produziu:
+
+```text
+negative_mechanical_pressure_n = 4
+non_positive_delta_pressure_n = 1
+classification = THERMAL_CORRECTED_COMPLIANCE_SIGN_AMBIGUOUS
+```
+
+Portanto, a Fase 10.21C melhora a rastreabilidade da serie, mas nao libera a
+implementacao de `pressure_tabulated_geometric`. O gate permanece fechado:
+
+```text
+THERMAL_CORRECTION_EXTRACTED_DIAGNOSTIC_ONLY
+PRESSURE_TABULATED_STILL_BLOCKED_MISSING_BALANCE_TERMS
+PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS
+```
+
+Campos ainda ausentes para fechar a reconstrucao fisica:
+
+```text
+dV_geom_m3_rad
+dMl_term_m3_rad
+dV_leakoff_m3_rad
+opened
+```
+
+Conclusao: nao usar a serie corrigida como modelo solver, nao versionar os
+artefatos em `results/` e nao promover `pressure_tabulated_geometric`. A proxima
+fase deve reinstrumentar temporariamente o legado, ou criar uma extracao que
+una explicitamente `dT`, `dV_geom`, `dMl`, `dV_leakoff`, `k` e `opened` no mesmo
+trace.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que
