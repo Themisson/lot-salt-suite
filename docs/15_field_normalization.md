@@ -618,3 +618,35 @@ classification = SIGMA_THETA_STATIC_OPENED_TOO_EARLY
 
 Essa normalização é diagnóstica. Ela não declara `sigma_theta_static` como
 equivalente ao `getSigmaTheta()` legado nem como tensão runtime de saltcreep.
+
+## Fase 10.19B — normalizacao de vazao e volume por radiano
+
+A Fase 10.19B registrou a normalizacao entre a convencao de vazao/volume do
+legado e a convencao moderna:
+
+| Campo | Convencao | Unidade | Observacao |
+|---|---|---|---|
+| `APB1da::flowRate(t)` | volume acumulado por radiano | m3/rad | `Conv_bbmin_m3min(Q) * t` para `idQ=6`. |
+| `APB1da::ConvflowRate()` | vazao por radiano | m3/min/rad | Usada nas formulas de fratura legado. |
+| `line_up[lu].Vq` | volume acumulado por radiano | m3/rad | Entra no `dP` legado junto com `Vi`. |
+| `line_up[lu].Vi` | volume anular por radiano | m3/rad | Compatível com `Vq` no legado. |
+| `PknResult.injected_volume_m3` | volume total moderno | m3 | Exportado pelo `ResultWriter`. |
+| `PknInput.annular_volume_m3` | volume total moderno | m3 | Usado no denominador do `volumetric_balance`. |
+| `initial_annular_volume_per_radian_m3` | volume por radiano moderno | m3/rad | Exportado como metadado de diagnóstico. |
+
+A equivalencia de pressurizacao e:
+
+```text
+dV_rad / (C * V_rad) == dV_total / (C * V_total)
+```
+
+desde que numerador e denominador estejam na mesma convencao. A auditoria
+classificou:
+
+```text
+FLOWRATE_CONVENTION_MATCHES_LEGACY
+```
+
+e portanto nao promoveu nenhuma correcao de unidade/conversao de vazao.
+Permanece bloqueada a equivalencia fisica porque o legado tambem possui o termo
+geometrico `dV` de complacencia anular.

@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">64/71</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">65/72</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">229</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">70</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">78</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -1318,6 +1318,47 @@ saltcreep. O resultado do diagnóstico 10.19A foi:</p>
 abre cedo demais. A próxima etapa deve alimentar o critério com uma fonte
 runtime por altura de influência (<code>SigmaThetaInfluenceLayer</code>), não apenas com
 um valor escalar estático extraído do legado.</p>
+<h3 id="auditoria-de-vazao-e-complacencia-pre-fratura-fase-1019b">Auditoria de vazao e complacencia pre-fratura — Fase 10.19B</h3>
+<p><strong>Status:</strong> <code>PHASE10_19B_FLOWRATE_BALANCE_AUDIT_COMPLETE_NO_SOLVER_CORRECTION</code>.</p>
+<p>A Fase 10.19B auditou a hipotese de erro de vazao no salto inicial do modo
+<code>volumetric_balance</code>. No legado <code>APB1da</code>, o caso BUZ67D usa:</p>
+<pre><code class="language-text">idQ = 6
+Q = 0.5 bbl/min
+dt = 0.5 min
+</code></pre>
+<p>Para <code>idQ = 6</code>, <code>Conv_bbmin_m3min(Q)</code> calcula:</p>
+<pre><code class="language-text">Q_total = 0.5 * 0.158987 = 0.0794935 m3/min
+Q_rad = Q_total / (2*pi) = 0.01265178346867558 m3/min/rad
+Q_rad_s = 0.00021086305781125968 m3/s/rad
+dV_30s_rad = 0.00632589173433779 m3/rad
+</code></pre>
+<p>O legado armazena internamente <code>Vq</code> e <code>Vi</code> por radiano. O moderno usa volume
+injetado total e volume anular total no modo <code>volumetric_balance</code>. Como
+numerador e denominador usam a mesma convencao, a razao de pressurizacao e
+equivalente:</p>
+<pre><code class="language-text">dP = dV_rad / (C * V_rad) = dV_total / (C * V_total)
+</code></pre>
+<p>Com <code>C = 6.4e-10 1/Pa</code> e <code>V_annular_rad = 0.17842518895535997 m3/rad</code>, a
+compressao pura do fluido no primeiro passo produz:</p>
+<pre><code class="language-text">dP_theoretical = 55396919.53121999 Pa
+</code></pre>
+<p>Esse valor explica a escala do salto moderno de aproximadamente <code>55.4 MPa</code>.
+No audit timeseries legado, o primeiro <code>dP</code> em <code>t = 30 s</code> e apenas:</p>
+<pre><code class="language-text">legacy_first_dP = 1845413.7784679066 Pa
+legacy_first_dP / dP_theoretical = 0.03331256651017148
+</code></pre>
+<p>A diferenca nao foi classificada como erro de vazao, unidade de tempo ou fator
+<code>2*pi</code>. O codigo legado ativo calcula:</p>
+<pre><code class="language-text">dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+</code></pre>
+<p>onde <code>dV</code> vem de <code>getdV(lu)</code> e representa a variacao geometrica do volume
+anular a partir dos deslocamentos <code>u(e)</code> e <code>u(e1)</code>. Portanto, a causa raiz
+diagnostica foi classificada como:</p>
+<pre><code class="language-text">ROOT_CAUSE_MISSING_GEOMETRIC_COMPLIANCE
+</code></pre>
+<p>Nenhuma correcao C++ foi aplicada nesta fase. Uma correcao fisica deve ser fase
+separada, com modelo explicito de <code>annular_compliance</code> ou
+<code>wellbore_compliance</code>, sem fator empirico de pressao.</p>
 </div>
 </section>
 
@@ -2509,7 +2550,38 @@ classificacao                   = SIGMA_THETA_STATIC_OPENED_TOO_EARLY
 <p><strong>Impacto:</strong> <code>sigma_theta_static</code> prova a arquitetura de provider, mas não deve
 ser tratado como critério físico validado. A próxima evolução precisa de uma
 fonte runtime de <code>SigmaThetaInfluenceLayer</code>/altura de influência, provavelmente
-via rota opt-in de <code>SaltCreepTimeBridge</code>/<code>SaltWallStressDiagnostics</code>.
+via rota opt-in de <code>SaltCreepTimeBridge</code>/<code>SaltWallStressDiagnostics</code>.</p>
+<hr />
+<h2 id="r18-volumetric_balance-moderno-nao-inclui-complacencia-geometrica-pre-fratura">R18 — <code>volumetric_balance</code> moderno não inclui complacência geométrica pré-fratura</h2>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Confirmado na Fase 10.19B</p>
+<p>A Fase 10.19B auditou a hipótese de erro de vazão no caso BUZ67D. O legado usa
+<code>idQ = 6</code>, <code>Q = 0.5 bbl/min</code> e converte:</p>
+<pre><code class="language-text">Q_total = 0.0794935 m3/min
+Q_rad = Q_total / (2*pi)
+</code></pre>
+<p>No primeiro passo de <code>30 s</code>, isso gera:</p>
+<pre><code class="language-text">dV_rad = 0.00632589173433779 m3/rad
+</code></pre>
+<p>Usando <code>V_annular_rad = 0.17842518895535997 m3/rad</code> e
+<code>C = 6.4e-10 1/Pa</code>, a compressão pura do fluido produz:</p>
+<pre><code class="language-text">dP_theoretical = 55396919.53121999 Pa
+</code></pre>
+<p>Esse valor bate com a escala do salto trial moderno. O legado auditado, porém,
+apresenta no primeiro passo:</p>
+<pre><code class="language-text">legacy_first_dP = 1845413.7784679066 Pa
+legacy_first_dP / dP_theoretical = 0.03331256651017148
+</code></pre>
+<p>A causa raiz foi classificada como:</p>
+<pre><code class="language-text">ROOT_CAUSE_MISSING_GEOMETRIC_COMPLIANCE
+</code></pre>
+<p>porque <code>APB1da</code> usa a fórmula ativa:</p>
+<pre><code class="language-text">dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+</code></pre>
+<p>e <code>dV</code> vem de deslocamentos geométricos do anular (<code>u(e)</code>, <code>u(e1)</code>). O moderno
+10.19B ainda usa apenas compressão de fluido menos sinks de fratura/leakoff.</p>
+<p><strong>Impacto:</strong> não corrigir isso com fator empírico de pressão. A próxima fase
+deve planejar/implementar um modelo opt-in explícito de <code>annular_compliance</code> ou
+<code>wellbore_compliance</code>, preservando <code>pkn_direct</code> e casos padrão.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -5332,6 +5404,38 @@ sigma-theta, mas o proxy estático de abertura ainda não reproduz a altura de
 influência legada. A próxima fase deve substituir o valor estático por uma
 fonte opt-in runtime de <code>SigmaThetaInfluenceLayer</code>, ainda sem tornar isso
 default global.</p>
+<h2 id="auditoria-de-vazao-e-complacencia-do-balanco-lot-fase-1019b">Auditoria de vazao e complacencia do balanço LOT — Fase 10.19B</h2>
+<p>A Fase 10.19B investigou se a abertura precoce do caso
+<code>sigma_theta_static</code> vinha de erro de vazao, unidade ou fator <code>2*pi</code>.</p>
+<p>Resultado:</p>
+<pre><code class="language-text">FLOWRATE_CONVENTION_MATCHES_LEGACY
+ROOT_CAUSE_MISSING_GEOMETRIC_COMPLIANCE
+</code></pre>
+<p>No legado <code>APB1da</code>, <code>idQ = 6</code> converte <code>0.5 bbl/min</code> para:</p>
+<pre><code class="language-text">Q_total = 0.0794935 m3/min
+Q_rad = 0.01265178346867558 m3/min/rad
+dV_30s_rad = 0.00632589173433779 m3/rad
+</code></pre>
+<p>O legado calcula internamente <code>Vq</code> e <code>Vi</code> por radiano. O moderno usa volumes
+totais no <code>volumetric_balance</code>, mas a razao de pressurizacao e equivalente
+quando numerador e denominador usam a mesma convencao:</p>
+<pre><code class="language-text">dV_rad / (C * V_rad) == dV_total / (C * V_total)
+</code></pre>
+<p>O calculo de fechamento do primeiro passo com compressao pura de fluido resultou
+em:</p>
+<pre><code class="language-text">dP_theoretical = 55396919.53121999 Pa
+</code></pre>
+<p>No traço legado auditado, o primeiro passo tem:</p>
+<pre><code class="language-text">legacy_first_dP = 1845413.7784679066 Pa
+</code></pre>
+<p>A diferenca e coerente com a presença, no legado, de <code>dV</code> geometrico calculado
+a partir de deslocamentos anulares e inserido em:</p>
+<pre><code class="language-text">dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+</code></pre>
+<p>Portanto, esta fase nao altera <code>LotSaltPressureMap</code>,
+<code>LotSaltCouplingStep</code>, sigma-theta runtime ou <code>lot-sim run --mode lot-pkn</code>.
+O proximo avanço fisico deve modelar explicitamente <code>annular_compliance</code> ou
+<code>wellbore_compliance</code> antes de declarar equivalencia com <code>pw_Pa</code> legado.</p>
 <h2 id="volume-anular-buz67d-com-drill-pipe-fase-1016">Volume anular BUZ67D com drill pipe (Fase 10.16)</h2>
 <p>A Fase 10.16 adiciona suporte diagnostico para volume anular inicial com drill
 pipe no caso controlado <code>buz67d_pkn_legacy_aligned.yaml</code>.</p>

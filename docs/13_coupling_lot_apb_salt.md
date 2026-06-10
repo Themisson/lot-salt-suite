@@ -2101,6 +2101,59 @@ influência legada. A próxima fase deve substituir o valor estático por uma
 fonte opt-in runtime de `SigmaThetaInfluenceLayer`, ainda sem tornar isso
 default global.
 
+## Auditoria de vazao e complacencia do balanço LOT — Fase 10.19B
+
+A Fase 10.19B investigou se a abertura precoce do caso
+`sigma_theta_static` vinha de erro de vazao, unidade ou fator `2*pi`.
+
+Resultado:
+
+```text
+FLOWRATE_CONVENTION_MATCHES_LEGACY
+ROOT_CAUSE_MISSING_GEOMETRIC_COMPLIANCE
+```
+
+No legado `APB1da`, `idQ = 6` converte `0.5 bbl/min` para:
+
+```text
+Q_total = 0.0794935 m3/min
+Q_rad = 0.01265178346867558 m3/min/rad
+dV_30s_rad = 0.00632589173433779 m3/rad
+```
+
+O legado calcula internamente `Vq` e `Vi` por radiano. O moderno usa volumes
+totais no `volumetric_balance`, mas a razao de pressurizacao e equivalente
+quando numerador e denominador usam a mesma convencao:
+
+```text
+dV_rad / (C * V_rad) == dV_total / (C * V_total)
+```
+
+O calculo de fechamento do primeiro passo com compressao pura de fluido resultou
+em:
+
+```text
+dP_theoretical = 55396919.53121999 Pa
+```
+
+No traço legado auditado, o primeiro passo tem:
+
+```text
+legacy_first_dP = 1845413.7784679066 Pa
+```
+
+A diferenca e coerente com a presença, no legado, de `dV` geometrico calculado
+a partir de deslocamentos anulares e inserido em:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+Portanto, esta fase nao altera `LotSaltPressureMap`,
+`LotSaltCouplingStep`, sigma-theta runtime ou `lot-sim run --mode lot-pkn`.
+O proximo avanço fisico deve modelar explicitamente `annular_compliance` ou
+`wellbore_compliance` antes de declarar equivalencia com `pw_Pa` legado.
+
 ## Volume anular BUZ67D com drill pipe (Fase 10.16)
 
 A Fase 10.16 adiciona suporte diagnostico para volume anular inicial com drill

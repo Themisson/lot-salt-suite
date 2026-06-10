@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.19A sigma-theta static opt-in validada localmente; commit/push pendente
+Fase ativa  : 10.19B auditoria de vazao/balanco volumetrico validada localmente; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
 Testes C++  : 229/229 passaram em 2026-06-10
-Testes Py   : 70/70 passaram em 2026-06-10
+Testes Py   : 78/78 passaram em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,55 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-10] Fase 10.19B — auditoria de vazao, volume e complacencia pre-fratura — Codex
+
+**Status:** Implementada e validada localmente; commit/push pendente.
+
+**Objetivo:** auditar se a abertura precoce da rota `sigma_theta_static` vinha
+de vazao, unidade, fator `2*pi`, incremental/acumulado ou ausência de
+complacencia geometrica no balanço moderno.
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase10_19b_flowrate_balance.py
+```
+
+**Resultado:**
+
+```text
+classification = FLOWRATE_CONVENTION_MATCHES_LEGACY
+root_cause_classification = ROOT_CAUSE_MISSING_GEOMETRIC_COMPLIANCE
+```
+
+**Numeros principais:**
+
+```text
+Q_total_m3_min = 0.0794935
+Q_rad_m3_min = 0.01265178346867558
+Q_rad_m3_s = 0.00021086305781125968
+dV_inj_first_step_rad_m3 = 0.00632589173433779
+V_annular_rad_m3 = 0.17842518895535997
+C_fluid = 6.4e-10 1/Pa
+dP_theoretical_rad_Pa = 55396919.53121999
+legacy_first_dP_Pa = 1845413.7784679066
+legacy_first_dP_over_theoretical = 0.03331256651017148
+```
+
+**Conclusao:** a conversao de vazao/convenção total-vs-radiano nao e causa
+raiz. O salto moderno de primeiro passo e compativel com compressao pura do
+fluido. A diferenca remanescente e atribuida ao termo geometrico `dV`/complacencia
+do legado:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+**Decisao:** nenhuma correcao C++ foi aplicada. A proxima fase deve planejar
+`annular_compliance`/`wellbore_compliance` opt-in, sem ajuste empirico.
 
 ---
 

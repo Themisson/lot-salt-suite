@@ -243,6 +243,35 @@
       "No Zamora, casing compliance, compositional fluid or temporal salt coupling was implemented."
     ]
   },
+  "phase10_19b_flowrate_balance_audit": {
+    "status": "PHASE10_19B_FLOWRATE_BALANCE_AUDIT_COMPLETE_NO_SOLVER_CORRECTION",
+    "classification": "FLOWRATE_CONVENTION_MATCHES_LEGACY",
+    "root_cause_classification": "ROOT_CAUSE_MISSING_GEOMETRIC_COMPLIANCE",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "solver_correction_applied": false,
+    "case": "cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml",
+    "audit_tool": "tools/audit_phase10_19b_flowrate_balance.py",
+    "audit_json": "results/comparison/phase10_19b/flowrate_balance_audit.json",
+    "audit_csv": "results/comparison/phase10_19b/flowrate_balance_audit.csv",
+    "q_total_m3_min": 0.0794935,
+    "q_rad_m3_min": 0.01265178346867558,
+    "q_rad_m3_s": 0.00021086305781125968,
+    "dV_inj_first_step_rad_m3": 0.00632589173433779,
+    "annular_volume_per_radian_m3": 0.17842518895535997,
+    "fluid_compressibility_per_Pa": 6.4e-10,
+    "dP_theoretical_rad_Pa": 55396919.53121999,
+    "legacy_first_dP_Pa": 1845413.7784679066,
+    "legacy_first_dP_over_theoretical": 0.03331256651017148,
+    "diagnostic_observation": "Legacy idQ=6 converts 0.5 bbl/min to m3/min/rad and the modern total/total convention is algebraically equivalent. The first-step pure-fluid compression estimate matches the modern trial jump scale, while the audited legacy first dP is far smaller because APB1da includes geometric dV/compliance in the active dP formula.",
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "No C++ solver correction was applied.",
+      "No Zamora, sigma-theta runtime provider, casing compliance model or new PKN formulation was implemented.",
+      "results/comparison/phase10_19b outputs are local diagnostics and must not be versioned."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

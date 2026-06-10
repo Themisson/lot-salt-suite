@@ -111,3 +111,16 @@ def test_no_blocked_field_is_promoted_to_allowed_next_step() -> None:
 
     for phrase in ("sigmatheta comparison", "pw comparison", "margin comparison", "opened comparison"):
         assert phrase not in allowed
+
+
+def test_phase10_19b_flowrate_audit_keeps_physical_gate_closed() -> None:
+    data = load_gate()
+    audit = data["phase10_19b_flowrate_balance_audit"]
+
+    assert audit["status"] == "PHASE10_19B_FLOWRATE_BALANCE_AUDIT_COMPLETE_NO_SOLVER_CORRECTION"
+    assert audit["classification"] == "FLOWRATE_CONVENTION_MATCHES_LEGACY"
+    assert audit["root_cause_classification"] == "ROOT_CAUSE_MISSING_GEOMETRIC_COMPLIANCE"
+    assert audit["physical_validation"] is False
+    assert audit["numeric_equivalence"] is False
+    assert audit["solver_correction_applied"] is False
+    assert audit["legacy_first_dP_over_theoretical"] < 0.04

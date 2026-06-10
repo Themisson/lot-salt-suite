@@ -625,6 +625,60 @@ classificacao                   = SIGMA_THETA_STATIC_OPENED_TOO_EARLY
 ser tratado como critério físico validado. A próxima evolução precisa de uma
 fonte runtime de `SigmaThetaInfluenceLayer`/altura de influência, provavelmente
 via rota opt-in de `SaltCreepTimeBridge`/`SaltWallStressDiagnostics`.
+
+---
+
+## R18 — `volumetric_balance` moderno não inclui complacência geométrica pré-fratura
+
+**Severidade:** Alta | **Status:** Confirmado na Fase 10.19B
+
+A Fase 10.19B auditou a hipótese de erro de vazão no caso BUZ67D. O legado usa
+`idQ = 6`, `Q = 0.5 bbl/min` e converte:
+
+```text
+Q_total = 0.0794935 m3/min
+Q_rad = Q_total / (2*pi)
+```
+
+No primeiro passo de `30 s`, isso gera:
+
+```text
+dV_rad = 0.00632589173433779 m3/rad
+```
+
+Usando `V_annular_rad = 0.17842518895535997 m3/rad` e
+`C = 6.4e-10 1/Pa`, a compressão pura do fluido produz:
+
+```text
+dP_theoretical = 55396919.53121999 Pa
+```
+
+Esse valor bate com a escala do salto trial moderno. O legado auditado, porém,
+apresenta no primeiro passo:
+
+```text
+legacy_first_dP = 1845413.7784679066 Pa
+legacy_first_dP / dP_theoretical = 0.03331256651017148
+```
+
+A causa raiz foi classificada como:
+
+```text
+ROOT_CAUSE_MISSING_GEOMETRIC_COMPLIANCE
+```
+
+porque `APB1da` usa a fórmula ativa:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+e `dV` vem de deslocamentos geométricos do anular (`u(e)`, `u(e1)`). O moderno
+10.19B ainda usa apenas compressão de fluido menos sinks de fratura/leakoff.
+
+**Impacto:** não corrigir isso com fator empírico de pressão. A próxima fase
+deve planejar/implementar um modelo opt-in explícito de `annular_compliance` ou
+`wellbore_compliance`, preservando `pkn_direct` e casos padrão.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

@@ -219,7 +219,7 @@ unidades reais usadas no `LOT_APB_v5` antes de aceitar nomes ou dimensões.
   volumétrico, mantendo `lot-sim run --mode lot-pkn` desacoplado por default.
 - A Fase 10.19A criou o contrato opt-in `sigma_theta_static`, mas o proxy
   escalar ainda abriu cedo demais. A próxima evolução deve trocar o valor
-  estático por um provider runtime explícito, provavelmente:
+  estático por um provider runtime explícito, por uma rota como:
 
 ```text
 CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
@@ -228,3 +228,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 
   Essa rota futura deve continuar opt-in, sem tornar sal/sigma-theta default
   para `lot-sim run --mode lot-pkn`.
+- A Fase 10.19B auditou a hipótese de erro de vazão e classificou a convenção
+  como `FLOWRATE_CONVENTION_MATCHES_LEGACY`. O salto moderno de primeiro passo
+  é compatível com compressão pura do fluido, enquanto o legado inclui o termo
+  geométrico `dV` no balanço. Antes de avançar para sigma-theta runtime como
+  validação física, deve existir uma fase opt-in para `annular_compliance` ou
+  `wellbore_compliance`, sem fator empírico.

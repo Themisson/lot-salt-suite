@@ -723,3 +723,68 @@ Conclusão: a arquitetura opt-in foi estabelecida, mas o proxy estático ainda
 abre cedo demais. A próxima etapa deve alimentar o critério com uma fonte
 runtime por altura de influência (`SigmaThetaInfluenceLayer`), não apenas com
 um valor escalar estático extraído do legado.
+
+### Auditoria de vazao e complacencia pre-fratura — Fase 10.19B
+
+**Status:** `PHASE10_19B_FLOWRATE_BALANCE_AUDIT_COMPLETE_NO_SOLVER_CORRECTION`.
+
+A Fase 10.19B auditou a hipotese de erro de vazao no salto inicial do modo
+`volumetric_balance`. No legado `APB1da`, o caso BUZ67D usa:
+
+```text
+idQ = 6
+Q = 0.5 bbl/min
+dt = 0.5 min
+```
+
+Para `idQ = 6`, `Conv_bbmin_m3min(Q)` calcula:
+
+```text
+Q_total = 0.5 * 0.158987 = 0.0794935 m3/min
+Q_rad = Q_total / (2*pi) = 0.01265178346867558 m3/min/rad
+Q_rad_s = 0.00021086305781125968 m3/s/rad
+dV_30s_rad = 0.00632589173433779 m3/rad
+```
+
+O legado armazena internamente `Vq` e `Vi` por radiano. O moderno usa volume
+injetado total e volume anular total no modo `volumetric_balance`. Como
+numerador e denominador usam a mesma convencao, a razao de pressurizacao e
+equivalente:
+
+```text
+dP = dV_rad / (C * V_rad) = dV_total / (C * V_total)
+```
+
+Com `C = 6.4e-10 1/Pa` e `V_annular_rad = 0.17842518895535997 m3/rad`, a
+compressao pura do fluido no primeiro passo produz:
+
+```text
+dP_theoretical = 55396919.53121999 Pa
+```
+
+Esse valor explica a escala do salto moderno de aproximadamente `55.4 MPa`.
+No audit timeseries legado, o primeiro `dP` em `t = 30 s` e apenas:
+
+```text
+legacy_first_dP = 1845413.7784679066 Pa
+legacy_first_dP / dP_theoretical = 0.03331256651017148
+```
+
+A diferenca nao foi classificada como erro de vazao, unidade de tempo ou fator
+`2*pi`. O codigo legado ativo calcula:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+onde `dV` vem de `getdV(lu)` e representa a variacao geometrica do volume
+anular a partir dos deslocamentos `u(e)` e `u(e1)`. Portanto, a causa raiz
+diagnostica foi classificada como:
+
+```text
+ROOT_CAUSE_MISSING_GEOMETRIC_COMPLIANCE
+```
+
+Nenhuma correcao C++ foi aplicada nesta fase. Uma correcao fisica deve ser fase
+separada, com modelo explicito de `annular_compliance` ou
+`wellbore_compliance`, sem fator empirico de pressao.

@@ -1552,3 +1552,64 @@ A fase não valida fratura física nem equivalência numérica. Ela estabelece q
 o contrato estrutural funciona e que o próximo bloqueio é a fonte física de
 `sigma_theta_compression_positive_Pa`, não o transporte de dados até o
 `PknModel`.
+
+---
+
+## Fase 10.19B — auditoria de vazao e balanco volumetrico
+
+**Status:** `PHASE10_19B_FLOWRATE_BALANCE_AUDIT_COMPLETE_NO_SOLVER_CORRECTION`.
+
+A Fase 10.19B criou a ferramenta:
+
+```text
+tools/audit_phase10_19b_flowrate_balance.py
+```
+
+Entradas locais usadas:
+
+```text
+cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+results/comparison/phase10_19a/modern_sigma_theta_static/timeseries.csv
+```
+
+Saidas locais nao versionadas:
+
+```text
+results/comparison/phase10_19b/flowrate_balance_audit.json
+results/comparison/phase10_19b/flowrate_balance_audit.csv
+```
+
+Metricas observadas:
+
+| Metrica | Valor |
+|---|---:|
+| `Q_total_m3_min` | `0.0794935` |
+| `Q_rad_m3_min` | `0.01265178346867558` |
+| `Q_rad_m3_s` | `0.00021086305781125968` |
+| `dV_inj_first_step_rad_m3` | `0.00632589173433779` |
+| `V_annular_rad_m3` | `0.17842518895535997` |
+| `C_fluid_1_Pa` | `6.4e-10` |
+| `dP_theoretical_rad_Pa` | `55396919.53121999` |
+| `legacy_first_dP_Pa` | `1845413.7784679066` |
+| `legacy_first_dP_over_theoretical` | `0.03331256651017148` |
+
+Classificacoes:
+
+```text
+FLOWRATE_CONVENTION_MATCHES_LEGACY
+ROOT_CAUSE_MISSING_GEOMETRIC_COMPLIANCE
+```
+
+Conclusao: a conversao de vazao moderna nao foi classificada como causa raiz.
+O legado usa `Vq` e `Vi` por radiano, enquanto o moderno usa volume total para
+ambos; essas formas sao equivalentes para `dP = dV/(C*V)`. A divergencia vem da
+ausencia, no moderno, do termo geometrico `dV` que entra na formula legada:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho*FC))) / Vi / k
+```
+
+Esta fase nao altera solver C++ e nao promove o Level 1 para validacao fisica.
+O proximo passo deve ser uma fase de desenho/implementacao opt-in para
+`annular_compliance`/`wellbore_compliance`, sem fator empirico.
