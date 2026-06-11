@@ -466,3 +466,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `STAGE11_PARAMETRIC_INFRASTRUCTURE`. O foco futuro deve ser infraestrutura
   paramétrica, índices de estudos e relatórios multi-estudo, sem promover
   sensibilidade diagnóstica a calibração física.
+- A Fase 11.1A registra o plano técnico da Etapa 11 em
+  `docs/44_stage11_parametric_infrastructure_plan.md`. A primeira implementação
+  recomendada é `STAGE11_1B_MULTI_STUDY_MATRIX_INDEX`, mantendo solver e casos
+  protegidos inalterados.

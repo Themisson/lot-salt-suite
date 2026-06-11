@@ -1525,6 +1525,33 @@
       "Stage 11 should focus on parametric infrastructure and study discoverability."
     ]
   },
+  "phase11_1a_parametric_infrastructure_plan": {
+    "status": "STAGE11_PARAMETRIC_INFRASTRUCTURE_PLAN_RECORDED",
+    "next_phase": "NEXT_PHASE_STAGE11_1B_MULTI_STUDY_MATRIX_INDEX",
+    "phase": "11.1A",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": true,
+    "tool": "tools/plan_stage11_parametric_infrastructure.py",
+    "document": "docs/44_stage11_parametric_infrastructure_plan.md",
+    "primary_goal": "PARAMETRIC_INFRASTRUCTURE",
+    "planned_phases": [
+      "11.1B",
+      "11.2A",
+      "11.2B",
+      "11.3A",
+      "11.3B",
+      "11.4A",
+      "11.5A"
+    ],
+    "caveats": [
+      "Stage 11 starts with parametric infrastructure, not solver changes.",
+      "Generated studies remain diagnostic until independent validation gates are added.",
+      "The first implementation should register studies without duplicating matrices."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

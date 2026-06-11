@@ -157,3 +157,19 @@ Status de handoff:
 PHASE10_CLOSED_READY_FOR_STAGE11
 STAGE11_PARAMETRIC_INFRASTRUCTURE_RECOMMENDED
 ```
+
+## Plano 11.1A registrado
+
+A Fase 11.1A cria o documento `docs/44_stage11_parametric_infrastructure_plan.md`
+e a ferramenta `tools/plan_stage11_parametric_infrastructure.py`.
+
+Status:
+
+```text
+STAGE11_PARAMETRIC_INFRASTRUCTURE_PLAN_RECORDED
+NEXT_PHASE_STAGE11_1B_MULTI_STUDY_MATRIX_INDEX
+```
+
+A primeira implementação recomendada da Etapa 11 é um índice versionado de
+estudos de sensibilidade, preservando o runner existente e evitando mudanças de
+solver.

@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.31B Phase 10 closure and Stage 11 handoff
+Fase ativa  : 11.1A Stage 11 parametric infrastructure plan
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 271/271 previstos apos Fase 10.31B em 2026-06-11
+Testes Py   : 276/276 previstos apos Fase 11.1A em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,35 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 11.1A — plano técnico da Etapa 11 — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Documento criado:**
+
+```text
+docs/44_stage11_parametric_infrastructure_plan.md
+```
+
+**Ferramenta criada:**
+
+```text
+tools/plan_stage11_parametric_infrastructure.py
+```
+
+**Resultado:**
+
+```text
+STAGE11_PARAMETRIC_INFRASTRUCTURE_PLAN_RECORDED
+NEXT_PHASE_STAGE11_1B_MULTI_STUDY_MATRIX_INDEX
+```
+
+A Etapa 11 foi aberta com foco em infraestrutura paramétrica `modern-refined`:
+índices de estudos, matrizes reutilizáveis, execução reproduzível e relatórios
+multi-estudo. Solver, schemas e casos protegidos permanecem fora do escopo.
 
 ---
 

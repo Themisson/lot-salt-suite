@@ -324,3 +324,22 @@ A Etapa 10 fica encerrada como pacote BUZ-67D `modern-refined` reproduzível,
 com matriz versionada, runner, reporter e documentação operacional. O fechamento
 reafirma que não há equivalência estrita com `LOT_Tese`, sigmaTheta runtime real
 ou calibração física automática de `C_geom`.
+
+## Fase 11.1A registrada
+
+A Fase 11.1A abre formalmente a Etapa 11:
+
+```text
+docs/44_stage11_parametric_infrastructure_plan.md
+tools/plan_stage11_parametric_infrastructure.py
+```
+
+Status:
+
+```text
+STAGE11_PARAMETRIC_INFRASTRUCTURE_PLAN_RECORDED
+NEXT_PHASE_STAGE11_1B_MULTI_STUDY_MATRIX_INDEX
+```
+
+O foco passa a ser infraestrutura paramétrica `modern-refined`, começando por
+um índice multi-estudo para matrizes de sensibilidade.
