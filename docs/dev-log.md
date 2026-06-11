@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.27C roadmap pos-10.27 registrado
+Fase ativa  : 10.28A pacote modern-refined para casos adicionais
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
-Testes C++  : 258/258 passaram apos Fase 10.24C em 2026-06-11
-Testes Py   : 207/207 previstos apos Fase 10.27C em 2026-06-11
+Testes C++  : 263/263 passaram apos Fase 10.27C em 2026-06-11
+Testes Py   : 211/211 previstos apos Fase 10.28A em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -57,9 +57,43 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 10.28A — pacote modern-refined para casos adicionais — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Documento criado:**
+
+```text
+docs/33_phase10_28a_modern_refined_validation_package.md
+```
+
+**Ferramenta criada:**
+
+```text
+tools/plan_phase10_28a_modern_refined_validation.py
+```
+
+**Status:**
+
+```text
+PHASE=10.28A
+MODE=MODERN_REFINED_VALIDATION_PACKAGE
+LEGACY_EQUIVALENCE=SEPARATE_TRACK
+BASE_CASE=BUZ67D_MODERN_REFINED
+NEXT_GATE=ADDITIONAL_WELLS_OR_SENSITIVITY_MATRIX
+PROTECTED_SCOPE_UNCHANGED=true
+```
+
+**Interpretação:** a próxima validação `modern-refined` deve usar casos/poços
+adicionais somente se houver dados completos. Se não houver, a rota correta é
+uma matriz formal de sensibilidade BUZ-67D, sem misturar exigências de
+`legacy-equivalence`.
+
+---
+
 ### [2026-06-11] Fase 10.27C — roadmap pós-10.27 — Codex
 
-**Status:** Roadmap registrado; testes/commit/push em andamento.
+**Status:** Publicado em `5888401`.
 
 **Documento criado:**
 

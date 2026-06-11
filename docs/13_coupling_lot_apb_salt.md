@@ -3386,3 +3386,28 @@ estão bons para diagnóstico, enquanto a abertura em `660 s` permanece uma
 diferença documentada, não erro automático. Exigir abertura em `510 s` continua
 restrito ao `legacy-equivalence mode` com geometria/sampling APBSalt1D
 realmente consumidos.
+
+## Pacote modern-refined para casos adicionais (Fase 10.28A)
+
+A Fase 10.28A cria:
+
+```text
+docs/33_phase10_28a_modern_refined_validation_package.md
+tools/plan_phase10_28a_modern_refined_validation.py
+```
+
+O objetivo é preparar a expansão do `modern-refined mode` para outros casos ou
+poços. Quando não houver dados completos, a rota recomendada é executar uma
+matriz de sensibilidade BUZ-67D, mantendo `legacy-equivalence` como trilha
+separada.
+
+Status:
+
+```text
+PHASE=10.28A
+MODE=MODERN_REFINED_VALIDATION_PACKAGE
+LEGACY_EQUIVALENCE=SEPARATE_TRACK
+BASE_CASE=BUZ67D_MODERN_REFINED
+NEXT_GATE=ADDITIONAL_WELLS_OR_SENSITIVITY_MATRIX
+PROTECTED_SCOPE_UNCHANGED=true
+```

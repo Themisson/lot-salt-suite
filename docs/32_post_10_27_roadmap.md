@@ -116,3 +116,17 @@ sampling dentro do próprio modo moderno.
 6. Rodar `python tools/generate_docs_index.py`.
 7. Validar os três casos principais LOT-PKN.
 8. Confirmar que `results/` permanece ignorado.
+
+## Fase 10.28A registrada
+
+A Fase 10.28A cria o pacote documental em:
+
+```text
+docs/33_phase10_28a_modern_refined_validation_package.md
+```
+
+Ela mantém a recomendação do roadmap: primeiro tentar casos/poços adicionais
+com dados completos; se isso não estiver disponível, executar uma matriz de
+sensibilidade `modern-refined` baseada no BUZ-67D. A trilha
+`legacy-equivalence` permanece separada e condicionada ao consumo real de
+geometria/sampling APBSalt1D.

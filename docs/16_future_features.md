@@ -411,3 +411,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   sensibilidade de malha/dominio/sampling (`10.28B`) e graficos de publicacao
   (`10.28C`). A rota `legacy-equivalence` com solver APBSalt1D fica opcional e
   condicionada a necessidade explicita de regressao estrita.
+- A Fase 10.28A criou o pacote de planejamento
+  `docs/33_phase10_28a_modern_refined_validation_package.md`. O gate novo e
+  `ADDITIONAL_WELLS_OR_SENSITIVITY_MATRIX`: usar casos/poços adicionais apenas
+  com dados completos; caso contrario, executar matriz de sensibilidade
+  BUZ-67D sem transformar divergencias temporais ou numericas em erro
+  automatico.

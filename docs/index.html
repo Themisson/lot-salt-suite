@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">92/99</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">93/100</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">263</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">207</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">211</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -7649,6 +7649,23 @@ estão bons para diagnóstico, enquanto a abertura em <code>660 s</code> permane
 diferença documentada, não erro automático. Exigir abertura em <code>510 s</code> continua
 restrito ao <code>legacy-equivalence mode</code> com geometria/sampling APBSalt1D
 realmente consumidos.</p>
+<h2 id="pacote-modern-refined-para-casos-adicionais-fase-1028a">Pacote modern-refined para casos adicionais (Fase 10.28A)</h2>
+<p>A Fase 10.28A cria:</p>
+<pre><code class="language-text">docs/33_phase10_28a_modern_refined_validation_package.md
+tools/plan_phase10_28a_modern_refined_validation.py
+</code></pre>
+<p>O objetivo é preparar a expansão do <code>modern-refined mode</code> para outros casos ou
+poços. Quando não houver dados completos, a rota recomendada é executar uma
+matriz de sensibilidade BUZ-67D, mantendo <code>legacy-equivalence</code> como trilha
+separada.</p>
+<p>Status:</p>
+<pre><code class="language-text">PHASE=10.28A
+MODE=MODERN_REFINED_VALIDATION_PACKAGE
+LEGACY_EQUIVALENCE=SEPARATE_TRACK
+BASE_CASE=BUZ67D_MODERN_REFINED
+NEXT_GATE=ADDITIONAL_WELLS_OR_SENSITIVITY_MATRIX
+PROTECTED_SCOPE_UNCHANGED=true
+</code></pre>
 </div>
 </section>
 

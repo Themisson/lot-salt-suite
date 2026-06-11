@@ -1222,6 +1222,32 @@
       "pressure_source/timing remains blocked for strict legacy-equivalence claims."
     ]
   },
+  "phase10_28a_modern_refined_validation_package": {
+    "status": "MODERN_REFINED_VALIDATION_PACKAGE_PLANNED",
+    "phase": "10.28A",
+    "mode": "MODERN_REFINED_VALIDATION_PACKAGE",
+    "legacy_equivalence": "SEPARATE_TRACK",
+    "base_case": "BUZ67D_MODERN_REFINED",
+    "next_gate": "ADDITIONAL_WELLS_OR_SENSITIVITY_MATRIX",
+    "protected_scope_unchanged": true,
+    "tool": "tools/plan_phase10_28a_modern_refined_validation.py",
+    "document": "docs/33_phase10_28a_modern_refined_validation_package.md",
+    "minimum_additional_case_data": [
+      "validated modern YAML",
+      "traceable pressure and schedule",
+      "fluid and geometry metadata",
+      "compliance model declaration",
+      "sink timing declaration",
+      "sigmaTheta source or explicit blocker"
+    ],
+    "fallback_if_data_missing": "BUZ67D modern-refined sensitivity matrix",
+    "caveats": [
+      "Do not invent new field data.",
+      "Do not classify time or numeric differences as errors without a documented physical criterion.",
+      "Do not mix legacy-equivalence with modern-refined validation.",
+      "Strict LOT_Tese regression remains a separate track."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

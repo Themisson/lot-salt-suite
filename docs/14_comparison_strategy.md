@@ -2764,3 +2764,23 @@ MODERN_REFINED_NOT_LEGACY_EQUIVALENT
 PRESSURE_SOURCE_TIMING_REVIEW_BLOCKED_BY_GEOMETRY
 APBSALT1D_SAMPLING_BRIDGE_BLOCKED
 ```
+
+## Fase 10.28A — pacote modern-refined para casos adicionais
+
+A Fase 10.28A registra o contrato para ampliar a validação `modern-refined`:
+
+```text
+docs/33_phase10_28a_modern_refined_validation_package.md
+```
+
+O pacote preserva a separação entre `modern-refined validation` e
+`legacy-equivalence`. Novos casos/poços só devem ser aceitos quando houver dados
+completos de schedule, pressão, fluido, geometria, compliance e caveats. Se
+esses dados não existirem, a próxima etapa deve ser uma matriz de sensibilidade
+BUZ-67D, não uma regressão física contra o `LOT_Tese`.
+
+Gate:
+
+```text
+ADDITIONAL_WELLS_OR_SENSITIVITY_MATRIX
+```
