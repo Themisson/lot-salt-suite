@@ -186,7 +186,7 @@ void validate_input(const PknInput& input) {
   if (input.pressure_model == PknPressureModel::VolumetricBalance &&
       input.fracture_initiation ==
           FractureInitiationCriterion::SigmaThetaProviderRuntime &&
-      input.sigma_theta_provider == nullptr) {
+      !input.sigma_theta_provider) {
     throw std::invalid_argument(
         "PknModel: sigma_theta_provider_runtime requires provider");
   }
@@ -385,6 +385,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
   double initiation_margin_Pa = 0.0;
   double initiation_time_s = 0.0;
   double sigma_theta_lookup_time_s = 0.0;
+  double sigma_theta_depth_m = 0.0;
   std::string sigma_theta_layer_id;
   std::string sigma_theta_source;
   std::string sigma_theta_mapping_status;
@@ -435,6 +436,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
             input.sigma_theta_fracture.sigma_theta_compression_positive_Pa;
         const double margin_Pa = trial_pressure_Pa - sigma_theta_Pa;
         sigma_theta_lookup_time_s = series.time_series_s[i];
+        sigma_theta_depth_m = input.sigma_theta_fracture.influence_depth_m;
         sigma_theta_layer_id = input.sigma_theta_fracture.layer_id;
         sigma_theta_source = input.sigma_theta_fracture.source;
         sigma_theta_mapping_status = input.sigma_theta_fracture.mapping_status;
@@ -456,6 +458,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
             trial_pressure_Pa -
             sigma_theta.sigma_theta_compression_positive_Pa;
         sigma_theta_lookup_time_s = sigma_theta.time_s;
+        sigma_theta_depth_m = sigma_theta.influence_depth_m;
         sigma_theta_layer_id = sigma_theta.layer_id;
         sigma_theta_source = sigma_theta.source;
         sigma_theta_mapping_status = sigma_theta.mapping_status;
@@ -534,10 +537,17 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
   series.sink_timing = sink_timing_label(input.sink_timing);
   series.fracture_initiation_type =
       fracture_initiation_label(input.fracture_initiation);
-  series.fracture_initiation_layer_id = input.sigma_theta_fracture.layer_id;
-  series.fracture_initiation_depth_m =
-      input.sigma_theta_fracture.influence_depth_m;
-  series.fracture_initiation_source = input.sigma_theta_fracture.source;
+  if (input.fracture_initiation ==
+      FractureInitiationCriterion::SigmaThetaProviderRuntime) {
+    series.fracture_initiation_layer_id = sigma_theta_layer_id;
+    series.fracture_initiation_depth_m = sigma_theta_depth_m;
+    series.fracture_initiation_source = sigma_theta_source;
+  } else {
+    series.fracture_initiation_layer_id = input.sigma_theta_fracture.layer_id;
+    series.fracture_initiation_depth_m =
+        input.sigma_theta_fracture.influence_depth_m;
+    series.fracture_initiation_source = input.sigma_theta_fracture.source;
+  }
   series.sigma_theta_provider_type =
       input.fracture_initiation ==
               FractureInitiationCriterion::SigmaThetaProviderRuntime

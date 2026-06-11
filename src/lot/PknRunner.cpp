@@ -1,8 +1,10 @@
 #include "lot/PknRunner.hpp"
 
 #include <cmath>
+#include <memory>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "lot/PknModel.hpp"
 #include "wellbore/AnnularVolume.hpp"
@@ -146,6 +148,9 @@ FractureInitiationCriterion parse_fracture_initiation(
   if (criterion.type == "sigma_theta_static") {
     return FractureInitiationCriterion::SigmaThetaStatic;
   }
+  if (criterion.type == "sigma_theta_time_series") {
+    return FractureInitiationCriterion::SigmaThetaProviderRuntime;
+  }
   throw std::runtime_error("PknRunner: unsupported fracture initiation type: " +
                            criterion.type);
 }
@@ -284,6 +289,20 @@ PknInput make_pkn_input(const lss::core::CaseData& data) {
       data.lot.sigma_theta_fracture.comparison;
   input.sigma_theta_fracture.mapping_status =
       data.lot.sigma_theta_fracture.mapping_status;
+  if (data.lot.sigma_theta_fracture.type == "sigma_theta_time_series") {
+    std::vector<SigmaThetaTimeSeriesPoint> points;
+    points.reserve(data.lot.sigma_theta_fracture.time_series.size());
+    for (const auto& point : data.lot.sigma_theta_fracture.time_series) {
+      points.push_back({point.time_s,
+                        point.sigma_theta_compression_positive_Pa,
+                        point.layer_id,
+                        point.influence_depth_m});
+    }
+    input.sigma_theta_provider =
+        std::make_shared<SigmaThetaTimeSeriesProvider>(
+            std::move(points), data.lot.sigma_theta_fracture.source,
+            data.lot.sigma_theta_fracture.mapping_status);
+  }
   if (input.pressure_model == PknPressureModel::VolumetricBalance) {
     const auto annular_context = make_annular_volume_context(data);
     if (!annular_context.available || annular_context.total_m3 <= 0.0) {

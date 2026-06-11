@@ -102,6 +102,13 @@ struct InjectionPhaseData {
 };
 
 struct SigmaThetaFractureCriterionData {
+  struct TimeSeriesPoint {
+    double time_s = 0.0;
+    double sigma_theta_compression_positive_Pa = 0.0;
+    std::string layer_id;
+    double influence_depth_m = 0.0;
+  };
+
   bool enabled = false;
   std::string type;
   std::string layer_id;
@@ -111,6 +118,9 @@ struct SigmaThetaFractureCriterionData {
   std::string pressure_source;
   std::string comparison;
   std::string mapping_status;
+  std::string interpolation;
+  std::string out_of_range;
+  std::vector<TimeSeriesPoint> time_series;
 };
 
 struct VolumetricComplianceData {

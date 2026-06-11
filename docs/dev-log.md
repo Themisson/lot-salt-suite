@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.24A contrato SigmaThetaProvider runtime; commit/push pendente
+Fase ativa  : 10.24B sigma_theta_time_series diagnostico; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
-Último push : 2026-06-10
-Testes C++  : 249/249 passaram apos Fase 10.24A em 2026-06-11
-Testes Py   : 133/133 passaram apos Fase 10.23C em 2026-06-10
+Último push : 2026-06-11
+Testes C++  : 258/258 passaram apos Fase 10.24B em 2026-06-11
+Testes Py   : 139/139 passaram apos Fase 10.24B em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -57,9 +57,65 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
-### [2026-06-11] Fase 10.24A — contrato SigmaThetaProvider runtime — Codex
+### [2026-06-11] Fase 10.24B — sigma_theta_time_series diagnóstico — Codex
 
 **Status:** Implementada localmente; commit/push pendente.
+
+**Classificação:** `SIGMA_THETA_TIMESERIES_DIAGNOSTIC_ONLY`.
+
+**Objetivo:** expor uma fonte temporal opt-in de
+`sigma_theta_compression_positive_Pa` para o `volumetric_balance`, usando o
+contrato `SigmaThetaProvider` da Fase 10.24A, sem conectar `saltcreep`,
+`SaltCreepTimeBridge`, `SaltWallStressDiagnostics` ou alterar o default runtime.
+
+**Implementação:** adicionado `SigmaThetaTimeSeriesProvider` em `lot/`, com
+interpolação linear e clamp fora do intervalo. O schema e o parser aceitam:
+
+```text
+lot.fracture.initiation.type = sigma_theta_time_series
+pressure_source = wellbore_pressure_trial_Pa
+comparison = legacy_algebra
+sigma_theta_series.interpolation = linear
+sigma_theta_series.out_of_range = clamp
+```
+
+**Caso controlado criado:**
+
+```text
+cases/validation/buz67d_pkn_legacy_sigma_theta_timeseries.yaml
+```
+
+O caso usa uma série mínima derivada da trace unificada 10.22C (`480 s`,
+`510 s`, `540 s`; `sigmaTheta = 66666600 Pa`) para validar o wiring
+`YAML -> CaseParser -> CaseData -> PknRunner -> SigmaThetaProvider -> PknModel`.
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase10_24b.py
+```
+
+**Resultado diagnóstico local:**
+
+```text
+classification = SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED
+max_pressure_legacy_Pa = 69035836.1743195
+max_pressure_modern_Pa = 67331393.612597
+relative_error_max_pressure = -0.02468924338685035
+modern_fracture_initiation_time_s = 660.0
+modern_first_sink_positive_time_s = 690.0
+modern_sink_delay_s = 30.0
+```
+
+**Preservações:** `pkn_direct` continua ignorando provider runtime; casos
+protegidos não foram alterados; a rota não é default; não há validação física de
+fratura.
+
+---
+
+### [2026-06-11] Fase 10.24A — contrato SigmaThetaProvider runtime — Codex
+
+**Status:** Concluída, commitada e enviada em `b81ea57`.
 
 **Gate:** `SIGMA_THETA_PROVIDER_CONTRACT_IMPLEMENTATION_ALLOWED`.
 
@@ -70,8 +126,9 @@ consultar `sigma_theta_compression_positive_Pa` sem depender de
 
 **Implementacao:** foi criado `include/lot/SigmaThetaProvider.hpp` com
 `SigmaThetaRuntimePoint` e a interface `SigmaThetaProvider`. O `PknInput` agora
-aceita `FractureInitiationCriterion::SigmaThetaProviderRuntime` e um ponteiro
-nao proprietario `sigma_theta_provider`. O `PknModel` usa essa rota apenas no
+aceita `FractureInitiationCriterion::SigmaThetaProviderRuntime` e um
+`std::shared_ptr<const SigmaThetaProvider> sigma_theta_provider`. O `PknModel`
+usa essa rota apenas no
 `volumetric_balance` quando explicitamente configurada, avaliando:
 
 ```text

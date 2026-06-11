@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iterator>
+#include <memory>
 #include <vector>
 #include <stdexcept>
 
@@ -139,7 +140,7 @@ lss::lot::PknInput sigma_theta_input(double sigma_theta_Pa) {
 }
 
 lss::lot::PknInput runtime_sigma_theta_input(
-    const lss::lot::SigmaThetaProvider& provider, double sigma_theta_Pa) {
+    std::shared_ptr<const lss::lot::SigmaThetaProvider> provider) {
   auto input = synthetic_input();
   input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
   input.annular_volume_m3 = 10.0;
@@ -147,8 +148,7 @@ lss::lot::PknInput runtime_sigma_theta_input(
   input.breakdown.pressure_Pa = 1.0e12;
   input.fracture_initiation =
       lss::lot::FractureInitiationCriterion::SigmaThetaProviderRuntime;
-  input.sigma_theta_provider = &provider;
-  (void)sigma_theta_Pa;
+  input.sigma_theta_provider = std::move(provider);
   return input;
 }
 
@@ -285,12 +285,12 @@ TEST_CASE("Sigma theta provider absence preserves existing behavior") {
 
 TEST_CASE("Sigma theta provider contract opens from runtime threshold") {
   const lss::lot::PknModel model;
-  FixedSigmaThetaProvider provider(50.0);
-  const auto input = runtime_sigma_theta_input(provider, 50.0);
+  auto provider = std::make_shared<FixedSigmaThetaProvider>(50.0);
+  const auto input = runtime_sigma_theta_input(provider);
 
   const auto result = model.simulate(input);
 
-  CHECK(provider.call_count > 0);
+  CHECK(provider->call_count > 0);
   CHECK(result.fracture_initiated);
   CHECK(result.fracture_initiation_type == "sigma_theta_provider_runtime");
   CHECK(result.sigma_theta_provider_type == "runtime");
@@ -303,17 +303,72 @@ TEST_CASE("Sigma theta provider contract opens from runtime threshold") {
         Catch::Approx(result.fracture_initiation_time_s));
 }
 
+TEST_CASE("Sigma theta time-series interpolates linearly") {
+  const lss::lot::SigmaThetaTimeSeriesProvider provider(
+      {{0.0, 10.0, "layer_a", 100.0}, {10.0, 30.0, "layer_a", 100.0}},
+      "unit_series", "LINEAR_TEST");
+
+  const auto point = provider.sample(5.0, 20.0);
+
+  CHECK(point.valid);
+  CHECK(point.time_s == Catch::Approx(5.0));
+  CHECK(point.sigma_theta_compression_positive_Pa == Catch::Approx(20.0));
+  CHECK(point.layer_id == "layer_a");
+  CHECK(point.source == "unit_series");
+  CHECK(point.mapping_status == "LINEAR_TEST");
+}
+
+TEST_CASE("Sigma theta time-series clamps below range") {
+  const lss::lot::SigmaThetaTimeSeriesProvider provider(
+      {{10.0, 10.0, "layer_a", 100.0}, {20.0, 30.0, "layer_b", 200.0}},
+      "unit_series", "CLAMP_TEST");
+
+  const auto point = provider.sample(0.0, 20.0);
+
+  CHECK(point.sigma_theta_compression_positive_Pa == Catch::Approx(10.0));
+  CHECK(point.layer_id == "layer_a");
+  CHECK(point.influence_depth_m == Catch::Approx(100.0));
+}
+
+TEST_CASE("Sigma theta time-series clamps above range") {
+  const lss::lot::SigmaThetaTimeSeriesProvider provider(
+      {{10.0, 10.0, "layer_a", 100.0}, {20.0, 30.0, "layer_b", 200.0}},
+      "unit_series", "CLAMP_TEST");
+
+  const auto point = provider.sample(30.0, 20.0);
+
+  CHECK(point.sigma_theta_compression_positive_Pa == Catch::Approx(30.0));
+  CHECK(point.layer_id == "layer_b");
+  CHECK(point.influence_depth_m == Catch::Approx(200.0));
+}
+
+TEST_CASE("Sigma theta time-series rejects unsorted times") {
+  CHECK_THROWS_AS(
+      lss::lot::SigmaThetaTimeSeriesProvider(
+          {{10.0, 10.0, "layer_a", 100.0}, {10.0, 30.0, "layer_b", 200.0}},
+          "unit_series", "INVALID"),
+      std::invalid_argument);
+}
+
+TEST_CASE("Sigma theta time-series rejects non-positive sigma theta") {
+  CHECK_THROWS_AS(
+      lss::lot::SigmaThetaTimeSeriesProvider(
+          {{0.0, 10.0, "layer_a", 100.0}, {10.0, 0.0, "layer_b", 200.0}},
+          "unit_series", "INVALID"),
+      std::invalid_argument);
+}
+
 TEST_CASE("Sigma theta provider contract does not affect pkn_direct") {
   const lss::lot::PknModel model;
-  FixedSigmaThetaProvider provider(1.0);
+  auto provider = std::make_shared<FixedSigmaThetaProvider>(1.0);
   auto input = synthetic_input();
   input.fracture_initiation =
       lss::lot::FractureInitiationCriterion::SigmaThetaProviderRuntime;
-  input.sigma_theta_provider = &provider;
+  input.sigma_theta_provider = provider;
 
   const auto result = model.simulate(input);
 
-  CHECK(provider.call_count == 0);
+  CHECK(provider->call_count == 0);
   CHECK(result.pressure_model == "pkn_direct");
   CHECK(result.fracture_initiation_type == "constant_pressure");
   CHECK(result.sigma_theta_provider_type == "none");

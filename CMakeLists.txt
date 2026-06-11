@@ -114,6 +114,7 @@ set(LSS_CORE_SOURCES
   src/lot/LeakoffModel.cpp
   src/lot/PknModel.cpp
   src/lot/PknRunner.cpp
+  src/lot/SigmaThetaProvider.cpp
   src/coupling/LotSaltBridgeConfigBuilder.cpp
   src/coupling/LotSaltCouplingConfigBuilder.cpp
   src/coupling/LotSaltHydrostaticContext.cpp

@@ -2165,7 +2165,64 @@ Comparabilidade:
 
 - `sigma_theta_static` continua sendo proxy fixo;
 - `sigma_theta_provider_runtime` é opt-in programático;
-- `sigma_theta_time_series` e `sigma_theta_salt_runtime` permanecem fases
-  futuras;
+- `sigma_theta_time_series` foi implementado na Fase 10.24B como provider
+  diagnóstico mínimo por YAML;
+- `sigma_theta_salt_runtime` permanece fase futura;
 - nenhuma conclusão de equivalência física deve ser extraída da existência do
   contrato.
+
+## Fase 10.24B — comparação diagnóstica `sigma_theta_time_series`
+
+A Fase 10.24B adiciona o caso controlado:
+
+```text
+cases/validation/buz67d_pkn_legacy_sigma_theta_timeseries.yaml
+```
+
+e a ferramenta:
+
+```text
+tools/compare_phase10_24b.py
+```
+
+O objetivo é comparar, de forma limitada, o efeito de uma série temporal
+diagnóstica de `sigma_theta_compression_positive_Pa` no runtime LOT/PKN. A série
+usa pontos mínimos derivados da trace unificada 10.22C e deve ser interpretada
+como fixture de wiring, não como curva física completa de tensão tangencial.
+
+Classificações possíveis:
+
+```text
+SIGMA_THETA_TIMESERIES_EFFECTIVE
+SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED
+SIGMA_THETA_TIMESERIES_OPENING_OK_PRESSURE_SHIFTED
+SIGMA_THETA_TIMESERIES_NO_IMPROVEMENT
+SIGMA_THETA_TIMESERIES_INCONCLUSIVE
+```
+
+Campos comparados:
+
+- tempo legado de abertura (`510 s`);
+- primeiro sink positivo legado (`540 s`);
+- tempo moderno de abertura;
+- primeiro sink positivo moderno;
+- erro relativo de pressão máxima.
+
+Resultado diagnóstico observado na execução local da Fase 10.24B:
+
+```text
+classification = SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED
+max_pressure_legacy_Pa = 69035836.1743195
+max_pressure_modern_Pa = 67331393.612597
+relative_error_max_pressure = -0.02468924338685035
+modern_fracture_initiation_time_s = 660.0
+modern_first_sink_positive_time_s = 690.0
+modern_sink_delay_s = 30.0
+```
+
+Caveats:
+
+- não há comparação física de ruptura;
+- a série temporal atual não vem de `SaltCreepTimeBridge`;
+- `sigma_theta_salt_runtime` ainda não existe;
+- o default de `lot-sim run --mode lot-pkn` não muda.

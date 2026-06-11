@@ -249,12 +249,12 @@ properties:
             properties:
               type:
                 type: string
-                enum: [constant_pressure, sigma_theta_static]
+                enum: [constant_pressure, sigma_theta_static, sigma_theta_time_series]
               source:
                 type: string
               pressure_source:
                 type: string
-                enum: [wellbore_pressure_Pa]
+                enum: [wellbore_pressure_Pa, wellbore_pressure_trial_Pa]
               comparison:
                 type: string
                 enum: [legacy_algebra]
@@ -275,6 +275,43 @@ properties:
                     $ref: "#/$defs/length_quantity"
                   mapping_status:
                     type: string
+              sigma_theta_series:
+                type: object
+                required:
+                  - source
+                  - interpolation
+                  - out_of_range
+                  - values
+                additionalProperties: false
+                properties:
+                  source:
+                    type: string
+                  interpolation:
+                    type: string
+                    enum: [linear]
+                  out_of_range:
+                    type: string
+                    enum: [clamp]
+                  mapping_status:
+                    type: string
+                  values:
+                    type: array
+                    minItems: 2
+                    items:
+                      type: object
+                      required:
+                        - time
+                        - sigma_theta_compression_positive
+                      additionalProperties: false
+                      properties:
+                        time:
+                          $ref: "#/$defs/time_quantity"
+                        sigma_theta_compression_positive:
+                          $ref: "#/$defs/pressure_quantity"
+                        layer_id:
+                          type: string
+                        influence_depth:
+                          $ref: "#/$defs/length_quantity"
             allOf:
               - if:
                   properties:
@@ -282,6 +319,12 @@ properties:
                       const: sigma_theta_static
                 then:
                   required: [source, pressure_source, comparison, sigma_theta]
+              - if:
+                  properties:
+                    type:
+                      const: sigma_theta_time_series
+                then:
+                  required: [pressure_source, comparison, sigma_theta_series]
           balance:
             type: object
             additionalProperties: false

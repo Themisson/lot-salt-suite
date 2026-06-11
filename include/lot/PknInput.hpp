@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "lot/InjectionSchedule.hpp"
@@ -71,7 +72,7 @@ struct PknInput {
   FractureInitiationCriterion fracture_initiation =
       FractureInitiationCriterion::ConstantPressure;
   SigmaThetaFractureCriterion sigma_theta_fracture;
-  const SigmaThetaProvider* sigma_theta_provider = nullptr;
+  std::shared_ptr<const SigmaThetaProvider> sigma_theta_provider;
 };
 
 }  // namespace lss::lot

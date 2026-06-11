@@ -767,6 +767,45 @@
       "pkn_direct remains unaffected."
     ]
   },
+  "phase10_24b_sigma_theta_time_series": {
+    "status": "SIGMA_THETA_TIMESERIES_DIAGNOSTIC_ONLY",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "saltcreep_runtime_connected": false,
+    "case": "cases/validation/buz67d_pkn_legacy_sigma_theta_timeseries.yaml",
+    "tool": "tools/compare_phase10_24b.py",
+    "criterion": "sigma_theta_time_series",
+    "interpolation": "linear",
+    "out_of_range": "clamp",
+    "pressure_source": "wellbore_pressure_trial_Pa",
+    "source_trace": "results/comparison/phase10_22c/legacy_unified_balance_opening_trace.csv",
+    "legacy_reference": {
+      "first_opened_time_s": 510.0,
+      "first_sink_positive_time_s": 540.0,
+      "first_pw_Pa": 66769500.0,
+      "first_sigmaTheta_Pa": 66666600.0,
+      "first_margin_Pa": 102865.0
+    },
+    "classification": "SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED",
+    "metrics": {
+      "max_pressure_legacy_Pa": 69035836.1743195,
+      "max_pressure_modern_Pa": 67331393.612597,
+      "relative_error_max_pressure": -0.02468924338685035,
+      "legacy_first_opened_time_s": 510.0,
+      "modern_fracture_initiation_time_s": 660.0,
+      "legacy_first_sink_positive_time_s": 540.0,
+      "modern_first_sink_positive_time_s": 690.0,
+      "modern_sink_delay_s": 30.0
+    },
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "The time-series case uses a minimal legacy-derived fixture, not a complete salt stress history.",
+      "SaltCreepTimeBridge and SaltWallStressDiagnostics remain disconnected from LOT runtime.",
+      "pkn_direct and default runtime behavior remain unchanged."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

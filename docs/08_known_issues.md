@@ -178,6 +178,15 @@ Até validação física futura:
   segue a álgebra legado-moderna documentada, mas não prova equivalência física
   de ruptura.
 
+A Fase 10.24B adicionou `sigma_theta_time_series` como provider diagnóstico
+configurável por YAML, com interpolação linear e clamp fora do intervalo. A
+série controlada atual é uma fixture mínima derivada da trace unificada do
+legado, não um histórico completo de tensão do sal. Ela não conecta
+`SaltCreepTimeBridge`, não usa `SaltWallStressDiagnostics` real e não valida
+fisicamente o critério `pw > sigmaTheta`.
+
+**Status 10.24B:** `SIGMA_THETA_TIMESERIES_DIAGNOSTIC_ONLY`.
+
 **Nota de acoplamento fraco:** O deslocamento do sal é calculado fora do loop iterativo
 de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativo (linhas
 560–868) recalcula pressão sem iterar no sal. Isto é acoplamento **sequencial fraco**

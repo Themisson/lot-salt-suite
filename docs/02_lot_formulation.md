@@ -1503,5 +1503,48 @@ JSON: `sigma_theta_provider_type`, `sigma_theta_source`,
 `sigma_theta_mapping_status`.
 
 Status fisico: contrato arquitetural apenas. Nao ha provider real de
-`saltcreep`, nao ha `SaltCreepTimeBridge` no runtime LOT/PKN, e
-`sigma_theta_time_series` fica reservado para fase posterior.
+`saltcreep`, nao ha `SaltCreepTimeBridge` no runtime LOT/PKN.
+
+### Critério `sigma_theta_time_series` opt-in — Fase 10.24B
+
+A Fase 10.24B expõe o primeiro provider diagnóstico configurável por YAML:
+`lot.fracture.initiation.type = sigma_theta_time_series`. Essa rota continua
+restrita ao `volumetric_balance` e usa o contrato runtime da Fase 10.24A:
+
+```text
+opened = wellbore_pressure_trial_Pa > sigma_theta_compression_positive_Pa
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+```
+
+O bloco YAML aceita uma série temporal mínima com:
+
+```text
+pressure_source = wellbore_pressure_trial_Pa
+comparison = legacy_algebra
+interpolation = linear
+out_of_range = clamp
+```
+
+O provider valida tempos crescentes, `sigma_theta_compression_positive_Pa > 0`,
+interpola linearmente dentro do intervalo e usa clamp fora do intervalo. O caso
+controlado:
+
+```text
+cases/validation/buz67d_pkn_legacy_sigma_theta_timeseries.yaml
+```
+
+usa três pontos derivados da trace unificada da Fase 10.22C como fixture
+diagnóstico mínimo. Essa série não é um histórico completo de tensão de sal, não
+conecta `SaltCreepTimeBridge`, não substitui `sigma_theta_static` como proxy
+diagnóstico e não muda o default global.
+
+`pkn_direct` continua ignorando o provider runtime. A rota existe apenas para
+testar o encadeamento:
+
+```text
+YAML -> CaseParser -> CaseData -> PknRunner -> SigmaThetaTimeSeriesProvider -> PknModel
+```
+
+Status fisico: `SIGMA_THETA_TIMESERIES_DIAGNOSTIC_ONLY`. A comparação com o
+legado deve ser lida como diagnóstico de wiring e timing, não como validação
+física de fratura.

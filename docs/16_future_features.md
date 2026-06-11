@@ -321,8 +321,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 - A Fase 10.24A implementou o primeiro contrato arquitetural dessa rota:
   `SigmaThetaProvider` em `lot/`. Ele permite que o `PknModel` consulte
   `sigma_theta_compression_positive_Pa` de uma fonte runtime opt-in, sem incluir
-  `saltcreep`, `SaltCreepTimeBridge` ou `SaltWallStressDiagnostics`. As fases
-  futuras devem implementar primeiro um provider diagnostico por serie temporal
-  e, somente depois, avaliar se `SaltWallStressDiagnostics` pode ser a fonte
-  runtime fisicamente controlada. O default de `lot-sim run --mode lot-pkn`
-  permanece inalterado.
+  `saltcreep`, `SaltCreepTimeBridge` ou `SaltWallStressDiagnostics`.
+- A Fase 10.24B implementou o provider diagnostico `sigma_theta_time_series`
+  por YAML, com interpolacao linear e clamp. Essa rota ainda e fixture minima
+  de wiring e nao substitui uma fonte fisica real. As fases futuras devem
+  avaliar se `SaltWallStressDiagnostics` pode ser a fonte runtime fisicamente
+  controlada. O default de `lot-sim run --mode lot-pkn` permanece inalterado.

@@ -234,7 +234,7 @@
   <div class="brand">
     <h1>lot-salt-suite<span class="dot">.</span></h1>
     <div class="sub">LOT · APB · Fluência de sal</div>
-    <span class="ver">v0.1.0 · atualizado 2026-06-10</span>
+    <span class="ver">v0.1.0 · atualizado 2026-06-11</span>
   </div>
   <div class="search-wrap">
     <input type="text" id="navSearch" placeholder="buscar na navegação..." autocomplete="off">
@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">79/86</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">249</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">133</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">80/87</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">258</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">139</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -2185,8 +2185,36 @@ JSON: <code>sigma_theta_provider_type</code>, <code>sigma_theta_source</code>,
 <code>sigma_theta_lookup_time_s</code>, <code>sigma_theta_layer_id</code> e
 <code>sigma_theta_mapping_status</code>.</p>
 <p>Status fisico: contrato arquitetural apenas. Nao ha provider real de
-<code>saltcreep</code>, nao ha <code>SaltCreepTimeBridge</code> no runtime LOT/PKN, e
-<code>sigma_theta_time_series</code> fica reservado para fase posterior.</p>
+<code>saltcreep</code>, nao ha <code>SaltCreepTimeBridge</code> no runtime LOT/PKN.</p>
+<h3 id="criterio-sigma_theta_time_series-opt-in-fase-1024b">Critério <code>sigma_theta_time_series</code> opt-in — Fase 10.24B</h3>
+<p>A Fase 10.24B expõe o primeiro provider diagnóstico configurável por YAML:
+<code>lot.fracture.initiation.type = sigma_theta_time_series</code>. Essa rota continua
+restrita ao <code>volumetric_balance</code> e usa o contrato runtime da Fase 10.24A:</p>
+<pre><code class="language-text">opened = wellbore_pressure_trial_Pa &gt; sigma_theta_compression_positive_Pa
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+</code></pre>
+<p>O bloco YAML aceita uma série temporal mínima com:</p>
+<pre><code class="language-text">pressure_source = wellbore_pressure_trial_Pa
+comparison = legacy_algebra
+interpolation = linear
+out_of_range = clamp
+</code></pre>
+<p>O provider valida tempos crescentes, <code>sigma_theta_compression_positive_Pa &gt; 0</code>,
+interpola linearmente dentro do intervalo e usa clamp fora do intervalo. O caso
+controlado:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_sigma_theta_timeseries.yaml
+</code></pre>
+<p>usa três pontos derivados da trace unificada da Fase 10.22C como fixture
+diagnóstico mínimo. Essa série não é um histórico completo de tensão de sal, não
+conecta <code>SaltCreepTimeBridge</code>, não substitui <code>sigma_theta_static</code> como proxy
+diagnóstico e não muda o default global.</p>
+<p><code>pkn_direct</code> continua ignorando o provider runtime. A rota existe apenas para
+testar o encadeamento:</p>
+<pre><code class="language-text">YAML -&gt; CaseParser -&gt; CaseData -&gt; PknRunner -&gt; SigmaThetaTimeSeriesProvider -&gt; PknModel
+</code></pre>
+<p>Status fisico: <code>SIGMA_THETA_TIMESERIES_DIAGNOSTIC_ONLY</code>. A comparação com o
+legado deve ser lida como diagnóstico de wiring e timing, não como validação
+física de fratura.</p>
 </div>
 </section>
 
@@ -2939,6 +2967,13 @@ usa <code>SaltWallStressDiagnostics</code> real e não torna sigma-theta runtime
   segue a álgebra legado-moderna documentada, mas não prova equivalência física
   de ruptura.</li>
 </ul>
+<p>A Fase 10.24B adicionou <code>sigma_theta_time_series</code> como provider diagnóstico
+configurável por YAML, com interpolação linear e clamp fora do intervalo. A
+série controlada atual é uma fixture mínima derivada da trace unificada do
+legado, não um histórico completo de tensão do sal. Ela não conecta
+<code>SaltCreepTimeBridge</code>, não usa <code>SaltWallStressDiagnostics</code> real e não valida
+fisicamente o critério <code>pw &gt; sigmaTheta</code>.</p>
+<p><strong>Status 10.24B:</strong> <code>SIGMA_THETA_TIMESERIES_DIAGNOSTIC_ONLY</code>.</p>
 <p><strong>Nota de acoplamento fraco:</strong> O deslocamento do sal é calculado fora do loop iterativo
 de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativo (linhas
 560–868) recalcula pressão sem iterar no sal. Isto é acoplamento <strong>sequencial fraco</strong>
@@ -7182,7 +7217,6 @@ margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
 <li>não há provider real de <code>saltcreep</code>;</li>
 <li><code>SaltCreepTimeBridge</code> não foi instanciado no runtime LOT/PKN;</li>
 <li><code>SaltWallStressDiagnostics</code> ainda não alimenta <code>PknModel</code>;</li>
-<li><code>sigma_theta_time_series</code> ainda não foi exposto em YAML;</li>
 <li>o default global permanece <code>constant_pressure</code>/<code>pkn_direct</code> conforme os casos
   existentes;</li>
 <li><code>sigma_theta_static</code> segue suportado como proxy diagnóstico fixo.</li>
@@ -7191,6 +7225,42 @@ margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
 <code>sigma_theta_lookup_time_s</code>, <code>sigma_theta_layer_id</code> e
 <code>sigma_theta_mapping_status</code> foram adicionados ao resultado moderno para manter
 rastreável a origem da tensão quando um provider opt-in for usado.</p>
+<h2 id="provider-sigma_theta_time_series-diagnostico-fase-1024b">Provider <code>sigma_theta_time_series</code> diagnóstico (Fase 10.24B)</h2>
+<p>A Fase 10.24B expôs o primeiro provider configurável por YAML:
+<code>lot.fracture.initiation.type = sigma_theta_time_series</code>. Ele é opt-in,
+diagnóstico e restrito ao <code>volumetric_balance</code>.</p>
+<p>O provider consome uma série de pontos:</p>
+<pre><code class="language-text">time_s
+sigma_theta_compression_positive_Pa
+layer_id
+influence_depth_m
+</code></pre>
+<p>com interpolação <code>linear</code> e extrapolação por <code>clamp</code>. O <code>PknRunner</code> monta um
+<code>SigmaThetaTimeSeriesProvider</code> e o <code>PknModel</code> avalia:</p>
+<pre><code class="language-text">opened = wellbore_pressure_trial_Pa &gt; sigma_theta_compression_positive_Pa
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+</code></pre>
+<p>Caso controlado:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_sigma_theta_timeseries.yaml
+</code></pre>
+<p>Esse caso usa três pontos mínimos derivados da trace unificada da Fase 10.22C
+(<code>480 s</code>, <code>510 s</code>, <code>540 s</code>, <code>sigmaTheta = 66666600 Pa</code>) para validar o wiring
+<code>YAML -&gt; CaseParser -&gt; CaseData -&gt; PknRunner -&gt; SigmaThetaProvider -&gt; PknModel</code>.</p>
+<p>Na comparação diagnóstica local, a rota foi classificada como:</p>
+<pre><code class="language-text">SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED
+</code></pre>
+<p>Ou seja, a escala de pressão máxima permaneceu próxima ao legado, mas a abertura
+moderna ainda ocorreu em <code>660 s</code>, contra <code>510 s</code> na trace legada.</p>
+<p>Limites físicos:</p>
+<ul>
+<li>a série é fixture diagnóstica mínima, não histórico completo de tensão do sal;</li>
+<li><code>SaltCreepTimeBridge</code> e <code>SaltWallStressDiagnostics</code> continuam desconectados do
+  runtime LOT/PKN;</li>
+<li><code>pkn_direct</code> continua ignorando o provider;</li>
+<li>o default global não muda;</li>
+<li>a comparação permanece <code>SIGMA_THETA_TIMESERIES_DIAGNOSTIC_ONLY</code>, sem validação
+  física de fratura.</li>
+</ul>
 </div>
 </section>
 

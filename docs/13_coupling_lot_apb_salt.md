@@ -2904,7 +2904,6 @@ Limites da fase:
 - não há provider real de `saltcreep`;
 - `SaltCreepTimeBridge` não foi instanciado no runtime LOT/PKN;
 - `SaltWallStressDiagnostics` ainda não alimenta `PknModel`;
-- `sigma_theta_time_series` ainda não foi exposto em YAML;
 - o default global permanece `constant_pressure`/`pkn_direct` conforme os casos
   existentes;
 - `sigma_theta_static` segue suportado como proxy diagnóstico fixo.
@@ -2913,3 +2912,55 @@ Os campos `sigma_theta_provider_type`, `sigma_theta_source`,
 `sigma_theta_lookup_time_s`, `sigma_theta_layer_id` e
 `sigma_theta_mapping_status` foram adicionados ao resultado moderno para manter
 rastreável a origem da tensão quando um provider opt-in for usado.
+
+## Provider `sigma_theta_time_series` diagnóstico (Fase 10.24B)
+
+A Fase 10.24B expôs o primeiro provider configurável por YAML:
+`lot.fracture.initiation.type = sigma_theta_time_series`. Ele é opt-in,
+diagnóstico e restrito ao `volumetric_balance`.
+
+O provider consome uma série de pontos:
+
+```text
+time_s
+sigma_theta_compression_positive_Pa
+layer_id
+influence_depth_m
+```
+
+com interpolação `linear` e extrapolação por `clamp`. O `PknRunner` monta um
+`SigmaThetaTimeSeriesProvider` e o `PknModel` avalia:
+
+```text
+opened = wellbore_pressure_trial_Pa > sigma_theta_compression_positive_Pa
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+```
+
+Caso controlado:
+
+```text
+cases/validation/buz67d_pkn_legacy_sigma_theta_timeseries.yaml
+```
+
+Esse caso usa três pontos mínimos derivados da trace unificada da Fase 10.22C
+(`480 s`, `510 s`, `540 s`, `sigmaTheta = 66666600 Pa`) para validar o wiring
+`YAML -> CaseParser -> CaseData -> PknRunner -> SigmaThetaProvider -> PknModel`.
+
+Na comparação diagnóstica local, a rota foi classificada como:
+
+```text
+SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED
+```
+
+Ou seja, a escala de pressão máxima permaneceu próxima ao legado, mas a abertura
+moderna ainda ocorreu em `660 s`, contra `510 s` na trace legada.
+
+Limites físicos:
+
+- a série é fixture diagnóstica mínima, não histórico completo de tensão do sal;
+- `SaltCreepTimeBridge` e `SaltWallStressDiagnostics` continuam desconectados do
+  runtime LOT/PKN;
+- `pkn_direct` continua ignorando o provider;
+- o default global não muda;
+- a comparação permanece `SIGMA_THETA_TIMESERIES_DIAGNOSTIC_ONLY`, sem validação
+  física de fratura.

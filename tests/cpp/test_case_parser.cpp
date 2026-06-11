@@ -20,6 +20,8 @@ constexpr const char* kBuz67dLegacyAlignedCasePath =
     "cases/validation/buz67d_pkn_legacy_aligned.yaml";
 constexpr const char* kBuz67dSigmaThetaStaticCasePath =
     "cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml";
+constexpr const char* kBuz67dSigmaThetaTimeSeriesCasePath =
+    "cases/validation/buz67d_pkn_legacy_sigma_theta_timeseries.yaml";
 constexpr const char* kBuz67dComplianceCasePath =
     "cases/validation/buz67d_pkn_legacy_compliance.yaml";
 
@@ -331,6 +333,60 @@ TEST_CASE("BUZ67D sigma theta static case loads diagnostic fracture initiation")
         Catch::Approx(67342521.84592447));
   CHECK(data.lot.sigma_theta_fracture.mapping_status ==
         "STATIC_FROM_LEGACY_AUDIT");
+}
+
+TEST_CASE("BUZ67D sigma theta time-series case loads diagnostic provider data") {
+  const auto data = lss::io::parse_yaml(kBuz67dSigmaThetaTimeSeriesCasePath);
+
+  CHECK(data.name == "buz67d_pkn_legacy_sigma_theta_timeseries");
+  CHECK(data.lot.pressure_model == "volumetric_balance");
+  CHECK(data.lot.sigma_theta_fracture.enabled);
+  CHECK(data.lot.sigma_theta_fracture.type == "sigma_theta_time_series");
+  CHECK(data.lot.sigma_theta_fracture.source ==
+        "legacy_unified_trace_phase10_22c");
+  CHECK(data.lot.sigma_theta_fracture.pressure_source ==
+        "wellbore_pressure_trial_Pa");
+  CHECK(data.lot.sigma_theta_fracture.comparison == "legacy_algebra");
+  CHECK(data.lot.sigma_theta_fracture.interpolation == "linear");
+  CHECK(data.lot.sigma_theta_fracture.out_of_range == "clamp");
+  CHECK(data.lot.sigma_theta_fracture.mapping_status ==
+        "TIME_SERIES_FROM_LEGACY_TRACE_MINIMAL_DIAGNOSTIC");
+  REQUIRE(data.lot.sigma_theta_fracture.time_series.size() == 3);
+  CHECK(data.lot.sigma_theta_fracture.time_series[0].time_s ==
+        Catch::Approx(480.0));
+  CHECK(data.lot.sigma_theta_fracture.time_series[1].time_s ==
+        Catch::Approx(510.0));
+  CHECK(data.lot.sigma_theta_fracture.time_series[2].time_s ==
+        Catch::Approx(540.0));
+  CHECK(data.lot.sigma_theta_fracture.time_series[1]
+            .sigma_theta_compression_positive_Pa ==
+        Catch::Approx(66666600.0));
+  CHECK(data.lot.sigma_theta_fracture.time_series[1].layer_id ==
+        "legacy_layer_16");
+  CHECK(data.lot.sigma_theta_fracture.time_series[1].influence_depth_m ==
+        Catch::Approx(4374.0));
+}
+
+TEST_CASE("CaseParser rejects unsorted sigma theta time-series points") {
+  auto yaml = read_text_file(kBuz67dSigmaThetaTimeSeriesCasePath);
+  const auto pos = yaml.find("value: 510.0");
+  REQUIRE(pos != std::string::npos);
+  yaml.replace(pos, std::string("value: 510.0").size(), "value: 470.0");
+  const auto path = write_temp_case("lss_unsorted_sigma_theta_series.yaml", yaml);
+
+  CHECK_THROWS_AS(lss::io::parse_yaml(path), std::runtime_error);
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects non-positive sigma theta time-series values") {
+  auto yaml = read_text_file(kBuz67dSigmaThetaTimeSeriesCasePath);
+  const auto pos = yaml.find("value: 66666600.0");
+  REQUIRE(pos != std::string::npos);
+  yaml.replace(pos, std::string("value: 66666600.0").size(), "value: 0.0");
+  const auto path = write_temp_case("lss_bad_sigma_theta_series_value.yaml", yaml);
+
+  CHECK_THROWS_AS(lss::io::parse_yaml(path), std::runtime_error);
+  std::filesystem::remove(path);
 }
 
 TEST_CASE("BUZ67D compliance case loads opt-in geometric compliance") {

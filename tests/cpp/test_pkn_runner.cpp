@@ -27,6 +27,8 @@ constexpr const char* kBuz67dComplianceCasePath =
     "cases/validation/buz67d_pkn_legacy_compliance.yaml";
 constexpr const char* kBuz67dNextStepSinkCasePath =
     "cases/validation/buz67d_pkn_legacy_compliance_next_step_sink.yaml";
+constexpr const char* kBuz67dSigmaThetaTimeSeriesCasePath =
+    "cases/validation/buz67d_pkn_legacy_sigma_theta_timeseries.yaml";
 
 void check_finite_series(const lss::lot::PknResult& result) {
   REQUIRE_FALSE(result.time_series_s.empty());
@@ -311,6 +313,37 @@ TEST_CASE("PknRunner supports opt-in next-step fracture sink timing") {
         0.0);
   CHECK(run.result.fracture_initiation_time_s ==
         Catch::Approx(run.result.time_series_s[opened]));
+}
+
+TEST_CASE("PknRunner enables opt-in sigma theta time-series criterion") {
+  const auto data = lss::io::parse_yaml(kBuz67dSigmaThetaTimeSeriesCasePath);
+  const auto run = lss::lot::run_pkn_case(data);
+
+  CHECK(data.name == "buz67d_pkn_legacy_sigma_theta_timeseries");
+  CHECK(data.lot.sigma_theta_fracture.enabled);
+  CHECK(data.lot.sigma_theta_fracture.type == "sigma_theta_time_series");
+  CHECK(data.lot.sigma_theta_fracture.pressure_source ==
+        "wellbore_pressure_trial_Pa");
+  CHECK(data.lot.sigma_theta_fracture.interpolation == "linear");
+  CHECK(data.lot.sigma_theta_fracture.out_of_range == "clamp");
+  CHECK(run.input.fracture_initiation ==
+        lss::lot::FractureInitiationCriterion::SigmaThetaProviderRuntime);
+  REQUIRE(run.input.sigma_theta_provider != nullptr);
+  CHECK(run.input.sink_timing == lss::lot::FractureSinkTiming::NextStep);
+  CHECK(run.result.pressure_model == "volumetric_balance");
+  CHECK(run.result.fracture_initiation_type == "sigma_theta_provider_runtime");
+  CHECK(run.result.sigma_theta_provider_type == "runtime");
+  CHECK(run.result.sigma_theta_source == "legacy_unified_trace_phase10_22c");
+  CHECK(run.result.sigma_theta_mapping_status ==
+        "TIME_SERIES_FROM_LEGACY_TRACE_MINIMAL_DIAGNOSTIC");
+  CHECK(run.result.fracture_initiation_layer_id == "legacy_layer_16");
+  CHECK(run.result.fracture_initiation_sigma_theta_Pa ==
+        Catch::Approx(66666600.0));
+  CHECK(run.result.fracture_initiation_pressure_Pa >
+        run.result.fracture_initiation_sigma_theta_Pa);
+  CHECK(run.result.fracture_initiation_margin_Pa > 0.0);
+  CHECK(run.result.sigma_theta_lookup_time_s ==
+        Catch::Approx(run.result.fracture_initiation_time_s));
 }
 
 TEST_CASE("CaseParser rejects unsupported fracture sink timing") {

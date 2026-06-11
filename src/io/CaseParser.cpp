@@ -364,6 +364,54 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
       data.lot.sigma_theta_fracture.mapping_status =
           require_as<std::string>(sigma_theta["mapping_status"],
                                   "lot.fracture.initiation.sigma_theta.mapping_status");
+    } else if (data.lot.sigma_theta_fracture.type == "sigma_theta_time_series") {
+      data.lot.sigma_theta_fracture.enabled = true;
+      data.lot.sigma_theta_fracture.pressure_source =
+          require_as<std::string>(initiation["pressure_source"],
+                                  "lot.fracture.initiation.pressure_source");
+      data.lot.sigma_theta_fracture.comparison =
+          require_as<std::string>(initiation["comparison"],
+                                  "lot.fracture.initiation.comparison");
+      const YAML::Node series =
+          require_node(initiation["sigma_theta_series"],
+                       "lot.fracture.initiation.sigma_theta_series");
+      data.lot.sigma_theta_fracture.source =
+          require_as<std::string>(series["source"],
+                                  "lot.fracture.initiation.sigma_theta_series.source");
+      data.lot.sigma_theta_fracture.interpolation =
+          require_as<std::string>(
+              series["interpolation"],
+              "lot.fracture.initiation.sigma_theta_series.interpolation");
+      data.lot.sigma_theta_fracture.out_of_range =
+          require_as<std::string>(
+              series["out_of_range"],
+              "lot.fracture.initiation.sigma_theta_series.out_of_range");
+      data.lot.sigma_theta_fracture.mapping_status =
+          optional_string(series, "mapping_status",
+                          "TIME_SERIES_FROM_LEGACY_TRACE");
+      const YAML::Node values =
+          require_node(series["values"],
+                       "lot.fracture.initiation.sigma_theta_series.values");
+      for (std::size_t i = 0; i < values.size(); ++i) {
+        const YAML::Node value = values[i];
+        lss::core::SigmaThetaFractureCriterionData::TimeSeriesPoint point;
+        point.time_s =
+            parse_value_unit(value["time"],
+                             "lot.fracture.initiation.sigma_theta_series.values[].time",
+                             "time");
+        point.sigma_theta_compression_positive_Pa = parse_value_unit(
+            value["sigma_theta_compression_positive"],
+            "lot.fracture.initiation.sigma_theta_series.values[].sigma_theta_compression_positive",
+            "pressure");
+        point.layer_id = optional_string(value, "layer_id");
+        if (value["influence_depth"]) {
+          point.influence_depth_m = parse_value_unit(
+              value["influence_depth"],
+              "lot.fracture.initiation.sigma_theta_series.values[].influence_depth",
+              "length");
+        }
+        data.lot.sigma_theta_fracture.time_series.push_back(point);
+      }
     } else if (data.lot.sigma_theta_fracture.type != "constant_pressure") {
       throw std::runtime_error(
           "lot.fracture.initiation.type invalido: " +
@@ -560,27 +608,65 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
     }
     if (data.lot.sigma_theta_fracture.enabled) {
       const auto& criterion = data.lot.sigma_theta_fracture;
-      if (criterion.pressure_source != "wellbore_pressure_Pa") {
+      if (criterion.type == "sigma_theta_static" &&
+          criterion.pressure_source != "wellbore_pressure_Pa") {
         throw std::runtime_error(
             "Validacao falhou: sigma_theta_static exige pressure_source wellbore_pressure_Pa");
       }
+      if (criterion.type == "sigma_theta_time_series" &&
+          criterion.pressure_source != "wellbore_pressure_trial_Pa") {
+        throw std::runtime_error(
+            "Validacao falhou: sigma_theta_time_series exige pressure_source wellbore_pressure_trial_Pa");
+      }
       if (criterion.comparison != "legacy_algebra") {
         throw std::runtime_error(
-            "Validacao falhou: sigma_theta_static exige comparison legacy_algebra");
+            "Validacao falhou: sigma_theta exige comparison legacy_algebra");
       }
-      if (criterion.layer_id.empty()) {
-        throw std::runtime_error(
-            "Validacao falhou: sigma_theta_static exige layer_id nao vazio");
+      if (criterion.type == "sigma_theta_static") {
+        if (criterion.layer_id.empty()) {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_static exige layer_id nao vazio");
+        }
+        if (!std::isfinite(criterion.influence_depth_m) ||
+            criterion.influence_depth_m <= 0.0) {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_static exige influence_depth > 0");
+        }
+        if (!std::isfinite(criterion.sigma_theta_compression_positive_Pa) ||
+            criterion.sigma_theta_compression_positive_Pa <= 0.0) {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_static exige sigma_theta > 0");
+        }
       }
-      if (!std::isfinite(criterion.influence_depth_m) ||
-          criterion.influence_depth_m <= 0.0) {
-        throw std::runtime_error(
-            "Validacao falhou: sigma_theta_static exige influence_depth > 0");
-      }
-      if (!std::isfinite(criterion.sigma_theta_compression_positive_Pa) ||
-          criterion.sigma_theta_compression_positive_Pa <= 0.0) {
-        throw std::runtime_error(
-            "Validacao falhou: sigma_theta_static exige sigma_theta > 0");
+      if (criterion.type == "sigma_theta_time_series") {
+        if (criterion.interpolation != "linear") {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_time_series exige interpolation linear");
+        }
+        if (criterion.out_of_range != "clamp") {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_time_series exige out_of_range clamp");
+        }
+        if (criterion.time_series.size() < 2) {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_time_series exige ao menos 2 pontos");
+        }
+        for (std::size_t i = 0; i < criterion.time_series.size(); ++i) {
+          const auto& point = criterion.time_series[i];
+          if (!std::isfinite(point.time_s) || point.time_s < 0.0) {
+            throw std::runtime_error(
+                "Validacao falhou: sigma_theta_time_series exige time >= 0");
+          }
+          if (i > 0 && point.time_s <= criterion.time_series[i - 1].time_s) {
+            throw std::runtime_error(
+                "Validacao falhou: sigma_theta_time_series exige tempos crescentes");
+          }
+          if (!std::isfinite(point.sigma_theta_compression_positive_Pa) ||
+              point.sigma_theta_compression_positive_Pa <= 0.0) {
+            throw std::runtime_error(
+                "Validacao falhou: sigma_theta_time_series exige sigma_theta > 0");
+          }
+        }
       }
     }
     if (data.lot.fracture_fluid_viscosity_Pa_s <= 0.0) {
