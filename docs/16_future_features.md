@@ -443,3 +443,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   saidas PKN, mas os fontes ativos auditados sao `penny-shaped`, `circular` ou
   ambiguos. Uma fase futura deve auditar a proveniencia das saidas PKN ou
   planejar suporte KGD/penny-shaped antes de criar YAML moderno.
+- A Fase 10.30A criou uma matriz YAML versionada para a sensibilidade BUZ-67D
+  `modern-refined`: `buz67d_modern_refined_cgeom_matrix.yaml`. Essa matriz
+  deve ser a entrada preferencial para reproducao local da sensibilidade por
+  `tools/run_lot_pkn_sensitivity_matrix.py`. Ela nao altera solver nem promove
+  fator de compliance a calibracao automatica.

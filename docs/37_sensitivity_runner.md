@@ -101,3 +101,21 @@ cases/validation/sensitivity/
 
 Esses casos permanecem diagnósticos. O runner automatiza validação, execução e
 sumarização; ele não transforma o melhor cenário em calibração validada.
+
+## Matriz versionada BUZ-67D
+
+A Fase 10.30A adiciona a matriz versionada:
+
+```text
+cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix.yaml
+```
+
+Ela contém os cenários `0.60x..1.25x` de `constant_geometric` e o cenário
+`same_step`. O status associado é:
+
+```text
+VERSIONED_BUZ67D_CGEOM_SENSITIVITY_MATRIX_ADDED
+```
+
+A matriz continua diagnóstica e não promove nenhum fator a calibração
+automática.

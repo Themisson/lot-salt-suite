@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.29C BUZ-29D legacy audit
+Fase ativa  : 10.30A versioned BUZ-67D sensitivity matrix
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
-Testes C++  : 263/263 passaram apos Fase 10.29C em 2026-06-11
-Testes Py   : 241/241 previstos apos Fase 10.29C em 2026-06-11
+Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
+Testes Py   : 247/247 previstos apos Fase 10.30A em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,34 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.30A — matriz versionada BUZ-67D modern-refined — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Matriz criada:**
+
+```text
+cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix.yaml
+```
+
+**Documento criado:**
+
+```text
+docs/39_buz67d_modern_refined_cgeom_matrix.md
+```
+
+**Resultado:**
+
+```text
+VERSIONED_BUZ67D_CGEOM_SENSITIVITY_MATRIX_ADDED
+```
+
+A matriz referencia os cenários `0.60x..1.25x` e `same_step` já versionados,
+passou em `dry-run` pelo runner genérico e permanece diagnóstica: não é
+calibração automática nem rota `legacy-equivalence`.
 
 ---
 

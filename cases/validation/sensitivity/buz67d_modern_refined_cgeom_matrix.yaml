@@ -1,0 +1,68 @@
+matrix_id: buz67d_modern_refined_cgeom_sensitivity
+description: >
+  Phase 10.30A versioned sensitivity matrix for BUZ-67D modern-refined mode.
+  Diagnostic only; not automatic calibration and not legacy-equivalence mode.
+mode: lot-pkn
+base_case: cases/validation/sensitivity/buz67d_modern_refined_sens_baseline.yaml
+baseline_scenario: cgeom_100_next_step
+scenarios:
+  - id: cgeom_060_next_step
+    case: cases/validation/sensitivity/buz67d_modern_refined_sens_cgeom_060.yaml
+    metadata:
+      cgeom_factor: 0.60
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+  - id: cgeom_065_next_step
+    case: cases/validation/sensitivity/buz67d_modern_refined_sens_cgeom_065.yaml
+    metadata:
+      cgeom_factor: 0.65
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+  - id: cgeom_070_next_step
+    case: cases/validation/sensitivity/buz67d_modern_refined_sens_cgeom_070.yaml
+    metadata:
+      cgeom_factor: 0.70
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+  - id: cgeom_075_next_step
+    case: cases/validation/sensitivity/buz67d_modern_refined_sens_cgeom_075.yaml
+    metadata:
+      cgeom_factor: 0.75
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+  - id: cgeom_080_next_step
+    case: cases/validation/sensitivity/buz67d_modern_refined_sens_cgeom_080.yaml
+    metadata:
+      cgeom_factor: 0.80
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+  - id: cgeom_085_next_step
+    case: cases/validation/sensitivity/buz67d_modern_refined_sens_cgeom_085.yaml
+    metadata:
+      cgeom_factor: 0.85
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+  - id: cgeom_090_next_step
+    case: cases/validation/sensitivity/buz67d_modern_refined_sens_cgeom_090.yaml
+    metadata:
+      cgeom_factor: 0.90
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+  - id: cgeom_100_next_step
+    case: cases/validation/sensitivity/buz67d_modern_refined_sens_baseline.yaml
+    metadata:
+      cgeom_factor: 1.00
+      sink_timing: next_step
+      interpretation: diagnostic_baseline
+  - id: cgeom_125_next_step
+    case: cases/validation/sensitivity/buz67d_modern_refined_sens_cgeom_125.yaml
+    metadata:
+      cgeom_factor: 1.25
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+  - id: cgeom_100_same_step
+    case: cases/validation/sensitivity/buz67d_modern_refined_sens_same_step.yaml
+    metadata:
+      cgeom_factor: 1.00
+      sink_timing: same_step
+      interpretation: diagnostic_sink_timing_comparison

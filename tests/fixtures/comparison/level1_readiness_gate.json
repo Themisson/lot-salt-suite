@@ -1397,6 +1397,25 @@
       "No BUZ-29D modern YAML was created in Phase 10.29C."
     ]
   },
+  "phase10_30a_versioned_cgeom_matrix": {
+    "status": "VERSIONED_BUZ67D_CGEOM_SENSITIVITY_MATRIX_ADDED",
+    "phase": "10.30A",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": true,
+    "matrix": "cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix.yaml",
+    "document": "docs/39_buz67d_modern_refined_cgeom_matrix.md",
+    "runner": "tools/run_lot_pkn_sensitivity_matrix.py",
+    "scenario_count": 10,
+    "baseline_scenario": "cgeom_100_next_step",
+    "caveats": [
+      "The matrix is diagnostic and reproducible, not automatic calibration.",
+      "The best compliance factor must not be promoted without independent validation.",
+      "legacy-equivalence remains a separate track."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

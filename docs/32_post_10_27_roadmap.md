@@ -226,3 +226,22 @@ BUZ-29D possui fontes e saídas legadas, inclusive artefatos PKN, mas nenhum
 fonte PKN ativo completo foi promovido a caso moderno. A rota recomendada e
 auditar a proveniência das saídas PKN ou planejar suporte KGD/penny-shaped em
 fase própria.
+
+## Fase 10.30A registrada
+
+A Fase 10.30A adiciona uma matriz YAML versionada para a sensibilidade BUZ-67D:
+
+```text
+cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix.yaml
+docs/39_buz67d_modern_refined_cgeom_matrix.md
+```
+
+Status:
+
+```text
+VERSIONED_BUZ67D_CGEOM_SENSITIVITY_MATRIX_ADDED
+```
+
+A matriz permite reproduzir a sensibilidade `modern-refined` com o runner
+genérico, mantendo `legacy-equivalence` separada e sem promover fatores de
+compliance a calibração automática.

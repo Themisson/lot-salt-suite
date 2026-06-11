@@ -97,3 +97,16 @@ Criar uma infraestrutura genérica de sensitivity runner para evitar duplicaçã
 entre comparadores de fase. O runner deve validar/rodar YAMLs de matriz,
 coletar `timeseries.csv`, emitir `summary.csv`/`metadata.json`, e deixar claro
 que o resultado é diagnóstico.
+
+## Atualização 10.30A
+
+A Fase 10.30A transformou os cenários desta sensibilidade em matriz YAML
+versionada:
+
+```text
+cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix.yaml
+```
+
+Isso permite reproduzir a matriz pelo runner genérico sem usar scripts
+específicos da Fase 10.29A. A interpretação permanece igual: sensibilidade
+diagnóstica, não calibração automática.

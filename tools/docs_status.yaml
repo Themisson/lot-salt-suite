@@ -112,6 +112,7 @@ phases:
   phase_10_29a_refined_modern_refined_sensitivity: completed
   phase_10_29b_generic_lot_pkn_sensitivity_runner: completed
   phase_10_29c_buz29d_legacy_audit: completed
+  phase_10_30a_versioned_buz67d_cgeom_matrix: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -150,6 +151,7 @@ docs:
   phase10_29a_refined_sensitivity: implemented
   phase10_29b_sensitivity_runner: implemented
   phase10_29c_buz29d_legacy_audit: implemented
+  phase10_30a_buz67d_cgeom_matrix: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -215,12 +217,12 @@ validation:
 test_counts:
   cpp_tests: 263        # Catch2 lot-salt-suite — 263/263 previstos apos Fase 10.26B (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 241     # pytest lot-salt-suite — 241/241 previstos apos Fase 10.29C (2026-06-11)
+  python_tests: 247     # pytest lot-salt-suite — 247/247 previstos apos Fase 10.30A (2026-06-11)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-11"
-updated_by: "codex (Fase 10.29C BUZ29D legacy audit)"
+updated_by: "codex (Fase 10.30A versioned BUZ67D cgeom matrix)"
 project_version: "0.1.0"
