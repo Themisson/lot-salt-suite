@@ -1735,6 +1735,36 @@
       "No physical validation or legacy-modern numeric equivalence is claimed."
     ]
   },
+  "phase11_6b_non_pkn_model_roadmap": {
+    "status": "NON_PKN_MODEL_ROADMAP_RECORDED",
+    "phase": "11.6B",
+    "source": "DOCUMENTED_PHASE11_6A_AUDIT",
+    "recommended_next_phase": "PHASE11_6C_PENNY_SHAPED_FORMULATION_AUDIT",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": false,
+    "tool": "tools/plan_phase11_6b_non_pkn_models.py",
+    "document": "docs/58_non_pkn_model_roadmap.md",
+    "tracks": [
+      "penny_shaped",
+      "kgd_circular_elliptical",
+      "zamora_compositional_fluid",
+      "legacy_output_provenance",
+      "modern_refined_buz67d_continuation"
+    ],
+    "blocking_gates": [
+      "NON_PKN_FORMULATION_NOT_IMPLEMENTED",
+      "BUZ29_PKN_OUTPUT_PROVENANCE_NOT_ESTABLISHED",
+      "ZAMORA_FLUID_MODEL_OUT_OF_SCOPE"
+    ],
+    "caveats": [
+      "BUZ29 first-well is not converted to PKN by inference.",
+      "Penny-shaped/KGD/Zamora require separate gates before runtime implementation.",
+      "BUZ-67D remains the executable modern-refined LOT/PKN path."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

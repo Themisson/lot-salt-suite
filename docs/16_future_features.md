@@ -525,3 +525,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `penny-shaped` e a linha PKN está comentada. A próxima evolução deve ser um
   roadmap não-PKN, cobrindo penny-shaped/KGD/Zamora como escopo futuro separado
   da infraestrutura BUZ-67D modern-refined.
+- A Fase 11.6B registra esse roadmap não-PKN: priorizar auditoria de formulação
+  `penny-shaped`, manter KGD/circular/elliptical como rota opcional, bloquear
+  Zamora/compositional fluid até gate próprio e auditar proveniência dos outputs
+  PKN antes de usá-los como referência.

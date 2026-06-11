@@ -275,3 +275,22 @@ BUZ29_VISCO_FIRST_WELL_MODERN_YAML_NOT_READY
 
 O caso não deve ser forçado para a infraestrutura LOT/PKN porque o modelo ativo
 é `penny-shaped`. A próxima fase recomendada é um roadmap não-PKN.
+
+## Fase 11.6B roadmap não-PKN
+
+A Fase 11.6B registra o roadmap não-PKN em:
+
+```text
+docs/58_non_pkn_model_roadmap.md
+tools/plan_phase11_6b_non_pkn_models.py
+```
+
+O gate novo é:
+
+```text
+NON_PKN_MODEL_ROADMAP_RECORDED
+```
+
+O caminho prioritário recomendado é auditar a formulação `penny-shaped` antes
+de qualquer tentativa de YAML moderno BUZ29. KGD/circular/elliptical e Zamora
+ficam em trilhas separadas.

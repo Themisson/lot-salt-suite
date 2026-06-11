@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.6A BUZ29 VISCO first-well audit
+Fase ativa  : 11.6B non-PKN model roadmap
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 364/364 previstos apos Fase 11.6A em 2026-06-11
+Testes Py   : 369/369 previstos apos Fase 11.6B em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,35 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 11.6B — roadmap não-PKN — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/plan_phase11_6b_non_pkn_models.py
+```
+
+**Documento criado:**
+
+```text
+docs/58_non_pkn_model_roadmap.md
+```
+
+**Status registrado:**
+
+```text
+NON_PKN_MODEL_ROADMAP_RECORDED
+NEXT_PHASE = PHASE11_6C_PENNY_SHAPED_FORMULATION_AUDIT
+```
+
+**Interpretação:** BUZ29-VISCO-first-well permanece fora de LOT/PKN moderno
+porque o modelo ativo é `penny-shaped`. A próxima etapa segura é auditar a
+formulação `penny-shaped`; KGD/circular e Zamora ficam em trilhas separadas.
 
 ---
 

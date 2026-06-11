@@ -1,0 +1,73 @@
+# Non-PKN model roadmap (Fase 11.6B)
+
+## Resumo executivo
+
+A Fase 11.6B consolida a decisão técnica após a auditoria
+`BUZ29-VISCO-first-well` da Fase 11.6A.
+
+Status:
+
+```text
+NON_PKN_MODEL_ROADMAP_RECORDED
+NEXT_PHASE = PHASE11_6C_PENNY_SHAPED_FORMULATION_AUDIT
+```
+
+O caso BUZ29-VISCO-first-well não deve ser convertido para PKN por inferência:
+o modelo ativo no legado é `penny-shaped`, a linha PKN está comentada e os
+artefatos `.dat` com PKN no nome são output-only. A rota correta é separar
+modelos não-PKN da infraestrutura LOT/PKN modern-refined já estabilizada.
+
+## Entradas do gate
+
+| Campo | Valor |
+|---|---|
+| Fonte auditada | `legance/LOT_Tese/BUZ29-VISCO-first-well.cpp` |
+| Status da fonte | `BUZ29_VISCO_FIRST_WELL_SOURCE_FOUND` |
+| Modelo ativo | `PENNY_SHAPED` |
+| Evidência PKN | `COMMENT_ONLY` |
+| Readiness YAML moderno | `BUZ29_VISCO_FIRST_WELL_MODERN_YAML_NOT_READY` |
+| Próxima fase recomendada | `PHASE11_6C_PENNY_SHAPED_FORMULATION_AUDIT` |
+
+## Roadmap de rotas não-PKN
+
+| Prioridade | Rota | Driver | Objetivo | Pré-condição | Status |
+|---:|---|---|---|---|---|
+| 1 | `penny_shaped` | `BUZ29_VISCO_FIRST_WELL` | Auditar e formular modelo LOT penny-shaped moderno antes de qualquer YAML BUZ29. | Documentar formulação legada e contrato de saída esperado. | `PLANNED` |
+| 2 | `kgd_circular_elliptical` | variantes BUZ29/Zamora | Auditar KGD circular/elliptical e decidir se entram no escopo moderno. | Separar mecânica KGD de fluido Zamora. | `PLANNED_OPTIONAL` |
+| 3 | `zamora_compositional_fluid` | variantes Zamora | Manter Zamora fora do runtime até gate próprio de fluido. | Definir variáveis de estado, unidades e parser. | `BLOCKED_BY_FORMULATION_GATE` |
+| 4 | `legacy_output_provenance` | `.dat` BUZ29 PKN | Auditar proveniência dos outputs PKN antes de usá-los como referência. | Encontrar fonte ou script exato que gerou os `.dat`. | `PLANNED` |
+| 5 | `modern_refined_buz67d_continuation` | BUZ-67D | Continuar infraestrutura paramétrica BUZ-67D enquanto não-PKN fica fora do runtime. | Nenhum solver novo. | `AVAILABLE_NOW` |
+
+## Gates bloqueadores
+
+```text
+NON_PKN_FORMULATION_NOT_IMPLEMENTED
+BUZ29_PKN_OUTPUT_PROVENANCE_NOT_ESTABLISHED
+ZAMORA_FLUID_MODEL_OUT_OF_SCOPE
+```
+
+Esses gates impedem:
+
+- criar YAML moderno BUZ29 a partir de output-only;
+- tratar `penny-shaped` como PKN por conveniência;
+- misturar Zamora/compositional fluid com migração de modelo de fratura.
+
+## Próxima fase recomendada
+
+A próxima fase técnica recomendada é:
+
+```text
+11.6C — penny-shaped formulation audit
+```
+
+Essa fase deve auditar a formulação legada penny-shaped, listar entradas e
+saídas necessárias, decidir se há escopo para um solver moderno e somente então
+planejar implementação C++.
+
+## Caveats
+
+- Este roadmap não implementa solver novo.
+- Este roadmap não altera parser, C++, schemas ou casos protegidos.
+- Este roadmap não valida BUZ29 numericamente.
+- BUZ-67D modern-refined continua a rota executável principal enquanto BUZ29
+  permanece em planejamento não-PKN.

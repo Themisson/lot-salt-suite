@@ -139,6 +139,26 @@ O arquivo legado existe e contém parâmetros úteis, mas o modelo ativo é
 `penny-shaped`; a linha PKN está comentada. A continuidade segura é planejar a
 rota não-PKN antes de criar qualquer YAML moderno BUZ29.
 
+## Fase 11.6B registrada
+
+A Fase 11.6B consolida o roadmap não-PKN em:
+
+```text
+docs/58_non_pkn_model_roadmap.md
+tools/plan_phase11_6b_non_pkn_models.py
+```
+
+Status:
+
+```text
+NON_PKN_MODEL_ROADMAP_RECORDED
+NEXT_PHASE = PHASE11_6C_PENNY_SHAPED_FORMULATION_AUDIT
+```
+
+O roadmap separa `penny-shaped`, KGD/circular/elliptical, Zamora/compositional
+fluid e proveniência de outputs PKN. BUZ29 não deve ser forçado para PKN por
+inferência; BUZ-67D permanece a rota modern-refined executável principal.
+
 ## Fase 10.28A registrada
 
 A Fase 10.28A cria o pacote documental em:
