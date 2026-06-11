@@ -2469,11 +2469,14 @@ Campos modernos ausentes para fechar a auditoria sem ambiguidade:
 - `sigma_theta_margin_Pa` por passo;
 - `fracture_initiation_time_s` por linha.
 
-Resultado da análise:
+Resultado da análise após o adendo geométrico da 10.26A:
 
 ```text
-cause = MISSING_PRESSURE_TRACE_FIELDS
-gate = MODERN_TRACE_EXPORT_REQUIRED
+cause = SIGMATHETA_MESH_OR_DOMAIN_MISMATCH
+gate = LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING
+
+pressure_source_timing_cause_before_geometry_gate = MISSING_PRESSURE_TRACE_FIELDS
+pressure_source_timing_gate_before_geometry_gate = MODERN_TRACE_EXPORT_REQUIRED
 
 legacy_first_opened_time_s = 510.0
 legacy_first_pw_Pa = 66769500.0
@@ -2490,19 +2493,63 @@ best_candidate.opening_time_error_s = 90.0
 best_candidate.classification = OPENING_TOO_LATE
 ```
 
-Interpretação: nenhuma combinação derivada a partir dos campos atualmente
-exportados reproduz a abertura legada em `510 s`. O melhor candidato ainda abre
-em `600 s`, e os candidatos com `wellbore_pressure_trial_Pa` ficam
-`INSUFFICIENT_FIELDS` porque o CSV moderno não exporta o valor real. Assim, a
-próxima fase deve primeiro exportar um trace moderno opt-in contendo as pressões
-`before`, `trial` e `after`, a sigma-theta consultada por passo e o tempo de
-lookup do provider antes de alterar o comportamento do critério.
+Interpretação de pressure/timing antes do gate geométrico: nenhuma combinação
+derivada a partir dos campos atualmente exportados reproduz a abertura legada em
+`510 s`. O melhor candidato ainda abre em `600 s`, e os candidatos com
+`wellbore_pressure_trial_Pa` ficam `INSUFFICIENT_FIELDS` porque o CSV moderno não
+exporta o valor real.
+
+O adendo obrigatório da 10.26A, porém, mostrou que essa conclusão ainda não pode
+ser promovida a correção de `pressure_source` ou de timing. O `sigmaTheta`
+legado é calculado por `APBSalt1D` com configuração radial própria:
+
+| Item | LOT_Tese `APBSalt1D` | Moderno / bridge diagnóstico |
+|---|---:|---:|
+| Raio externo | `8 m` (`outer_diam_m = 16 m`) | default/builder `1.556 m` |
+| Elementos radiais | `15` | default/builder `40` |
+| Razão geométrica | `10` | não fixada como equivalência legada no builder |
+| Ordem de integração | `3` | `3` em `AxisymL3` |
+| Raio interno | `(diam_in / 2) * 0.0254` | `inner_radius_m` explícito/default |
+| Amostra `sigmaTheta` | `mdl->getElem(0)->getSigmaTheta()` -> `sig(2,0)` | wall samples por menor `r_m` em `StressSampler` quando o bridge é usado |
+
+Portanto, a classificação principal passa a ser:
+
+```text
+SIGMATHETA_MESH_OR_DOMAIN_MISMATCH
+SIGMATHETA_SAMPLING_POINT_MISMATCH
+MODERN_MESH_NOT_LEGACY_EQUIVALENT
+MODERN_REFINED_MESH_POTENTIALLY_MORE_REALISTIC
+LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING
+TIMING_ANALYSIS_INCONCLUSIVE
+```
+
+A próxima fase não deve corrigir `pressure_source` ou timing ainda. A evolução
+correta é uma fase de equivalência de malha/domínio, por exemplo:
+
+```text
+10.26B — reproduzir configuração APBSalt1D legado no moderno
+outer_radius_m = 8 m
+radial_elements = 15
+mesh_ratio = 10
+integration_order = 3
+sampling = elemento 0 / ponto de Gauss local 0 equivalente
+```
+
+Se o moderno com malha equivalente abrir próximo de `510 s`, a diferença
+anterior é explicada por malha/domínio/ponto de amostragem. Se continuar abrindo
+em `660 s`, a análise de `pressure_source`/timing deve ser retomada usando um
+trace moderno com `before/trial/after`, `sigmaTheta` por passo, margem por passo
+e tempo de lookup explícitos.
 
 Caveats:
 
 - a análise é diagnóstica, não validação física;
 - candidatos derivados de `wellbore_pressure_Pa` não devem ser tratados como
   semântica runtime;
+- a malha/domínio/ponto de amostragem do `APBSalt1D` legado ainda não foram
+  reproduzidos no moderno;
+- a rota moderna com malha mais refinada pode ser mais realista, mas ainda não é
+  equivalente ao legado;
 - nenhuma mudança em `pkn_direct`, compliance, Zamora, `SaltWallStressDiagnostics`
   ou defaults foi feita;
 - `results/` permanece fora do versionamento.

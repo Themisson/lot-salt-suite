@@ -131,8 +131,10 @@ def test_missing_pressure_field_sets_modern_trace_export_gate(tmp_path: Path) ->
     )
     result = _run(tmp_path, rows)
 
-    assert result["cause"] == "MISSING_PRESSURE_TRACE_FIELDS"
-    assert result["gate"] == "MODERN_TRACE_EXPORT_REQUIRED"
+    assert result["pressure_source_timing_cause_before_geometry_gate"] == "MISSING_PRESSURE_TRACE_FIELDS"
+    assert result["pressure_source_timing_gate_before_geometry_gate"] == "MODERN_TRACE_EXPORT_REQUIRED"
+    assert result["cause"] == "SIGMATHETA_MESH_OR_DOMAIN_MISMATCH"
+    assert result["gate"] == "LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING"
 
 
 def test_missing_sigma_field_blocks_without_legacy_sigma(tmp_path: Path) -> None:
@@ -165,7 +167,31 @@ def test_missing_sigma_field_blocks_without_legacy_sigma(tmp_path: Path) -> None
     )
 
     assert result["gate"] in {
+        "LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING",
         "MODERN_TRACE_EXPORT_REQUIRED",
         "NO_FIX_UNTIL_RUNTIME_TRACE_COMPLETE",
     }
     assert result["sigmaTheta_points_from_legacy_trace"] == 0
+
+
+def test_geometry_audit_blocks_pressure_timing_correction_until_mesh_matches(
+    tmp_path: Path,
+) -> None:
+    rows = _modern_rows(
+        pressures=[0.0] * 17 + [66700000.0, 68000000.0],
+        include_trial=True,
+    )
+    result = _run(tmp_path, rows)
+
+    geometry = result["geometry_audit"]
+    assert geometry["legacy_apb_salt_1d"]["outer_radius_m"] == 8.0
+    assert geometry["legacy_apb_salt_1d"]["radial_elements"] == 15
+    assert geometry["legacy_apb_salt_1d"]["mesh_ratio"] == 10.0
+    assert geometry["legacy_apb_salt_1d"]["integration_order"] == 3
+    assert geometry["modern_bridge_defaults"]["builder_default_outer_radius_m"] == 1.556
+    assert geometry["modern_bridge_defaults"]["builder_default_radial_elements"] == 40
+    assert geometry["geometry_equivalent"] is False
+    assert "SIGMATHETA_MESH_OR_DOMAIN_MISMATCH" in geometry["classifications"]
+    assert "MODERN_MESH_NOT_LEGACY_EQUIVALENT" in geometry["classifications"]
+    assert "TIMING_ANALYSIS_INCONCLUSIVE" in geometry["classifications"]
+    assert result["gate"] == "LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING"

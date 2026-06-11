@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.26A auditoria pressure_source/timing sigmaTheta; commit/push em andamento
+Fase ativa  : 10.26A adendo geometrico APBSalt1D; commit/push em andamento
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 258/258 passaram apos Fase 10.24C em 2026-06-11
-Testes Py   : 167/167 passaram apos Fase 10.26A em 2026-06-11
+Testes Py   : 168/168 passaram apos adendo Fase 10.26A em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -59,7 +59,7 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ### [2026-06-11] Fase 10.26A — auditoria `pressure_source`/timing do critério `sigmaTheta` — Codex
 
-**Status:** Implementada localmente; commit/push pendente.
+**Status:** Implementada e publicada em `009b722`; adendo geometrico em andamento.
 
 **Ferramenta criada:**
 
@@ -74,11 +74,21 @@ results/comparison/phase10_22c/legacy_unified_balance_opening_trace.csv
 results/comparison/phase10_25b/modern_sigma_theta_refined_timeseries/timeseries.csv
 ```
 
-**Classificação:**
+**Classificação original antes do adendo geométrico:**
 
 ```text
 cause = MISSING_PRESSURE_TRACE_FIELDS
 gate = MODERN_TRACE_EXPORT_REQUIRED
+```
+
+**Classificação final com adendo geométrico:**
+
+```text
+cause = SIGMATHETA_MESH_OR_DOMAIN_MISMATCH
+gate = LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING
+
+pressure_source_timing_cause_before_geometry_gate = MISSING_PRESSURE_TRACE_FIELDS
+pressure_source_timing_gate_before_geometry_gate = MODERN_TRACE_EXPORT_REQUIRED
 ```
 
 **Melhor candidato derivado:**
@@ -98,9 +108,71 @@ classification = OPENING_TOO_LATE
 `delta_pressure_Pa`, `sigma_theta_compression_positive_Pa` por passo,
 `sigma_theta_margin_Pa` por passo e `fracture_initiation_time_s` por linha.
 
-**Conclusão:** nenhuma combinação derivada dos campos atuais reproduz a abertura
-legada em `510 s`. A próxima fase deve criar exportação/trace moderno opt-in dos
-campos de pressão e sigma-theta por passo antes de alterar o critério.
+**Conclusão corrigida:** nenhuma combinação derivada dos campos atuais reproduz a
+abertura legada em `510 s`, mas a decisão de corrigir `pressure_source`/timing
+fica bloqueada. O `APBSalt1D` legado usa `outer_radius_m = 8 m`, `nelem = 15`,
+`ratio = 10`, `integration_order = 3` e amostra
+`mdl->getElem(0)->getSigmaTheta()`, enquanto o caminho moderno diagnostico ainda
+nao reproduz explicitamente esse dominio/malha/ponto. A próxima fase deve primeiro
+rodar uma equivalencia de malha APBSalt1D no moderno; so depois retomar
+`pressure_source`/timing.
+
+---
+
+### [2026-06-11] Fase 10.26A — adendo geometrico APBSalt1D — Codex
+
+**Status:** Implementado localmente; commit/push pendente.
+
+**Motivo:** antes de classificar o deslocamento de abertura moderno (`660 s`) como
+erro de `pressure_source` ou timing, foi exigida auditoria do dominio radial,
+malha e ponto de amostragem do `sigmaTheta` legado.
+
+**Evidência legado:**
+
+```text
+legance/LOT_Tese/include/apb/apb_salt_1d.h
+outer_diam_m = 16 m
+outer_radius_m = 8 m
+nelem = 15
+ratio = 10
+integration_order = 3
+
+legance/LOT_Tese/src/apb/apb_salt_1d.cpp
+inner_radius_m = (diam_in / 2) * 0.0254
+sigmaTheta = mdl->getElem(0)->getSigmaTheta()
+```
+
+**Evidência moderno:**
+
+```text
+LotSaltBridgeConfigOptions default outer_radius_m = 1.556
+LotSaltBridgeConfigOptions default radial_elements = 40
+SaltCreepTimeBridgeConfig default outer_radius_m = 1.556
+SaltCreepTimeBridgeConfig default radial_elements = 40
+StressSampler::sample_wall_gauss_points seleciona menor r_m
+```
+
+**Classificações adicionadas:**
+
+```text
+SIGMATHETA_MESH_OR_DOMAIN_MISMATCH
+SIGMATHETA_SAMPLING_POINT_MISMATCH
+MODERN_MESH_NOT_LEGACY_EQUIVALENT
+MODERN_REFINED_MESH_POTENTIALLY_MORE_REALISTIC
+LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING
+TIMING_ANALYSIS_INCONCLUSIVE
+```
+
+**Gate atualizado:**
+
+```text
+LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING
+```
+
+**Próxima fase recomendada:** 10.26B deve reproduzir opt-in a configuração
+APBSalt1D legado no moderno (`outer_radius_m = 8 m`, `radial_elements = 15`,
+`ratio = 10`, `integration_order = 3`, mesmo ponto de amostragem de
+`sigmaTheta`) antes de qualquer correção de `pressure_source`/timing.
 
 ---
 

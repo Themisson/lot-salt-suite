@@ -12,6 +12,33 @@ LEGACY_OPENING_TIME_S = 510.0
 PHASE = "10.26A"
 
 
+LEGACY_GEOMETRY_AUDIT = {
+    "source": "legance/LOT_Tese/include/apb/apb_salt_1d.h + src/apb/apb_salt_1d.cpp",
+    "outer_diam_m": 16.0,
+    "outer_radius_m": 8.0,
+    "inner_radius_source": "(diam_in / 2) * 0.0254",
+    "radial_elements": 15,
+    "mesh_ratio": 10.0,
+    "integration_order": 3,
+    "mesh_rule": "geometric progression with q = ratio ** (1 / (nelem - 1))",
+    "sigma_theta_source": "APBSalt1D::getSigmaTheta() -> mdl->getElem(0)->getSigmaTheta()",
+    "sigma_theta_sampling": "Element 0, local Gauss point 0, sig(2, 0)",
+}
+
+
+MODERN_GEOMETRY_AUDIT = {
+    "source": "include/salt/SaltCreepTimeBridge.hpp + src/coupling/LotSaltBridgeConfigBuilder.cpp",
+    "default_outer_radius_m": 1.556,
+    "builder_default_outer_radius_m": 1.556,
+    "default_radial_elements": 40,
+    "builder_default_radial_elements": 40,
+    "integration_order": 3,
+    "mesh_builder": "build_mesh_L3(inner_radius_m, outer_radius_m, radial_elements, height_m)",
+    "wall_stress_sampling": "StressSampler::sample_wall_gauss_points selects Gauss point(s) with minimum r_m",
+    "runtime_timeseries_source": "sigma_theta_time_series provider uses tabulated values, not SaltWallStressDiagnostics mesh",
+}
+
+
 def _read_csv(path: Path) -> list[dict[str, str]]:
     if not path.exists():
         raise FileNotFoundError(path)
@@ -299,6 +326,65 @@ def _cause_and_gate(
     return "NO_COMBINATION_MATCHES_LEGACY", "NO_FIX_UNTIL_RUNTIME_TRACE_COMPLETE"
 
 
+def _geometry_audit() -> dict[str, Any]:
+    outer_radius_matches = (
+        MODERN_GEOMETRY_AUDIT["builder_default_outer_radius_m"]
+        == LEGACY_GEOMETRY_AUDIT["outer_radius_m"]
+    )
+    radial_elements_match = (
+        MODERN_GEOMETRY_AUDIT["builder_default_radial_elements"]
+        == LEGACY_GEOMETRY_AUDIT["radial_elements"]
+    )
+    integration_order_matches = (
+        MODERN_GEOMETRY_AUDIT["integration_order"]
+        == LEGACY_GEOMETRY_AUDIT["integration_order"]
+    )
+    sampling_is_equivalent = False
+    classifications = [
+        "SIGMATHETA_MESH_OR_DOMAIN_MISMATCH",
+        "SIGMATHETA_SAMPLING_POINT_MISMATCH",
+        "MODERN_MESH_NOT_LEGACY_EQUIVALENT",
+        "LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING",
+        "TIMING_ANALYSIS_INCONCLUSIVE",
+    ]
+    if not outer_radius_matches or not radial_elements_match:
+        classifications.append("MODERN_REFINED_MESH_POTENTIALLY_MORE_REALISTIC")
+    return {
+        "legacy_apb_salt_1d": LEGACY_GEOMETRY_AUDIT,
+        "modern_bridge_defaults": MODERN_GEOMETRY_AUDIT,
+        "outer_radius_matches": outer_radius_matches,
+        "radial_elements_match": radial_elements_match,
+        "integration_order_matches": integration_order_matches,
+        "sampling_point_equivalence_confirmed": sampling_is_equivalent,
+        "geometry_equivalent": (
+            outer_radius_matches
+            and radial_elements_match
+            and integration_order_matches
+            and sampling_is_equivalent
+        ),
+        "classifications": classifications,
+        "recommended_next_phase": (
+            "10.26B reproduce APBSalt1D legacy mesh/domain before changing "
+            "pressure_source or timing"
+        ),
+        "recommended_legacy_equivalence_config": {
+            "outer_radius_m": 8.0,
+            "radial_elements": 15,
+            "mesh_ratio": 10.0,
+            "integration_order": 3,
+            "sampling": "Element 0 / local Gauss point 0 equivalent",
+        },
+    }
+
+
+def _apply_geometry_gate(
+    pressure_timing_cause: str, pressure_timing_gate: str, geometry: dict[str, Any]
+) -> tuple[str, str]:
+    if not geometry["geometry_equivalent"]:
+        return "SIGMATHETA_MESH_OR_DOMAIN_MISMATCH", "LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING"
+    return pressure_timing_cause, pressure_timing_gate
+
+
 def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fields: list[str] = []
@@ -383,7 +469,9 @@ def analyze(args: argparse.Namespace) -> dict[str, Any]:
     modern_steps = _modern_step_rows(modern_rows)
     candidates = _candidate_rows(modern_steps, sigma_points)
     best = _best_candidate(candidates)
-    cause, gate = _cause_and_gate(fields, candidates, best)
+    pressure_timing_cause, pressure_timing_gate = _cause_and_gate(fields, candidates, best)
+    geometry = _geometry_audit()
+    cause, gate = _apply_geometry_gate(pressure_timing_cause, pressure_timing_gate, geometry)
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     _write_csv(Path(args.output_csv), candidates)
@@ -392,6 +480,9 @@ def analyze(args: argparse.Namespace) -> dict[str, Any]:
         "phase": PHASE,
         "cause": cause,
         "gate": gate,
+        "pressure_source_timing_cause_before_geometry_gate": pressure_timing_cause,
+        "pressure_source_timing_gate_before_geometry_gate": pressure_timing_gate,
+        "geometry_audit": geometry,
         "legacy": legacy,
         "modern_fields": fields,
         "missing_modern_fields": [key for key, present in fields.items() if not present],
@@ -407,6 +498,8 @@ def analyze(args: argparse.Namespace) -> dict[str, Any]:
             "Diagnostic only; not physical validation.",
             "Modern CSV does not export explicit before/trial/after pressure fields.",
             "Derived pressure candidates use previous/current wellbore_pressure_Pa and must not be treated as runtime semantics.",
+            "APBSalt1D legacy mesh/domain/sampling are not yet reproduced by the modern bridge defaults.",
+            "Do not correct pressure_source or timing until a legacy-equivalent mesh/domain case is tested.",
             "No default LOT/PKN behavior changed.",
         ],
     }

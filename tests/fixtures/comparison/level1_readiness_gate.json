@@ -938,8 +938,10 @@
     ]
   },
   "phase10_26a_sigma_theta_pressure_source_timing_audit": {
-    "status": "MODERN_TRACE_EXPORT_REQUIRED",
-    "cause": "MISSING_PRESSURE_TRACE_FIELDS",
+    "status": "LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING",
+    "cause": "SIGMATHETA_MESH_OR_DOMAIN_MISMATCH",
+    "pressure_source_timing_status_before_geometry_gate": "MODERN_TRACE_EXPORT_REQUIRED",
+    "pressure_source_timing_cause_before_geometry_gate": "MISSING_PRESSURE_TRACE_FIELDS",
     "level1_ready": false,
     "physical_validation": false,
     "numeric_equivalence": false,
@@ -974,11 +976,32 @@
       "sigma_theta_margin_Pa",
       "fracture_initiation_time_s"
     ],
+    "geometry_audit": {
+      "legacy_outer_radius_m": 8.0,
+      "legacy_radial_elements": 15,
+      "legacy_mesh_ratio": 10.0,
+      "legacy_integration_order": 3,
+      "legacy_sigma_theta_sampling": "APBSalt1D::getSigmaTheta -> mdl->getElem(0)->getSigmaTheta -> sig(2,0)",
+      "modern_default_outer_radius_m": 1.556,
+      "modern_default_radial_elements": 40,
+      "modern_sampling": "StressSampler wall samples by minimum r_m when bridge diagnostics are used",
+      "geometry_equivalent": false,
+      "classifications": [
+        "SIGMATHETA_MESH_OR_DOMAIN_MISMATCH",
+        "SIGMATHETA_SAMPLING_POINT_MISMATCH",
+        "MODERN_MESH_NOT_LEGACY_EQUIVALENT",
+        "MODERN_REFINED_MESH_POTENTIALLY_MORE_REALISTIC",
+        "LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING",
+        "TIMING_ANALYSIS_INCONCLUSIVE"
+      ]
+    },
     "caveats": [
       "Diagnostic only; not physical validation.",
       "Derived pressure candidates use current/previous wellbore_pressure_Pa and are not runtime semantics.",
+      "APBSalt1D legacy geometry/domain/sampling are not yet reproduced by the modern bridge defaults.",
+      "Do not change pressure_source or timing before running a legacy-equivalent mesh/domain case.",
       "No default runtime behavior changed.",
-      "Next phase should export modern pressure and sigma-theta trace fields before changing criterion timing."
+      "After mesh equivalence is tested, the pressure and sigma-theta trace export may still be needed."
     ]
   },
   "blocked_items": [

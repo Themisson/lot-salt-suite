@@ -357,10 +357,14 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   amostragem e uso de `wellbore_pressure_before_step_Pa`,
   `wellbore_pressure_trial_Pa` e `wellbore_pressure_after_step_Pa` no criterio
   moderno antes de conectar fonte runtime real de tensao de sal.
-- A Fase 10.26A auditou os campos exportados e concluiu
-  `MISSING_PRESSURE_TRACE_FIELDS` com gate `MODERN_TRACE_EXPORT_REQUIRED`. O
-  melhor candidato derivado dos campos atuais ainda abre em `600 s`
-  (`+90 s`), e `wellbore_pressure_trial_Pa` real nao esta no `timeseries.csv`.
-  A proxima fase deve criar um trace moderno opt-in, sem mudar defaults, para
-  exportar `before/trial/after`, sigma-theta por passo, margem por passo e tempo
-  de lookup antes de qualquer correcao de timing.
+- A Fase 10.26A auditou os campos exportados e, no adendo geometrico, bloqueou
+  uma correcao prematura de `pressure_source`/timing. A evidencia bruta ainda
+  mostra `MISSING_PRESSURE_TRACE_FIELDS` e melhor candidato abrindo em `600 s`
+  (`+90 s`), mas o gate final e
+  `LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING`: o `APBSalt1D` legado usa
+  `outer_radius_m = 8 m`, `nelem = 15`, `ratio = 10`, `integration_order = 3`
+  e amostra `mdl->getElem(0)->getSigmaTheta()`, enquanto a rota moderna
+  diagnostica/bridge usa defaults de dominio e refinamento diferentes. A proxima
+  fase deve primeiro reproduzir uma configuracao APBSalt1D equivalente no
+  moderno; so depois disso a auditoria de `before/trial/after` e timing deve ser
+  retomada.
