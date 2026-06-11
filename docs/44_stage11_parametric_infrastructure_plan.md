@@ -254,3 +254,24 @@ A Fase 11.5C consolida os estudos 11.5A e 11.5B em
 mantém `C_geom=0.75x` como melhor ranking diagnóstico combinado e registra que
 `C_geom=0.55x` aproxima melhor a pressão máxima, reforçando que não há
 calibração física automática.
+
+## Fase 11.6A auditoria BUZ29-VISCO-first-well
+
+A Fase 11.6A adiciona uma auditoria somente leitura para o candidato
+`BUZ29-VISCO-first-well.cpp`:
+
+```text
+docs/57_buz29_visco_first_well_audit.md
+tools/audit_phase11_6a_buz29_visco_first_well.py
+```
+
+Resultado:
+
+```text
+BUZ29_VISCO_FIRST_WELL_SOURCE_FOUND
+BUZ29_VISCO_FIRST_WELL_NOT_PKN
+BUZ29_VISCO_FIRST_WELL_MODERN_YAML_NOT_READY
+```
+
+O caso não deve ser forçado para a infraestrutura LOT/PKN porque o modelo ativo
+é `penny-shaped`. A próxima fase recomendada é um roadmap não-PKN.

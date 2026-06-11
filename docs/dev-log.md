@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.5C BUZ-67D sensitivity consolidation
+Fase ativa  : 11.6A BUZ29 VISCO first-well audit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 358/358 previstos apos Fase 11.5C em 2026-06-11
+Testes Py   : 364/364 previstos apos Fase 11.6A em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,37 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 11.6A — auditoria BUZ29-VISCO-first-well — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase11_6a_buz29_visco_first_well.py
+```
+
+**Documento criado:**
+
+```text
+docs/57_buz29_visco_first_well_audit.md
+```
+
+**Resultado:**
+
+```text
+BUZ29_VISCO_FIRST_WELL_SOURCE_FOUND
+BUZ29_VISCO_FIRST_WELL_NOT_PKN
+BUZ29_VISCO_FIRST_WELL_MODERN_YAML_NOT_READY
+NEXT_PHASE_NON_PKN_ROADMAP
+```
+
+**Interpretação:** `BUZ29-VISCO-first-well.cpp` existe e contém parâmetros
+úteis, mas o modelo ativo é `penny-shaped`; a linha PKN está comentada. A fase
+não cria YAML moderno BUZ29 e recomenda roadmap não-PKN.
 
 ---
 

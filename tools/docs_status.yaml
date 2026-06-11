@@ -130,6 +130,7 @@ phases:
   phase_11_5a_buz67d_cgeom_extended_sensitivity: completed
   phase_11_5b_buz67d_cgeom_sink_timing_sensitivity: completed
   phase_11_5c_buz67d_sensitivity_consolidation: completed
+  phase_11_6a_buz29_visco_first_well_audit: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -186,6 +187,7 @@ docs:
   stage11_5a_buz67d_cgeom_extended_sensitivity: implemented
   stage11_5b_buz67d_cgeom_sink_timing_sensitivity: implemented
   stage11_5c_buz67d_sensitivity_consolidation: implemented
+  stage11_6a_buz29_visco_first_well_audit: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -251,12 +253,12 @@ validation:
 test_counts:
   cpp_tests: 263        # Catch2 lot-salt-suite — 263/263 previstos apos Fase 10.26B (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 358     # pytest lot-salt-suite — 358/358 previstos apos Fase 11.5C (2026-06-11)
+  python_tests: 364     # pytest lot-salt-suite — 364/364 previstos apos Fase 11.6A (2026-06-11)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-11"
-updated_by: "codex (Fase 11.5C BUZ67D sensitivity consolidation)"
+updated_by: "codex (Fase 11.6A BUZ29 VISCO first-well audit)"
 project_version: "0.1.0"

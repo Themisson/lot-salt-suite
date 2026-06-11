@@ -1711,6 +1711,30 @@
       "The generic runner remains matrix-path based in this phase."
     ]
   },
+  "phase11_6a_buz29_visco_first_well_audit": {
+    "status": "BUZ29_VISCO_FIRST_WELL_AUDITED",
+    "phase": "11.6A",
+    "source_status": "BUZ29_VISCO_FIRST_WELL_SOURCE_FOUND",
+    "primary_classification": "BUZ29_VISCO_FIRST_WELL_NOT_PKN",
+    "future_yaml_readiness": "BUZ29_VISCO_FIRST_WELL_MODERN_YAML_NOT_READY",
+    "recommended_next_phase": "PHASE11_6B_NON_PKN_ROADMAP",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": false,
+    "tool": "tools/audit_phase11_6a_buz29_visco_first_well.py",
+    "document": "docs/57_buz29_visco_first_well_audit.md",
+    "primary_source": "legance/LOT_Tese/BUZ29-VISCO-first-well.cpp",
+    "active_model": "PENNY_SHAPED",
+    "pkn_evidence": "COMMENT_ONLY",
+    "caveats": [
+      "The first-well source exists, but the active model is penny-shaped.",
+      "The PKN leakoff line is commented and does not make the case modern PKN-ready.",
+      "No BUZ29 modern YAML was created in Phase 11.6A.",
+      "No physical validation or legacy-modern numeric equivalence is claimed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

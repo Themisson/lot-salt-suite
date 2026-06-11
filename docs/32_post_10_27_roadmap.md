@@ -117,6 +117,28 @@ sampling dentro do próprio modo moderno.
 7. Validar os três casos principais LOT-PKN.
 8. Confirmar que `results/` permanece ignorado.
 
+## Fase 11.6A registrada
+
+A Fase 11.6A auditou `BUZ29-VISCO-first-well.cpp` em modo somente leitura:
+
+```text
+docs/57_buz29_visco_first_well_audit.md
+tools/audit_phase11_6a_buz29_visco_first_well.py
+```
+
+Resultado:
+
+```text
+BUZ29_VISCO_FIRST_WELL_SOURCE_FOUND
+BUZ29_VISCO_FIRST_WELL_NOT_PKN
+BUZ29_VISCO_FIRST_WELL_MODERN_YAML_NOT_READY
+NEXT_PHASE_NON_PKN_ROADMAP
+```
+
+O arquivo legado existe e contém parâmetros úteis, mas o modelo ativo é
+`penny-shaped`; a linha PKN está comentada. A continuidade segura é planejar a
+rota não-PKN antes de criar qualquer YAML moderno BUZ29.
+
 ## Fase 10.28A registrada
 
 A Fase 10.28A cria o pacote documental em:

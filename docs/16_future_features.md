@@ -520,3 +520,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   interpretativo. O bloco fecha com `C_geom=0.75x` como melhor ranking
   diagnóstico combinado, `C_geom=0.55x` como melhor ranking por pressão máxima
   e transição recomendada para auditoria BUZ29-VISCO-first-well.
+- A Fase 11.6A auditou `BUZ29-VISCO-first-well.cpp` e confirmou que o caso
+  existe, mas não está pronto para YAML moderno LOT/PKN: o modelo ativo é
+  `penny-shaped` e a linha PKN está comentada. A próxima evolução deve ser um
+  roadmap não-PKN, cobrindo penny-shaped/KGD/Zamora como escopo futuro separado
+  da infraestrutura BUZ-67D modern-refined.
