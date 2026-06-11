@@ -145,3 +145,18 @@ VERSIONED_SENSITIVITY_RUN_OK
 ```
 
 Os resultados continuam em `results/` e não são versionados.
+
+## Relatório automático de sensibilidade
+
+A Fase 10.30C adiciona:
+
+```text
+tools/report_lot_pkn_sensitivity_matrix.py
+docs/41_sensitivity_reporting.md
+```
+
+O relatório consome `summary.csv` e `metadata.json` produzidos pelo runner e
+gera JSON/Markdown com ranking por abertura, pressão máxima e score combinado.
+Quando alvos legados não são fornecidos, o relatório é relativo ao baseline.
+Quando alvos legados documentados são fornecidos, os resultados continuam
+diagnósticos e não viram calibração automática.

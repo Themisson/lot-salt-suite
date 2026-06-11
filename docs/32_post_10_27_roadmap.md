@@ -264,3 +264,22 @@ VERSIONED_SENSITIVITY_RUN_OK
 Essa fase estabelece que a matriz BUZ-67D `modern-refined` é reproduzível pelo
 runner genérico. Os resultados continuam locais em `results/` e não são
 tratados como calibração automática.
+
+## Fase 10.30C registrada
+
+A Fase 10.30C adiciona o gerador de relatório:
+
+```text
+tools/report_lot_pkn_sensitivity_matrix.py
+docs/41_sensitivity_reporting.md
+```
+
+Status:
+
+```text
+SENSITIVITY_REPORT_GENERATED
+```
+
+A ferramenta consolida ranking por abertura, pressão máxima e score combinado.
+Ela e pós-processamento diagnóstico, não runtime C++ e não calibração
+automática.

@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.30B versioned BUZ-67D sensitivity run verification
+Fase ativa  : 10.30C LOT-PKN sensitivity report generator
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 253/253 previstos apos Fase 10.30B em 2026-06-11
+Testes Py   : 261/261 previstos apos Fase 10.30C em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,36 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.30C — gerador de relatório de sensibilidade LOT/PKN — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/report_lot_pkn_sensitivity_matrix.py
+```
+
+**Documento criado:**
+
+```text
+docs/41_sensitivity_reporting.md
+```
+
+**Resultado:**
+
+```text
+SENSITIVITY_REPORT_GENERATED
+```
+
+O relatório consome `summary.csv` e `metadata.json` do runner genérico e emite
+JSON/Markdown reproduzíveis. Com alvos legados documentados para BUZ-67D, o
+ranking diagnóstico identifica `0.75x` por abertura e score combinado, e
+`0.60x` por pressão máxima. Isso permanece pós-processamento diagnóstico, não
+calibração automática.
 
 ---
 

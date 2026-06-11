@@ -453,3 +453,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `tools/verify_phase10_30b_sensitivity_run.py`. A classificacao
   `VERSIONED_SENSITIVITY_RUN_OK` confirma reprodutibilidade operacional da
   matriz, nao calibracao fisica.
+- A Fase 10.30C criou `tools/report_lot_pkn_sensitivity_matrix.py` para gerar
+  relatorios JSON/Markdown reproduziveis a partir de `summary.csv` e
+  `metadata.json`. O ranking de fatores e diagnostico e nao deve ser usado como
+  calibracao automatica.

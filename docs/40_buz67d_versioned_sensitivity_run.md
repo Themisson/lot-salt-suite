@@ -55,3 +55,16 @@ The same-step scenario confirms that changing sink timing affects the sink delay
 - Results under `results/` are reproducible local artifacts, not versioned files.
 - The 0.75x scenario is a diagnostic sensitivity point and must not be promoted automatically to a calibrated parameter.
 - APBSalt1D metadata remains metadata-only until spatial sigmaTheta sampling exists.
+
+## Phase 10.30C reporting
+
+Phase 10.30C adds `tools/report_lot_pkn_sensitivity_matrix.py` to turn this
+run's `summary.csv` and `metadata.json` into a reproducible JSON/Markdown
+report. For the documented BUZ-67D legacy targets, the report keeps the same
+diagnostic interpretation:
+
+- best opening-time factor: `0.75x`;
+- best maximum-pressure factor: `0.60x`;
+- best combined-score factor: `0.75x`.
+
+These are report rankings, not automatic calibration.
