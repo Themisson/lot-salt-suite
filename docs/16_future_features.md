@@ -536,3 +536,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `PENNY_SHAPED`. A decisão é documental e técnica; não implementa modelo novo,
   não cria YAML BUZ29 e não declara validação física. A próxima etapa segura é
   auditar matematicamente a formulação penny-shaped antes de qualquer solver.
+- A Fase 11.7B audita a matemática penny-shaped legada e extrai relações
+  mínimas para `w0`, `R`, `pressureFactor` e volume proxy. O status permite
+  especificação YAML/IO e eventual núcleo C++ isolado, mas continua bloqueando
+  validação BUZ29 e equivalência com o legado completo.

@@ -78,6 +78,21 @@ Essa decisão não altera solver, parser ou casos. Ela apenas impede que BUZ29
 seja forçado para `lot-pkn` enquanto a formulação `penny-shaped` não for
 auditada.
 
+## Fase 11.7B — auditoria matemática penny-shaped
+
+A Fase 11.7B audita o bloco `idTypeFracture == 3` em
+`APB1da::calculateLOTFracturedSaltRock(...)` e registra:
+
+```text
+status = SELECTED_MODEL_MATH_AUDITED
+selected_track = PENNY_SHAPED
+implementation_readiness = MINIMAL_IMPLEMENTATION_READY_DIAGNOSTIC_ONLY
+```
+
+A auditoria extrai as relações mínimas de abertura `w0`, raio `R`,
+`pressureFactor = pw/sigmaTheta` e volume proxy. Ela não implementa solver novo
+e não valida BUZ29.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

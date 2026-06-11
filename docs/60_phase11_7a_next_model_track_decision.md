@@ -73,3 +73,16 @@ matemática penny-shaped antes de qualquer especificação YAML oficial ou C++.
 ```text
 PHASE11_7B_LEGACY_MATH_AUDIT_SELECTED_MODEL
 ```
+
+## Resultado da 11.7B
+
+A fase seguinte confirmou a trilha:
+
+```text
+selected_track = PENNY_SHAPED
+status = SELECTED_MODEL_MATH_AUDITED
+implementation_readiness = MINIMAL_IMPLEMENTATION_READY_DIAGNOSTIC_ONLY
+```
+
+O resultado mantém a 11.7A como decisão correta, mas limita qualquer próxima
+implementação a um núcleo mínimo isolado e diagnóstico.

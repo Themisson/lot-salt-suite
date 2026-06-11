@@ -57,6 +57,37 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.7B — auditoria matemática penny-shaped — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase11_7b_selected_model_math.py
+```
+
+**Documento criado:**
+
+```text
+docs/61_selected_non_pkn_model_math_audit.md
+```
+
+**Resultado:**
+
+```text
+SELECTED_MODEL_MATH_AUDITED
+selected_track = PENNY_SHAPED
+implementation_readiness = MINIMAL_IMPLEMENTATION_READY_DIAGNOSTIC_ONLY
+recommended_next_phase = PHASE11_7C_SELECTED_MODEL_YAML_IO_SPEC
+```
+
+**Interpretação:** foram extraídas as relações legadas mínimas para abertura,
+raio, fator de pressão e volume proxy penny-shaped. A fase não implementa
+modelo moderno e não declara validação BUZ29.
+
+---
+
 ### [2026-06-11] Fase 11.7A — decisão de trilha pós-BUZ29 — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

@@ -1787,6 +1787,29 @@
       "No BUZ29 physical validation or legacy equivalence is claimed."
     ]
   },
+  "phase11_7b_selected_model_math_audit": {
+    "status": "SELECTED_MODEL_MATH_AUDITED",
+    "phase": "11.7B",
+    "selected_track": "PENNY_SHAPED",
+    "implementation_readiness": "MINIMAL_IMPLEMENTATION_READY_DIAGNOSTIC_ONLY",
+    "recommended_next_phase": "PHASE11_7C_SELECTED_MODEL_YAML_IO_SPEC",
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "tool": "tools/audit_phase11_7b_selected_model_math.py",
+    "document": "docs/61_selected_non_pkn_model_math_audit.md",
+    "equations": [
+      "w0 = 3.65 * ((mu^2 * Qinj^3) / EPd^2)^(1/9) * time^(1/9)",
+      "R = 0.572 * ((EPd * Qinj^3) / mu)^(1/9) * time^(4/9)",
+      "pressureFactor = pw / sigmaTheta",
+      "dV_leakoff = 10 * (w0/2)^2 * R * pi * pressureFactor"
+    ],
+    "caveats": [
+      "Minimum implementation readiness covers isolated formulas only.",
+      "BUZ29 validation still requires APB/salt state, sigmaTheta source and pressure history.",
+      "The legacy factor 10 remains explicit and diagnostic."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
