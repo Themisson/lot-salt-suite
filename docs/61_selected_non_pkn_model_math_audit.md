@@ -102,3 +102,19 @@ parâmetros. Isso não significa que BUZ29 esteja pronto para validação modern
 ```text
 PHASE11_7C_SELECTED_MODEL_YAML_IO_SPEC
 ```
+
+## Resultado da Fase 11.7C
+
+A Fase 11.7C criou uma especificação YAML/IO para essas entradas e saídas em
+modo fixture-only:
+
+```text
+SELECTED_MODEL_YAML_IO_SPECIFIED
+SPEC_FIXTURE_ONLY_NOT_RUNTIME_SCHEMA
+```
+
+O contrato exige unidades explícitas para `young_modulus`,
+`poisson_ratio`, `viscosity`, `flow_rate`, `elapsed_since_opening`,
+`wellbore_pressure` e `sigma_theta_compression_positive`, além do fator legado
+`volume_multiplier = 10.0`. O parser principal e os schemas oficiais continuam
+inalterados.

@@ -135,6 +135,7 @@ phases:
   phase_11_6b_non_pkn_model_roadmap: completed
   phase_11_7a_next_model_track_decision: completed
   phase_11_7b_selected_non_pkn_model_math_audit: completed
+  phase_11_7c_selected_non_pkn_model_yaml_io_spec: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -196,6 +197,7 @@ docs:
   stage11_6b_non_pkn_model_roadmap: implemented
   stage11_7a_next_model_track_decision: implemented
   stage11_7b_selected_non_pkn_model_math_audit: implemented
+  stage11_7c_selected_non_pkn_model_yaml_io_spec: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented

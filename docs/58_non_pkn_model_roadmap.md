@@ -93,6 +93,21 @@ A auditoria extrai as relações mínimas de abertura `w0`, raio `R`,
 `pressureFactor = pw/sigmaTheta` e volume proxy. Ela não implementa solver novo
 e não valida BUZ29.
 
+## Fase 11.7C — especificação YAML/IO penny-shaped
+
+A Fase 11.7C congela uma especificação versionada de YAML/IO para a trilha
+`PENNY_SHAPED`:
+
+```text
+status = SELECTED_MODEL_YAML_IO_SPECIFIED
+schema_status = SPEC_FIXTURE_ONLY_NOT_RUNTIME_SCHEMA
+recommended_next_phase = PHASE11_8A_MINIMAL_SELECTED_NON_PKN_MODEL
+```
+
+Essa especificação usa fixture em `tests/fixtures/comparison/` e validador
+externo em `tools/`. Ela não altera o schema oficial, parser, runtime, CLI ou
+casos protegidos.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

@@ -1,0 +1,40 @@
+phase: 11.7C
+selected_track: PENNY_SHAPED
+fracture_model:
+  type: penny_shaped
+  status: SPEC_FIXTURE_ONLY_NOT_RUNTIME_SCHEMA
+  units: SI_with_minutes_for_legacy_formula
+  elasticity:
+    young_modulus:
+      value: 5710000.0
+      unit: Pa
+    poisson_ratio:
+      value: 0.36
+      unit: dimensionless
+  fluid:
+    viscosity:
+      value: 180.0
+      unit: Pa_min
+  injection:
+    flow_rate:
+      value: 0.05
+      unit: m3_min
+  initiation:
+    elapsed_since_opening:
+      value: 1.0
+      unit: min
+    wellbore_pressure:
+      value: 67000000.0
+      unit: Pa
+    sigma_theta_compression_positive:
+      value: 66000000.0
+      unit: Pa
+  legacy_options:
+    volume_multiplier: 10.0
+    pressure_factor: pw_over_sigma_theta
+  expected_outputs:
+    - opening_m
+    - radius_m
+    - pressure_factor
+    - fracture_volume_proxy_m3
+  caveat: Spec fixture only; not a runtime schema, not BUZ29 validation, and not legacy equivalence.

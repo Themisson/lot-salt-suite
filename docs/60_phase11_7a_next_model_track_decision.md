@@ -86,3 +86,17 @@ implementation_readiness = MINIMAL_IMPLEMENTATION_READY_DIAGNOSTIC_ONLY
 
 O resultado mantém a 11.7A como decisão correta, mas limita qualquer próxima
 implementação a um núcleo mínimo isolado e diagnóstico.
+
+## Resultado da 11.7C
+
+A especificação YAML/IO confirmou que a trilha `PENNY_SHAPED` pode avançar por
+fixture versionada antes de qualquer schema/runtime oficial:
+
+```text
+status = SELECTED_MODEL_YAML_IO_SPECIFIED
+schema_status = SPEC_FIXTURE_ONLY_NOT_RUNTIME_SCHEMA
+recommended_next_phase = PHASE11_8A_MINIMAL_SELECTED_NON_PKN_MODEL
+```
+
+Isso preserva a separação entre especificação documental, implementação mínima
+isolada e eventual integração futura.

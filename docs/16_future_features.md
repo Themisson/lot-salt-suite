@@ -540,3 +540,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   mínimas para `w0`, `R`, `pressureFactor` e volume proxy. O status permite
   especificação YAML/IO e eventual núcleo C++ isolado, mas continua bloqueando
   validação BUZ29 e equivalência com o legado completo.
+- A Fase 11.7C especifica o YAML/IO mínimo do modelo `penny_shaped` em uma
+  fixture versionada, com validador Python e status
+  `SPEC_FIXTURE_ONLY_NOT_RUNTIME_SCHEMA`. Isso prepara a 11.8A sem alterar
+  parser, schema oficial, runtime ou casos protegidos.

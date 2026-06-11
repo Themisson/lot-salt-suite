@@ -1810,6 +1810,31 @@
       "The legacy factor 10 remains explicit and diagnostic."
     ]
   },
+  "phase11_7c_selected_model_yaml_io_spec": {
+    "status": "SELECTED_MODEL_YAML_IO_SPECIFIED",
+    "phase": "11.7C",
+    "selected_track": "PENNY_SHAPED",
+    "schema_status": "SPEC_FIXTURE_ONLY_NOT_RUNTIME_SCHEMA",
+    "recommended_next_phase": "PHASE11_8A_MINIMAL_SELECTED_NON_PKN_MODEL",
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "runtime_schema_changed": false,
+    "fixture": "tests/fixtures/comparison/phase11_7c_selected_model_case_fixture.yaml",
+    "tool": "tools/validate_phase11_7c_selected_model_yaml_spec.py",
+    "document": "docs/62_selected_non_pkn_model_yaml_io_spec.md",
+    "required_outputs": [
+      "opening_m",
+      "radius_m",
+      "pressure_factor",
+      "fracture_volume_proxy_m3"
+    ],
+    "caveats": [
+      "The specification is a versioned fixture only, not an official parser schema.",
+      "No BUZ29 validation, runtime integration, or legacy equivalence is claimed.",
+      "The legacy volume multiplier remains explicit."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

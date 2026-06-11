@@ -57,6 +57,42 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.7C — especificação YAML/IO penny-shaped — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/validate_phase11_7c_selected_model_yaml_spec.py
+```
+
+**Fixture criada:**
+
+```text
+tests/fixtures/comparison/phase11_7c_selected_model_case_fixture.yaml
+```
+
+**Documento criado:**
+
+```text
+docs/62_selected_non_pkn_model_yaml_io_spec.md
+```
+
+**Resultado:**
+
+```text
+SELECTED_MODEL_YAML_IO_SPECIFIED
+schema_status = SPEC_FIXTURE_ONLY_NOT_RUNTIME_SCHEMA
+recommended_next_phase = PHASE11_8A_MINIMAL_SELECTED_NON_PKN_MODEL
+```
+
+**Interpretação:** a fase congela o contrato de entradas/saídas para um núcleo
+`penny_shaped` mínimo e isolado. Parser, schema oficial, runtime, CLI e casos
+protegidos permanecem inalterados.
+
+---
+
 ### [2026-06-11] Fase 11.7B — auditoria matemática penny-shaped — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.
