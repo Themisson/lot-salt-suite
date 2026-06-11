@@ -838,6 +838,48 @@
       "No default runtime behavior changed."
     ]
   },
+  "phase10_25a_refined_legacy_sigma_theta_extraction": {
+    "status": "SIGMA_THETA_REFINED_PROVIDER_UPDATE_ALLOWED",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "legacy_instrumentation_committable": false,
+    "tool": "tools/analyze_phase10_25a_sigma_theta_refined.py",
+    "trace_csv": "results/comparison/phase10_25a/legacy_sigma_theta_refined_trace.csv",
+    "refined_series_csv": "results/comparison/phase10_25a/sigma_theta_refined_series.csv",
+    "summary_json": "results/comparison/phase10_25a/sigma_theta_refined_summary.json",
+    "audit_patch": "results/comparison/phase10_25a/legacy_sigma_theta_refined_audit.patch",
+    "classifications": [
+      "SIGMA_THETA_REFINED_SERIES_COMPLETE",
+      "SIGMA_THETA_YAML_SERIES_TOO_SPARSE",
+      "SIGMA_THETA_SOURCE_MISMATCH_EXPLAINS_OPENING_SHIFT"
+    ],
+    "metrics": {
+      "number_of_sigmaTheta_points": 44,
+      "primary_idAnnular": 1,
+      "primary_idLayer": 7,
+      "legacy_first_opened_time_s": 510.0,
+      "legacy_first_opened_step": 721,
+      "legacy_first_pw_Pa": 66769500.0,
+      "legacy_first_sigmaTheta_Pa": 66666600.0,
+      "legacy_first_margin_Pa": 102865.0,
+      "legacy_first_sink_positive_time_s": 540.0,
+      "sink_delay_s": 30.0,
+      "sigmaTheta_at_510s": 66666600.0,
+      "sigmaTheta_at_660s": 65445500.0,
+      "sigmaTheta_at_660s_yaml": 66666600.0,
+      "max_abs_difference_between_yaml_and_refined": 7079400.0,
+      "mean_abs_difference_between_yaml_and_refined": 1831338.6363636365
+    },
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "The refined series comes from temporary LOT_Tese instrumentation, not SaltWallStressDiagnostics runtime.",
+      "The Phase 10.24B YAML source is too sparse for the opening timing decision.",
+      "No results/ artifacts are versioned.",
+      "No default runtime behavior changed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

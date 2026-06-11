@@ -334,3 +334,12 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   no legado. A proxima fase deve melhorar/auditar a fonte temporal de
   sigma-theta antes de promover `SaltWallStressDiagnostics` como provider
   runtime.
+- A Fase 10.25A extraiu uma serie refinada de `sigmaTheta` diretamente do
+  ponto do criterio legado `pw > sigmaTheta`. A serie refinada tem `44` pontos,
+  cobre `30..1320 s`, confirma abertura em `510 s` e sink em `540 s`, e mostra
+  que a fixture 10.24B era esparsa: em `660 s`, o refinado tem
+  `65445500 Pa`, contra `66666600 Pa` no YAML anterior. O gate
+  `SIGMA_THETA_REFINED_PROVIDER_UPDATE_ALLOWED` permite criar um novo caso
+  diagnostico opt-in com essa serie. Ainda assim, isso nao valida fratura fisica
+  nem promove `SaltWallStressDiagnostics` runtime; apenas melhora a fonte
+  temporal diagnostica antes da decisao seguinte.

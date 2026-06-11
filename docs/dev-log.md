@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.24C diagnostico final sigma_theta_time_series; commit/push pendente
+Fase ativa  : 10.25A extracao refinada sigmaTheta LOT_Tese; commit/push em andamento
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 258/258 passaram apos Fase 10.24C em 2026-06-11
-Testes Py   : 144/144 passaram apos Fase 10.24C em 2026-06-11
+Testes Py   : 150/150 passaram apos Fase 10.25A em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -57,9 +57,79 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
-### [2026-06-11] Fase 10.24C — diagnóstico final `sigma_theta_time_series` BUZ67D — Codex
+### [2026-06-11] Fase 10.25A — extração refinada da série `sigmaTheta` do LOT_Tese — Codex
 
 **Status:** Implementada localmente; commit/push pendente.
+
+**Gate:** `SIGMA_THETA_REFINED_PROVIDER_UPDATE_ALLOWED`.
+
+**Classificações:**
+
+```text
+SIGMA_THETA_REFINED_SERIES_COMPLETE
+SIGMA_THETA_YAML_SERIES_TOO_SPARSE
+SIGMA_THETA_SOURCE_MISMATCH_EXPLAINS_OPENING_SHIFT
+```
+
+**Objetivo:** instrumentar temporariamente o `LOT_Tese` no ponto exato do
+critério legado `pw > sigmaTheta` para extrair uma série refinada
+`sigma_theta_compression_positive_Pa(t)` por passo temporal, sem commitar
+alterações em `legance/`.
+
+**Ferramenta criada:**
+
+```text
+tools/analyze_phase10_25a_sigma_theta_refined.py
+```
+
+**Trace auditado gerado fora do Git:**
+
+```text
+results/comparison/phase10_25a/legacy_sigma_theta_refined_trace.csv
+results/comparison/phase10_25a/sigma_theta_refined_series.csv
+results/comparison/phase10_25a/sigma_theta_refined_summary.json
+results/comparison/phase10_25a/legacy_sigma_theta_refined_audit.patch
+```
+
+**Resultados principais:**
+
+```text
+number_of_sigmaTheta_points = 44
+primary_idAnnular = 1
+primary_idLayer = 7
+time_range = 30.0 .. 1320.0 s
+legacy_first_opened_time_s = 510.0
+legacy_first_opened_step = 721
+legacy_first_pw_Pa = 66769500.0
+legacy_first_sigmaTheta_Pa = 66666600.0
+legacy_first_margin_Pa = 102865.0
+legacy_first_sink_positive_time_s = 540.0
+sink_delay_s = 30.0
+sigmaTheta_at_510s = 66666600.0
+sigmaTheta_at_660s = 65445500.0
+n_points_yaml = 3
+time_range_yaml = 480.0 .. 540.0 s
+sigmaTheta_at_660s_yaml = 66666600.0
+max_abs_difference_between_yaml_and_refined = 7079400.0
+mean_abs_difference_between_yaml_and_refined = 1831338.6363636365
+```
+
+**Interpretação:** a série 10.24B era uma fixture mínima de três pontos e não
+representava a queda temporal refinada de `sigmaTheta` observada no caminho
+legado. A diferença é suficiente para explicar, em nível diagnóstico, o
+deslocamento da abertura moderna para `660 s`. A próxima fase permitida é criar
+um novo caso diagnóstico com a série refinada, sem substituir o caso 10.24B.
+
+**Escopo:** `legance/LOT_Tese/` foi modificado apenas temporariamente para
+instrumentação, o patch foi salvo em `results/`, e os arquivos legados foram
+restaurados antes de qualquer commit. Nenhum arquivo em `results/` deve ser
+versionado.
+
+---
+
+### [2026-06-11] Fase 10.24C — diagnóstico final `sigma_theta_time_series` BUZ67D — Codex
+
+**Status:** Concluída, commitada e enviada em `6dd7f6d`.
 
 **Classificação final:** `SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED`.
 

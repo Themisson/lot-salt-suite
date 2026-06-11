@@ -95,6 +95,7 @@ phases:
   phase_10_24a_sigma_theta_provider_contract: completed
   phase_10_24b_sigma_theta_time_series: completed
   phase_10_24c_buz67d_sigma_theta_timeseries_diagnostic: completed
+  phase_10_25a_refined_legacy_sigma_theta_extraction: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -189,12 +190,12 @@ validation:
 test_counts:
   cpp_tests: 258        # Catch2 lot-salt-suite — 258/258 passaram na Fase 10.24B (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 144     # pytest lot-salt-suite — 144/144 passaram na Fase 10.24C (2026-06-11)
+  python_tests: 150     # pytest lot-salt-suite — 150/150 passaram na Fase 10.25A (2026-06-11)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-11"
-updated_by: "codex (Fase 10.24C BUZ67D sigma theta time-series diagnostic)"
+updated_by: "codex (Fase 10.25A refined legacy sigma theta extraction)"
 project_version: "0.1.0"

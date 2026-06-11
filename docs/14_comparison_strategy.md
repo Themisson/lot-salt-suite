@@ -2275,3 +2275,60 @@ faixas diagnósticas boas, mas não corrige a cronologia de abertura. Como a sé
 `SaltWallStressDiagnostics` ao runtime padrão; a próxima fase deve buscar uma
 fonte sigma-theta temporal mais representativa ou auditar por que a pressão
 trial moderna cruza `66666600 Pa` apenas em `660 s`.
+
+## Fase 10.25A — extração refinada `sigmaTheta` para comparação diagnóstica
+
+A Fase 10.25A resolve a lacuna apontada pela 10.24C: a série
+`sigma_theta_time_series` original era uma fixture mínima para wiring, não uma
+amostragem refinada da tensão usada no critério legado. A nova extração auditou
+o `LOT_Tese` diretamente em `APB1da::calculateLOTFracturedSaltRock(...)`, no
+mesmo ponto lógico em que são calculados:
+
+```text
+pw = pi + dP
+sigmaTheta = -getSigmaTheta()
+margin = pw - sigmaTheta
+opened = pw > sigmaTheta
+```
+
+O par moderno/legado continua limitado a diagnóstico estrutural e temporal:
+
+- não compara dano;
+- não compara `j2` ou von Mises;
+- não valida ruptura física;
+- não conecta `SaltWallStressDiagnostics` ao runtime;
+- não substitui o caso 10.24B.
+
+Resumo da série refinada:
+
+| Métrica | Valor |
+|---|---:|
+| Pontos refinados | `44` |
+| `idAnnular` primário | `1` |
+| `idLayer` primário | `7` |
+| Faixa temporal | `30 .. 1320 s` |
+| Abertura legada | `510 s` |
+| Primeiro sink positivo | `540 s` |
+| `sigmaTheta(510 s)` refinado | `66666600 Pa` |
+| `sigmaTheta(660 s)` refinado | `65445500 Pa` |
+| `sigmaTheta(660 s)` YAML 10.24B | `66666600 Pa` |
+| Diferença absoluta máxima YAML/refinado | `7079400 Pa` |
+
+Classificações:
+
+```text
+SIGMA_THETA_REFINED_SERIES_COMPLETE
+SIGMA_THETA_YAML_SERIES_TOO_SPARSE
+SIGMA_THETA_SOURCE_MISMATCH_EXPLAINS_OPENING_SHIFT
+```
+
+Gate:
+
+```text
+SIGMA_THETA_REFINED_PROVIDER_UPDATE_ALLOWED
+```
+
+Portanto, a próxima comparação deve criar um novo caso diagnóstico com a série
+refinada completa. Esse passo ainda não promove a fonte a runtime físico; ele
+apenas testa se uma fonte temporal mais fiel ao legado corrige o deslocamento de
+abertura observado na 10.24C.

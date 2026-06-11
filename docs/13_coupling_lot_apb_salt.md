@@ -2964,3 +2964,95 @@ Limites físicos:
 - o default global não muda;
 - a comparação permanece `SIGMA_THETA_TIMESERIES_DIAGNOSTIC_ONLY`, sem validação
   física de fratura.
+
+## Extração refinada da série `sigmaTheta` do LOT_Tese (Fase 10.25A)
+
+A Fase 10.25A instrumentou temporariamente o `LOT_Tese` no ponto exato em que o
+critério legado de abertura é avaliado em:
+
+```text
+legance/LOT_Tese/src/apb_code/APB1da.cpp
+APB1da::calculateLOTFracturedSaltRock(...)
+```
+
+O caminho auditado foi:
+
+```text
+pw = line_up[lu].pi(idAnnular) + line_up[lu].dP(idAnnular)
+sigmaTheta = -line_up[lu].mdl->getSigmaTheta()
+margin = pw - sigmaTheta
+opened = pw > sigmaTheta
+```
+
+A instrumentação foi passiva: não alterou equações, parâmetros, conversões ou
+fluxo de controle. O patch temporário foi salvo em `results/` e
+`legance/LOT_Tese/` foi restaurado antes do commit.
+
+Campos extraídos no trace refinado:
+
+```text
+step
+time_min
+time_s
+dt_min
+dt_s
+idAnnular
+idLayer
+depth_influence_m
+thickness_m
+pi_Pa
+dP_Pa
+pw_Pa
+sigmaTheta_raw_Pa
+sigmaTheta_compression_positive_Pa
+margin_Pa
+opened
+opened_before_step
+opened_after_step
+fracture_started_this_step
+sink_positive
+sink_started_this_step
+dV_leakoff_m3_rad
+dV_leakoff_increment_m3_rad
+Qinj_m3_rad_min
+```
+
+Resultado da análise:
+
+```text
+gate = SIGMA_THETA_REFINED_PROVIDER_UPDATE_ALLOWED
+classification = SIGMA_THETA_REFINED_SERIES_COMPLETE
+classification = SIGMA_THETA_YAML_SERIES_TOO_SPARSE
+classification = SIGMA_THETA_SOURCE_MISMATCH_EXPLAINS_OPENING_SHIFT
+
+number_of_sigmaTheta_points = 44
+primary_idAnnular = 1
+primary_idLayer = 7
+legacy_first_opened_time_s = 510.0
+legacy_first_pw_Pa = 66769500.0
+legacy_first_sigmaTheta_Pa = 66666600.0
+legacy_first_margin_Pa = 102865.0
+legacy_first_sink_positive_time_s = 540.0
+sink_delay_s = 30.0
+sigmaTheta_at_510s = 66666600.0
+sigmaTheta_at_660s = 65445500.0
+sigmaTheta_at_660s_yaml_10_24B = 66666600.0
+max_abs_difference_between_yaml_and_refined = 7079400.0
+```
+
+Interpretação: a série mínima da Fase 10.24B, com três pontos quase constantes,
+foi adequada para testar o wiring do `SigmaThetaTimeSeriesProvider`, mas não
+representa a evolução temporal usada pelo critério legado. A série refinada
+mostra queda relevante de `sigmaTheta` depois da abertura e fornece evidência
+diagnóstica suficiente para criar um novo caso opt-in na Fase 10.25B.
+
+Caveats:
+
+- a série refinada vem do `LOT_Tese`, não de `SaltWallStressDiagnostics`;
+- a comparação continua diagnóstica e não valida fratura física;
+- a igualdade não abre no critério legado, pois a comparação é estrita
+  `pw > sigmaTheta`;
+- múltiplas visitas não lineares podem ocorrer no mesmo `time_s`; a série
+  candidata ao provider mantém a última amostra por tempo para a primeira camada
+  que abre (`idAnnular = 1`, `idLayer = 7`);
+- nenhum arquivo em `results/` deve ser versionado.
