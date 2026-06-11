@@ -509,3 +509,6 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 - A Fase 11.4B adiciona verificação formal de diretórios de resultado por
   `tools/verify_lot_pkn_study_results.py`, cobrindo manifesto v1, outputs,
   resumo, metadados, relatórios opcionais e cenários.
+- A Fase 11.5A amplia a sensibilidade BUZ-67D `modern-refined` de `C_geom` com
+  matriz v2 e execução por `study_id`, mantendo a interpretação como
+  diagnóstico e não calibração física.

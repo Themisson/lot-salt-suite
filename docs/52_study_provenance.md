@@ -58,3 +58,9 @@ fisicos independentes sejam definidos.
 A Fase 11.4B conecta a proveniência ao verificador
 `tools/verify_lot_pkn_study_results.py`. Ele confirma integridade operacional do
 diretório de resultados e pode gerar relatório JSON/Markdown local.
+
+## Uso em estudos ampliados
+
+A Fase 11.5A usa o mesmo manifesto v1 para registrar o estudo
+`buz67d_cgeom_extended_sensitivity_v2`. Os artefatos permanecem locais em
+`results/` e não são versionados.

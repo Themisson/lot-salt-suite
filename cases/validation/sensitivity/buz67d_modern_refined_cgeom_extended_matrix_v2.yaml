@@ -1,0 +1,121 @@
+matrix_id: buz67d_modern_refined_cgeom_extended_v2
+schema_version: 2
+description: >
+  Stage 11.5A extended BUZ-67D modern-refined C_geom sensitivity matrix.
+  This matrix is diagnostic only. C_geom factors must not be interpreted as
+  physical calibration without independent evidence.
+mode: lot-pkn
+base_case: cases/validation/sensitivity/buz67d_modern_refined_sens_baseline.yaml
+baseline_scenario: cgeom_100_next_step
+materialization:
+  output_subdir: materialized_cases
+  filename_template: "{scenario_id}.yaml"
+scenarios:
+  - id: cgeom_050_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000009285983469305003
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.50
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+      caveat: "Diagnostic sensitivity only; not automatic calibration."
+  - id: cgeom_055_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000010214581816235504
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.55
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+      caveat: "Diagnostic sensitivity only; not automatic calibration."
+  - id: cgeom_060_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000011143180163166004
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.60
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+      caveat: "Diagnostic sensitivity only; not automatic calibration."
+  - id: cgeom_065_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000012071778510096503
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.65
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+      caveat: "Diagnostic sensitivity only; not automatic calibration."
+  - id: cgeom_070_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000013000376857027003
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.70
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+      caveat: "Diagnostic sensitivity only; not automatic calibration."
+  - id: cgeom_075_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000013928975203957504
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.75
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+      caveat: "Diagnostic sensitivity only; not automatic calibration."
+  - id: cgeom_080_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000014857573550888005
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.80
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+      caveat: "Diagnostic sensitivity only; not automatic calibration."
+  - id: cgeom_085_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000015786171897818503
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.85
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+      caveat: "Diagnostic sensitivity only; not automatic calibration."
+  - id: cgeom_090_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000016714770244749006
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.90
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+      caveat: "Diagnostic sensitivity only; not automatic calibration."
+  - id: cgeom_100_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000018571966938610005
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 1.00
+      sink_timing: next_step
+      interpretation: diagnostic_baseline
+      caveat: "Diagnostic sensitivity only; not automatic calibration."
+  - id: cgeom_110_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000020429163632471008
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 1.10
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+      caveat: "Diagnostic sensitivity only; not automatic calibration."
+  - id: cgeom_125_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000023214958673262507
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 1.25
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+      caveat: "Diagnostic sensitivity only; not automatic calibration."

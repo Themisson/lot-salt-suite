@@ -82,6 +82,26 @@
     "results_versioned": false,
     "physical_validation": false
   },
+  "phase11_5a_buz67d_cgeom_extended_sensitivity": {
+    "status": "PHASE11_5A_CGEOM_EXTENDED_MATRIX_ADDED",
+    "study_status": "BUZ67D_CGEOM_EXTENDED_STUDY_REGISTERED",
+    "analysis_status": "CGEOM_EXTENDED_SENSITIVITY_ANALYZED",
+    "study_id": "buz67d_cgeom_extended_sensitivity_v2",
+    "matrix": "cases/validation/sensitivity/buz67d_modern_refined_cgeom_extended_matrix_v2.yaml",
+    "tool": "tools/analyze_phase11_5a_cgeom_extended.py",
+    "document": "docs/54_buz67d_cgeom_extended_sensitivity.md",
+    "scenario_count": 12,
+    "best_by_opening_time": "cgeom_075_next_step",
+    "best_by_max_pressure": "cgeom_055_next_step",
+    "best_by_combined_score": "cgeom_075_next_step",
+    "results_versioned": false,
+    "physical_validation": false,
+    "caveats": [
+      "The extended C_geom matrix is diagnostic sensitivity, not automatic calibration.",
+      "Best factors are rankings within the local modern-refined study.",
+      "Generated results/ artifacts remain local and must not be versioned."
+    ]
+  },
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,

@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.1B Sensitivity studies index
+Fase ativa  : 11.5A BUZ-67D extended C_geom sensitivity
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
@@ -54,6 +54,50 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 11.5A — matriz estendida C_geom BUZ-67D — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Matriz criada:**
+
+```text
+cases/validation/sensitivity/buz67d_modern_refined_cgeom_extended_matrix_v2.yaml
+```
+
+**Estudo registrado:**
+
+```text
+buz67d_cgeom_extended_sensitivity_v2
+```
+
+**Ferramenta criada:**
+
+```text
+tools/analyze_phase11_5a_cgeom_extended.py
+```
+
+**Documento criado:**
+
+```text
+docs/54_buz67d_cgeom_extended_sensitivity.md
+```
+
+**Resultado diagnóstico observado:**
+
+```text
+classification = CGEOM_EXTENDED_SENSITIVITY_ANALYZED
+scenario_count = 12
+best_by_opening_time = cgeom_075_next_step
+best_by_max_pressure = cgeom_055_next_step
+best_by_combined_score = cgeom_075_next_step
+```
+
+**Caveat:** os fatores de `C_geom` são variações diagnósticas do baseline
+modern-refined. Não constituem calibração física automática nem validação
+independente do modelo.
 
 ---
 

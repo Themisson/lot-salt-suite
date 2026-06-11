@@ -169,3 +169,15 @@ Desde a Fase 11.4A, `tools/run_lot_pkn_study.py` copia a resolução do
 `study_id` para `study_manifest.json` v1. Isso registra o `studies_index`, a
 matriz resolvida, o `matrix_id`, o `base_case` e os comandos de reprodução sem
 versionar `results/`.
+
+## Estudo ampliado de C_geom
+
+A Fase 11.5A registra:
+
+```text
+buz67d_cgeom_extended_sensitivity_v2
+```
+
+Esse estudo aponta para
+`cases/validation/sensitivity/buz67d_modern_refined_cgeom_extended_matrix_v2.yaml`
+e avalia fatores `0.50..1.25` com `sink_timing=next_step`.

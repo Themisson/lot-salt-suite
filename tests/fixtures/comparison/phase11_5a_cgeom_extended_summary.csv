@@ -1,0 +1,4 @@
+scenario_id,case,timeseries_csv,max_pressure_Pa,fracture_initiation_time_s,first_sink_positive_time_s,sink_delay_s,final_pressure_Pa
+cgeom_050_next_step,case_050.yaml,runs/cgeom_050_next_step/timeseries.csv,70000000,480,510,30,65000000
+cgeom_075_next_step,case_075.yaml,runs/cgeom_075_next_step/timeseries.csv,68100000,510,540,30,64000000
+cgeom_100_next_step,case_100.yaml,runs/cgeom_100_next_step/timeseries.csv,67300000,660,690,30,63000000

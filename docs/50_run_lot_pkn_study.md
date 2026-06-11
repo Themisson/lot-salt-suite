@@ -163,3 +163,12 @@ python tools/verify_lot_pkn_study_results.py --result-dir <output-dir>
 Use `--allow-dry-run` para validar manifestos gerados sem simulação e
 `--require-report` para exigir `sensitivity_report.json` e
 `sensitivity_report.md`.
+
+## Exemplo 11.5A
+
+```powershell
+python tools/run_lot_pkn_study.py `
+  --study-id buz67d_cgeom_extended_sensitivity_v2 `
+  --output-dir results/comparison/phase11_5a/buz67d_cgeom_extended `
+  --lot-sim build/Debug/lot-sim.exe
+```

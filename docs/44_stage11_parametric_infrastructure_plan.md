@@ -231,3 +231,10 @@ A Fase 11.4B adiciona `tools/verify_lot_pkn_study_results.py`. O verificador
 confirma integridade operacional de diretórios de estudo produzidos pelo comando
 canônico: manifesto v1, outputs, resumo, metadados, relatório opcional e status
 dos cenários.
+
+## Fase 11.5A matriz C_geom ampliada
+
+A Fase 11.5A registra e executa
+`buz67d_cgeom_extended_sensitivity_v2`, uma matriz v2 ampliada de `C_geom` para
+BUZ-67D `modern-refined`. O resultado é diagnóstico: `cgeom_075_next_step` foi o
+melhor por abertura e score combinado, mas isso não é calibração física.
