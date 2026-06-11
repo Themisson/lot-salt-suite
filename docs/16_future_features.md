@@ -343,3 +343,11 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   diagnostico opt-in com essa serie. Ainda assim, isso nao valida fratura fisica
   nem promove `SaltWallStressDiagnostics` runtime; apenas melhora a fonte
   temporal diagnostica antes da decisao seguinte.
+- A Fase 10.25B criou o caso opt-in
+  `cases/validation/buz67d_pkn_legacy_sigma_theta_refined_timeseries.yaml`
+  com os 44 pontos refinados. O diagnostico permaneceu
+  `SIGMA_THETA_REFINED_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED`: pressao maxima,
+  pressao na abertura, pressao final e sink delay continuam bons, mas a abertura
+  moderna segue em `660 s` contra `510 s` no legado. A proxima decisao deve
+  priorizar auditoria de `pressure_source`/timing ou mapeamento temporal antes
+  de promover uma fonte runtime real de `SaltWallStressDiagnostics`.

@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.25A extracao refinada sigmaTheta LOT_Tese; commit/push em andamento
+Fase ativa  : 10.25B caso diagnostico com sigmaTheta refinado; commit/push em andamento
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 258/258 passaram apos Fase 10.24C em 2026-06-11
-Testes Py   : 150/150 passaram apos Fase 10.25A em 2026-06-11
+Testes Py   : 156/156 passaram apos Fase 10.25B em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,55 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.25B — diagnóstico BUZ67D com série `sigmaTheta` refinada — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Caso criado:**
+
+```text
+cases/validation/buz67d_pkn_legacy_sigma_theta_refined_timeseries.yaml
+```
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase10_25b.py
+```
+
+**Classificação observada:**
+
+```text
+SIGMA_THETA_REFINED_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED
+```
+
+**Métricas principais:**
+
+```text
+legacy_first_opened_time_s = 510.0
+modern_fracture_initiation_time_s = 660.0
+opening_time_error_s = 150.0
+
+legacy_sink_delay_s = 30.0
+modern_sink_delay_s = 30.0
+sink_delay_error_s = 0.0
+
+relative_error_max_pressure = -0.02468924338685035
+pressure_at_opening_relative_error = 0.008415423398363079
+final_pressure_relative_error = -0.009582917751452825
+```
+
+**Conclusão:** a série refinada de 44 pontos melhora a rastreabilidade da fonte
+`sigmaTheta`, mas não corrige a abertura moderna deslocada. A escala de pressão
+e o sink delay permanecem bons. A Fase 10.25C deve decidir se a próxima revisão
+deve focar em `pressure_source`/timing, mapeamento de ponto/camada/tempo ou
+fonte runtime real de `SaltWallStressDiagnostics`.
+
+**Escopo:** nenhum arquivo em `legance/`, `legacy/`, `external/saltcreep/`,
+`tests/baselines/`, `postprocess/` ou `results/` deve ser versionado.
 
 ---
 

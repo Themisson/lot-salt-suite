@@ -3056,3 +3056,62 @@ Caveats:
   candidata ao provider mantém a última amostra por tempo para a primeira camada
   que abre (`idAnnular = 1`, `idLayer = 7`);
 - nenhum arquivo em `results/` deve ser versionado.
+
+## Caso diagnóstico com `sigmaTheta` refinado (Fase 10.25B)
+
+A Fase 10.25B criou um novo caso opt-in:
+
+```text
+cases/validation/buz67d_pkn_legacy_sigma_theta_refined_timeseries.yaml
+```
+
+Esse caso não substitui `buz67d_pkn_legacy_sigma_theta_timeseries.yaml`.
+Ele preserva:
+
+- `constant_geometric`;
+- `sink_timing: next_step`;
+- `pressure_source: wellbore_pressure_trial_Pa`;
+- `comparison: legacy_algebra`;
+- interpolação linear;
+- `out_of_range: clamp`.
+
+A única mudança diagnóstica intencional é a troca da série mínima 10.24B por
+uma série refinada de `44` pontos extraída na 10.25A diretamente do critério
+legado `pw > sigmaTheta`.
+
+Resultado observado com:
+
+```text
+tools/compare_phase10_25b.py
+```
+
+```text
+classification = SIGMA_THETA_REFINED_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED
+
+legacy_first_opened_time_s = 510.0
+modern_fracture_initiation_time_s = 660.0
+opening_time_error_s = 150.0
+
+legacy_sink_delay_s = 30.0
+modern_sink_delay_s = 30.0
+
+relative_error_max_pressure = -0.02468924338685035
+pressure_at_opening_relative_error = 0.008415423398363079
+final_pressure_relative_error = -0.009582917751452825
+```
+
+Interpretação: a série refinada é melhor documentada e cobre todo o ciclo, mas
+não corrige o deslocamento de abertura moderno. Portanto, a hipótese de que o
+erro de `+150 s` vinha apenas da esparsidade da série YAML 10.24B fica
+enfraquecida. O próximo diagnóstico deve comparar a 10.24C e a 10.25B e decidir
+se o foco passa a ser `pressure_source`/timing (`before`, `trial`, `after`),
+mapeamento de ponto/camada, ou uma fonte runtime real de
+`SaltWallStressDiagnostics`.
+
+Caveats:
+
+- o caso continua diagnóstico e opt-in;
+- não há validação física de fratura;
+- `SaltWallStressDiagnostics` ainda não é provider runtime;
+- `pkn_direct`, `constant_geometric`, `sink_timing` e defaults globais não
+  foram alterados.

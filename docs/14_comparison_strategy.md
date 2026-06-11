@@ -2332,3 +2332,51 @@ Portanto, a próxima comparação deve criar um novo caso diagnóstico com a sé
 refinada completa. Esse passo ainda não promove a fonte a runtime físico; ele
 apenas testa se uma fonte temporal mais fiel ao legado corrige o deslocamento de
 abertura observado na 10.24C.
+
+## Fase 10.25B — diagnóstico com série `sigmaTheta` refinada
+
+A Fase 10.25B adiciona o caso:
+
+```text
+cases/validation/buz67d_pkn_legacy_sigma_theta_refined_timeseries.yaml
+```
+
+O caso usa a série refinada de 44 pontos gerada pela 10.25A, preservando a rota
+diagnóstica da 10.24B:
+
+- `constant_geometric`;
+- `sink_timing: next_step`;
+- `pressure_source: wellbore_pressure_trial_Pa`;
+- `comparison: legacy_algebra`;
+- interpolação linear;
+- clamp fora da faixa.
+
+A ferramenta:
+
+```text
+tools/compare_phase10_25b.py
+```
+
+compara o `timeseries.csv` moderno refinado contra
+`results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv`.
+
+Resultado local observado:
+
+| Métrica | Valor |
+|---|---:|
+| Classificação | `SIGMA_THETA_REFINED_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED` |
+| Abertura legada | `510 s` |
+| Abertura moderna | `660 s` |
+| Erro de abertura | `150 s` |
+| Sink delay legado | `30 s` |
+| Sink delay moderno | `30 s` |
+| Erro relativo de pressão máxima | `-0.02468924338685035` |
+| Erro relativo de pressão na abertura | `0.008415423398363079` |
+| Erro relativo de pressão final | `-0.009582917751452825` |
+
+Conclusão: a fonte `sigmaTheta` refinada não altera o diagnóstico de abertura
+deslocada. A escala de pressão e o atraso do sink continuam bons, mas a abertura
+moderna permanece em `660 s`. Isso sugere que a próxima decisão deve auditar
+principalmente o timing/fonte de pressão usada no critério moderno ou o
+mapeamento temporal efetivo, antes de conectar uma fonte runtime de tensão de
+sal.

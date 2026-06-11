@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">82/89</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">83/90</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">258</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">150</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">156</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -7337,6 +7337,54 @@ diagnóstica suficiente para criar um novo caso opt-in na Fase 10.25B.</p>
   candidata ao provider mantém a última amostra por tempo para a primeira camada
   que abre (<code>idAnnular = 1</code>, <code>idLayer = 7</code>);</li>
 <li>nenhum arquivo em <code>results/</code> deve ser versionado.</li>
+</ul>
+<h2 id="caso-diagnostico-com-sigmatheta-refinado-fase-1025b">Caso diagnóstico com <code>sigmaTheta</code> refinado (Fase 10.25B)</h2>
+<p>A Fase 10.25B criou um novo caso opt-in:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_sigma_theta_refined_timeseries.yaml
+</code></pre>
+<p>Esse caso não substitui <code>buz67d_pkn_legacy_sigma_theta_timeseries.yaml</code>.
+Ele preserva:</p>
+<ul>
+<li><code>constant_geometric</code>;</li>
+<li><code>sink_timing: next_step</code>;</li>
+<li><code>pressure_source: wellbore_pressure_trial_Pa</code>;</li>
+<li><code>comparison: legacy_algebra</code>;</li>
+<li>interpolação linear;</li>
+<li><code>out_of_range: clamp</code>.</li>
+</ul>
+<p>A única mudança diagnóstica intencional é a troca da série mínima 10.24B por
+uma série refinada de <code>44</code> pontos extraída na 10.25A diretamente do critério
+legado <code>pw &gt; sigmaTheta</code>.</p>
+<p>Resultado observado com:</p>
+<pre><code class="language-text">tools/compare_phase10_25b.py
+</code></pre>
+<pre><code class="language-text">classification = SIGMA_THETA_REFINED_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED
+
+legacy_first_opened_time_s = 510.0
+modern_fracture_initiation_time_s = 660.0
+opening_time_error_s = 150.0
+
+legacy_sink_delay_s = 30.0
+modern_sink_delay_s = 30.0
+
+relative_error_max_pressure = -0.02468924338685035
+pressure_at_opening_relative_error = 0.008415423398363079
+final_pressure_relative_error = -0.009582917751452825
+</code></pre>
+<p>Interpretação: a série refinada é melhor documentada e cobre todo o ciclo, mas
+não corrige o deslocamento de abertura moderno. Portanto, a hipótese de que o
+erro de <code>+150 s</code> vinha apenas da esparsidade da série YAML 10.24B fica
+enfraquecida. O próximo diagnóstico deve comparar a 10.24C e a 10.25B e decidir
+se o foco passa a ser <code>pressure_source</code>/timing (<code>before</code>, <code>trial</code>, <code>after</code>),
+mapeamento de ponto/camada, ou uma fonte runtime real de
+<code>SaltWallStressDiagnostics</code>.</p>
+<p>Caveats:</p>
+<ul>
+<li>o caso continua diagnóstico e opt-in;</li>
+<li>não há validação física de fratura;</li>
+<li><code>SaltWallStressDiagnostics</code> ainda não é provider runtime;</li>
+<li><code>pkn_direct</code>, <code>constant_geometric</code>, <code>sink_timing</code> e defaults globais não
+  foram alterados.</li>
 </ul>
 </div>
 </section>

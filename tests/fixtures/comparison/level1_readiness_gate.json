@@ -880,6 +880,37 @@
       "No default runtime behavior changed."
     ]
   },
+  "phase10_25b_refined_sigma_theta_timeseries_diagnostic": {
+    "status": "SIGMA_THETA_REFINED_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "case": "cases/validation/buz67d_pkn_legacy_sigma_theta_refined_timeseries.yaml",
+    "tool": "tools/compare_phase10_25b.py",
+    "legacy_csv": "results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv",
+    "modern_csv": "results/comparison/phase10_25b/modern_sigma_theta_refined_timeseries/timeseries.csv",
+    "summary_csv": "results/comparison/phase10_25b/phase10_25b_summary.csv",
+    "metadata_json": "results/comparison/phase10_25b/phase10_25b_metadata.json",
+    "metrics": {
+      "refined_sigma_theta_points": 44,
+      "legacy_first_opened_time_s": 510.0,
+      "modern_fracture_initiation_time_s": 660.0,
+      "opening_time_error_s": 150.0,
+      "legacy_sink_delay_s": 30.0,
+      "modern_sink_delay_s": 30.0,
+      "sink_delay_error_s": 0.0,
+      "relative_error_max_pressure": -0.02468924338685035,
+      "pressure_at_opening_relative_error": 0.008415423398363079,
+      "final_pressure_relative_error": -0.009582917751452825
+    },
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "The refined sigmaTheta series comes from LOT_Tese criterion tracing, not SaltWallStressDiagnostics runtime.",
+      "The opening remains shifted after replacing the sparse 10.24B series.",
+      "No default runtime behavior changed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",
