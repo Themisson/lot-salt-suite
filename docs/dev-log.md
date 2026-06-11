@@ -57,6 +57,36 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.3A — execução verificada da matriz v2 BUZ-67D — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/verify_phase11_3a_v2_sensitivity_run.py
+```
+
+**Documento criado:**
+
+```text
+docs/48_buz67d_parametric_matrix_v2_execution.md
+```
+
+**Resultado observado:**
+
+```text
+PHASE11_3A_V2_SENSITIVITY_RUN_OK
+V2_REPRODUCES_V1_DIAGNOSTICS
+```
+
+A matriz `buz67d_modern_refined_cgeom_sensitivity_v2` foi executada com o
+runner genérico. Os casos derivados foram materializados em `results/`, não
+versionados, e reproduziram os diagnósticos documentados da matriz v1 para os
+cenários selecionados.
+
+---
+
 ### [2026-06-11] Fase 11.2C — runner com matriz paramétrica v2 — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

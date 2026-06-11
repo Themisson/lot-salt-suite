@@ -136,3 +136,15 @@ A Fase 11.2C integra o runner com matrizes v2. O runner detecta
 `schema_version: 2`, materializa cenários no `output-dir` e registra
 `materialized_case_path` em summary/metadata. Matrizes v1 permanecem
 compatíveis.
+
+## Execução verificada
+
+A Fase 11.3A confirma em execução real que a matriz BUZ-67D v2 materializa e
+roda os cenários selecionados, preservando os diagnósticos documentados da
+matriz v1:
+
+```text
+PHASE11_3A_V2_SENSITIVITY_RUN_VERIFIED
+PARAMETRIC_MATRIX_V2_EXECUTION_CONFIRMED
+V2_REPRODUCES_V1_DIAGNOSTICS
+```

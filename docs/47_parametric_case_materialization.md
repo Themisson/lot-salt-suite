@@ -87,6 +87,17 @@ Quando o runner recebe uma matriz v2, ele materializa os casos em
 O materializador também pode continuar sendo usado diretamente para auditoria
 ou dry-run.
 
+## Fase 11.3A
+
+A primeira execução real verificada com materialização v2 foi a matriz BUZ-67D
+`modern-refined`:
+
+```text
+cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix_v2.yaml
+```
+
+Os casos derivados foram gerados em `results/` e não foram versionados.
+
 ## Promoção manual
 
 Um caso derivado só deve ser promovido para `cases/validation/` depois de revisão humana, justificativa documental e commit explícito. A ferramenta não promove casos automaticamente.

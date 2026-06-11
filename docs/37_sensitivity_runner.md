@@ -256,3 +256,24 @@ Status:
 SENSITIVITY_RUNNER_SUPPORTS_PARAMETRIC_MATRIX_V2
 BUZ67D_CGEOM_SENSITIVITY_V2_REGISTERED
 ```
+
+## Execução verificada da matriz v2 BUZ-67D
+
+A Fase 11.3A executa a matriz:
+
+```text
+cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix_v2.yaml
+```
+
+com materialização em `results/` e verifica:
+
+```text
+PHASE11_3A_V2_SENSITIVITY_RUN_OK
+V2_REPRODUCES_V1_DIAGNOSTICS
+```
+
+O verificador associado é:
+
+```text
+tools/verify_phase11_3a_v2_sensitivity_run.py
+```

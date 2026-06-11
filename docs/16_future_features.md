@@ -489,3 +489,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `materialized_case_path` em summary/metadata e preserva compatibilidade com
   matrizes v1. A variante `buz67d_cgeom_sensitivity_v2` fica registrada no
   índice de estudos.
+- A Fase 11.3A executa a matriz v2 BUZ-67D e confirma
+  `V2_REPRODUCES_V1_DIAGNOSTICS` para os cenários selecionados. Os YAMLs
+  materializados continuam artefatos locais em `results/`, não casos
+  versionados.

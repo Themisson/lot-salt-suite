@@ -181,3 +181,9 @@ Status:
 SENSITIVITY_RUNNER_SUPPORTS_PARAMETRIC_MATRIX_V2
 BUZ67D_CGEOM_SENSITIVITY_V2_REGISTERED
 ```
+
+## Fase 11.3A verificação v2
+
+A Fase 11.3A executa a matriz v2 BUZ-67D com o runner genérico e confirma que
+os cenários materializados em `results/` reproduzem os diagnósticos v1
+documentados para `0.75x`, baseline, `1.25x` e `same_step`.

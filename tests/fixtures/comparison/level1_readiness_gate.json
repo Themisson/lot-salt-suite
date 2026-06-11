@@ -25,6 +25,14 @@
     "derived_cases_versioned": false,
     "physical_validation": false
   },
+  "phase11_3a_buz67d_parametric_matrix_v2_execution": {
+    "status": "PHASE11_3A_V2_SENSITIVITY_RUN_VERIFIED",
+    "execution_status": "PARAMETRIC_MATRIX_V2_EXECUTION_CONFIRMED",
+    "v1_v2_classification": "V2_REPRODUCES_V1_DIAGNOSTICS",
+    "matrix_id": "buz67d_modern_refined_cgeom_sensitivity_v2",
+    "materialized_cases_versioned": false,
+    "physical_validation": false
+  },
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,

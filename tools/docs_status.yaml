@@ -122,6 +122,7 @@ phases:
   phase_11_2a_parametric_matrix_schema: completed
   phase_11_2b_parametric_case_materializer: completed
   phase_11_2c_sensitivity_runner_parametric_v2: completed
+  phase_11_3a_buz67d_parametric_matrix_v2_execution: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -170,6 +171,7 @@ docs:
   stage11_2a_parametric_matrix_schema: implemented
   stage11_2b_parametric_case_materialization: implemented
   stage11_2c_sensitivity_runner_parametric_v2: implemented
+  stage11_3a_buz67d_parametric_matrix_v2_execution: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented

@@ -117,3 +117,10 @@ cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix_v2.yaml
 
 Essa matriz usa `base_case + overrides`; os casos derivados são gerados pelo
 runner em `results/` e não são versionados automaticamente.
+
+A Fase 11.3A executou essa matriz e confirmou:
+
+```text
+PHASE11_3A_V2_SENSITIVITY_RUN_OK
+V2_REPRODUCES_V1_DIAGNOSTICS
+```
