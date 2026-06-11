@@ -202,3 +202,19 @@ A Fase 11.5C consolida os dois estudos em
 `docs/56_buz67d_modern_refined_sensitivity_consolidation.md`. O documento fecha
 o bloco BUZ-67D modern-refined e recomenda a transição para a auditoria
 BUZ29-VISCO-first-well.
+
+## Summaries com máximos — Fase 11.5D
+
+A Fase 11.5D adiciona ao `summary.csv` do runner genérico os campos:
+
+```text
+max_fracture_volume_m3
+max_leakoff_volume_m3
+max_fracture_length_m
+max_fracture_width_m
+max_net_pressure_Pa
+```
+
+Esses campos são agregados a partir de `timeseries.csv` quando as colunas
+existem. A mudança não altera o índice de estudos, não muda casos e não
+versiona `results/`.

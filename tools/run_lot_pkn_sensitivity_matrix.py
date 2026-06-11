@@ -48,6 +48,11 @@ class SummaryRow:
     first_sink_positive_time_s: float | None
     sink_delay_s: float | None
     final_pressure_Pa: float | None
+    max_fracture_volume_m3: float | None = None
+    max_leakoff_volume_m3: float | None = None
+    max_fracture_length_m: float | None = None
+    max_fracture_width_m: float | None = None
+    max_net_pressure_Pa: float | None = None
     materialized_case_path: str | None = None
 
 
@@ -123,6 +128,15 @@ def read_csv(path: Path) -> list[dict[str, str]]:
     return rows
 
 
+def max_present(rows: list[dict[str, str]], names: Iterable[str]) -> float | None:
+    values: list[float] = []
+    for row in rows:
+        value = first_present(row, names)
+        if value is not None:
+            values.append(value)
+    return max(values) if values else None
+
+
 def summarize_timeseries(path: Path, scenario: MatrixScenario) -> SummaryRow:
     rows = read_csv(path)
     pressures = [
@@ -164,6 +178,11 @@ def summarize_timeseries(path: Path, scenario: MatrixScenario) -> SummaryRow:
         first_sink_positive_time_s=sink_time,
         sink_delay_s=(sink_time - opened) if sink_time is not None and opened is not None else None,
         final_pressure_Pa=pressures[-1],
+        max_fracture_volume_m3=max_present(rows, ["fracture_volume_m3", "fracture_volume_series_m3"]),
+        max_leakoff_volume_m3=max_present(rows, ["leakoff_volume_m3", "leakoff_volume_series_m3"]),
+        max_fracture_length_m=max_present(rows, ["fracture_length_m", "length_m"]),
+        max_fracture_width_m=max_present(rows, ["fracture_width_m", "width_m"]),
+        max_net_pressure_Pa=max_present(rows, ["net_pressure_Pa"]),
         materialized_case_path=scenario.materialized_case_path,
     )
 

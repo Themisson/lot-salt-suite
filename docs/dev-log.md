@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.6B non-PKN model roadmap
+Fase ativa  : 11.5D summary fracture/leakoff maxima
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 369/369 previstos apos Fase 11.6B em 2026-06-11
+Testes Py   : 373/373 previstos apos Fase 11.5D em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,44 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 11.5D — maxima em summaries LOT/PKN — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase11_5d_summary_maxima.py
+```
+
+**Documento criado:**
+
+```text
+docs/59_summary_fracture_leakoff_maxima.md
+```
+
+**Runner atualizado:**
+
+```text
+tools/run_lot_pkn_sensitivity_matrix.py
+```
+
+**Campos adicionados ao `summary.csv`:**
+
+```text
+max_fracture_volume_m3
+max_leakoff_volume_m3
+max_fracture_length_m
+max_fracture_width_m
+max_net_pressure_Pa
+```
+
+**Gate:** `SUMMARY_MAXIMA_PYTHON_ONLY_SAFE`. Os campos já existem em
+`timeseries.csv`, então não houve alteração C++, parser, schema, writer ou
+casos protegidos.
 
 ---
 

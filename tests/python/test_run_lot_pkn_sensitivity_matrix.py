@@ -22,8 +22,28 @@ def write_matrix(path, timeseries_a=None):
 def write_timeseries(path):
     path.parent.mkdir(parents=True, exist_ok=True)
     rows = [
-        {"time_s": "0", "wellbore_pressure_Pa": "1000", "fracture_initiated": "false", "fracture_sink_applied_m3": "0"},
-        {"time_s": "30", "wellbore_pressure_Pa": "2000", "fracture_initiated": "true", "fracture_sink_applied_m3": "0.1"},
+        {
+            "time_s": "0",
+            "wellbore_pressure_Pa": "1000",
+            "fracture_initiated": "false",
+            "fracture_sink_applied_m3": "0",
+            "fracture_volume_m3": "0.01",
+            "leakoff_volume_m3": "0.02",
+            "fracture_length_m": "3",
+            "fracture_width_m": "0.001",
+            "net_pressure_Pa": "100",
+        },
+        {
+            "time_s": "30",
+            "wellbore_pressure_Pa": "2000",
+            "fracture_initiated": "true",
+            "fracture_sink_applied_m3": "0.1",
+            "fracture_volume_m3": "0.03",
+            "leakoff_volume_m3": "0.05",
+            "fracture_length_m": "4",
+            "fracture_width_m": "0.002",
+            "net_pressure_Pa": "120",
+        },
     ]
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
@@ -72,6 +92,11 @@ def test_only_summary_with_synthetic_data(tmp_path):
     assert metadata["summary_csv"] is not None
     rows = runner.read_csv(tmp_path / "out" / "summary.csv")
     assert len(rows) == 2
+    assert rows[0]["max_fracture_volume_m3"] == "0.03"
+    assert rows[0]["max_leakoff_volume_m3"] == "0.05"
+    assert rows[0]["max_fracture_length_m"] == "4.0"
+    assert rows[0]["max_fracture_width_m"] == "0.002"
+    assert rows[0]["max_net_pressure_Pa"] == "120.0"
 
 
 def test_missing_case_in_matrix_is_rejected(tmp_path):

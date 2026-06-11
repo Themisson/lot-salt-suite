@@ -529,3 +529,6 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `penny-shaped`, manter KGD/circular/elliptical como rota opcional, bloquear
   Zamora/compositional fluid até gate próprio e auditar proveniência dos outputs
   PKN antes de usá-los como referência.
+- A Fase 11.5D adiciona máximos de fratura, leakoff, comprimento, abertura e
+  pressão líquida aos summaries de estudos LOT/PKN. A mudança é Python-only e
+  usa colunas já exportadas pelo runtime moderno; não altera formulação física.

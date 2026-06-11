@@ -294,3 +294,18 @@ NON_PKN_MODEL_ROADMAP_RECORDED
 O caminho prioritário recomendado é auditar a formulação `penny-shaped` antes
 de qualquer tentativa de YAML moderno BUZ29. KGD/circular/elliptical e Zamora
 ficam em trilhas separadas.
+
+## Fase 11.5D maxima em summaries
+
+A Fase 11.5D adiciona máximos opcionais ao `summary.csv` do runner genérico:
+
+```text
+max_fracture_volume_m3
+max_leakoff_volume_m3
+max_fracture_length_m
+max_fracture_width_m
+max_net_pressure_Pa
+```
+
+O gate é `SUMMARY_MAXIMA_PYTHON_ONLY_SAFE`: esses campos já existem em
+`timeseries.csv`, então a mudança fica restrita a pós-processamento Python.

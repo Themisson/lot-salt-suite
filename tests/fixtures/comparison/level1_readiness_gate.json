@@ -1765,6 +1765,31 @@
       "BUZ-67D remains the executable modern-refined LOT/PKN path."
     ]
   },
+  "phase11_5d_summary_fracture_leakoff_maxima": {
+    "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
+    "phase": "11.5D",
+    "runner_update": "MAXIMA_ADDED_TO_SUMMARY_WHEN_COLUMNS_EXIST",
+    "requires_cpp_change": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": true,
+    "tool": "tools/audit_phase11_5d_summary_maxima.py",
+    "document": "docs/59_summary_fracture_leakoff_maxima.md",
+    "runner": "tools/run_lot_pkn_sensitivity_matrix.py",
+    "summary_columns": [
+      "max_fracture_volume_m3",
+      "max_leakoff_volume_m3",
+      "max_fracture_length_m",
+      "max_fracture_width_m",
+      "max_net_pressure_Pa"
+    ],
+    "caveats": [
+      "Summary maxima are diagnostic post-processing aggregates.",
+      "The change does not alter LOT/PKN physics, C++ runtime, parser, schemas or cases.",
+      "Blank maxima cells remain allowed for old synthetic CSV fixtures without optional columns."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

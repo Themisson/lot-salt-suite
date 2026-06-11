@@ -346,3 +346,20 @@ A Fase 11.4B adiciona `tools/verify_lot_pkn_study_results.py` para validar um
 diretório produzido pelo comando canônico. A ferramenta verifica manifesto v1,
 outputs esperados, `summary.csv`, `metadata.json`, relatórios opcionais e status
 dos cenários. Ela não valida física nem equivalência com o legado.
+
+## Máximos de fratura/leakoff no summary
+
+A Fase 11.5D adiciona agregações opcionais ao `summary.csv`:
+
+```text
+max_fracture_volume_m3
+max_leakoff_volume_m3
+max_fracture_length_m
+max_fracture_width_m
+max_net_pressure_Pa
+```
+
+Esses campos são calculados a partir de `timeseries.csv` quando as colunas
+existem. Para fixtures antigas ou CSVs sintéticos sem esses campos, o runner
+preserva compatibilidade e deixa as células vazias. A mudança é pós-processo
+Python-only e não altera o runtime LOT/PKN.
