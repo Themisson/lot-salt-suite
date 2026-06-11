@@ -2811,6 +2811,65 @@ Esta fase nao compara fisica de fratura, nao valida `sigmaTheta`, nao implementa
 Zamora, nao libera `pressure_tabulated_geometric` e nao torna `next_step` default
 runtime. A evidencia e exclusivamente de cronologia estrutural do sink.
 
+## Diagnostico combinado BUZ-67D (Fase 10.23B)
+
+A Fase 10.23B criou um caso diagnostico controlado combinando:
+
+```text
+constant_geometric compliance da Fase 10.19C
+sigma_theta_static fixo da Fase 10.22C
+sink_timing: next_step da Fase 10.23A
+initial_pressure auditada
+schedule injecao + shut-in
+drill pipe
+```
+
+Caso criado:
+
+```text
+cases/validation/buz67d_pkn_legacy_compliance_sigma_theta_next_step.yaml
+```
+
+Valores principais usados:
+
+```text
+C_geom = 1.8571966938610005e-8 1/Pa
+sigma_theta_static = 66666600.0 Pa
+sink_timing = next_step
+initial_pressure = 26732215.17314985 Pa
+```
+
+Resultado da ferramenta:
+
+```text
+tools/compare_phase10_23b.py
+classification = COMBINED_DIAGNOSTIC_PRESSURE_OK_OPENING_SHIFTED
+```
+
+| Campo | Legado | Moderno combinado |
+|---|---:|---:|
+| `max_pressure_Pa` | `69035836.1743195` | `67331393.612597` |
+| `relative_error_max_pressure` | n/a | `-0.02468924338685035` |
+| `first_opened_time_s` | `510.0` | `660.0` |
+| `first_sink_positive_time_s` | `540.0` | `690.0` |
+| `sink_delay_s` | `30.0` | `30.0` |
+| `pressure_at_opening_Pa` | `66769500.0` | `67331393.612597` |
+| `final_pressure_Pa` | `67982867.8436506` | `67331393.612597` |
+
+Interpretacao:
+
+- a escala de pressao permanece dentro de `+-10%`;
+- o atraso entre abertura e sink foi reproduzido (`30 s`);
+- a abertura moderna ainda ocorre tarde (`660 s` contra `510 s`);
+- portanto, a combinacao e util como diagnostico de pressao/sink, mas ainda nao
+  resolve o criterio de abertura.
+
+Esta fase nao implementa sigma-theta runtime, nao conecta sal/APB ao runtime,
+nao implementa Zamora e nao libera `pressure_tabulated_geometric`. A evidencia
+aponta que a proxima decisao deve priorizar o criterio de abertura/sigma-theta
+ou uma formulacao de compliance dependente de fase, em vez de apenas ajustar o
+timing do sink.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que

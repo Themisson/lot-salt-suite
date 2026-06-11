@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.23A sink timing next_step opt-in; commit/push pendente
+Fase ativa  : 10.23B diagnostico BUZ-67D combinado; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
 Testes C++  : 245/245 passaram em 2026-06-10
-Testes Py   : 125/125 passaram apos Fase 10.23A em 2026-06-10
+Testes Py   : 128/128 passaram apos Fase 10.23B em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -99,6 +99,43 @@ tools/compare_phase10_23a.py
 **Caveat:** esta fase alinha a cronologia diagnostica do sink com a evidencia
 legada da 10.22C, mas nao valida equivalencia fisica moderna nem libera
 `pressure_tabulated_geometric` ou qualquer novo modelo runtime.
+
+---
+
+### [2026-06-10] Fase 10.23B — diagnostico BUZ-67D combinado — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Objetivo:** testar um caso BUZ-67D opt-in combinando `constant_geometric`
+da 10.19C, `sigma_theta_static` da 10.22C e `sink_timing: next_step` da 10.23A.
+
+**Caso criado:**
+
+```text
+cases/validation/buz67d_pkn_legacy_compliance_sigma_theta_next_step.yaml
+```
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase10_23b.py
+```
+
+**Resultado diagnostico:** `COMBINED_DIAGNOSTIC_PRESSURE_OK_OPENING_SHIFTED`.
+
+| Campo | Legado | Moderno combinado |
+|---|---:|---:|
+| `max_pressure_Pa` | `69035836.1743195` | `67331393.612597` |
+| `relative_error_max_pressure` | n/a | `-0.02468924338685035` |
+| `first_opened_time_s` | `510.0` | `660.0` |
+| `first_sink_positive_time_s` | `540.0` | `690.0` |
+| `sink_delay_s` | `30.0` | `30.0` |
+| `pressure_at_opening_Pa` | `66769500.0` | `67331393.612597` |
+
+**Caveat:** a escala de pressao e o atraso de sink estao bons para diagnostico,
+mas a abertura moderna continua deslocada. A fase nao valida fisica de fratura,
+nao implementa sigma-theta runtime, nao implementa Zamora e nao libera
+`pressure_tabulated_geometric`.
 
 ---
 

@@ -90,6 +90,7 @@ phases:
   phase_10_22b_termwise_geometric_compliance: completed
   phase_10_22c_unified_legacy_opening_balance_trace: completed
   phase_10_23a_next_step_sink_timing: completed
+  phase_10_23b_combined_buz67d_diagnostic: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -184,12 +185,12 @@ validation:
 test_counts:
   cpp_tests: 245        # Catch2 lot-salt-suite — 245/245 passaram na Fase 10.23A (2026-06-10)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 125     # pytest lot-salt-suite — 125/125 passaram apos Fase 10.23A (2026-06-10)
+  python_tests: 128     # pytest lot-salt-suite — 128/128 passaram apos Fase 10.23B (2026-06-10)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-10"
-updated_by: "codex (Fase 10.23A next-step sink timing)"
+updated_by: "codex (Fase 10.23B combined BUZ-67D diagnostic)"
 project_version: "0.1.0"

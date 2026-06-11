@@ -2069,3 +2069,45 @@ promove nenhum campo para equivalencia fisica. `pw`, `sigmaTheta`, `margin`,
 `opened` e `sink_positive` continuam sendo evidencias internas do legado; a
 comparacao moderna ainda precisa de uma fase de formulacao antes de qualquer
 validacao quantitativa.
+
+## Fase 10.23B — diagnostico combinado de pressao, abertura e sink
+
+A Fase 10.23B testou um caso moderno controlado que combina as tres pecas
+diagnosticas mais maduras ate aqui:
+
+```text
+constant_geometric compliance da 10.19C
+sigma_theta_static da 10.22C
+sink_timing: next_step da 10.23A
+```
+
+Ferramenta:
+
+```text
+tools/compare_phase10_23b.py
+```
+
+Caso:
+
+```text
+cases/validation/buz67d_pkn_legacy_compliance_sigma_theta_next_step.yaml
+```
+
+Resultado:
+
+```text
+classification = COMBINED_DIAGNOSTIC_PRESSURE_OK_OPENING_SHIFTED
+```
+
+| Metrica | Legado | Moderno combinado | Status |
+|---|---:|---:|---|
+| Pico de pressao [Pa] | `69035836.1743195` | `67331393.612597` | dentro de `+-10%` |
+| Primeiro opened [s] | `510.0` | `660.0` | deslocado |
+| Primeiro sink positivo [s] | `540.0` | `690.0` | deslocado junto com abertura |
+| Sink delay [s] | `30.0` | `30.0` | reproduzido |
+
+Consequencia para a estrategia: o Level 1 pode registrar que o ajuste de sink e
+a compliance constante melhoram a escala de pressao, mas ainda nao deve declarar
+equivalencia fisica de abertura. A divergencia restante aponta para criterio de
+abertura/sigma-theta runtime ou compliance dependente de fase, nao para uma
+simples promocao de `next_step` ou `constant_geometric` a default.

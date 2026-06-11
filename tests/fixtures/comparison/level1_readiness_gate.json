@@ -696,6 +696,39 @@
       "pressure_tabulated_geometric remains blocked from runtime use."
     ]
   },
+  "phase10_23b_combined_buz67d_diagnostic": {
+    "status": "PHASE10_23B_COMBINED_DIAGNOSTIC_COMPLETE",
+    "classification": "COMBINED_DIAGNOSTIC_PRESSURE_OK_OPENING_SHIFTED",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "case": "cases/validation/buz67d_pkn_legacy_compliance_sigma_theta_next_step.yaml",
+    "tool": "tools/compare_phase10_23b.py",
+    "summary_csv": "results/comparison/phase10_23b/phase10_23b_summary.csv",
+    "metadata_json": "results/comparison/phase10_23b/phase10_23b_metadata.json",
+    "configuration": {
+      "compliance": "constant_geometric_phase10_19c",
+      "sigma_theta_static_Pa": 66666600.0,
+      "sink_timing": "next_step"
+    },
+    "metrics": {
+      "max_pressure_legacy_Pa": 69035836.1743195,
+      "max_pressure_modern_Pa": 67331393.612597,
+      "relative_error_max_pressure": -0.02468924338685035,
+      "legacy_first_opened_time_s": 510.0,
+      "modern_fracture_initiation_time_s": 660.0,
+      "legacy_first_sink_positive_time_s": 540.0,
+      "modern_first_sink_positive_time_s": 690.0,
+      "modern_sink_delay_s": 30.0
+    },
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "sigma_theta_static remains a fixed proxy, not runtime salt stress.",
+      "constant_geometric remains inferred diagnostic compliance.",
+      "Opening remains shifted relative to legacy."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

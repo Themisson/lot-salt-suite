@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">76/83</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">77/84</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">245</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">125</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">128</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -2145,6 +2145,24 @@ maxima moderna passou de <code>67331393.612597 Pa</code> em <code>same_step</cod
 legado. Esse ajuste de cronologia ainda e diagnostico estrutural; a abertura
 moderna permanece em <code>690 s</code>, enquanto o trace legado indicou abertura em
 <code>510 s</code>.</p>
+<h3 id="diagnostico-combinado-de-compliance-sigma-theta-e-sink-fase-1023b">Diagnostico combinado de compliance, sigma-theta e sink — Fase 10.23B</h3>
+<p>A Fase 10.23B combinou, em caso opt-in separado, <code>constant_geometric</code>,
+<code>sigma_theta_static</code> com <code>sigma_theta = 66666600.0 Pa</code> da 10.22C e
+<code>sink_timing: next_step</code>.</p>
+<p>Resultado:</p>
+<pre><code class="language-text">classification = COMBINED_DIAGNOSTIC_PRESSURE_OK_OPENING_SHIFTED
+max_pressure_legacy_Pa = 69035836.1743195
+max_pressure_modern_Pa = 67331393.612597
+relative_error_max_pressure = -0.02468924338685035
+modern_fracture_initiation_time_s = 660.0
+modern_first_sink_positive_time_s = 690.0
+modern_sink_delay_s = 30.0
+</code></pre>
+<p>Conclusao local: a combinacao preserva boa escala de pressao e reproduz o atraso
+do sink, mas ainda desloca a abertura em relacao ao legado (<code>660 s</code> moderno
+contra <code>510 s</code> legado). Portanto, a evidencia favorece uma proxima fase de
+decisao/formulacao sobre criterio de abertura e sigma-theta runtime, e nao uma
+promocao automatica de <code>constant_geometric</code> ou <code>next_step</code> a default fisico.</p>
 </div>
 </section>
 
@@ -3501,7 +3519,21 @@ mesmo trace. O primeiro registro aberto ocorreu em <code>510.0 s</code>, com
 <code>540.0 s</code>, resultando em <code>sink_delay_s = 30.0</code>. A classificacao da fase foi
 <code>PHASE_DEPENDENCE_EXPLAINED_BY_SINK</code>, mas isso e apenas evidencia diagnostica
 interna do legado. Nao ha validacao fisica moderna nem liberacao de
-<code>pressure_tabulated_geometric</code> como rota runtime.
+<code>pressure_tabulated_geometric</code> como rota runtime.</p>
+<p><strong>Atualizacao 10.23B:</strong> o caso combinado moderno com <code>constant_geometric</code>,
+<code>sigma_theta_static = 66666600.0 Pa</code> e <code>sink_timing: next_step</code> reproduziu o
+atraso de sink de <code>30 s</code> e manteve o pico de pressao dentro de <code>+-10%</code>, mas a
+abertura moderna ainda ficou deslocada:</p>
+<pre><code class="language-text">classification = COMBINED_DIAGNOSTIC_PRESSURE_OK_OPENING_SHIFTED
+legacy_first_opened_time_s = 510.0
+modern_fracture_initiation_time_s = 660.0
+modern_sink_delay_s = 30.0
+relative_error_max_pressure = -0.02468924338685035
+</code></pre>
+<p>Esse resultado confirma que o ajuste de timing do sink nao resolve sozinho o
+criterio de abertura. <code>pressure_tabulated_geometric</code>, sigma-theta runtime e
+qualquer promocao de <code>next_step</code> a default continuam bloqueados ate nova fase
+de formulacao/validacao.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -7003,6 +7035,87 @@ de sink reproduz o atraso diagnostico de <code>30 s</code>.</p>
 <p>Esta fase nao compara fisica de fratura, nao valida <code>sigmaTheta</code>, nao implementa
 Zamora, nao libera <code>pressure_tabulated_geometric</code> e nao torna <code>next_step</code> default
 runtime. A evidencia e exclusivamente de cronologia estrutural do sink.</p>
+<h2 id="diagnostico-combinado-buz-67d-fase-1023b">Diagnostico combinado BUZ-67D (Fase 10.23B)</h2>
+<p>A Fase 10.23B criou um caso diagnostico controlado combinando:</p>
+<pre><code class="language-text">constant_geometric compliance da Fase 10.19C
+sigma_theta_static fixo da Fase 10.22C
+sink_timing: next_step da Fase 10.23A
+initial_pressure auditada
+schedule injecao + shut-in
+drill pipe
+</code></pre>
+<p>Caso criado:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_compliance_sigma_theta_next_step.yaml
+</code></pre>
+<p>Valores principais usados:</p>
+<pre><code class="language-text">C_geom = 1.8571966938610005e-8 1/Pa
+sigma_theta_static = 66666600.0 Pa
+sink_timing = next_step
+initial_pressure = 26732215.17314985 Pa
+</code></pre>
+<p>Resultado da ferramenta:</p>
+<pre><code class="language-text">tools/compare_phase10_23b.py
+classification = COMBINED_DIAGNOSTIC_PRESSURE_OK_OPENING_SHIFTED
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th style="text-align: right;">Legado</th>
+<th style="text-align: right;">Moderno combinado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>max_pressure_Pa</code></td>
+<td style="text-align: right;"><code>69035836.1743195</code></td>
+<td style="text-align: right;"><code>67331393.612597</code></td>
+</tr>
+<tr>
+<td><code>relative_error_max_pressure</code></td>
+<td style="text-align: right;">n/a</td>
+<td style="text-align: right;"><code>-0.02468924338685035</code></td>
+</tr>
+<tr>
+<td><code>first_opened_time_s</code></td>
+<td style="text-align: right;"><code>510.0</code></td>
+<td style="text-align: right;"><code>660.0</code></td>
+</tr>
+<tr>
+<td><code>first_sink_positive_time_s</code></td>
+<td style="text-align: right;"><code>540.0</code></td>
+<td style="text-align: right;"><code>690.0</code></td>
+</tr>
+<tr>
+<td><code>sink_delay_s</code></td>
+<td style="text-align: right;"><code>30.0</code></td>
+<td style="text-align: right;"><code>30.0</code></td>
+</tr>
+<tr>
+<td><code>pressure_at_opening_Pa</code></td>
+<td style="text-align: right;"><code>66769500.0</code></td>
+<td style="text-align: right;"><code>67331393.612597</code></td>
+</tr>
+<tr>
+<td><code>final_pressure_Pa</code></td>
+<td style="text-align: right;"><code>67982867.8436506</code></td>
+<td style="text-align: right;"><code>67331393.612597</code></td>
+</tr>
+</tbody>
+</table>
+<p>Interpretacao:</p>
+<ul>
+<li>a escala de pressao permanece dentro de <code>+-10%</code>;</li>
+<li>o atraso entre abertura e sink foi reproduzido (<code>30 s</code>);</li>
+<li>a abertura moderna ainda ocorre tarde (<code>660 s</code> contra <code>510 s</code>);</li>
+<li>portanto, a combinacao e util como diagnostico de pressao/sink, mas ainda nao
+  resolve o criterio de abertura.</li>
+</ul>
+<p>Esta fase nao implementa sigma-theta runtime, nao conecta sal/APB ao runtime,
+nao implementa Zamora e nao libera <code>pressure_tabulated_geometric</code>. A evidencia
+aponta que a proxima decisao deve priorizar o criterio de abertura/sigma-theta
+ou uma formulacao de compliance dependente de fase, em vez de apenas ajustar o
+timing do sink.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser

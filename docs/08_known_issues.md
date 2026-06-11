@@ -826,6 +826,24 @@ mesmo trace. O primeiro registro aberto ocorreu em `510.0 s`, com
 `PHASE_DEPENDENCE_EXPLAINED_BY_SINK`, mas isso e apenas evidencia diagnostica
 interna do legado. Nao ha validacao fisica moderna nem liberacao de
 `pressure_tabulated_geometric` como rota runtime.
+
+**Atualizacao 10.23B:** o caso combinado moderno com `constant_geometric`,
+`sigma_theta_static = 66666600.0 Pa` e `sink_timing: next_step` reproduziu o
+atraso de sink de `30 s` e manteve o pico de pressao dentro de `+-10%`, mas a
+abertura moderna ainda ficou deslocada:
+
+```text
+classification = COMBINED_DIAGNOSTIC_PRESSURE_OK_OPENING_SHIFTED
+legacy_first_opened_time_s = 510.0
+modern_fracture_initiation_time_s = 660.0
+modern_sink_delay_s = 30.0
+relative_error_max_pressure = -0.02468924338685035
+```
+
+Esse resultado confirma que o ajuste de timing do sink nao resolve sozinho o
+criterio de abertura. `pressure_tabulated_geometric`, sigma-theta runtime e
+qualquer promocao de `next_step` a default continuam bloqueados ate nova fase
+de formulacao/validacao.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

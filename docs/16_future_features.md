@@ -304,3 +304,11 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   formulacao, mas ainda nao libera runtime: uma evolucao futura deve decidir se
   a informacao vira apenas diagnostico, uma tabela opt-in controlada ou um
   modelo mecanico de acomodacao/sink mais explicito.
+- A Fase 10.23B combinou `constant_geometric`, `sigma_theta_static` fixo da
+  10.22C e `sink_timing: next_step`. O resultado
+  `COMBINED_DIAGNOSTIC_PRESSURE_OK_OPENING_SHIFTED` mostra que o pico de
+  pressao e o atraso de sink estao adequados para diagnostico, mas a abertura
+  moderna ainda ocorre tarde (`660 s` contra `510 s`). A proxima evolucao deve
+  ser uma fase de decisao: priorizar sigma-theta runtime, compliance dependente
+  de fase ou manter `constant_geometric` apenas como diagnostico suficiente para
+  comparar outros pocos. `pressure_tabulated_geometric` continua bloqueado.

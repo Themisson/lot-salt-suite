@@ -1448,3 +1448,27 @@ maxima moderna passou de `67331393.612597 Pa` em `same_step` para
 legado. Esse ajuste de cronologia ainda e diagnostico estrutural; a abertura
 moderna permanece em `690 s`, enquanto o trace legado indicou abertura em
 `510 s`.
+
+### Diagnostico combinado de compliance, sigma-theta e sink — Fase 10.23B
+
+A Fase 10.23B combinou, em caso opt-in separado, `constant_geometric`,
+`sigma_theta_static` com `sigma_theta = 66666600.0 Pa` da 10.22C e
+`sink_timing: next_step`.
+
+Resultado:
+
+```text
+classification = COMBINED_DIAGNOSTIC_PRESSURE_OK_OPENING_SHIFTED
+max_pressure_legacy_Pa = 69035836.1743195
+max_pressure_modern_Pa = 67331393.612597
+relative_error_max_pressure = -0.02468924338685035
+modern_fracture_initiation_time_s = 660.0
+modern_first_sink_positive_time_s = 690.0
+modern_sink_delay_s = 30.0
+```
+
+Conclusao local: a combinacao preserva boa escala de pressao e reproduz o atraso
+do sink, mas ainda desloca a abertura em relacao ao legado (`660 s` moderno
+contra `510 s` legado). Portanto, a evidencia favorece uma proxima fase de
+decisao/formulacao sobre criterio de abertura e sigma-theta runtime, e nao uma
+promocao automatica de `constant_geometric` ou `next_step` a default fisico.
