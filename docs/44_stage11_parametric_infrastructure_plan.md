@@ -246,3 +246,11 @@ A Fase 11.5B registra e executa
 fatores de `C_geom` com `same_step` e `next_step`. O estudo confirma a separação
 operacional entre abertura controlada por compliance e atraso de sink controlado
 por `sink_timing`, ainda como diagnóstico `modern-refined`.
+
+## Fase 11.5C consolidação BUZ-67D
+
+A Fase 11.5C consolida os estudos 11.5A e 11.5B em
+`docs/56_buz67d_modern_refined_sensitivity_consolidation.md`. A conclusão
+mantém `C_geom=0.75x` como melhor ranking diagnóstico combinado e registra que
+`C_geom=0.55x` aproxima melhor a pressão máxima, reforçando que não há
+calibração física automática.

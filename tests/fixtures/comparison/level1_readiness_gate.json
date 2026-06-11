@@ -123,6 +123,22 @@
       "Generated results/ artifacts remain local and must not be versioned."
     ]
   },
+  "phase11_5c_buz67d_sensitivity_consolidation": {
+    "status": "PHASE11_5C_BUZ67D_SENSITIVITY_CONSOLIDATED",
+    "consolidation_status": "BUZ67D_MODERN_REFINED_SENSITIVITIES_CONSOLIDATED",
+    "source": "DOCUMENTED_PHASE_SUMMARY",
+    "tool": "tools/summarize_phase11_5_buz67d_sensitivities.py",
+    "document": "docs/56_buz67d_modern_refined_sensitivity_consolidation.md",
+    "next_phase": "PHASE11_6A_BUZ29_VISCO_FIRST_WELL_AUDIT",
+    "results_versioned": false,
+    "physical_validation": false,
+    "caveats": [
+      "C_geom rankings are diagnostic and metric-dependent.",
+      "C_geom=0.75x remains the best combined diagnostic ranking, not calibration.",
+      "C_geom=0.55x is the best maximum-pressure ranking in the extended matrix.",
+      "The consolidation does not claim strict LOT_Tese equivalence."
+    ]
+  },
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,

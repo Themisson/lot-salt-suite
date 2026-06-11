@@ -110,3 +110,9 @@ A Fase 11.5B foi registrada como
 `buz67d_cgeom_sink_timing_sensitivity_v2`. Ela confirmou que, para a matriz
 cruzada, `sink_timing=next_step` reproduz o atraso diagnóstico de 30 s, enquanto
 o tempo de abertura permanece controlado principalmente pelo fator `C_geom`.
+
+## Consolidação 11.5C
+
+A Fase 11.5C consolida esta matriz ampliada com a matriz cruzada
+`C_geom x sink_timing`. O ranking `cgeom_075_next_step` continua sendo
+diagnóstico combinado, não calibração física.

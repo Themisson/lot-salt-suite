@@ -516,3 +516,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `study_id`. Ela separa efeitos de compliance e temporização do sink, confirma
   o atraso operacional de 30 s para `next_step` nos pares com abertura e mantém
   a classificação como diagnóstico, não calibração física.
+- A Fase 11.5C consolida os estudos BUZ-67D 11.5A/11.5B em um relatório
+  interpretativo. O bloco fecha com `C_geom=0.75x` como melhor ranking
+  diagnóstico combinado, `C_geom=0.55x` como melhor ranking por pressão máxima
+  e transição recomendada para auditoria BUZ29-VISCO-first-well.

@@ -195,3 +195,10 @@ Esse estudo aponta para
 e cruza fatores `0.60`, `0.75`, `1.00` e `1.25` com `same_step` e
 `next_step`. A matriz separa efeitos diagnósticos de compliance e temporização
 do sink, mas não calibra fisicamente o modelo.
+
+## Consolidação BUZ-67D
+
+A Fase 11.5C consolida os dois estudos em
+`docs/56_buz67d_modern_refined_sensitivity_consolidation.md`. O documento fecha
+o bloco BUZ-67D modern-refined e recomenda a transição para a auditoria
+BUZ29-VISCO-first-well.

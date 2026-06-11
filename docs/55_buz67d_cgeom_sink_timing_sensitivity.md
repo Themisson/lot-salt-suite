@@ -157,3 +157,10 @@ diagnostic setup:
 The next useful phase is to consolidate the two 11.5 studies into a compact
 modern-refined interpretation package or extend the canonical study tooling so
 summary CSVs expose volume maxima explicitly for future sensitivity analyses.
+
+## Phase 11.5C Consolidation
+
+Phase 11.5C consolidates this two-factor matrix with the extended `C_geom`
+matrix in `docs/56_buz67d_modern_refined_sensitivity_consolidation.md`. The
+consolidated interpretation keeps all rankings diagnostic and recommends the
+BUZ29-VISCO-first-well audit as the next phase.

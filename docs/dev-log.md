@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.5B BUZ-67D C_geom sink_timing sensitivity
+Fase ativa  : 11.5C BUZ-67D sensitivity consolidation
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 355/355 previstos apos Fase 11.5B em 2026-06-11
+Testes Py   : 358/358 previstos apos Fase 11.5C em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,38 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 11.5C — consolidação BUZ-67D modern-refined — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/summarize_phase11_5_buz67d_sensitivities.py
+```
+
+**Documento criado:**
+
+```text
+docs/56_buz67d_modern_refined_sensitivity_consolidation.md
+```
+
+**Status registrado:**
+
+```text
+BUZ67D_MODERN_REFINED_SENSITIVITIES_CONSOLIDATED
+PHASE11_5C_BUZ67D_SENSITIVITY_CONSOLIDATED
+NEXT_PHASE_BUZ29_VISCO_FIRST_WELL_AUDIT
+```
+
+**Interpretação:** `C_geom` controla rigidez aparente, pressão máxima e tempo
+de abertura; `sink_timing` controla principalmente o atraso operacional do sink.
+`C_geom=0.75x` permanece melhor ranking diagnóstico combinado, enquanto
+`C_geom=0.55x` é melhor para pressão máxima. Nenhum dos dois é calibração
+física.
 
 ---
 
