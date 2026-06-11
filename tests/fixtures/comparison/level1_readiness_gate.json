@@ -729,6 +729,20 @@
       "Opening remains shifted relative to legacy."
     ]
   },
+  "phase10_23c_next_model_decision": {
+    "status": "PHASE10_23C_DECISION_COMPLETE",
+    "decision": "NEXT_MODEL_SIGMA_THETA_RUNTIME",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "pressure_tabulated_geometric_allowed": false,
+    "pressure_tabulated_geometric_status": "NEXT_MODEL_PRESSURE_TABULATED_STILL_BLOCKED",
+    "sigma_theta_runtime_priority": true,
+    "phase_dependent_compliance_priority": false,
+    "justification": "The combined route matches pressure scale and sink delay, but opening remains shifted.",
+    "next_phase_recommendation": "Prioritize an opt-in sigma-theta runtime provider or a better opening criterion before adding pressure_tabulated_geometric."
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

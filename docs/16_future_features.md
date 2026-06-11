@@ -312,3 +312,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   ser uma fase de decisao: priorizar sigma-theta runtime, compliance dependente
   de fase ou manter `constant_geometric` apenas como diagnostico suficiente para
   comparar outros pocos. `pressure_tabulated_geometric` continua bloqueado.
+- A Fase 10.23C tomou essa decisao: `NEXT_MODEL_SIGMA_THETA_RUNTIME`. O motivo e
+  que a combinacao 10.23B ja preserva escala de pressao e `sink_delay_s = 30 s`,
+  mas ainda desloca o instante de abertura. Assim, a proxima evolucao deve focar
+  em uma rota opt-in para sigma-theta runtime ou criterio de abertura mais fiel.
+  `pressure_tabulated_geometric` permanece bloqueado e `constant_geometric`
+  continua apenas diagnostico.

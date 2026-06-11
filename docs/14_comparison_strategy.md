@@ -2111,3 +2111,33 @@ a compliance constante melhoram a escala de pressao, mas ainda nao deve declarar
 equivalencia fisica de abertura. A divergencia restante aponta para criterio de
 abertura/sigma-theta runtime ou compliance dependente de fase, nao para uma
 simples promocao de `next_step` ou `constant_geometric` a default.
+
+## Fase 10.23C — decisao do proximo modelo
+
+A Fase 10.23C consumiu os summaries das Fases 10.23A e 10.23B e classificou a
+proxima prioridade como:
+
+```text
+NEXT_MODEL_SIGMA_THETA_RUNTIME
+```
+
+Justificativa:
+
+- `constant_geometric` + `next_step` mantem o pico de pressao dentro de `+-10%`;
+- o atraso de sink moderno reproduz `30 s`;
+- a abertura moderna ainda permanece deslocada (`660 s` contra `510 s`);
+- portanto, o erro dominante remanescente esta no criterio de abertura, nao no
+  mero timing do sink.
+
+Decisao:
+
+```text
+pressure_tabulated_geometric_allowed = false
+pressure_tabulated_geometric_status = NEXT_MODEL_PRESSURE_TABULATED_STILL_BLOCKED
+sigma_theta_runtime_priority = true
+phase_dependent_compliance_priority = false
+```
+
+A proxima fase recomendada deve formular/implementar uma rota opt-in de
+sigma-theta runtime ou um criterio de abertura mais fiel, ainda sem tornar isso
+default de `lot-sim run --mode lot-pkn`.

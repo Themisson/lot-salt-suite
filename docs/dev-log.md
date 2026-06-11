@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.23B diagnostico BUZ-67D combinado; commit/push pendente
+Fase ativa  : 10.23C decisao do proximo modelo; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
 Testes C++  : 245/245 passaram em 2026-06-10
-Testes Py   : 128/128 passaram apos Fase 10.23B em 2026-06-10
+Testes Py   : 133/133 passaram apos Fase 10.23C em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -136,6 +136,32 @@ tools/compare_phase10_23b.py
 mas a abertura moderna continua deslocada. A fase nao valida fisica de fratura,
 nao implementa sigma-theta runtime, nao implementa Zamora e nao libera
 `pressure_tabulated_geometric`.
+
+---
+
+### [2026-06-10] Fase 10.23C — decisao do proximo modelo — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Objetivo:** consumir os summaries das Fases 10.23A e 10.23B para decidir o
+proximo caminho sem implementar novo solver.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_phase10_23c_next_model.py
+```
+
+**Decisao:** `NEXT_MODEL_SIGMA_THETA_RUNTIME`.
+
+**Justificativa:** a 10.23B manteve a pressao maxima dentro de `+-10%` e
+reproduziu `sink_delay_s = 30 s`, mas a abertura moderna ainda ficou em `660 s`
+contra `510 s` no legado. Portanto, o gargalo remanescente e o criterio de
+abertura/sigma-theta, nao a cronologia do sink.
+
+**Gate:** `pressure_tabulated_geometric` continua bloqueado; `constant_geometric`
+permanece diagnostico; a proxima fase deve priorizar sigma-theta runtime opt-in
+ou um criterio de abertura mais fiel.
 
 ---
 
