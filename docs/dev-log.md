@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.21C compliance aparente corrigida por perfil termico; commit/push pendente
+Fase ativa  : 10.22A auditoria direta dos termos do balanco legado; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
 Testes C++  : 242/242 passaram em 2026-06-10
-Testes Py   : 92/92 esperados apos Fase 10.21A em 2026-06-10
+Testes Py   : 110/110 esperados apos Fase 10.22A em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,81 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-10] Fase 10.22A — auditoria direta do balanco legado termo-a-termo — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Objetivo:** instrumentar temporariamente o `LOT_Tese` para exportar os termos
+ativos do balanco de pressao PKN, executar o caso BUZ67D legado, restaurar
+`legance/LOT_Tese/` e analisar a reconstrução de `dP` sem alterar runtime
+moderno.
+
+**Formula confirmada em `APB1da::calculateLOTFracturedSaltRock(...)`:**
+
+```text
+dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC))/(Vi*k)
+```
+
+**Ferramenta criada:**
+
+```text
+tools/analyze_phase10_22a_legacy_balance_terms.py
+```
+
+**Teste criado:**
+
+```text
+tests/python/test_analyze_phase10_22a_legacy_balance_terms.py
+```
+
+**Fixture criado:**
+
+```text
+tests/fixtures/comparison/phase10_22a_balance_terms_fixture.csv
+```
+
+**Resultados do trace legado real:**
+
+| Métrica | Valor |
+|---|---:|
+| `max_abs_residual_Pa` | `1.862645149230957e-9` |
+| `mean_abs_residual_Pa` | `4.215656166620175e-10` |
+| primeiro sink volumetrico positivo | `540 s` |
+| `mean_thermal_fraction` pre-abertura | `0.7237524643800288` |
+| `mean_volumetric_fraction` pre-abertura | `0.27624753561997123` |
+| `mean_C_eff_termwise_1_Pa` pre-abertura | `-2.2595356091978464e-7` |
+| `median_C_eff_termwise_1_Pa` pre-abertura | `5.934858409233096e-10` |
+| `std_C_eff_termwise_1_Pa` pre-abertura | `7.648603719350452e-7` |
+| `cv_C_eff_termwise` pre-abertura | `3.3850334945886376` |
+
+**Classificações:**
+
+```text
+LEGACY_BALANCE_TRACE_PARTIAL
+LEGACY_BALANCE_TRACE_SIGN_CONFIRMED
+LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP
+```
+
+**Campos ainda ausentes no mesmo trace:**
+
+```text
+T_final_C
+sigmaTheta_Pa
+margin_Pa
+opened
+opened_before_step
+opened_after_step
+```
+
+**Conclusão:** a Fase 10.22A confirma a algebra termo-a-termo do balanco legado
+e fecha a ambiguidade de sinal da reconstrução de `dP`, mas ainda nao abre
+validacao fisica Level 1 nem libera `pressure_tabulated_geometric` como rota
+runtime. A proxima fase pode tentar uma rota diagnostica com compliance
+termo-a-termo ou reinstrumentar `opened/sigmaTheta` no mesmo trace, mantendo
+tudo opt-in.
 
 ---
 

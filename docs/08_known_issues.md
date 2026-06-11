@@ -753,6 +753,40 @@ Portanto, mesmo apos a correcao termica diagnostica, a tabela
 `pressure_tabulated_geometric` continua bloqueada. A proxima tentativa precisa
 exportar no mesmo trace `dV_geom`, `dMl`, `dV_leakoff`, `k`, `dT` e `opened`,
 ou resolver explicitamente a convencao de sinal do termo mecanico corrigido.
+
+**Atualizacao 10.22A:** a instrumentacao temporaria direta do `LOT_Tese`
+confirmou a formula ativa de `dP` no ponto de calculo:
+
+```text
+dP = (alpha*dT - (-Vq + dV - dMl/(rho_f2*FC)) / Vi) / k
+```
+
+ou, reorganizada:
+
+```text
+dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC)) / (Vi*k)
+```
+
+A reconstrucao termo-a-termo fechou com residual numerico muito pequeno:
+
+```text
+max_abs_residual_Pa = 1.862645149230957e-09
+mean_abs_residual_Pa = 4.215656166620175e-10
+```
+
+Classificacao:
+
+```text
+LEGACY_BALANCE_TRACE_PARTIAL
+LEGACY_BALANCE_TRACE_SIGN_CONFIRMED
+LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP
+```
+
+O trace ainda e parcial porque `opened`, `sigmaTheta` e `margin` nao foram
+exportados no mesmo ponto de `dP`. O primeiro sink positivo foi inferido em
+`540 s` por incremento de `dV_leakoff`; o instante exato de `opened` precisa
+ser exportado diretamente se a proxima fase quiser alinhar criterio de abertura
+e compliance termo-a-termo.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

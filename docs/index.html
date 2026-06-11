@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">72/79</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">73/80</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">242</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">103</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -1904,6 +1904,50 @@ PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS
 <p>Conclusao: a 10.21C transforma o bloqueio termico em evidencia quantitativa
 mais precisa, mas mantem <code>pressure_tabulated_geometric</code> bloqueado. Ainda faltam
 <code>dV_geom</code>, <code>dMl</code>, <code>dV_leakoff</code> e <code>opened</code> no mesmo trace.</p>
+<h3 id="instrumentacao-direta-do-balanco-legado-fase-1022a">Instrumentacao direta do balanco legado — Fase 10.22A</h3>
+<p><strong>Status:</strong> <code>LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP</code>.</p>
+<p>A Fase 10.22A instrumentou temporariamente o <code>LOT_Tese</code> no ponto exato em que
+<code>dP</code> e calculado e restaurou <code>legance/LOT_Tese/</code> antes do commit. A formula
+ativa no ramo LOT de <code>APB1da.cpp</code> e:</p>
+<pre><code class="language-text">double dP = (alpha * dT - (-Vq + dV - dMl/(rho_f2 * FC))) / Vi) / k;
+</code></pre>
+<p>Isto equivale a:</p>
+<pre><code class="language-text">dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC)) / (Vi*k)
+</code></pre>
+<p>A instrumentacao exportou, no mesmo ponto de calculo, <code>Vq</code>, <code>dV</code>,
+<code>dV_leakoff</code>, <code>dMl</code>, <code>rho</code>, <code>FC</code>, <code>Vi</code>, <code>k</code>, <code>alpha</code>, <code>dT</code>, <code>pi</code>, <code>pw</code>,
+termo termico e termo volumetrico equivalente. A analise reconstruiu:</p>
+<pre><code class="language-text">dP_reconstructed = thermal_pressure_equivalent + volumetric_pressure_equivalent
+</code></pre>
+<p>Resultado:</p>
+<pre><code class="language-text">max_abs_residual_Pa = 1.862645149230957e-09
+mean_abs_residual_Pa = 4.215656166620175e-10
+classifications =
+  LEGACY_BALANCE_TRACE_PARTIAL
+  LEGACY_BALANCE_TRACE_SIGN_CONFIRMED
+  LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP
+</code></pre>
+<p>O trace continua parcial porque <code>sigmaTheta</code>, <code>margin</code> e <code>opened</code> nao foram
+exportados no mesmo ponto do calculo de <code>dP</code>; o primeiro sink positivo foi
+inferido por incremento de <code>dV_leakoff</code>:</p>
+<pre><code class="language-text">first_sink_positive_time_s = 540.0
+first_opened_time_s = not exported in this trace
+</code></pre>
+<p>Na linha representativa de maior <code>dP</code> por tempo, as fracoes medias foram:</p>
+<pre><code class="language-text">mean_thermal_fraction_pre_opening = 0.7237524643800288
+mean_volumetric_fraction_pre_opening = 0.27624753561997123
+</code></pre>
+<p>A compliance termo-a-termo diagnostica permanece instavel quando reduzida a uma
+linha representativa por tempo:</p>
+<pre><code class="language-text">mean_C_eff_termwise_pre_opening = -2.2595356091978464e-7 1/Pa
+median_C_eff_termwise_pre_opening = 5.934858409233096e-10 1/Pa
+cv_C_eff_termwise_pre_opening = 3.3850334945886376
+</code></pre>
+<p>Conclusao: o sinal da formula de <code>dP</code> foi confirmado e a reconstrucao fecha
+numericamente, mas ainda nao ha base para promover <code>pressure_tabulated_geometric</code>.
+A proxima fase deve exportar <code>opened</code>/<code>sigmaTheta</code> no mesmo trace ou definir
+uma selecao de linha/camada que evite misturar iteracoes e camadas ao calcular
+compliance termo-a-termo.</p>
 </div>
 </section>
 
@@ -3187,7 +3231,28 @@ PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS
 <p>Portanto, mesmo apos a correcao termica diagnostica, a tabela
 <code>pressure_tabulated_geometric</code> continua bloqueada. A proxima tentativa precisa
 exportar no mesmo trace <code>dV_geom</code>, <code>dMl</code>, <code>dV_leakoff</code>, <code>k</code>, <code>dT</code> e <code>opened</code>,
-ou resolver explicitamente a convencao de sinal do termo mecanico corrigido.
+ou resolver explicitamente a convencao de sinal do termo mecanico corrigido.</p>
+<p><strong>Atualizacao 10.22A:</strong> a instrumentacao temporaria direta do <code>LOT_Tese</code>
+confirmou a formula ativa de <code>dP</code> no ponto de calculo:</p>
+<pre><code class="language-text">dP = (alpha*dT - (-Vq + dV - dMl/(rho_f2*FC)) / Vi) / k
+</code></pre>
+<p>ou, reorganizada:</p>
+<pre><code class="language-text">dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC)) / (Vi*k)
+</code></pre>
+<p>A reconstrucao termo-a-termo fechou com residual numerico muito pequeno:</p>
+<pre><code class="language-text">max_abs_residual_Pa = 1.862645149230957e-09
+mean_abs_residual_Pa = 4.215656166620175e-10
+</code></pre>
+<p>Classificacao:</p>
+<pre><code class="language-text">LEGACY_BALANCE_TRACE_PARTIAL
+LEGACY_BALANCE_TRACE_SIGN_CONFIRMED
+LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP
+</code></pre>
+<p>O trace ainda e parcial porque <code>opened</code>, <code>sigmaTheta</code> e <code>margin</code> nao foram
+exportados no mesmo ponto de <code>dP</code>. O primeiro sink positivo foi inferido em
+<code>540 s</code> por incremento de <code>dV_leakoff</code>; o instante exato de <code>opened</code> precisa
+ser exportado diretamente se a proxima fase quiser alinhar criterio de abertura
+e compliance termo-a-termo.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -6393,6 +6458,45 @@ artefatos em <code>results/</code> e nao promover <code>pressure_tabulated_geome
 fase deve reinstrumentar temporariamente o legado, ou criar uma extracao que
 una explicitamente <code>dT</code>, <code>dV_geom</code>, <code>dMl</code>, <code>dV_leakoff</code>, <code>k</code> e <code>opened</code> no mesmo
 trace.</p>
+<h2 id="balanco-legado-termo-a-termo-fase-1022a">Balanco legado termo-a-termo (Fase 10.22A)</h2>
+<p>A Fase 10.22A instrumentou temporariamente o <code>LOT_Tese</code> imediatamente apos o
+calculo de <code>dP</code>, executou o caso BUZ67D PKN, salvou o patch em
+<code>results/comparison/phase10_22a/legacy_balance_terms_audit.patch</code> e restaurou
+<code>legance/LOT_Tese/</code> antes do commit.</p>
+<p>Formula exata auditada em <code>legance/LOT_Tese/src/apb_code/APB1da.cpp</code>, ramo LOT:</p>
+<pre><code class="language-text">double dP = (alpha * dT - (-Vq + dV - dMl/(rho_f2 * FC))) / Vi) / k;
+</code></pre>
+<p>A ferramenta <code>tools/analyze_phase10_22a_legacy_balance_terms.py</code> reconstruiu:</p>
+<pre><code class="language-text">thermal_pressure_equivalent = alpha*dT/k
+volumetric_pressure_equivalent = (Vq - dV + dMl/(rho_f2*FC)) / (Vi*k)
+dP_reconstructed = thermal_pressure_equivalent + volumetric_pressure_equivalent
+</code></pre>
+<p>Resultado da reconstrucao:</p>
+<pre><code class="language-text">max_abs_residual_Pa = 1.862645149230957e-09
+mean_abs_residual_Pa = 4.215656166620175e-10
+</code></pre>
+<p>Classificacoes:</p>
+<pre><code class="language-text">LEGACY_BALANCE_TRACE_PARTIAL
+LEGACY_BALANCE_TRACE_SIGN_CONFIRMED
+LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP
+</code></pre>
+<p>Campos exportados incluem <code>Vq</code>, <code>dV</code>, <code>dV_leakoff</code>, <code>dMl</code>, <code>rho</code>, <code>FC</code>, <code>Vi</code>,
+<code>k</code>, <code>alpha</code>, <code>dT</code>, <code>pi</code>, <code>pw</code>, termo termico e termo volumetrico. Campos ainda
+ausentes no mesmo ponto de calculo:</p>
+<pre><code class="language-text">sigmaTheta_Pa
+margin_Pa
+opened
+opened_before_step
+opened_after_step
+T_final_C
+</code></pre>
+<p>O primeiro sink positivo foi inferido pelo incremento de <code>dV_leakoff</code> em:</p>
+<pre><code class="language-text">first_sink_positive_time_s = 540.0
+</code></pre>
+<p>Como <code>opened</code> nao foi exportado neste trace, o instante de abertura ainda nao
+esta no mesmo ponto de dados da formula de <code>dP</code>. A proxima fase deve decidir se
+reinstrumenta o criterio <code>pw &gt; sigmaTheta</code> junto com o balanco ou se primeiro
+define uma regra de selecao de linha/camada para a compliance termo-a-termo.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser

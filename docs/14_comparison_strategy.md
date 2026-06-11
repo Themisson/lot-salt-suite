@@ -1932,3 +1932,57 @@ parte da janela pre-abertura e nao contem os termos volumetricos completos do
 legado (`dV_geom`, `dMl`, `dV_leakoff`, `opened`). Portanto, a proxima fase de
 comparacao deve continuar sendo auditoria/instrumentacao de termos, nao
 validacao fisica nem implementacao de tabela no solver.
+
+## Fase 10.22A — auditoria direta dos termos do balanco legado
+
+A Fase 10.22A instrumentou temporariamente o `LOT_Tese`, executou o caso
+`8-BUZ-67D-RJS-VISCO-pkn.cpp` e restaurou integralmente `legance/LOT_Tese/`
+antes do commit. A instrumentacao foi posicionada no ponto ativo de calculo de
+`dP` em `APB1da::calculateLOTFracturedSaltRock(...)`.
+
+A formula confirmada para a rota PKN ativa e:
+
+```text
+dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC))/(Vi*k)
+```
+
+O trace nativo exportou os termos `alpha`, `dT`, `k`, `Vq`, `dV`,
+`dMl/(rho_f2*FC)`, `Vi`, o equivalente termico de pressao, o equivalente
+volumetrico de pressao e `dP`. A reconstrução independente apresentou:
+
+| Métrica | Valor |
+|---|---:|
+| `max_abs_residual_Pa` | `1.862645149230957e-9` |
+| `mean_abs_residual_Pa` | `4.215656166620175e-10` |
+
+Classificações registradas:
+
+```text
+LEGACY_BALANCE_TRACE_PARTIAL
+LEGACY_BALANCE_TRACE_SIGN_CONFIRMED
+LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP
+```
+
+A comparacao Level 1 continua fechada para equivalencia fisica. O trace ainda
+nao exporta `sigmaTheta`, `margin`, `opened`, `opened_before_step`,
+`opened_after_step` ou temperatura final no mesmo registro. Portanto, a fase
+confirma a algebra do balanco de pressao legado, mas nao valida ruptura,
+abertura de fratura, dano ou equivalencia entre `dP` legado e qualquer campo
+moderno.
+
+Estatisticas diagnosticas pre-abertura extraidas do trace termo-a-termo:
+
+| Campo | Valor |
+|---|---:|
+| `mean_C_eff_termwise_1_Pa` | `-2.2595356091978464e-7` |
+| `median_C_eff_termwise_1_Pa` | `5.934858409233096e-10` |
+| `std_C_eff_termwise_1_Pa` | `7.648603719350452e-7` |
+| `cv_C_eff_termwise` | `3.3850334945886376` |
+| `mean_C_geom_termwise_1_Pa` | `-2.2659356091978462e-7` |
+| `mean_thermal_fraction` | `0.7237524643800288` |
+| `mean_volumetric_fraction` | `0.27624753561997123` |
+
+O primeiro instante com sink volumetrico positivo no trace representativo foi
+`540 s`, coerente com a janela legada de quebra previamente observada. Como
+`opened` nao foi exportado no mesmo trace, esse instante permanece diagnostico,
+nao um gatilho fisico validado.

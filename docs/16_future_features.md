@@ -282,3 +282,11 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS`. Uma evolucao
   futura deve instrumentar ou extrair `dV_geom`, `dMl`, `dV_leakoff`, `k`,
   `dT` e `opened` no mesmo trace antes de qualquer tabela de compliance.
+- A Fase 10.22A confirmou diretamente a algebra ativa do balanco PKN legado:
+  `dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC))/(Vi*k)`. A reconstrução
+  termo-a-termo bateu com `dP` com residual maximo `1.86e-9 Pa`, mas a rota
+  `pressure_tabulated_geometric` ainda deve permanecer bloqueada. O trace
+  continua parcial: `opened`, `sigmaTheta`, `margin` e o estado antes/depois da
+  abertura nao foram exportados no mesmo registro. A proxima evolucao deve ser
+  uma fase de analise/instrumentacao adicional ou uma tentativa diagnostica
+  claramente opt-in usando a compliance termo-a-termo, nunca default runtime.

@@ -1247,3 +1247,71 @@ mean_C_geom_corrected_subtract / C_geom_constant_10_19C = 6.411961169523989
 Conclusao: a 10.21C transforma o bloqueio termico em evidencia quantitativa
 mais precisa, mas mantem `pressure_tabulated_geometric` bloqueado. Ainda faltam
 `dV_geom`, `dMl`, `dV_leakoff` e `opened` no mesmo trace.
+
+### Instrumentacao direta do balanco legado — Fase 10.22A
+
+**Status:** `LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP`.
+
+A Fase 10.22A instrumentou temporariamente o `LOT_Tese` no ponto exato em que
+`dP` e calculado e restaurou `legance/LOT_Tese/` antes do commit. A formula
+ativa no ramo LOT de `APB1da.cpp` e:
+
+```text
+double dP = (alpha * dT - (-Vq + dV - dMl/(rho_f2 * FC))) / Vi) / k;
+```
+
+Isto equivale a:
+
+```text
+dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC)) / (Vi*k)
+```
+
+A instrumentacao exportou, no mesmo ponto de calculo, `Vq`, `dV`,
+`dV_leakoff`, `dMl`, `rho`, `FC`, `Vi`, `k`, `alpha`, `dT`, `pi`, `pw`,
+termo termico e termo volumetrico equivalente. A analise reconstruiu:
+
+```text
+dP_reconstructed = thermal_pressure_equivalent + volumetric_pressure_equivalent
+```
+
+Resultado:
+
+```text
+max_abs_residual_Pa = 1.862645149230957e-09
+mean_abs_residual_Pa = 4.215656166620175e-10
+classifications =
+  LEGACY_BALANCE_TRACE_PARTIAL
+  LEGACY_BALANCE_TRACE_SIGN_CONFIRMED
+  LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP
+```
+
+O trace continua parcial porque `sigmaTheta`, `margin` e `opened` nao foram
+exportados no mesmo ponto do calculo de `dP`; o primeiro sink positivo foi
+inferido por incremento de `dV_leakoff`:
+
+```text
+first_sink_positive_time_s = 540.0
+first_opened_time_s = not exported in this trace
+```
+
+Na linha representativa de maior `dP` por tempo, as fracoes medias foram:
+
+```text
+mean_thermal_fraction_pre_opening = 0.7237524643800288
+mean_volumetric_fraction_pre_opening = 0.27624753561997123
+```
+
+A compliance termo-a-termo diagnostica permanece instavel quando reduzida a uma
+linha representativa por tempo:
+
+```text
+mean_C_eff_termwise_pre_opening = -2.2595356091978464e-7 1/Pa
+median_C_eff_termwise_pre_opening = 5.934858409233096e-10 1/Pa
+cv_C_eff_termwise_pre_opening = 3.3850334945886376
+```
+
+Conclusao: o sinal da formula de `dP` foi confirmado e a reconstrucao fecha
+numericamente, mas ainda nao ha base para promover `pressure_tabulated_geometric`.
+A proxima fase deve exportar `opened`/`sigmaTheta` no mesmo trace ou definir
+uma selecao de linha/camada que evite misturar iteracoes e camadas ao calcular
+compliance termo-a-termo.

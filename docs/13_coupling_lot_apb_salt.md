@@ -2565,6 +2565,66 @@ fase deve reinstrumentar temporariamente o legado, ou criar uma extracao que
 una explicitamente `dT`, `dV_geom`, `dMl`, `dV_leakoff`, `k` e `opened` no mesmo
 trace.
 
+## Balanco legado termo-a-termo (Fase 10.22A)
+
+A Fase 10.22A instrumentou temporariamente o `LOT_Tese` imediatamente apos o
+calculo de `dP`, executou o caso BUZ67D PKN, salvou o patch em
+`results/comparison/phase10_22a/legacy_balance_terms_audit.patch` e restaurou
+`legance/LOT_Tese/` antes do commit.
+
+Formula exata auditada em `legance/LOT_Tese/src/apb_code/APB1da.cpp`, ramo LOT:
+
+```text
+double dP = (alpha * dT - (-Vq + dV - dMl/(rho_f2 * FC))) / Vi) / k;
+```
+
+A ferramenta `tools/analyze_phase10_22a_legacy_balance_terms.py` reconstruiu:
+
+```text
+thermal_pressure_equivalent = alpha*dT/k
+volumetric_pressure_equivalent = (Vq - dV + dMl/(rho_f2*FC)) / (Vi*k)
+dP_reconstructed = thermal_pressure_equivalent + volumetric_pressure_equivalent
+```
+
+Resultado da reconstrucao:
+
+```text
+max_abs_residual_Pa = 1.862645149230957e-09
+mean_abs_residual_Pa = 4.215656166620175e-10
+```
+
+Classificacoes:
+
+```text
+LEGACY_BALANCE_TRACE_PARTIAL
+LEGACY_BALANCE_TRACE_SIGN_CONFIRMED
+LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP
+```
+
+Campos exportados incluem `Vq`, `dV`, `dV_leakoff`, `dMl`, `rho`, `FC`, `Vi`,
+`k`, `alpha`, `dT`, `pi`, `pw`, termo termico e termo volumetrico. Campos ainda
+ausentes no mesmo ponto de calculo:
+
+```text
+sigmaTheta_Pa
+margin_Pa
+opened
+opened_before_step
+opened_after_step
+T_final_C
+```
+
+O primeiro sink positivo foi inferido pelo incremento de `dV_leakoff` em:
+
+```text
+first_sink_positive_time_s = 540.0
+```
+
+Como `opened` nao foi exportado neste trace, o instante de abertura ainda nao
+esta no mesmo ponto de dados da formula de `dP`. A proxima fase deve decidir se
+reinstrumenta o criterio `pw > sigmaTheta` junto com o balanco ou se primeiro
+define uma regra de selecao de linha/camada para a compliance termo-a-termo.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que

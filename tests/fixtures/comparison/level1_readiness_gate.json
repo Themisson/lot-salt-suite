@@ -525,6 +525,67 @@
       "Do not implement pressure_tabulated_geometric from this series."
     ]
   },
+  "phase10_22a_legacy_balance_terms_audit": {
+    "status": "PHASE10_22A_LEGACY_BALANCE_TERMS_AUDITED",
+    "classification": "LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "pressure_tabulated_geometric_allowed": false,
+    "tool": "tools/analyze_phase10_22a_legacy_balance_terms.py",
+    "fixture": "tests/fixtures/comparison/phase10_22a_balance_terms_fixture.csv",
+    "legacy_case": "legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp",
+    "legacy_trace": "results/comparison/phase10_22a/legacy_balance_terms_trace.csv",
+    "formula": "dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC))/(Vi*k)",
+    "residual": {
+      "max_abs_Pa": 1.862645149230957e-9,
+      "mean_abs_Pa": 4.215656166620175e-10,
+      "classification": "LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP"
+    },
+    "timing": {
+      "first_opened_time_s": null,
+      "first_sink_positive_time_s": 540.0,
+      "legacy_breakdown_time_s": 540.0
+    },
+    "pre_opening": {
+      "mean_C_eff_termwise_1_Pa": -2.2595356091978464e-7,
+      "median_C_eff_termwise_1_Pa": 5.934858409233096e-10,
+      "std_C_eff_termwise_1_Pa": 7.648603719350452e-7,
+      "cv_C_eff_termwise": 3.3850334945886376,
+      "mean_C_geom_termwise_1_Pa": -2.2659356091978462e-7,
+      "mean_thermal_fraction": 0.7237524643800288,
+      "mean_volumetric_fraction": 0.27624753561997123
+    },
+    "representative_rows": {
+      "thermal_pressure_equivalent_mean_Pa": 3795539.6681799,
+      "volumetric_pressure_equivalent_mean_Pa": 3875991.8513660217
+    },
+    "fields_missing": [
+      "T_final_C",
+      "sigmaTheta_Pa",
+      "margin_Pa",
+      "opened",
+      "opened_before_step",
+      "opened_after_step"
+    ],
+    "gate": [
+      "LEGACY_BALANCE_TRACE_PARTIAL",
+      "LEGACY_BALANCE_TRACE_SIGN_CONFIRMED",
+      "LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP",
+      "PRESSURE_TABULATED_STILL_BLOCKED_MISSING_OPENED_SIGMATHETA"
+    ],
+    "next_phase_recommendation": [
+      "PRESSURE_TABULATED_CAN_BE_RETRIED_WITH_TERMWISE_COMPLIANCE",
+      "LEGACY_TERMWISE_TRACE_REQUIRED_AGAIN"
+    ],
+    "caveats": [
+      "Temporary LOT_Tese instrumentation was restored before commit.",
+      "The generated results/comparison/phase10_22a artifacts are diagnostic outputs and must not be versioned.",
+      "The trace reconstructs dP but does not export opened or sigmaTheta in the same row.",
+      "No physical fracture validation is asserted."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",
