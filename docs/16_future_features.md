@@ -385,3 +385,11 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `legacy_elem0_sig_2_0` e ligar essa amostra a um `SigmaThetaProvider` opt-in.
   `pressure_source`/timing segue bloqueado ate que a geometria seja consumida
   ou rejeitada explicitamente.
+- A Fase 10.26D tentou o primeiro gate de sampling bridge e confirmou
+  `APBSALT1D_SAMPLING_BRIDGE_METADATA_ONLY`. A rota atual
+  `sigma_theta_time_series` nao possui amostras espaciais, raio de amostra,
+  elemento ou ponto de Gauss; portanto `legacy_elem0_sig_2_0` nao pode ser
+  consumido sem uma fonte espacial real. A proxima fase deve implementar um
+  provider/sampler opt-in baseado em amostras de parede, ou documentar
+  formalmente que a equivalencia APBSalt1D nao sera perseguida. Ajustes de
+  `pressure_source`/timing continuam bloqueados ate essa decisao.

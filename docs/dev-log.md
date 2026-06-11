@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.26C decisao consumo APBSalt1D sigmaTheta; commit/push em andamento
+Fase ativa  : 10.26D sampling bridge APBSalt1D sigmaTheta; commit/push em andamento
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 258/258 passaram apos Fase 10.24C em 2026-06-11
-Testes Py   : 168/168 passaram apos adendo Fase 10.26A em 2026-06-11
+Testes Py   : 186/186 previstos apos Fase 10.26D em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -57,9 +57,52 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
-### [2026-06-11] Fase 10.26C — decisão de consumo APBSalt1D para `sigmaTheta` — Codex
+### [2026-06-11] Fase 10.26D — APBSalt1D sampling bridge para `sigmaTheta` — Codex
 
 **Status:** Implementado localmente; testes/commit/push pendentes.
+
+**Gate:**
+
+```text
+APBSALT1D_SAMPLING_BRIDGE_BLOCKED_NO_SPATIAL_SAMPLES
+```
+
+**Classificação:**
+
+```text
+APBSALT1D_SAMPLING_BRIDGE_METADATA_ONLY
+```
+
+**Caso criado:**
+
+```text
+cases/validation/buz67d_pkn_legacy_apbsalt1d_sampling_bridge.yaml
+```
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase10_26d_apbsalt1d_sampling_bridge.py
+```
+
+**Interpretação:** a metadata APBSalt1D continua declarada, validada e
+rastreável, mas o caminho numérico atual é `sigma_theta_time_series`. Essa rota
+não possui amostras espaciais, raio, índice de elemento ou ponto de Gauss que
+permita remapear `legacy_elem0_sig_2_0`. Assim, a fase não altera
+`sigmaTheta`, não muda a abertura BUZ-67D e não libera correção de
+`pressure_source`/timing.
+
+**Próxima recomendação:**
+
+```text
+NEXT_PHASE_IMPLEMENT_WALL_STRESS_SAMPLING_PROVIDER
+```
+
+---
+
+### [2026-06-11] Fase 10.26C — decisão de consumo APBSalt1D para `sigmaTheta` — Codex
+
+**Status:** Publicado em `98fc0ba`.
 
 **Ferramenta criada:**
 

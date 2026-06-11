@@ -3236,3 +3236,85 @@ fase seguinte deve criar uma ponte de amostragem opt-in ou uma decisão formal d
 não equivalência: `CaseData`/metadata APBSalt1D -> configuração de bridge ->
 amostragem equivalente -> provider `sigmaTheta`, mantendo `lot/` sem depender
 diretamente de `external/saltcreep`.
+
+## APBSalt1D sampling bridge opt-in (Fase 10.26D)
+
+A Fase 10.26D auditou se a metadata APBSalt1D declarada na 10.26B poderia
+alterar efetivamente o sampling de `sigmaTheta` no diagnóstico BUZ-67D.
+
+Gate:
+
+```text
+APBSALT1D_SAMPLING_BRIDGE_BLOCKED_NO_SPATIAL_SAMPLES
+```
+
+Classificação final:
+
+```text
+APBSALT1D_SAMPLING_BRIDGE_METADATA_ONLY
+```
+
+A razão técnica é direta: o caso diagnóstico atual usa
+`type: sigma_theta_time_series`. Essa rota entrega ao `PknModel` uma série
+temporal `time_s -> sigma_theta_compression_positive_Pa` já pronta. Ela não
+carrega uma lista espacial de amostras, raios, índices de elemento, pontos de
+Gauss ou estado de tensão que permita remapear `legacy_elem0_sig_2_0`.
+
+Portanto, a metadata:
+
+```text
+outer_radius_m = 8.0
+radial_elements = 15
+ratio = 10.0
+integration_order = 3
+sampling = legacy_elem0_sig_2_0
+```
+
+continua rastreável e validada, mas não é consumida por cálculo de
+`sigmaTheta`. O novo caso:
+
+```text
+cases/validation/buz67d_pkn_legacy_apbsalt1d_sampling_bridge.yaml
+```
+
+existe apenas para testar esse contrato opt-in e preservar o status
+metadata-only com caveat explícito.
+
+A ferramenta:
+
+```text
+tools/compare_phase10_26d_apbsalt1d_sampling_bridge.py
+```
+
+classifica o diagnóstico como metadata-only quando o CSV moderno não contém
+campos espaciais como `sigma_theta_sample_radius_m`,
+`sigma_theta_sample_index`, `wall_stress_r_m` ou `wall_stress_gp_id`, ou quando
+o status reportado permanece `APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED`.
+
+Resultado BUZ-67D esperado nesta fase:
+
+```text
+legacy_opening_time_s = 510.0
+modern_opening_time_s = 660.0
+opening_time_error_s = 150.0
+legacy_sink_delay_s = 30.0
+modern_sink_delay_s = 30.0
+relative_error_max_pressure = -0.02468924338685035
+```
+
+Esse resultado não prova equivalência nem erro físico: ele apenas confirma que
+o caminho `sigma_theta_time_series` não possui amostras espaciais suficientes
+para consumir `legacy_elem0_sig_2_0`.
+
+Consequência para a sequência técnica:
+
+```text
+pressure_source/timing permanece bloqueado
+ate existir uma fonte espacial de sigmaTheta
+ou uma rejeicao formal da equivalencia APBSalt1D
+```
+
+O próximo passo recomendado é implementar um provider/sampler opt-in baseado em
+`SaltWallStressDiagnostics` ou uma ponte equivalente que exponha amostras
+espaciais de `sigmaTheta` com raio/índice/status de mapeamento, sem alterar o
+default de `lot-sim run --mode lot-pkn`.

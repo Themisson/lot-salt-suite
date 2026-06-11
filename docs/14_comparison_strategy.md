@@ -2654,3 +2654,45 @@ A próxima implementação recomendada é uma ponte de amostragem, não uma corr
 direta de pressão/timing. Se a ponte demonstrar que a malha APBSalt1D consumida
 continua abrindo em `660 s`, a análise de `before/trial/after` deve ser retomada
 com melhor rastreabilidade.
+
+## Fase 10.26D — sampling bridge APBSalt1D metadata-only
+
+A Fase 10.26D executa a primeira auditoria de sampling bridge para consumir a
+metadata APBSalt1D no diagnóstico `sigmaTheta`. A conclusão é que a rota atual
+permanece metadata-only:
+
+```text
+APBSALT1D_SAMPLING_BRIDGE_METADATA_ONLY
+APBSALT1D_SAMPLING_BRIDGE_BLOCKED_NO_SPATIAL_SAMPLES
+```
+
+O motivo é que o caso BUZ-67D usado nesta rota continua baseado em
+`sigma_theta_time_series`. Essa fonte contém apenas pares temporais
+`time_s -> sigma_theta_compression_positive_Pa`; ela não exporta amostras
+espaciais de parede, raio da amostra, índice de elemento, ponto de Gauss local
+ou um equivalente moderno de `mdl->getElem(0)->getSigmaTheta(); sig(2,0)`.
+
+Assim, o caso:
+
+```text
+cases/validation/buz67d_pkn_legacy_apbsalt1d_sampling_bridge.yaml
+```
+
+e a ferramenta:
+
+```text
+tools/compare_phase10_26d_apbsalt1d_sampling_bridge.py
+```
+
+servem para registrar que a metadata é declarada, mas ainda não consumida. A
+comparação continua diagnóstica e não deve ser lida como validação física de
+fratura.
+
+Impacto sobre a estratégia legado-moderno:
+
+- `legacy_elem0_sig_2_0` ainda não tem equivalente espacial moderno consumido;
+- `pressure_source`/timing continua bloqueado;
+- `hoop_state`, `opened`, `margin` e `sigmaTheta` não devem ser promovidos a
+  validação física;
+- a próxima fase deve criar uma fonte espacial real ou rejeitar formalmente a
+  equivalência APBSalt1D.

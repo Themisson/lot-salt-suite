@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">88/95</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">89/96</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">263</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">180</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">186</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -7550,6 +7550,60 @@ fase seguinte deve criar uma ponte de amostragem opt-in ou uma decisão formal d
 não equivalência: <code>CaseData</code>/metadata APBSalt1D -&gt; configuração de bridge -&gt;
 amostragem equivalente -&gt; provider <code>sigmaTheta</code>, mantendo <code>lot/</code> sem depender
 diretamente de <code>external/saltcreep</code>.</p>
+<h2 id="apbsalt1d-sampling-bridge-opt-in-fase-1026d">APBSalt1D sampling bridge opt-in (Fase 10.26D)</h2>
+<p>A Fase 10.26D auditou se a metadata APBSalt1D declarada na 10.26B poderia
+alterar efetivamente o sampling de <code>sigmaTheta</code> no diagnóstico BUZ-67D.</p>
+<p>Gate:</p>
+<pre><code class="language-text">APBSALT1D_SAMPLING_BRIDGE_BLOCKED_NO_SPATIAL_SAMPLES
+</code></pre>
+<p>Classificação final:</p>
+<pre><code class="language-text">APBSALT1D_SAMPLING_BRIDGE_METADATA_ONLY
+</code></pre>
+<p>A razão técnica é direta: o caso diagnóstico atual usa
+<code>type: sigma_theta_time_series</code>. Essa rota entrega ao <code>PknModel</code> uma série
+temporal <code>time_s -&gt; sigma_theta_compression_positive_Pa</code> já pronta. Ela não
+carrega uma lista espacial de amostras, raios, índices de elemento, pontos de
+Gauss ou estado de tensão que permita remapear <code>legacy_elem0_sig_2_0</code>.</p>
+<p>Portanto, a metadata:</p>
+<pre><code class="language-text">outer_radius_m = 8.0
+radial_elements = 15
+ratio = 10.0
+integration_order = 3
+sampling = legacy_elem0_sig_2_0
+</code></pre>
+<p>continua rastreável e validada, mas não é consumida por cálculo de
+<code>sigmaTheta</code>. O novo caso:</p>
+<pre><code class="language-text">cases/validation/buz67d_pkn_legacy_apbsalt1d_sampling_bridge.yaml
+</code></pre>
+<p>existe apenas para testar esse contrato opt-in e preservar o status
+metadata-only com caveat explícito.</p>
+<p>A ferramenta:</p>
+<pre><code class="language-text">tools/compare_phase10_26d_apbsalt1d_sampling_bridge.py
+</code></pre>
+<p>classifica o diagnóstico como metadata-only quando o CSV moderno não contém
+campos espaciais como <code>sigma_theta_sample_radius_m</code>,
+<code>sigma_theta_sample_index</code>, <code>wall_stress_r_m</code> ou <code>wall_stress_gp_id</code>, ou quando
+o status reportado permanece <code>APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED</code>.</p>
+<p>Resultado BUZ-67D esperado nesta fase:</p>
+<pre><code class="language-text">legacy_opening_time_s = 510.0
+modern_opening_time_s = 660.0
+opening_time_error_s = 150.0
+legacy_sink_delay_s = 30.0
+modern_sink_delay_s = 30.0
+relative_error_max_pressure = -0.02468924338685035
+</code></pre>
+<p>Esse resultado não prova equivalência nem erro físico: ele apenas confirma que
+o caminho <code>sigma_theta_time_series</code> não possui amostras espaciais suficientes
+para consumir <code>legacy_elem0_sig_2_0</code>.</p>
+<p>Consequência para a sequência técnica:</p>
+<pre><code class="language-text">pressure_source/timing permanece bloqueado
+ate existir uma fonte espacial de sigmaTheta
+ou uma rejeicao formal da equivalencia APBSalt1D
+</code></pre>
+<p>O próximo passo recomendado é implementar um provider/sampler opt-in baseado em
+<code>SaltWallStressDiagnostics</code> ou uma ponte equivalente que exponha amostras
+espaciais de <code>sigmaTheta</code> com raio/índice/status de mapeamento, sem alterar o
+default de <code>lot-sim run --mode lot-pkn</code>.</p>
 </div>
 </section>
 
