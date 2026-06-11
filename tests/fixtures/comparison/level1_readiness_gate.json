@@ -1765,6 +1765,28 @@
       "BUZ-67D remains the executable modern-refined LOT/PKN path."
     ]
   },
+  "phase11_7a_next_model_track_decision": {
+    "status": "NEXT_MODEL_TRACK_SELECTED",
+    "phase": "11.7A",
+    "selected_track": "PENNY_SHAPED",
+    "buz29_classification": "BUZ29_VISCO_FIRST_WELL_NOT_PKN",
+    "modern_pkn_ready": false,
+    "recommended_next_phase": "PHASE11_7B_LEGACY_MATH_AUDIT_SELECTED_MODEL",
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "tool": "tools/decide_phase11_7a_next_model_track.py",
+    "document": "docs/60_phase11_7a_next_model_track_decision.md",
+    "blocked_tracks": [
+      "BUZ29_PKN_YAML",
+      "ZAMORA_COMPOSITIONAL_FLUID"
+    ],
+    "caveats": [
+      "The phase selects a priority track only.",
+      "No non-PKN solver is implemented in Phase 11.7A.",
+      "No BUZ29 physical validation or legacy equivalence is claimed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

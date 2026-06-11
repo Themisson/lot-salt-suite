@@ -64,6 +64,20 @@ Essa fase deve auditar a formulação legada penny-shaped, listar entradas e
 saídas necessárias, decidir se há escopo para um solver moderno e somente então
 planejar implementação C++.
 
+## Fase 11.7A — decisão da trilha
+
+A Fase 11.7A formaliza essa recomendação como decisão de trilha:
+
+```text
+status = NEXT_MODEL_TRACK_SELECTED
+selected_track = PENNY_SHAPED
+recommended_next_phase = PHASE11_7B_LEGACY_MATH_AUDIT_SELECTED_MODEL
+```
+
+Essa decisão não altera solver, parser ou casos. Ela apenas impede que BUZ29
+seja forçado para `lot-pkn` enquanto a formulação `penny-shaped` não for
+auditada.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

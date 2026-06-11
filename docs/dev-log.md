@@ -57,6 +57,37 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.7A — decisão de trilha pós-BUZ29 — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_phase11_7a_next_model_track.py
+```
+
+**Documento criado:**
+
+```text
+docs/60_phase11_7a_next_model_track_decision.md
+```
+
+**Decisão:**
+
+```text
+NEXT_MODEL_TRACK_SELECTED
+selected_track = PENNY_SHAPED
+recommended_next_phase = PHASE11_7B_LEGACY_MATH_AUDIT_SELECTED_MODEL
+```
+
+**Interpretação:** BUZ29-VISCO-first-well não deve ser convertido para PKN por
+inferência. A primeira trilha não-PKN deve auditar a formulação
+`penny-shaped`; esta fase não implementa modelo físico e não declara validação
+do BUZ29.
+
+---
+
 ### [2026-06-11] Fase 11.5D — maxima em summaries LOT/PKN — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

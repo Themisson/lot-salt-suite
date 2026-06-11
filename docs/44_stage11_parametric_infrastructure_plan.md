@@ -309,3 +309,16 @@ max_net_pressure_Pa
 
 O gate é `SUMMARY_MAXIMA_PYTHON_ONLY_SAFE`: esses campos já existem em
 `timeseries.csv`, então a mudança fica restrita a pós-processamento Python.
+
+## Fase 11.7A decisão pós-BUZ29
+
+A Fase 11.7A seleciona a trilha prioritária para o primeiro modelo não-PKN:
+
+```text
+PHASE11_7A_NEXT_MODEL_TRACK_DECIDED
+selected_track = PENNY_SHAPED
+```
+
+A escolha segue a auditoria BUZ29-VISCO-first-well: o modelo ativo é
+`penny-shaped`, enquanto a evidência PKN é apenas linha comentada ou artefato
+output-only. A fase é decisória e não implementa modelo físico novo.

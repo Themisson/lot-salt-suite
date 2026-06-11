@@ -532,3 +532,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 - A Fase 11.5D adiciona máximos de fratura, leakoff, comprimento, abertura e
   pressão líquida aos summaries de estudos LOT/PKN. A mudança é Python-only e
   usa colunas já exportadas pelo runtime moderno; não altera formulação física.
+- A Fase 11.7A decide a primeira trilha não-PKN pós-BUZ29:
+  `PENNY_SHAPED`. A decisão é documental e técnica; não implementa modelo novo,
+  não cria YAML BUZ29 e não declara validação física. A próxima etapa segura é
+  auditar matematicamente a formulação penny-shaped antes de qualquer solver.
