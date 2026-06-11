@@ -198,6 +198,46 @@ void validate_references(const lss::core::CaseData& data) {
   }
 }
 
+void parse_sigma_theta_runtime_geometry(
+    const YAML::Node& initiation,
+    lss::core::SigmaThetaFractureCriterionData& criterion) {
+  const YAML::Node geometry = initiation["sigma_theta_runtime_geometry"];
+  if (!geometry) {
+    return;
+  }
+
+  auto& runtime = criterion.runtime_geometry;
+  runtime.enabled = true;
+  runtime.mode =
+      require_as<std::string>(geometry["mode"],
+                              "lot.fracture.initiation.sigma_theta_runtime_geometry.mode");
+  runtime.outer_radius_m = parse_value_unit(
+      geometry["outer_radius"],
+      "lot.fracture.initiation.sigma_theta_runtime_geometry.outer_radius",
+      "length");
+  runtime.radial_elements =
+      require_as<int>(geometry["radial_elements"],
+                      "lot.fracture.initiation.sigma_theta_runtime_geometry.radial_elements");
+  runtime.ratio =
+      require_as<double>(geometry["ratio"],
+                         "lot.fracture.initiation.sigma_theta_runtime_geometry.ratio");
+  runtime.integration_order =
+      require_as<int>(geometry["integration_order"],
+                      "lot.fracture.initiation.sigma_theta_runtime_geometry.integration_order");
+
+  const YAML::Node sampling =
+      require_node(geometry["sampling"],
+                   "lot.fracture.initiation.sigma_theta_runtime_geometry.sampling");
+  runtime.sampling_mode =
+      require_as<std::string>(
+          sampling["mode"],
+          "lot.fracture.initiation.sigma_theta_runtime_geometry.sampling.mode");
+  runtime.sampling_source = optional_string(sampling, "source");
+  runtime.consumption_status =
+      optional_string(geometry, "consumption_status",
+                      "APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED");
+}
+
 }  // namespace
 
 namespace lss::io {
@@ -417,6 +457,7 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
           "lot.fracture.initiation.type invalido: " +
           data.lot.sigma_theta_fracture.type);
     }
+    parse_sigma_theta_runtime_geometry(initiation, data.lot.sigma_theta_fracture);
   }
   if (fracture["balance"] && fracture["balance"]["sink_timing"]) {
     data.lot.fracture_sink_timing =
@@ -621,6 +662,42 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
       if (criterion.comparison != "legacy_algebra") {
         throw std::runtime_error(
             "Validacao falhou: sigma_theta exige comparison legacy_algebra");
+      }
+      if (criterion.runtime_geometry.enabled) {
+        const auto& geometry = criterion.runtime_geometry;
+        if (geometry.mode != "apbsalt1d_legacy_equivalent") {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_runtime_geometry exige mode "
+              "apbsalt1d_legacy_equivalent");
+        }
+        if (!std::isfinite(geometry.outer_radius_m) ||
+            geometry.outer_radius_m <= 0.0) {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_runtime_geometry exige outer_radius > 0");
+        }
+        if (geometry.radial_elements <= 0) {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_runtime_geometry exige radial_elements > 0");
+        }
+        if (!std::isfinite(geometry.ratio) || geometry.ratio <= 0.0) {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_runtime_geometry exige ratio > 0");
+        }
+        if (geometry.integration_order != 3) {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_runtime_geometry legado exige integration_order 3");
+        }
+        if (geometry.sampling_mode != "legacy_elem0_sig_2_0") {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_runtime_geometry exige sampling mode "
+              "legacy_elem0_sig_2_0");
+        }
+        if (geometry.consumption_status !=
+            "APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED") {
+          throw std::runtime_error(
+              "Validacao falhou: sigma_theta_runtime_geometry consumption_status "
+              "suportado e APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED");
+        }
       }
       if (criterion.type == "sigma_theta_static") {
         if (criterion.layer_id.empty()) {

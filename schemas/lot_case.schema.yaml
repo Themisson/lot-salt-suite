@@ -312,6 +312,44 @@ properties:
                           type: string
                         influence_depth:
                           $ref: "#/$defs/length_quantity"
+              sigma_theta_runtime_geometry:
+                type: object
+                required:
+                  - mode
+                  - outer_radius
+                  - radial_elements
+                  - ratio
+                  - integration_order
+                  - sampling
+                additionalProperties: false
+                properties:
+                  mode:
+                    type: string
+                    enum: [apbsalt1d_legacy_equivalent]
+                  outer_radius:
+                    $ref: "#/$defs/length_quantity"
+                  radial_elements:
+                    type: integer
+                    minimum: 1
+                  ratio:
+                    type: number
+                    exclusiveMinimum: 0
+                  integration_order:
+                    type: integer
+                    enum: [3]
+                  sampling:
+                    type: object
+                    required: [mode, source]
+                    additionalProperties: false
+                    properties:
+                      mode:
+                        type: string
+                        enum: [legacy_elem0_sig_2_0]
+                      source:
+                        type: string
+                  consumption_status:
+                    type: string
+                    enum: [APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED]
             allOf:
               - if:
                   properties:

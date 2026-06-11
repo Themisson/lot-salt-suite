@@ -100,6 +100,7 @@ phases:
   phase_10_25c_refined_sigma_theta_source_decision: completed
   phase_10_26a_sigma_theta_pressure_source_timing_audit: completed
   phase_10_26a_apbsalt1d_geometry_mesh_audit: completed
+  phase_10_26b_apbsalt1d_sigma_theta_equivalence_mode: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -192,14 +193,14 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 258        # Catch2 lot-salt-suite — 258/258 passaram na Fase 10.24B (2026-06-11)
+  cpp_tests: 263        # Catch2 lot-salt-suite — 263/263 previstos apos Fase 10.26B (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 168     # pytest lot-salt-suite — 168/168 passaram no adendo da Fase 10.26A (2026-06-11)
+  python_tests: 173     # pytest lot-salt-suite — 173/173 previstos apos Fase 10.26B (2026-06-11)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-11"
-updated_by: "codex (Fase 10.26A APBSalt1D geometry mesh audit addendum)"
+updated_by: "codex (Fase 10.26B APBSalt1D sigmaTheta equivalence metadata)"
 project_version: "0.1.0"

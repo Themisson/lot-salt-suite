@@ -3115,3 +3115,83 @@ Caveats:
 - `SaltWallStressDiagnostics` ainda não é provider runtime;
 - `pkn_direct`, `constant_geometric`, `sink_timing` e defaults globais não
   foram alterados.
+
+## Modo APBSalt1D legado-equivalente para `sigmaTheta` (Fase 10.26B)
+
+A Fase 10.26B adiciona um bloco opt-in de metadata para declarar a geometria
+radial usada pelo `APBSalt1D` legado no diagnóstico `sigmaTheta`. O objetivo é
+separar claramente dois modos:
+
+- `modern_refined_mode`: usa a série refinada `sigma_theta_time_series` da
+  Fase 10.25A/10.25B, sem declarar equivalência de malha/domínio;
+- `legacy_equivalence_mode`: declara a configuração APBSalt1D para comparação
+  futura de equivalência, mas ainda não conecta um provedor runtime real de
+  tensão de parede.
+
+O caso diagnóstico criado é:
+
+```text
+cases/validation/buz67d_pkn_legacy_apbsalt1d_equiv_sigma_theta.yaml
+```
+
+Parâmetros declarados:
+
+| Parâmetro | Valor legado APBSalt1D | Status moderno 10.26B |
+|---|---:|---|
+| `outer_radius_m` | `8.0` | declarado em YAML |
+| `radial_elements` / `nelem` | `15` | declarado em YAML |
+| `ratio` | `10.0` | declarado em YAML |
+| `integration_order` | `3` | validado pelo parser |
+| amostragem | `mdl->getElem(0)->getSigmaTheta(); sig(2,0)` | declarado como `legacy_elem0_sig_2_0` |
+
+O bloco YAML é validado em `CaseData` como
+`sigma_theta_runtime_geometry`, mas nesta fase o status é:
+
+```text
+APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED
+```
+
+Portanto, a configuração é rastreável e testável, porém **metadata-only**:
+nenhum cálculo de `sigmaTheta` runtime foi alterado, nenhum
+`SaltWallStressDiagnostics` real foi conectado e o solver continua consumindo a
+série refinada já existente. A ferramenta:
+
+```text
+tools/compare_phase10_26b_apbsalt1d_equivalence.py
+```
+
+classifica esse estado como:
+
+```text
+APBSALT1D_EQUIVALENCE_METADATA_ONLY
+```
+
+Resultado observado no BUZ-67D diagnóstico:
+
+```text
+legacy_opening_time_s = 510.0
+modern_opening_time_s = 660.0
+opening_time_error_s = 150.0
+legacy_sink_delay_s = 30.0
+modern_sink_delay_s = 30.0
+max_pressure_legacy_Pa = 69035836.1743195
+max_pressure_modern_Pa = 67331393.612597
+relative_error_max_pressure = -0.02468924338685035
+sigmaTheta_source_status = APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED
+apbsalt1d_geometry_status = APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED
+```
+
+Isso não é validação física de fratura. A conclusão da 10.26A permanece válida:
+antes de corrigir `pressure_source`/timing, uma fase posterior deve consumir de
+fato a malha/domínio/ponto de amostragem APBSalt1D ou demonstrar por que uma
+malha moderna refinada diferente deve ser usada.
+
+Caveats:
+
+- defaults globais de LOT/PKN permanecem inalterados;
+- o caso 10.25B refinado continua disponível;
+- `pkn_direct`, `constant_geometric`, `sink_timing` e Zamora não foram
+  modificados;
+- `lot-sim run --mode lot-pkn` continua desacoplado do sal runtime;
+- `APBSalt1D_CONFIG_DECLARED_NOT_CONSUMED` deve bloquear qualquer alegação de
+  equivalência física.

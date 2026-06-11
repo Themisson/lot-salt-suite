@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.26A adendo geometrico APBSalt1D; commit/push em andamento
+Fase ativa  : 10.26B APBSalt1D sigmaTheta equivalence metadata; commit/push em andamento
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
@@ -54,6 +54,66 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.26B — modo APBSalt1D legado-equivalente para `sigmaTheta` — Codex
+
+**Status:** Implementado localmente; testes passaram; commit/push pendentes.
+
+**Gate:** `APBSALT1D_EQUIVALENCE_MODE_IMPLEMENTATION_ALLOWED`, mas sem provider
+runtime real de tensão de parede nesta fase.
+
+**Configuração declarada:**
+
+```text
+mode = apbsalt1d_legacy_equivalent
+outer_radius_m = 8.0
+radial_elements = 15
+ratio = 10.0
+integration_order = 3
+sampling = legacy_elem0_sig_2_0
+consumption_status = APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED
+```
+
+**Caso criado:**
+
+```text
+cases/validation/buz67d_pkn_legacy_apbsalt1d_equiv_sigma_theta.yaml
+```
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase10_26b_apbsalt1d_equivalence.py
+```
+
+**Classificação esperada enquanto metadata-only:**
+
+```text
+APBSALT1D_EQUIVALENCE_METADATA_ONLY
+```
+
+**Resultado BUZ-67D observado:**
+
+```text
+legacy_opening_time_s = 510.0
+modern_opening_time_s = 660.0
+opening_time_error_s = 150.0
+legacy_sink_delay_s = 30.0
+modern_sink_delay_s = 30.0
+relative_error_max_pressure = -0.02468924338685035
+sigmaTheta_source_status = APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED
+apbsalt1d_geometry_status = APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED
+```
+
+**Interpretação:** o bloco `sigma_theta_runtime_geometry` agora é parseado,
+validado e rastreável em `CaseData`, mas ainda não é consumido por
+`SaltWallStressDiagnostics`, `SaltCreepTimeBridge` ou outro provider runtime. A
+série refinada `sigmaTheta(t)` continua sendo a fonte numérica do diagnóstico.
+Logo, qualquer deslocamento remanescente de abertura não deve ser reclassificado
+como erro de `pressure_source`/timing até que a geometria APBSalt1D seja
+consumida ou formalmente descartada.
 
 ---
 

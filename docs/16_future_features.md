@@ -368,3 +368,12 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   fase deve primeiro reproduzir uma configuracao APBSalt1D equivalente no
   moderno; so depois disso a auditoria de `before/trial/after` e timing deve ser
   retomada.
+- A Fase 10.26B criou essa rota como contrato opt-in inicial:
+  `sigma_theta_runtime_geometry` declara `outer_radius_m = 8 m`,
+  `radial_elements = 15`, `ratio = 10`, `integration_order = 3` e
+  `sampling = legacy_elem0_sig_2_0`. Nesta fase, porem, o status permanece
+  `APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED`: a configuracao e validada e
+  rastreavel, mas ainda nao alimenta um provider runtime real. Uma fase futura
+  deve consumir essa geometria em `SaltWallStressDiagnostics`/bridge opt-in ou
+  documentar formalmente que a malha moderna refinada nao busca equivalencia
+  com o legado.

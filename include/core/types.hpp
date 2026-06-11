@@ -109,6 +109,18 @@ struct SigmaThetaFractureCriterionData {
     double influence_depth_m = 0.0;
   };
 
+  struct RuntimeGeometryData {
+    bool enabled = false;
+    std::string mode;
+    double outer_radius_m = 0.0;
+    int radial_elements = 0;
+    double ratio = 0.0;
+    int integration_order = 0;
+    std::string sampling_mode;
+    std::string sampling_source;
+    std::string consumption_status = "APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED";
+  };
+
   bool enabled = false;
   std::string type;
   std::string layer_id;
@@ -121,6 +133,7 @@ struct SigmaThetaFractureCriterionData {
   std::string interpolation;
   std::string out_of_range;
   std::vector<TimeSeriesPoint> time_series;
+  RuntimeGeometryData runtime_geometry;
 };
 
 struct VolumetricComplianceData {

@@ -2553,3 +2553,72 @@ Caveats:
 - nenhuma mudança em `pkn_direct`, compliance, Zamora, `SaltWallStressDiagnostics`
   ou defaults foi feita;
 - `results/` permanece fora do versionamento.
+
+## Fase 10.26B — modo APBSalt1D legado-equivalente declarado
+
+A Fase 10.26B implementa a primeira resposta ao gate geométrico da 10.26A:
+um bloco opt-in de metadata `sigma_theta_runtime_geometry` no contrato YAML,
+parseado e validado pelo `CaseParser`, para declarar a configuração APBSalt1D
+legada:
+
+```text
+mode = apbsalt1d_legacy_equivalent
+outer_radius_m = 8.0
+radial_elements = 15
+ratio = 10.0
+integration_order = 3
+sampling = legacy_elem0_sig_2_0
+consumption_status = APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED
+```
+
+O novo caso:
+
+```text
+cases/validation/buz67d_pkn_legacy_apbsalt1d_equiv_sigma_theta.yaml
+```
+
+mantém a série refinada `sigmaTheta(t)` da 10.25B e adiciona apenas a metadata
+de geometria legada. Assim, a comparação 10.26B deve ser lida como:
+
+```text
+APBSALT1D_EQUIVALENCE_METADATA_ONLY
+```
+
+e não como equivalência física ou numérica. A configuração ainda não é consumida
+por um provider runtime real de tensão de parede. O valor moderno de abertura
+pode, portanto, permanecer igual ao caso refinado anterior, e isso não fecha a
+causa raiz.
+
+A ferramenta planejada/executada para essa leitura é:
+
+```text
+tools/compare_phase10_26b_apbsalt1d_equivalence.py
+```
+
+Ela reporta `legacy_opening_time_s`, `modern_opening_time_s`,
+`opening_time_error_s`, `sink_delay_s`, erro relativo de pico de pressão,
+`sigmaTheta_source_status` e `apbsalt1d_geometry_status`. Quando o status é
+`APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED`, a classificação obrigatória é
+`APBSALT1D_EQUIVALENCE_METADATA_ONLY`.
+
+No BUZ-67D, a execução diagnóstica preservou:
+
+| Métrica | Valor |
+|---|---:|
+| `legacy_opening_time_s` | `510.0` |
+| `modern_opening_time_s` | `660.0` |
+| `opening_time_error_s` | `150.0` |
+| `legacy_sink_delay_s` | `30.0` |
+| `modern_sink_delay_s` | `30.0` |
+| `relative_error_max_pressure` | `-0.02468924338685035` |
+
+Como a geometria ainda não é consumida, esses números apenas confirmam que o
+novo contrato não altera o resultado numérico do modo refinado anterior.
+
+Próxima decisão: a 10.26C não deve retomar `pressure_source`/timing enquanto a
+geometria APBSalt1D não for consumida por uma rota runtime ou enquanto não for
+documentada uma equivalência alternativa. O caminho tecnicamente mais limpo é
+implementar um provedor/sampler opt-in que consiga consumir `outer_radius_m`,
+`radial_elements`, `ratio`, `integration_order` e o ponto
+`legacy_elem0_sig_2_0`, ou classificar formalmente a malha moderna refinada como
+não equivalente ao legado.

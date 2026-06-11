@@ -1004,6 +1004,43 @@
       "After mesh equivalence is tested, the pressure and sigma-theta trace export may still be needed."
     ]
   },
+  "phase10_26b_apbsalt1d_sigma_theta_equivalence_mode": {
+    "status": "APBSALT1D_EQUIVALENCE_METADATA_ONLY",
+    "gate": "APBSALT1D_EQUIVALENCE_MODE_IMPLEMENTATION_ALLOWED",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "case": "cases/validation/buz67d_pkn_legacy_apbsalt1d_equiv_sigma_theta.yaml",
+    "tool": "tools/compare_phase10_26b_apbsalt1d_equivalence.py",
+    "run_output_dir": "results/comparison/phase10_26b/modern_apbsalt1d_equiv",
+    "summary_csv": "results/comparison/phase10_26b/phase10_26b_summary.csv",
+    "metadata_json": "results/comparison/phase10_26b/phase10_26b_metadata.json",
+    "configuration": {
+      "mode": "apbsalt1d_legacy_equivalent",
+      "outer_radius_m": 8.0,
+      "radial_elements": 15,
+      "ratio": 10.0,
+      "integration_order": 3,
+      "sampling": "legacy_elem0_sig_2_0",
+      "consumption_status": "APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED"
+    },
+    "metrics": {
+      "legacy_opening_time_s": 510.0,
+      "modern_opening_time_s": 660.0,
+      "opening_time_error_s": 150.0,
+      "legacy_sink_delay_s": 30.0,
+      "modern_sink_delay_s": 30.0,
+      "relative_error_max_pressure": -0.02468924338685035
+    },
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "APBSalt1D geometry is parsed and validated as metadata.",
+      "The geometry is not consumed by a runtime SaltWallStressDiagnostics provider in Phase 10.26B.",
+      "Do not reopen pressure_source/timing correction until the geometry is consumed or explicitly rejected.",
+      "No default runtime behavior changed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

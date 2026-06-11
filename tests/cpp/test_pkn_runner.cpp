@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 #include <string>
 
 #include <catch2/catch_approx.hpp>
@@ -29,6 +30,10 @@ constexpr const char* kBuz67dNextStepSinkCasePath =
     "cases/validation/buz67d_pkn_legacy_compliance_next_step_sink.yaml";
 constexpr const char* kBuz67dSigmaThetaTimeSeriesCasePath =
     "cases/validation/buz67d_pkn_legacy_sigma_theta_timeseries.yaml";
+constexpr const char* kBuz67dSigmaThetaRefinedCasePath =
+    "cases/validation/buz67d_pkn_legacy_sigma_theta_refined_timeseries.yaml";
+constexpr const char* kBuz67dApbSalt1dEquivCasePath =
+    "cases/validation/buz67d_pkn_legacy_apbsalt1d_equiv_sigma_theta.yaml";
 
 void check_finite_series(const lss::lot::PknResult& result) {
   REQUIRE_FALSE(result.time_series_s.empty());
@@ -142,6 +147,26 @@ std::size_t single_started_step_index(const lss::lot::PknResult& result) {
   }
   REQUIRE(found < result.time_series_s.size());
   return found;
+}
+
+std::filesystem::path write_modified_apbsalt1d_equiv_case(
+    const std::string& needle, const std::string& replacement,
+    const std::string& suffix) {
+  std::ifstream in(kBuz67dApbSalt1dEquivCasePath);
+  REQUIRE(in.good());
+  std::ostringstream buffer;
+  buffer << in.rdbuf();
+  std::string text = buffer.str();
+  const auto pos = text.find(needle);
+  REQUIRE(pos != std::string::npos);
+  text.replace(pos, needle.size(), replacement);
+
+  const auto path = std::filesystem::temp_directory_path() /
+                    ("lss_apbsalt1d_equiv_invalid_" + suffix + ".yaml");
+  std::ofstream out(path);
+  REQUIRE(out.good());
+  out << text;
+  return path;
 }
 
 }  // namespace
@@ -344,6 +369,61 @@ TEST_CASE("PknRunner enables opt-in sigma theta time-series criterion") {
   CHECK(run.result.fracture_initiation_margin_Pa > 0.0);
   CHECK(run.result.sigma_theta_lookup_time_s ==
         Catch::Approx(run.result.fracture_initiation_time_s));
+}
+
+TEST_CASE("APBSalt1D legacy-equivalence geometry is parsed") {
+  const auto data = lss::io::parse_yaml(kBuz67dApbSalt1dEquivCasePath);
+  const auto& criterion = data.lot.sigma_theta_fracture;
+  const auto& geometry = criterion.runtime_geometry;
+
+  CHECK(data.name == "buz67d_pkn_legacy_apbsalt1d_equiv_sigma_theta");
+  CHECK(criterion.enabled);
+  CHECK(criterion.type == "sigma_theta_time_series");
+  CHECK(criterion.mapping_status == "APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED");
+  CHECK(geometry.enabled);
+  CHECK(geometry.mode == "apbsalt1d_legacy_equivalent");
+  CHECK(geometry.outer_radius_m == Catch::Approx(8.0));
+  CHECK(geometry.radial_elements == 15);
+  CHECK(geometry.ratio == Catch::Approx(10.0));
+  CHECK(geometry.integration_order == 3);
+  CHECK(geometry.sampling_mode == "legacy_elem0_sig_2_0");
+  CHECK(geometry.sampling_source.find("sig(2,0)") != std::string::npos);
+  CHECK(geometry.consumption_status == "APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED");
+}
+
+TEST_CASE("APBSalt1D legacy-equivalence geometry preserves defaults when absent") {
+  const auto data = lss::io::parse_yaml(kBuz67dSigmaThetaRefinedCasePath);
+
+  CHECK(data.lot.sigma_theta_fracture.enabled);
+  CHECK_FALSE(data.lot.sigma_theta_fracture.runtime_geometry.enabled);
+}
+
+TEST_CASE("APBSalt1D legacy-equivalence rejects invalid radius") {
+  const auto path = write_modified_apbsalt1d_equiv_case(
+      "        outer_radius:\n          value: 8.0\n          unit: m",
+      "        outer_radius:\n          value: -8.0\n          unit: m",
+      "radius");
+
+  CHECK_THROWS_AS(lss::io::parse_yaml(path), std::runtime_error);
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("APBSalt1D legacy-equivalence rejects invalid radial elements") {
+  const auto path = write_modified_apbsalt1d_equiv_case(
+      "        radial_elements: 15", "        radial_elements: 0",
+      "radial_elements");
+
+  CHECK_THROWS_AS(lss::io::parse_yaml(path), std::runtime_error);
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("APBSalt1D sampling mode legacy_elem0_sig_2_0 is required") {
+  const auto path = write_modified_apbsalt1d_equiv_case(
+      "          mode: legacy_elem0_sig_2_0", "          mode: minimum_radius",
+      "sampling");
+
+  CHECK_THROWS_AS(lss::io::parse_yaml(path), std::runtime_error);
+  std::filesystem::remove(path);
 }
 
 TEST_CASE("CaseParser rejects unsupported fracture sink timing") {
