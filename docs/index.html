@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">90/97</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">91/98</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">263</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">194</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">200</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -7633,6 +7633,22 @@ SIGMATHETA_RUNTIME_STILL_FUTURE_WORK
 <p>O documento principal da decisão é:</p>
 <pre><code class="language-text">docs/30_legacy_equivalence_vs_modern_refined.md
 </code></pre>
+<h2 id="pacote-buz-67d-modern-refined-fase-1027b">Pacote BUZ-67D modern-refined (Fase 10.27B)</h2>
+<p>A Fase 10.27B documenta o BUZ-67D como caso diagnóstico do
+<code>modern-refined mode</code>:</p>
+<pre><code class="language-text">docs/31_buz67d_modern_refined_validation.md
+</code></pre>
+<p>Status registrados:</p>
+<pre><code class="language-text">BUZ67D_MODERN_REFINED_VALIDATION_DOCUMENTED
+MODERN_REFINED_NOT_LEGACY_EQUIVALENT
+PRESSURE_SOURCE_TIMING_REVIEW_BLOCKED_BY_GEOMETRY
+APBSALT1D_SAMPLING_BRIDGE_BLOCKED
+</code></pre>
+<p>O pacote preserva a conclusão de que a escala de pressão e o <code>sink_delay_s</code>
+estão bons para diagnóstico, enquanto a abertura em <code>660 s</code> permanece uma
+diferença documentada, não erro automático. Exigir abertura em <code>510 s</code> continua
+restrito ao <code>legacy-equivalence mode</code> com geometria/sampling APBSalt1D
+realmente consumidos.</p>
 </div>
 </section>
 

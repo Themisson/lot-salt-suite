@@ -3362,3 +3362,27 @@ O documento principal da decisão é:
 ```text
 docs/30_legacy_equivalence_vs_modern_refined.md
 ```
+
+## Pacote BUZ-67D modern-refined (Fase 10.27B)
+
+A Fase 10.27B documenta o BUZ-67D como caso diagnóstico do
+`modern-refined mode`:
+
+```text
+docs/31_buz67d_modern_refined_validation.md
+```
+
+Status registrados:
+
+```text
+BUZ67D_MODERN_REFINED_VALIDATION_DOCUMENTED
+MODERN_REFINED_NOT_LEGACY_EQUIVALENT
+PRESSURE_SOURCE_TIMING_REVIEW_BLOCKED_BY_GEOMETRY
+APBSALT1D_SAMPLING_BRIDGE_BLOCKED
+```
+
+O pacote preserva a conclusão de que a escala de pressão e o `sink_delay_s`
+estão bons para diagnóstico, enquanto a abertura em `660 s` permanece uma
+diferença documentada, não erro automático. Exigir abertura em `510 s` continua
+restrito ao `legacy-equivalence mode` com geometria/sampling APBSalt1D
+realmente consumidos.

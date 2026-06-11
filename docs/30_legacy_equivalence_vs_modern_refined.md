@@ -244,3 +244,20 @@ NEXT_PHASE_IMPLEMENT_SALT_WALL_STRESS_RUNTIME
 Em todos os casos, `NEXT_PHASE_RETURN_TO_PRESSURE_SOURCE_TIMING` só deve ser
 usado depois de equivalência geométrica real ou de uma decisão explícita de
 abandonar a equivalência APBSalt1D.
+
+## Pacote BUZ-67D modern-refined (Fase 10.27B)
+
+A Fase 10.27B aplica esta matriz ao BUZ-67D e registra o pacote documental:
+
+```text
+docs/31_buz67d_modern_refined_validation.md
+```
+
+O pacote confirma:
+
+- `modern-refined mode` não é regressão estrita;
+- a pressão máxima moderna fica cerca de `-2.47%` do legado;
+- o erro relativo da pressão na abertura é cerca de `0.8415%`;
+- `sink_delay_s = 30 s` é preservado;
+- abertura moderna em `660 s` é diferença documentada, não erro automático;
+- exigir `510 s` permanece condicionado ao `legacy-equivalence mode`.

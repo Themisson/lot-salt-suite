@@ -400,3 +400,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   pode ser uma divergencia aceitavel de malha/dominio/amostragem, nao erro
   automatico. O gate novo e
   `LEGACY_EQUIVALENCE_VS_MODERN_REFINED_DECISION_RECORDED`.
+- A Fase 10.27B consolidou o BUZ-67D como pacote `modern-refined`: pressao e
+  sink delay sustentam o diagnostico, enquanto abertura em `660 s` permanece
+  diferenca documentada e nao regressao estrita. A proxima evolucao deve
+  validar/sensibilizar o modo moderno em mais casos ou preparar graficos de
+  publicacao antes de qualquer tentativa de solver APBSalt1D equivalente.

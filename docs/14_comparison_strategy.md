@@ -2732,3 +2732,35 @@ Gate novo:
 ```text
 LEGACY_EQUIVALENCE_VS_MODERN_REFINED_DECISION_RECORDED
 ```
+
+## Fase 10.27B — pacote BUZ-67D modern-refined
+
+A Fase 10.27B cria o relatório:
+
+```text
+docs/31_buz67d_modern_refined_validation.md
+```
+
+Ele consolida o BUZ-67D como pacote diagnóstico do `modern-refined mode`.
+Comparáveis nesta rota:
+
+- escala de pressão;
+- pressão na abertura em escala diagnóstica;
+- `sink_delay_s = 30 s`;
+- preservação dos parâmetros físicos auditados.
+
+Não comparáveis como regressão estrita:
+
+- abertura em `510 s`;
+- `legacy_elem0_sig_2_0`;
+- equivalência APBSalt1D;
+- validação física de fratura.
+
+Status:
+
+```text
+BUZ67D_MODERN_REFINED_VALIDATION_DOCUMENTED
+MODERN_REFINED_NOT_LEGACY_EQUIVALENT
+PRESSURE_SOURCE_TIMING_REVIEW_BLOCKED_BY_GEOMETRY
+APBSALT1D_SAMPLING_BRIDGE_BLOCKED
+```

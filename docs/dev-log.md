@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.27A matriz legacy-equivalence vs modern-refined; commit/push em andamento
+Fase ativa  : 10.27B pacote BUZ67D modern-refined; commit/push em andamento
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 258/258 passaram apos Fase 10.24C em 2026-06-11
-Testes Py   : 194/194 previstos apos Fase 10.27A em 2026-06-11
+Testes Py   : 200/200 previstos apos Fase 10.27B em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -57,9 +57,41 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
-### [2026-06-11] Fase 10.27A — matriz legacy-equivalence vs modern-refined — Codex
+### [2026-06-11] Fase 10.27B — pacote BUZ-67D modern-refined — Codex
 
 **Status:** Implementado localmente; testes/commit/push pendentes.
+
+**Documento criado:**
+
+```text
+docs/31_buz67d_modern_refined_validation.md
+```
+
+**Ferramenta criada:**
+
+```text
+tools/summarize_phase10_27b_modern_refined.py
+```
+
+**Status:**
+
+```text
+BUZ67D_MODERN_REFINED_VALIDATION_DOCUMENTED
+MODERN_REFINED_NOT_LEGACY_EQUIVALENT
+PRESSURE_SOURCE_TIMING_REVIEW_BLOCKED_BY_GEOMETRY
+APBSALT1D_SAMPLING_BRIDGE_BLOCKED
+```
+
+**Interpretação:** BUZ-67D fica consolidado como pacote diagnóstico
+`modern-refined`. A escala de pressão e o `sink_delay_s = 30 s` sustentam a rota
+diagnóstica, mas abertura em `660 s` permanece diferença documentada, não erro
+automático nem regressão estrita contra o `LOT_Tese`.
+
+---
+
+### [2026-06-11] Fase 10.27A — matriz legacy-equivalence vs modern-refined — Codex
+
+**Status:** Publicado em `bbf1e7d`.
 
 **Ferramenta criada:**
 
