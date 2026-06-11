@@ -1501,6 +1501,30 @@
       "No C++ runtime behavior is changed."
     ]
   },
+  "phase10_31b_phase10_closure": {
+    "status": "PHASE10_CLOSED_READY_FOR_STAGE11",
+    "stage11_recommendation": "STAGE11_PARAMETRIC_INFRASTRUCTURE_RECOMMENDED",
+    "phase": "10.31B",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": true,
+    "tool": "tools/summarize_phase10_closure.py",
+    "document": "docs/43_phase10_closure_and_stage11_handoff.md",
+    "primary_artifact": "BUZ67D_MODERN_REFINED_REPRODUCIBLE_PACKAGE",
+    "blocked_items": [
+      "APBSALT1D_SAMPLING_BRIDGE_BLOCKED",
+      "SIGMATHETA_RUNTIME_STILL_FUTURE_WORK",
+      "PRESSURE_TABULATED_GEOMETRIC_BLOCKED",
+      "LEGACY_EQUIVALENCE_REQUIRES_APBSALT1D_GEOMETRY"
+    ],
+    "caveats": [
+      "Phase 10 closes as a modern-refined reproducible package, not strict LOT_Tese equivalence.",
+      "C_geom 0.75x remains diagnostic sensitivity, not automatic calibration.",
+      "Stage 11 should focus on parametric infrastructure and study discoverability."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

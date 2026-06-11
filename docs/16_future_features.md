@@ -461,3 +461,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `docs/42_buz67d_modern_refined_reproducible_package.md`, consolidando o fluxo
   end-to-end BUZ-67D `modern-refined` para outro computador/agente. O pacote
   continua diagnostico e grava artefatos apenas em `results/`.
+- A Fase 10.31B fecha formalmente a Etapa 10 com
+  `PHASE10_CLOSED_READY_FOR_STAGE11` e recomenda a Etapa 11 como
+  `STAGE11_PARAMETRIC_INFRASTRUCTURE`. O foco futuro deve ser infraestrutura
+  paramétrica, índices de estudos e relatórios multi-estudo, sem promover
+  sensibilidade diagnóstica a calibração física.

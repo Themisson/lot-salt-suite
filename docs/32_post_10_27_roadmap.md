@@ -302,3 +302,25 @@ BUZ67D_MODERN_REFINED_PACKAGE_RUNNER_ADDED
 
 O pacote é operacional e reproduzível, mas continua diagnóstico. Ele não altera
 solver, não cria calibração automática e mantém `results/` fora do versionamento.
+
+## Fase 10.31B registrada
+
+A Fase 10.31B fecha formalmente a Etapa 10 e registra o handoff para a Etapa
+11:
+
+```text
+docs/43_phase10_closure_and_stage11_handoff.md
+tools/summarize_phase10_closure.py
+```
+
+Status:
+
+```text
+PHASE10_CLOSED_READY_FOR_STAGE11
+STAGE11_PARAMETRIC_INFRASTRUCTURE_RECOMMENDED
+```
+
+A Etapa 10 fica encerrada como pacote BUZ-67D `modern-refined` reproduzível,
+com matriz versionada, runner, reporter e documentação operacional. O fechamento
+reafirma que não há equivalência estrita com `LOT_Tese`, sigmaTheta runtime real
+ou calibração física automática de `C_geom`.

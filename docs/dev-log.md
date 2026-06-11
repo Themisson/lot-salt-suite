@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.31A BUZ-67D modern-refined reproducible package
+Fase ativa  : 10.31B Phase 10 closure and Stage 11 handoff
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 267/267 previstos apos Fase 10.31A em 2026-06-11
+Testes Py   : 271/271 previstos apos Fase 10.31B em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,37 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.31B — fechamento da Etapa 10 e handoff para Etapa 11 — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Documento criado:**
+
+```text
+docs/43_phase10_closure_and_stage11_handoff.md
+```
+
+**Ferramenta criada:**
+
+```text
+tools/summarize_phase10_closure.py
+```
+
+**Resultado:**
+
+```text
+PHASE10_CLOSED_READY_FOR_STAGE11
+STAGE11_PARAMETRIC_INFRASTRUCTURE_RECOMMENDED
+```
+
+Etapa 10 fica formalmente encerrada como pacote BUZ-67D `modern-refined`
+reproduzível, com matriz versionada, runner, reporter e documentação
+operacional. O fechamento reafirma que não há equivalência estrita com
+`LOT_Tese`, sigmaTheta runtime real ou calibração física automática de
+`C_geom`.
 
 ---
 

@@ -122,3 +122,18 @@ The sensitivity is diagnostic. The `0.75x` factor is not automatic calibration, 
 5. Inspect `sensitivity_report.md`.
 6. Keep all `results/` artifacts local.
 7. Do not interpret best factors as calibration without a later validation phase.
+
+## Phase 10.31B handoff
+
+Phase 10.31B records this package as the primary reproducible artifact of Phase
+10 and opens Stage 11 with a parametric-infrastructure focus.
+
+Status:
+
+```text
+PHASE10_CLOSED_READY_FOR_STAGE11
+STAGE11_PARAMETRIC_INFRASTRUCTURE_RECOMMENDED
+```
+
+The package remains diagnostic. `C_geom = 0.75x` is not automatic calibration,
+and generated `results/` artifacts remain local and unversioned.
