@@ -2427,3 +2427,82 @@ A próxima fase deve auditar o uso de `wellbore_pressure_before_step_Pa`,
 moderno, além do instante em que o provider é amostrado em relação ao avanço
 volumétrico. Ainda não há justificativa para conectar
 `SaltWallStressDiagnostics` como provider runtime.
+
+## Fase 10.26A — auditoria de `pressure_source` e timing
+
+A Fase 10.26A criou:
+
+```text
+tools/analyze_phase10_26a_pressure_source_timing.py
+```
+
+para comparar o trace legado unificado:
+
+```text
+results/comparison/phase10_22c/legacy_unified_balance_opening_trace.csv
+```
+
+contra o `timeseries.csv` moderno do caso refinado da 10.25B:
+
+```text
+results/comparison/phase10_25b/modern_sigma_theta_refined_timeseries/timeseries.csv
+```
+
+Campos modernos disponíveis no CSV:
+
+- `time_s`;
+- `wellbore_pressure_Pa`;
+- `fracture_initiation_sigma_theta_Pa`;
+- `fracture_initiation_margin_Pa`;
+- `fracture_initiated`;
+- `fracture_started_this_step`;
+- `sink_active_this_step`;
+- `sink_deferred_this_step`.
+
+Campos modernos ausentes para fechar a auditoria sem ambiguidade:
+
+- `wellbore_pressure_before_Pa`;
+- `wellbore_pressure_trial_Pa`;
+- `wellbore_pressure_after_Pa`;
+- `delta_pressure_Pa`;
+- `sigma_theta_compression_positive_Pa` por passo;
+- `sigma_theta_margin_Pa` por passo;
+- `fracture_initiation_time_s` por linha.
+
+Resultado da análise:
+
+```text
+cause = MISSING_PRESSURE_TRACE_FIELDS
+gate = MODERN_TRACE_EXPORT_REQUIRED
+
+legacy_first_opened_time_s = 510.0
+legacy_first_pw_Pa = 66769500.0
+legacy_first_sigmaTheta_Pa = 66666600.0
+legacy_first_margin_Pa = 102865.0
+legacy_first_sink_positive_time_s = 540.0
+
+best_candidate.pressure_source = wellbore_pressure_after_Pa
+best_candidate.pressure_status = derived_current_wellbore_pressure_Pa
+best_candidate.sigmaTheta_timing = sigmaTheta(time_i + dt)
+best_candidate.record_timing = record_opening_at_step_start
+best_candidate.predicted_opening_time_s = 600.0
+best_candidate.opening_time_error_s = 90.0
+best_candidate.classification = OPENING_TOO_LATE
+```
+
+Interpretação: nenhuma combinação derivada a partir dos campos atualmente
+exportados reproduz a abertura legada em `510 s`. O melhor candidato ainda abre
+em `600 s`, e os candidatos com `wellbore_pressure_trial_Pa` ficam
+`INSUFFICIENT_FIELDS` porque o CSV moderno não exporta o valor real. Assim, a
+próxima fase deve primeiro exportar um trace moderno opt-in contendo as pressões
+`before`, `trial` e `after`, a sigma-theta consultada por passo e o tempo de
+lookup do provider antes de alterar o comportamento do critério.
+
+Caveats:
+
+- a análise é diagnóstica, não validação física;
+- candidatos derivados de `wellbore_pressure_Pa` não devem ser tratados como
+  semântica runtime;
+- nenhuma mudança em `pkn_direct`, compliance, Zamora, `SaltWallStressDiagnostics`
+  ou defaults foi feita;
+- `results/` permanece fora do versionamento.

@@ -937,6 +937,50 @@
       "No default runtime behavior changed."
     ]
   },
+  "phase10_26a_sigma_theta_pressure_source_timing_audit": {
+    "status": "MODERN_TRACE_EXPORT_REQUIRED",
+    "cause": "MISSING_PRESSURE_TRACE_FIELDS",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "tool": "tools/analyze_phase10_26a_pressure_source_timing.py",
+    "legacy_trace": "results/comparison/phase10_22c/legacy_unified_balance_opening_trace.csv",
+    "modern_csv": "results/comparison/phase10_25b/modern_sigma_theta_refined_timeseries/timeseries.csv",
+    "summary_json": "results/comparison/phase10_26a/pressure_source_timing_summary.json",
+    "analysis_csv": "results/comparison/phase10_26a/pressure_source_timing_analysis.csv",
+    "legacy_metrics": {
+      "first_opened_time_s": 510.0,
+      "first_pw_Pa": 66769500.0,
+      "first_sigmaTheta_Pa": 66666600.0,
+      "first_margin_Pa": 102865.0,
+      "first_sink_positive_time_s": 540.0
+    },
+    "best_candidate": {
+      "pressure_source": "wellbore_pressure_after_Pa",
+      "pressure_status": "derived_current_wellbore_pressure_Pa",
+      "sigmaTheta_timing": "sigmaTheta(time_i + dt)",
+      "record_timing": "record_opening_at_step_start",
+      "predicted_opening_time_s": 600.0,
+      "opening_time_error_s": 90.0,
+      "classification": "OPENING_TOO_LATE"
+    },
+    "missing_modern_fields": [
+      "wellbore_pressure_before_Pa",
+      "wellbore_pressure_trial_Pa",
+      "wellbore_pressure_after_Pa",
+      "delta_pressure_Pa",
+      "sigma_theta_compression_positive_Pa",
+      "sigma_theta_margin_Pa",
+      "fracture_initiation_time_s"
+    ],
+    "caveats": [
+      "Diagnostic only; not physical validation.",
+      "Derived pressure candidates use current/previous wellbore_pressure_Pa and are not runtime semantics.",
+      "No default runtime behavior changed.",
+      "Next phase should export modern pressure and sigma-theta trace fields before changing criterion timing."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

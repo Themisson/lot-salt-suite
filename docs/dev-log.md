@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.25C decisao da fonte sigmaTheta; commit/push em andamento
+Fase ativa  : 10.26A auditoria pressure_source/timing sigmaTheta; commit/push em andamento
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 258/258 passaram apos Fase 10.24C em 2026-06-11
-Testes Py   : 161/161 passaram apos Fase 10.25C em 2026-06-11
+Testes Py   : 167/167 passaram apos Fase 10.26A em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,53 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.26A — auditoria `pressure_source`/timing do critério `sigmaTheta` — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Ferramenta criada:**
+
+```text
+tools/analyze_phase10_26a_pressure_source_timing.py
+```
+
+**Inputs auditados:**
+
+```text
+results/comparison/phase10_22c/legacy_unified_balance_opening_trace.csv
+results/comparison/phase10_25b/modern_sigma_theta_refined_timeseries/timeseries.csv
+```
+
+**Classificação:**
+
+```text
+cause = MISSING_PRESSURE_TRACE_FIELDS
+gate = MODERN_TRACE_EXPORT_REQUIRED
+```
+
+**Melhor candidato derivado:**
+
+```text
+pressure_source = wellbore_pressure_after_Pa
+pressure_status = derived_current_wellbore_pressure_Pa
+sigmaTheta_timing = sigmaTheta(time_i + dt)
+record_timing = record_opening_at_step_start
+predicted_opening_time_s = 600.0
+opening_time_error_s = 90.0
+classification = OPENING_TOO_LATE
+```
+
+**Campos ausentes no CSV moderno:** `wellbore_pressure_before_Pa`,
+`wellbore_pressure_trial_Pa`, `wellbore_pressure_after_Pa`,
+`delta_pressure_Pa`, `sigma_theta_compression_positive_Pa` por passo,
+`sigma_theta_margin_Pa` por passo e `fracture_initiation_time_s` por linha.
+
+**Conclusão:** nenhuma combinação derivada dos campos atuais reproduz a abertura
+legada em `510 s`. A próxima fase deve criar exportação/trace moderno opt-in dos
+campos de pressão e sigma-theta por passo antes de alterar o critério.
 
 ---
 

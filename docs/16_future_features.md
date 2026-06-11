@@ -357,3 +357,10 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   amostragem e uso de `wellbore_pressure_before_step_Pa`,
   `wellbore_pressure_trial_Pa` e `wellbore_pressure_after_step_Pa` no criterio
   moderno antes de conectar fonte runtime real de tensao de sal.
+- A Fase 10.26A auditou os campos exportados e concluiu
+  `MISSING_PRESSURE_TRACE_FIELDS` com gate `MODERN_TRACE_EXPORT_REQUIRED`. O
+  melhor candidato derivado dos campos atuais ainda abre em `600 s`
+  (`+90 s`), e `wellbore_pressure_trial_Pa` real nao esta no `timeseries.csv`.
+  A proxima fase deve criar um trace moderno opt-in, sem mudar defaults, para
+  exportar `before/trial/after`, sigma-theta por passo, margem por passo e tempo
+  de lookup antes de qualquer correcao de timing.

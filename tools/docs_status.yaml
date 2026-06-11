@@ -98,6 +98,7 @@ phases:
   phase_10_25a_refined_legacy_sigma_theta_extraction: completed
   phase_10_25b_refined_sigma_theta_timeseries_diagnostic: completed
   phase_10_25c_refined_sigma_theta_source_decision: completed
+  phase_10_26a_sigma_theta_pressure_source_timing_audit: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -192,12 +193,12 @@ validation:
 test_counts:
   cpp_tests: 258        # Catch2 lot-salt-suite — 258/258 passaram na Fase 10.24B (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 161     # pytest lot-salt-suite — 161/161 passaram na Fase 10.25C (2026-06-11)
+  python_tests: 167     # pytest lot-salt-suite — 167/167 passaram na Fase 10.26A (2026-06-11)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-11"
-updated_by: "codex (Fase 10.25C refined sigma theta source decision)"
+updated_by: "codex (Fase 10.26A sigma theta pressure source timing audit)"
 project_version: "0.1.0"
