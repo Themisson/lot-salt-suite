@@ -121,6 +121,20 @@ runtime_integration = false
 physical_validation = false
 ```
 
+## Fase 11.8B — gate de integração
+
+A Fase 11.8B seleciona o caminho seguro de integração:
+
+```text
+status = PENNY_ADAPTER_OPT_IN_SELECTED
+selected_integration_path = diagnostic_adapter
+recommended_next_phase = PHASE11_8C_PENNY_ADAPTER_SPEC
+```
+
+Rotas de CLI/schema/runtime oficial permanecem bloqueadas ou adiadas. A próxima
+fase deve especificar um adapter diagnóstico opt-in antes de qualquer código de
+integração adicional.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

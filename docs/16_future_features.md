@@ -548,3 +548,6 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   testes Catch2 para as fórmulas auditadas. O código não é conectado ao CLI,
   parser, `PknRunner`, `PknModel` ou BUZ29; permanece base diagnóstica para
   decisão futura de integração.
+- A Fase 11.8B seleciona `PENNY_ADAPTER_OPT_IN_SELECTED` como caminho seguro de
+  integração. O próximo passo é especificar um adapter diagnóstico opt-in, sem
+  promover `penny_shaped` a rota oficial do `lot-sim`.

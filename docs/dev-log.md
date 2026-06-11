@@ -57,6 +57,36 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.8B — gate de integração penny-shaped — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_phase11_8b_penny_integration.py
+```
+
+**Documento criado:**
+
+```text
+docs/64_penny_integration_gate.md
+```
+
+**Decisão:**
+
+```text
+PENNY_ADAPTER_OPT_IN_SELECTED
+selected_integration_path = diagnostic_adapter
+recommended_next_phase = PHASE11_8C_PENNY_ADAPTER_SPEC
+```
+
+**Interpretação:** a fase seleciona apenas o caminho de adapter diagnóstico
+opt-in. Não valida BUZ29, não declara equivalência com o legado e não cria rota
+oficial do `lot-sim`.
+
+---
+
 ### [2026-06-11] Fase 11.8A — núcleo mínimo penny-shaped — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

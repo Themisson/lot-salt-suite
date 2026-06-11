@@ -78,3 +78,15 @@ PHASE11_8B_NON_PKN_MODEL_ADAPTER_OR_CASE_GATE
 Antes de qualquer integracao runtime, a proxima fase deve decidir se o nucleo
 sera usado por um adapter diagnostico, por um caso YAML oficial futuro ou apenas
 mantido como biblioteca de formula isolada.
+
+## Resultado da Fase 11.8B
+
+A decisão de integração selecionou:
+
+```text
+PENNY_ADAPTER_OPT_IN_SELECTED
+selected_integration_path = diagnostic_adapter
+```
+
+Isso mantém o núcleo fora do `lot-pkn` e direciona a próxima fase para uma
+especificação de adapter diagnóstico.
