@@ -429,3 +429,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   abriu na janela e `same_step` removeu o atraso de sink. Esse achado deve
   orientar novas sensibilidades ou auditoria de compliance, mas nao autoriza
   calibracao automatica nem mistura com `legacy-equivalence`.
+- A Fase 10.29A refinou essa sensibilidade em `0.60x..1.00x`. O melhor fator
+  por abertura e score combinado foi `0.75x`; o melhor fator por pressao maxima
+  isolada foi `0.60x`. A conclusao tecnica e que a abertura modern-refined e
+  fortemente controlada por `constant_geometric`, ainda como diagnostico.

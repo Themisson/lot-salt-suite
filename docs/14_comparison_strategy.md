@@ -2818,3 +2818,16 @@ O cenário `0.75x C_geom` aproxima o tempo de abertura de `510 s`, mas a
 estratégia de comparação continua a tratar esse resultado como sensibilidade
 diagnóstica. A matriz não reabre `legacy-equivalence`, não consome APBSalt1D e
 não estabelece validação física de fratura.
+
+## Fase 10.29A — sensibilidade refinada de compliance
+
+A Fase 10.29A amplia a matriz de `C_geom` para `0.60x..1.00x` e classifica:
+
+```text
+REFINED_SENSITIVITY_COMPLETED
+REFINED_SENSITIVITY_BEST_DIAGNOSTIC_FACTOR_FOUND
+REFINED_SENSITIVITY_OPENING_DOMINATED_BY_COMPLIANCE
+```
+
+O melhor fator por abertura/score combinado é `0.75x`, mas isso continua fora
+do contrato de validação física. A comparação segue sendo modern-refined.

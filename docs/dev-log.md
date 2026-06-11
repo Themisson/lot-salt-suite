@@ -57,6 +57,36 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 10.29A — sensibilidade refinada BUZ-67D — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Documento criado:**
+
+```text
+docs/36_phase10_29a_buz67d_refined_sensitivity.md
+```
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase10_29a_refined_sensitivity.py
+```
+
+**Resultado:**
+
+```text
+REFINED_SENSITIVITY_COMPLETED
+REFINED_SENSITIVITY_BEST_DIAGNOSTIC_FACTOR_FOUND
+REFINED_SENSITIVITY_OPENING_DOMINATED_BY_COMPLIANCE
+```
+
+Melhor fator por abertura e score combinado: `0.75x`. Melhor fator por pressão
+máxima isolada: `0.60x`. O resultado permanece sensibilidade diagnóstica, não
+calibração automática.
+
+---
+
 ### [2026-06-11] Fase 10.28C — matriz de sensibilidade modern-refined — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

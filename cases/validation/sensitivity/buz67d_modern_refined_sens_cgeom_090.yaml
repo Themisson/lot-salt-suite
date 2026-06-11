@@ -1,0 +1,726 @@
+# Phase 10.29A refined sensitivity case.
+# Derived from BUZ-67D modern-refined baseline.
+# Diagnostic sensitivity only; not automatic calibration and not legacy-equivalence mode.
+# C_geom factor = 0.90x; sink_timing = next_step.
+# Base: cases/validation/buz67d_pkn_legacy_sigma_theta_refined_timeseries.yaml.
+
+metadata:
+  name: buz67d_modern_refined_sens_cgeom_090
+  version: "0.1"
+  mode: lot-pkn
+  legacy_source: legance/LOT_Tese/main/8-BUZ-67D-RJS-VISCO-pkn.cpp
+  alignment_source: tests/fixtures/comparison/buz67d_legacy_parameters.json
+
+simulation:
+  mode: lot-pkn
+
+units:
+  length: m
+  pressure: Pa
+  temperature: degC
+  density: ppg
+  viscosity: cP
+
+wellbore:
+  airgap_m: 0.0
+  water_depth_m: 0.0
+  # EXTRACTED from legacy: profTeste = 4374.0 m.
+  total_depth_m: 4374.0
+  # EXTRACTED from legacy: LOT test depth uses profTeste = 4374.0 m.
+  shoe_depth_m: 4374.0
+  drill_pipe:
+    # EXTRACTED from legacy Solids[0]: di = 4.67 in, de = 5.5 in.
+    # Solids::getRi_m/getRe_m convert diameters in inches to radii in meters.
+    inner_diameter:
+      value: 4.67
+      unit: in
+    outer_diameter:
+      value: 5.5
+      unit: in
+    # EXTRACTED from legacy Solids[0]: bottom = profTeste.
+    depth:
+      value: 4374.0
+      unit: m
+
+casings:
+  - id: production_casing
+    top_m: 1922.0
+    # EXTRACTED from legacy solid[1]: bottom = 4356.0 m.
+    base_m: 4356.0
+    # EXTRACTED from legacy solid[1]: di = 12.376 in, de = 14.0 in.
+    di_in: 12.376
+    de_in: 14.0
+    E_Pa: 210000000000.0
+    nu: 0.30
+
+cements:
+  - id: production_cement
+    # EXTRACTED from legacy cement phase 3 solid[6].
+    top_m: 3879.14
+    base_m: 4356.0
+    di_in: 14.0
+    de_in: 16.0
+    E_Pa: 10350000000.0
+    nu: 0.21
+
+annulars:
+  - id: annulus_a
+    fluid: lot_fluid
+    top_m: 0.0
+    # EXTRACTED from legacy fluid[0] bottom = profTeste.
+    base_m: 4374.0
+
+fluids:
+  - id: lot_fluid
+    mode: constant
+    # EXTRACTED from legacy: vfluids[0]->setPFluid(11.5, 8E-4, 6.40E-10).
+    density_ppg: 11.5
+    # EXTRACTED from legacy: vfluids[0]->setLeakoffProps("pa_min", 3., "pkn").
+    viscosity_cP: 3.0
+    compressibility_per_Pa: 0.00000000064
+
+temperature:
+  mode: profile
+  data:
+    # EXTRACTED from legacy temperature profile A0/Af at depth 0.0.
+    - depth_m: 0.0
+      temp_C: 26.66
+    # EXTRACTED from legacy active halite T0 = 86 C and migrated surface-to-shoe contract.
+    - depth_m: 4374.0
+      temp_C: 86.0
+
+layers:
+  - id: legacy_aligned_halite_interval
+    # EXTRACTED from active legacy HALITA entries: 4356..4360 and 4358..profTeste.
+    top_m: 4356.0
+    base_m: 4374.0
+    rock: legacy_aligned_halite
+
+rocks:
+  - id: legacy_aligned_halite
+    model: double_mechanism
+    # EXTRACTED from legacy active HALITA Rock entries.
+    E_Pa: 20400000000.0
+    nu: 0.36
+    density_kg_m3: 2200.0
+    # EXTRACTED from legacy: e0_per_min = 5.22e-10 * 60.
+    # Modern CaseData stores e0_per_h; value is kept aligned with the existing
+    # migrated contract until parser semantics are revisited.
+    e0_per_h: 0.000000522
+    sig0_Pa: 9920000.0
+    T0_degC: 86.0
+    n1: 3.36
+    n2: 7.55
+
+lot:
+  enabled: true
+  # EXTRACTED from legacy: profTeste = 4374.0 m.
+  shoe_depth_m: 4374.0
+  model: pkn
+  initial_pressure:
+    # EXTRACTED from legacy audit Phase 10.18B:
+    # APB1da uses pw = line_up[lu].pi(idAnnular) + dP(idAnnular).
+    # At t = 0 in buz67d_audit_timeseries.csv, dP = 0 and pw_Pa = pi.
+    value: 26732215.17314985
+    unit: Pa
+  injection:
+    rate:
+      # EXTRACTED from legacy: APB1da(..., idQ=6, Q=0.5), comment "0.5 bpm".
+      value: 0.5
+      unit: bbl_min
+    schedule:
+      total_time:
+        # EXTRACTED from legacy Phase 10.18B:
+        # tend = 12.5 min and t_no_injection = 9.5 min; full cycle = 22 min.
+        value: 22.0
+        unit: min
+      dt:
+        # EXTRACTED from legacy: dt = 0.5 min = 30 s.
+        value: 0.5
+        unit: min
+      accommodation_time:
+        # Phase 10.18B: t_no_injection is modeled as shut-in after injection,
+        # not as pre-injection accommodation.
+        value: 0.0
+        unit: min
+      phases:
+        - name: injection
+          # EXTRACTED from legacy: tend = 12.5 min with Q = 0.5 bpm.
+          duration:
+            value: 12.5
+            unit: min
+          rate:
+            value: 0.5
+            unit: bbl_min
+        - name: shutin
+          # EXTRACTED from legacy: t_no_injection = 9.5 min and Vq remains
+          # fixed at flowRate(tend), equivalent to Q = 0 for new injection.
+          duration:
+            value: 9.5
+            unit: min
+          rate:
+            value: 0.0
+            unit: bbl_min
+  fracture:
+    geometry: pkn
+    # EXTRACTED from legacy leakoff props viscosity.
+    fluid_viscosity_cP: 3.0
+    height:
+      # NOT_FOUND in legacy; using fallback from migrated case.
+      value: 1.0
+      unit: m
+    initial_width:
+      value: 0.0
+      unit: m
+    breakdown:
+      method: pressure_threshold
+      pressure:
+        # Ignored by sigma_theta_static. Kept only to preserve the existing
+        # fallback schema/contract for constant_pressure diagnostics.
+        value: 1.0
+        unit: Pa
+    initiation:
+      type: sigma_theta_time_series
+      pressure_source: wellbore_pressure_trial_Pa
+      comparison: legacy_algebra
+      sigma_theta_series:
+        source: legacy_refined_criterion_trace_phase10_25a
+        interpolation: linear
+        out_of_range: clamp
+        mapping_status: TIME_SERIES_FROM_REFINED_LEGACY_CRITERION_TRACE_DIAGNOSTIC
+        values:
+          - time:
+              value: 30.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 73746000.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 60.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 72065900.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 90.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 71475000.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 120.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 71039500.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 150.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 70656000.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 180.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 70296000.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 210.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 69948700.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 240.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 69609100.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 270.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 69274400.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 300.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 68943000.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 330.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 68614100.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 360.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 68287000.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 390.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 67961200.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 420.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 67636400.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 450.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 67312500.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 480.0
+              unit: s
+            # PRE_OPENING_OR_SHUTIN_SUPPORT_POINT; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 66989300.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 510.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 66666600.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 540.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 66344400.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 570.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 66076200.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 600.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65844400.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 630.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65636100.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 660.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65445500.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 690.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65269100.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 720.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65104300.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 750.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 64949500.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 780.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 64803300.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 810.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 64925100.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 840.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 64997400.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 870.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65071300.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 900.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65138500.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 930.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65201300.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 960.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65259700.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 990.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65314200.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 1020.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65365200.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 1050.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65413000.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 1080.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65457800.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 1110.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65499900.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 1140.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65539500.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 1170.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65576800.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 1200.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65612000.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 1230.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65645300.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 1260.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65676700.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 1290.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65706500.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+          - time:
+              value: 1320.0
+              unit: s
+            # LEGACY_OPENED_STEP; refined from Phase 10.25A criterion trace.
+            sigma_theta_compression_positive:
+              value: 65734800.0
+              unit: Pa
+            layer_id: legacy_layer_7
+            influence_depth:
+              value: 4356.4
+              unit: m
+    balance:
+      # Phase 10.23A opt-in. Default remains same_step for all existing cases.
+      sink_timing: next_step
+  leakoff:
+    enabled: true
+    # EXTRACTED fracture type is PKN; modern coefficient remains synthetic by
+    # fallback because the legacy leakoff coefficient is not exported as YAML data.
+    model: synthetic_constant
+  detection:
+    method: derivative_drop
+  pressure_model:
+    # Fase 10.17B opt-in diagnostic route. Existing cases remain pkn_direct
+    # through the parser default when this block is absent.
+    type: volumetric_balance
+  volumetric_balance:
+    compliance:
+      enabled: true
+      model: constant_geometric
+      geometric_compressibility:
+        # Phase 10.19C diagnostic value:
+        # C_total = dV_inj_30s_rad / (V_annular_rad * legacy_first_dP)
+        #         = 1.9211966938610006e-8 1/Pa
+        # C_geom = C_total - C_fluid = 1.8571966938610005e-8 1/Pa.
+        value: 0.000000016714770244749004
+        unit: "1/Pa"
+      source: DIAGNOSTIC_FROM_LEGACY_FIRST_STEP
+      caveat: "Equivalent geometric compliance inferred from first-step legacy dP; not a validated casing/formation mechanics model."
+
+apb:
+  enabled: false
+  top_packer_m: 0.0
+  leakage_enabled: false
+  venting_enabled: false
+
+time:
+  # EXTRACTED/DERIVED from legacy Phase 10.18B:
+  # 12.5 min injection + 9.5 min shut-in = 22 min = 0.3666666667 h = 1320 s.
+  total_h: 0.3666666667
+  # EXTRACTED/DERIVED from legacy: 0.5 min = 0.0083333333 h = 30 s.
+  dt_h: 0.0083333333
+  scheme: explicit
+  solver:
+    tol_pressure_bar: 0.1
+    tol_eq: 0.00000001
+    stabilization_h: 0.0
+
+output:
+  directory: output/buz67d_modern_refined_sens_cgeom_090
+  every_n_steps: 1
+  fields: [pressure, stress, temperature]
+  format: json

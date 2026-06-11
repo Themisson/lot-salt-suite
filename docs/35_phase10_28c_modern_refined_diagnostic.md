@@ -83,3 +83,23 @@ A próxima fase deve decidir entre:
 - preparar figuras/relatório de comparação para tese/artigo;
 - auditar BUZ-29D em uma fase própria antes de criar YAML moderno;
 - manter `legacy-equivalence` separada até existir consumo real APBSalt1D.
+
+## Refinamento 10.29A
+
+A Fase 10.29A refinou a sensibilidade de `C_geom` em:
+
+```text
+docs/36_phase10_29a_buz67d_refined_sensitivity.md
+```
+
+Resultado:
+
+```text
+REFINED_SENSITIVITY_COMPLETED
+REFINED_SENSITIVITY_BEST_DIAGNOSTIC_FACTOR_FOUND
+REFINED_SENSITIVITY_OPENING_DOMINATED_BY_COMPLIANCE
+```
+
+O melhor fator por abertura e score combinado foi `0.75x`; o melhor fator por
+pressão máxima isolada foi `0.60x`. Esses fatores continuam diagnósticos e não
+devem ser promovidos automaticamente a calibração.

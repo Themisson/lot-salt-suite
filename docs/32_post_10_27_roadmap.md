@@ -168,3 +168,21 @@ PHASE10_28C_SENSITIVITY_MATRIX_RUN_OK
 O cenário `0.75x C_geom` aproximou a abertura de `510 s`, mas isso foi
 registrado apenas como sensibilidade diagnóstica. `constant_geometric` continua
 baseline diagnóstico, não calibração automática nem validação física.
+
+## Fase 10.29A registrada
+
+A Fase 10.29A refina a matriz em torno de `0.75x C_geom`:
+
+```text
+docs/36_phase10_29a_buz67d_refined_sensitivity.md
+```
+
+Resultado:
+
+```text
+PHASE10_29A_REFINED_SENSITIVITY_COMPLETED
+MODERN_REFINED_COMPLIANCE_SENSITIVITY_DOCUMENTED
+```
+
+A próxima fase recomendada é infraestrutura genérica de sensitivity runner para
+evitar duplicação de scripts por fase.

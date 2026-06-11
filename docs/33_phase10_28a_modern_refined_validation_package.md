@@ -155,3 +155,10 @@ PHASE10_28C_SENSITIVITY_MATRIX_RUN_OK
 A matriz mostra sensibilidade forte a `constant_geometric`: `0.75x` aproximou
 a abertura de `510 s`, enquanto `1.25x` não abriu na janela executada. Esse
 achado não deve ser usado como calibração automática.
+
+## Refinamento 10.29A
+
+A Fase 10.29A refinou a faixa `0.60x..1.00x` e confirmou que a abertura é
+dominada pela compliance diagnóstica nessa rota. O melhor fator por score
+combinado foi `0.75x`; o melhor fator por pressão máxima isolada foi `0.60x`.
+Ambos permanecem resultados de sensibilidade, não parâmetros calibrados.
