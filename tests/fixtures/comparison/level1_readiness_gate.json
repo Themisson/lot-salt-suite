@@ -1377,6 +1377,26 @@
       "results/ outputs remain local and must not be versioned."
     ]
   },
+  "phase10_29c_buz29d_legacy_audit": {
+    "status": "BUZ29D_LEGACY_AUDIT_RECORDED",
+    "phase": "10.29C",
+    "buz29d_source_status": "BUZ29D_MODERN_YAML_NOT_READY",
+    "model_status": "BUZ29D_NOT_PKN",
+    "future_yaml_readiness": "BUZ29D_MODERN_YAML_NOT_READY",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": false,
+    "tool": "tools/audit_phase10_29c_buz29d_case.py",
+    "document": "docs/38_buz29d_legacy_audit.md",
+    "recommended_next_step": "AUDIT_PKN_OUTPUT_PROVENANCE_OR_ADD_NON_PKN_RUNTIME",
+    "caveats": [
+      "BUZ-29D sources and outputs exist, but active audited sources are not ready PKN cases.",
+      "Output-only PKN artifacts are insufficient to create a modern YAML.",
+      "No BUZ-29D modern YAML was created in Phase 10.29C."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

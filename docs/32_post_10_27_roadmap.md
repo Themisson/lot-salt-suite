@@ -205,3 +205,24 @@ GENERIC_LOT_PKN_SENSITIVITY_RUNNER_ADDED
 O runner aceita uma matriz YAML, valida/roda cenários LOT/PKN, coleta
 `timeseries.csv` e gera `summary.csv`/`metadata.json`. Ele permanece ferramenta
 diagnóstica em `tools/`, sem alterar runtime C++.
+
+## Fase 10.29C registrada
+
+A Fase 10.29C registra a auditoria dedicada BUZ-29D:
+
+```text
+docs/38_buz29d_legacy_audit.md
+tools/audit_phase10_29c_buz29d_case.py
+```
+
+Status:
+
+```text
+BUZ29D_LEGACY_AUDIT_RECORDED
+BUZ29D_MODERN_YAML_NOT_READY
+```
+
+BUZ-29D possui fontes e saídas legadas, inclusive artefatos PKN, mas nenhum
+fonte PKN ativo completo foi promovido a caso moderno. A rota recomendada e
+auditar a proveniência das saídas PKN ou planejar suporte KGD/penny-shaped em
+fase própria.

@@ -438,3 +438,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   declarados em YAML e sumariza `timeseries.csv`, mas permanece pos-processo de
   diagnostico em `tools/`: nao muda runtime C++, nao cria modelo fisico novo e
   nao transforma sensibilidade em calibracao automatica.
+- A Fase 10.29C auditou BUZ-29D e manteve
+  `BUZ29D_MODERN_YAML_NOT_READY`. Existem fontes e saidas BUZ-29D, inclusive
+  saidas PKN, mas os fontes ativos auditados sao `penny-shaped`, `circular` ou
+  ambiguos. Uma fase futura deve auditar a proveniencia das saidas PKN ou
+  planejar suporte KGD/penny-shaped antes de criar YAML moderno.

@@ -116,3 +116,22 @@ PHASE10_28C_SENSITIVITY_MATRIX_RUN_OK
 O gate da 10.28B permanece válido: nenhum caso adicional foi promovido a YAML
 moderno, e a sensibilidade BUZ-67D foi tratada como diagnóstico
 `modern-refined`.
+
+## Atualização 10.29C
+
+A Fase 10.29C aprofundou a auditoria BUZ-29D em:
+
+```text
+docs/38_buz29d_legacy_audit.md
+```
+
+Classificação:
+
+```text
+BUZ29D_LEGACY_AUDIT_RECORDED
+BUZ29D_MODERN_YAML_NOT_READY
+```
+
+A decisão da 10.28B não mudou: BUZ-29D não deve ser promovido a YAML
+`modern-refined` enquanto não houver fonte PKN ativo completo ou auditoria de
+proveniência das saídas PKN existentes.

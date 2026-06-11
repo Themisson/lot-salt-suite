@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.29B generic LOT-PKN sensitivity runner
+Fase ativa  : 10.29C BUZ-29D legacy audit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
-Testes C++  : 263/263 passaram apos Fase 10.29B em 2026-06-11
-Testes Py   : 235/235 previstos apos Fase 10.29B em 2026-06-11
+Testes C++  : 263/263 passaram apos Fase 10.29C em 2026-06-11
+Testes Py   : 241/241 previstos apos Fase 10.29C em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,34 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.29C — auditoria dedicada BUZ-29D — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Documento criado:**
+
+```text
+docs/38_buz29d_legacy_audit.md
+```
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase10_29c_buz29d_case.py
+```
+
+**Resultado:**
+
+```text
+BUZ29D_LEGACY_AUDIT_RECORDED
+BUZ29D_MODERN_YAML_NOT_READY
+```
+
+BUZ-29D possui fontes e saídas legadas, mas os fontes ativos auditados não
+formam um caso PKN moderno pronto. Nenhum YAML moderno BUZ-29D foi criado.
 
 ---
 
