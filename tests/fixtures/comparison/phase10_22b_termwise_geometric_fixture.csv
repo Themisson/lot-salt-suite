@@ -1,0 +1,5 @@
+time_s,time_min,Vq_m3_rad,dV_total_m3_rad,dV_increment_m3_rad,Vi_m3_rad,dP_Pa,dP_increment_Pa,pw_Pa,thermal_pressure_equivalent_Pa,volumetric_pressure_equivalent_Pa,dMl_term_m3_rad,dMl_term_increment_m3_rad,dV_leakoff_m3_rad,dV_leakoff_increment_m3_rad
+30,0.5,1.0,2.0,2.0,10.0,100.0,100.0,1000.0,20.0,80.0,0.10,0.10,0.0,0.0
+60,1.0,2.0,4.0,2.0,10.0,200.0,100.0,1100.0,40.0,160.0,0.20,0.10,0.0,0.0
+90,1.5,3.0,6.0,2.0,10.0,300.0,100.0,1200.0,60.0,240.0,0.30,0.10,0.0,0.0
+120,2.0,4.0,8.0,2.0,10.0,400.0,100.0,1300.0,80.0,320.0,0.40,0.10,0.0,0.0

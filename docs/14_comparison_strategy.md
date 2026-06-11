@@ -1986,3 +1986,49 @@ O primeiro instante com sink volumetrico positivo no trace representativo foi
 `540 s`, coerente com a janela legada de quebra previamente observada. Como
 `opened` nao foi exportado no mesmo trace, esse instante permanece diagnostico,
 nao um gatilho fisico validado.
+
+## Fase 10.22B — compliance geometrica direta termo-a-termo
+
+A Fase 10.22B avaliou se o trace 10.22A ja seria suficiente para alimentar uma
+futura tabela `pressure_tabulated_geometric`. A resposta atual e negativa.
+
+Formulas avaliadas:
+
+```text
+C_geom_accumulated = dV_total_m3_rad/(Vi_m3_rad*dP_Pa)
+C_geom_incremental = dV_increment_m3_rad/(Vi_m3_rad*dP_increment_Pa)
+```
+
+Os incrementos foram calculados por diferenca temporal quando a linha
+representativa nao trazia valores incrementais preenchidos. Os regimes usados
+continuam sendo inferidos por tempo conhecido, e nao por `opened`.
+
+Resumo pre-abertura:
+
+| Serie | Media [1/Pa] | Mediana [1/Pa] | CV | Corr. pressao | Corr. tempo |
+|---|---:|---:|---:|---:|---:|
+| acumulada | `4.442167504384874e-10` | `1.5922475242866133e-10` | `0.9515146296674275` | `0.3889444766416119` | `-0.25737458213185305` |
+| incremental | `-3.8475791443484577e-8` | `1.508743863244543e-10` | `3.283372816341784` | `-0.20777313079760704` | `-0.30407267201730376` |
+
+Classificacoes:
+
+```text
+C_geom_accumulated: TERMWISE_GEOM_COMPLIANCE_NOISY
+C_geom_incremental: TERMWISE_GEOM_COMPLIANCE_NOISY
+phase_dependent: true
+```
+
+Gate recomendado:
+
+```text
+LEGACY_OPENING_TRACE_STILL_REQUIRED
+TERMWISE_GEOM_COMPLIANCE_INSUFFICIENT_FOR_MODEL
+TERMWISE_GEOM_COMPLIANCE_PHASE_DEPENDENT
+ELASTIC_MODEL_REQUIRES_SCALING
+```
+
+Consequencia para a estrategia legado-moderno: a comparacao Level 1 ainda pode
+usar essa serie para diagnostico estrutural, mas nao deve comparar fratura
+fisica, nem criar equivalencia quantitativa de `pressure_tabulated_geometric`.
+Antes disso, e preciso um trace que una `opened`, `sigmaTheta`, `margin`, `dV`,
+`Vi`, `dP` e os termos volumetricos na mesma linha temporal/camada.

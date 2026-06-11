@@ -2625,6 +2625,62 @@ esta no mesmo ponto de dados da formula de `dP`. A proxima fase deve decidir se
 reinstrumenta o criterio `pw > sigmaTheta` junto com o balanco ou se primeiro
 define uma regra de selecao de linha/camada para a compliance termo-a-termo.
 
+## Compliance geometrica direta do legado (Fase 10.22B)
+
+A Fase 10.22B criou uma extracao diagnostica da compliance geometrica direta do
+`LOT_Tese` usando o trace termo-a-termo da 10.22A. A fase nao altera
+`PknModel`, `volumetric_balance`, `LotSalt*`, CLI, YAML ou qualquer arquivo em
+`legance/`.
+
+Formulas:
+
+```text
+C_geom_accumulated = dV_total_m3_rad / (Vi_m3_rad*dP_Pa)
+C_geom_incremental = dV_increment_m3_rad / (Vi_m3_rad*dP_increment_Pa)
+```
+
+Como `opened` ainda nao existe no mesmo trace, os regimes sao apenas marcas
+diagnosticas conhecidas:
+
+```text
+pre_opening_known: time_s < 510
+opening_step_known: time_s == 510
+first_sink_positive_known: time_s >= 540
+regime_source: known_from_previous_phase_not_from_this_trace
+```
+
+Estatisticas pre-abertura:
+
+| Serie | count | mean [1/Pa] | median [1/Pa] | std [1/Pa] | CV | Classificacao |
+|---|---:|---:|---:|---:|---:|---|
+| acumulada | `16` | `4.442167504384874e-10` | `1.5922475242866133e-10` | `4.226787367855454e-10` | `0.9515146296674275` | `TERMWISE_GEOM_COMPLIANCE_NOISY` |
+| incremental | `15` | `-3.8475791443484577e-8` | `1.508743863244543e-10` | `1.2633036771277306e-7` | `3.283372816341784` | `TERMWISE_GEOM_COMPLIANCE_NOISY` |
+
+Comparacao:
+
+| Item | Valor |
+|---|---:|
+| `C_geom_constant_10_19C` | `1.8571966938610005e-8` |
+| `C_geom_elastic_10_20C` | `1.7242805809704984e-10` |
+| razao acumulada pre-abertura / constante 10.19C | `0.023918670106771914` |
+| razao incremental pre-abertura / constante 10.19C | `-2.0717133285164167` |
+| razao acumulada pre-abertura / elastica 10.20C | `2.5762440019388455` |
+
+Gate:
+
+```text
+LEGACY_OPENING_TRACE_STILL_REQUIRED
+TERMWISE_GEOM_COMPLIANCE_INSUFFICIENT_FOR_MODEL
+TERMWISE_GEOM_COMPLIANCE_PHASE_DEPENDENT
+ELASTIC_MODEL_REQUIRES_SCALING
+```
+
+A extracao mostra que a serie direta e util como evidencia diagnostica, mas
+nao e uma tabela fisica pronta para `pressure_tabulated_geometric`. A serie
+incremental muda de sinal, a acumulada tem CV alto, e a comparacao entre
+pre-abertura e pos-sink indica dependencia de fase. O coupling moderno deve
+continuar sem consumir essa serie automaticamente.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que

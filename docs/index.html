@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">73/80</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">74/81</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">242</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">103</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -1948,6 +1948,107 @@ numericamente, mas ainda nao ha base para promover <code>pressure_tabulated_geom
 A proxima fase deve exportar <code>opened</code>/<code>sigmaTheta</code> no mesmo trace ou definir
 uma selecao de linha/camada que evite misturar iteracoes e camadas ao calcular
 compliance termo-a-termo.</p>
+<h3 id="compliance-geometrica-direta-termo-a-termo-fase-1022b">Compliance geometrica direta termo-a-termo — Fase 10.22B</h3>
+<p><strong>Status:</strong> <code>TERMWISE_GEOM_COMPLIANCE_NOISY</code>.</p>
+<p>A Fase 10.22B consumiu o trace termo-a-termo da 10.22A e calculou a compliance
+geometrica diretamente do termo <code>dV</code>, sem usar a compliance aparente bruta e
+sem alterar o solver moderno.</p>
+<pre><code class="language-text">C_geom_accumulated = dV_total_m3_rad / (Vi_m3_rad * dP_Pa)
+C_geom_incremental = dV_increment_m3_rad / (Vi_m3_rad * dP_increment_Pa)
+</code></pre>
+<p>Quando os campos incrementais estavam vazios para as linhas representativas, a
+ferramenta reconstruiu <code>dV_increment</code> e <code>dP_increment</code> por diferenca temporal.
+Os regimes foram atribuidos por tempos conhecidos de fases anteriores, nao por
+um campo <code>opened</code> do trace:</p>
+<pre><code class="language-text">pre_opening_known: time_s &lt; 510
+opening_step_known: time_s == 510
+first_sink_positive_known: time_s &gt;= 540
+regime_source: known_from_previous_phase_not_from_this_trace
+</code></pre>
+<p>Resumo pre-abertura:</p>
+<table>
+<thead>
+<tr>
+<th>Serie</th>
+<th style="text-align: right;">mean [1/Pa]</th>
+<th style="text-align: right;">median [1/Pa]</th>
+<th style="text-align: right;">std [1/Pa]</th>
+<th style="text-align: right;">CV</th>
+<th style="text-align: right;">corr. pressao</th>
+<th style="text-align: right;">corr. tempo</th>
+<th>Classificacao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C_geom_accumulated</code></td>
+<td style="text-align: right;"><code>4.442167504384874e-10</code></td>
+<td style="text-align: right;"><code>1.5922475242866133e-10</code></td>
+<td style="text-align: right;"><code>4.226787367855454e-10</code></td>
+<td style="text-align: right;"><code>0.9515146296674275</code></td>
+<td style="text-align: right;"><code>0.3889444766416119</code></td>
+<td style="text-align: right;"><code>-0.25737458213185305</code></td>
+<td><code>TERMWISE_GEOM_COMPLIANCE_NOISY</code></td>
+</tr>
+<tr>
+<td><code>C_geom_incremental</code></td>
+<td style="text-align: right;"><code>-3.8475791443484577e-8</code></td>
+<td style="text-align: right;"><code>1.508743863244543e-10</code></td>
+<td style="text-align: right;"><code>1.2633036771277306e-7</code></td>
+<td style="text-align: right;"><code>3.283372816341784</code></td>
+<td style="text-align: right;"><code>-0.20777313079760704</code></td>
+<td style="text-align: right;"><code>-0.30407267201730376</code></td>
+<td><code>TERMWISE_GEOM_COMPLIANCE_NOISY</code></td>
+</tr>
+</tbody>
+</table>
+<p>Comparacao com modelos modernos:</p>
+<table>
+<thead>
+<tr>
+<th>Referencia</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C_geom_constant_10_19C</code></td>
+<td style="text-align: right;"><code>1.8571966938610005e-8</code></td>
+</tr>
+<tr>
+<td><code>C_eff_constant_10_19C</code></td>
+<td style="text-align: right;"><code>1.9211966938610006e-8</code></td>
+</tr>
+<tr>
+<td><code>C_geom_elastic_10_20C</code></td>
+<td style="text-align: right;"><code>1.7242805809704984e-10</code></td>
+</tr>
+<tr>
+<td>razao acumulada pre-abertura / constante 10.19C</td>
+<td style="text-align: right;"><code>0.023918670106771914</code></td>
+</tr>
+<tr>
+<td>razao incremental pre-abertura / constante 10.19C</td>
+<td style="text-align: right;"><code>-2.0717133285164167</code></td>
+</tr>
+<tr>
+<td>razao acumulada pre-abertura / elastica 10.20C</td>
+<td style="text-align: right;"><code>2.5762440019388455</code></td>
+</tr>
+</tbody>
+</table>
+<p>Gate da fase:</p>
+<pre><code class="language-text">LEGACY_OPENING_TRACE_STILL_REQUIRED
+TERMWISE_GEOM_COMPLIANCE_INSUFFICIENT_FOR_MODEL
+TERMWISE_GEOM_COMPLIANCE_PHASE_DEPENDENT
+ELASTIC_MODEL_REQUIRES_SCALING
+</code></pre>
+<p>Conclusao: a compliance geometrica direta acumulada fica muito abaixo do proxy
+<code>constant_geometric</code> da 10.19C na janela pre-abertura e e ruidosa. A serie
+incremental muda de sinal e tambem e ruidosa. Portanto, a 10.22B nao libera
+<code>pressure_tabulated_geometric</code>; ainda e necessario um trace complementar com
+<code>opened</code>, <code>sigmaTheta</code> e <code>margin</code> no mesmo registro antes de transformar a serie
+em modelo opt-in.</p>
 </div>
 </section>
 
@@ -3252,7 +3353,50 @@ LEGACY_BALANCE_RECONSTRUCTION_MATCHES_DP
 exportados no mesmo ponto de <code>dP</code>. O primeiro sink positivo foi inferido em
 <code>540 s</code> por incremento de <code>dV_leakoff</code>; o instante exato de <code>opened</code> precisa
 ser exportado diretamente se a proxima fase quiser alinhar criterio de abertura
-e compliance termo-a-termo.
+e compliance termo-a-termo.</p>
+<p><strong>Atualizacao 10.22B:</strong> a extracao direta de compliance geometrica do trace
+10.22A calculou:</p>
+<pre><code class="language-text">C_geom_accumulated = dV_total_m3_rad / (Vi_m3_rad*dP_Pa)
+C_geom_incremental = dV_increment_m3_rad / (Vi_m3_rad*dP_increment_Pa)
+</code></pre>
+<p>Resultado pre-abertura:</p>
+<table>
+<thead>
+<tr>
+<th>Serie</th>
+<th style="text-align: right;">Media [1/Pa]</th>
+<th style="text-align: right;">Mediana [1/Pa]</th>
+<th style="text-align: right;">CV</th>
+<th>Classificacao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>acumulada</td>
+<td style="text-align: right;"><code>4.442167504384874e-10</code></td>
+<td style="text-align: right;"><code>1.5922475242866133e-10</code></td>
+<td style="text-align: right;"><code>0.9515146296674275</code></td>
+<td><code>TERMWISE_GEOM_COMPLIANCE_NOISY</code></td>
+</tr>
+<tr>
+<td>incremental</td>
+<td style="text-align: right;"><code>-3.8475791443484577e-8</code></td>
+<td style="text-align: right;"><code>1.508743863244543e-10</code></td>
+<td style="text-align: right;"><code>3.283372816341784</code></td>
+<td><code>TERMWISE_GEOM_COMPLIANCE_NOISY</code></td>
+</tr>
+</tbody>
+</table>
+<p>A fase tambem classificou a resposta como dependente de fase. Isso reforca que
+a rota <code>pressure_tabulated_geometric</code> ainda nao deve ser implementada. O gate
+permanece:</p>
+<pre><code class="language-text">LEGACY_OPENING_TRACE_STILL_REQUIRED
+TERMWISE_GEOM_COMPLIANCE_INSUFFICIENT_FOR_MODEL
+TERMWISE_GEOM_COMPLIANCE_PHASE_DEPENDENT
+ELASTIC_MODEL_REQUIRES_SCALING
+</code></pre>
+<p>Sem <code>opened/sigmaTheta/margin</code> no mesmo trace, qualquer tabela baseada nesses
+valores seria diagnostica e poderia misturar regimes fisicos distintos.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -6497,6 +6641,98 @@ T_final_C
 esta no mesmo ponto de dados da formula de <code>dP</code>. A proxima fase deve decidir se
 reinstrumenta o criterio <code>pw &gt; sigmaTheta</code> junto com o balanco ou se primeiro
 define uma regra de selecao de linha/camada para a compliance termo-a-termo.</p>
+<h2 id="compliance-geometrica-direta-do-legado-fase-1022b">Compliance geometrica direta do legado (Fase 10.22B)</h2>
+<p>A Fase 10.22B criou uma extracao diagnostica da compliance geometrica direta do
+<code>LOT_Tese</code> usando o trace termo-a-termo da 10.22A. A fase nao altera
+<code>PknModel</code>, <code>volumetric_balance</code>, <code>LotSalt*</code>, CLI, YAML ou qualquer arquivo em
+<code>legance/</code>.</p>
+<p>Formulas:</p>
+<pre><code class="language-text">C_geom_accumulated = dV_total_m3_rad / (Vi_m3_rad*dP_Pa)
+C_geom_incremental = dV_increment_m3_rad / (Vi_m3_rad*dP_increment_Pa)
+</code></pre>
+<p>Como <code>opened</code> ainda nao existe no mesmo trace, os regimes sao apenas marcas
+diagnosticas conhecidas:</p>
+<pre><code class="language-text">pre_opening_known: time_s &lt; 510
+opening_step_known: time_s == 510
+first_sink_positive_known: time_s &gt;= 540
+regime_source: known_from_previous_phase_not_from_this_trace
+</code></pre>
+<p>Estatisticas pre-abertura:</p>
+<table>
+<thead>
+<tr>
+<th>Serie</th>
+<th style="text-align: right;">count</th>
+<th style="text-align: right;">mean [1/Pa]</th>
+<th style="text-align: right;">median [1/Pa]</th>
+<th style="text-align: right;">std [1/Pa]</th>
+<th style="text-align: right;">CV</th>
+<th>Classificacao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>acumulada</td>
+<td style="text-align: right;"><code>16</code></td>
+<td style="text-align: right;"><code>4.442167504384874e-10</code></td>
+<td style="text-align: right;"><code>1.5922475242866133e-10</code></td>
+<td style="text-align: right;"><code>4.226787367855454e-10</code></td>
+<td style="text-align: right;"><code>0.9515146296674275</code></td>
+<td><code>TERMWISE_GEOM_COMPLIANCE_NOISY</code></td>
+</tr>
+<tr>
+<td>incremental</td>
+<td style="text-align: right;"><code>15</code></td>
+<td style="text-align: right;"><code>-3.8475791443484577e-8</code></td>
+<td style="text-align: right;"><code>1.508743863244543e-10</code></td>
+<td style="text-align: right;"><code>1.2633036771277306e-7</code></td>
+<td style="text-align: right;"><code>3.283372816341784</code></td>
+<td><code>TERMWISE_GEOM_COMPLIANCE_NOISY</code></td>
+</tr>
+</tbody>
+</table>
+<p>Comparacao:</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C_geom_constant_10_19C</code></td>
+<td style="text-align: right;"><code>1.8571966938610005e-8</code></td>
+</tr>
+<tr>
+<td><code>C_geom_elastic_10_20C</code></td>
+<td style="text-align: right;"><code>1.7242805809704984e-10</code></td>
+</tr>
+<tr>
+<td>razao acumulada pre-abertura / constante 10.19C</td>
+<td style="text-align: right;"><code>0.023918670106771914</code></td>
+</tr>
+<tr>
+<td>razao incremental pre-abertura / constante 10.19C</td>
+<td style="text-align: right;"><code>-2.0717133285164167</code></td>
+</tr>
+<tr>
+<td>razao acumulada pre-abertura / elastica 10.20C</td>
+<td style="text-align: right;"><code>2.5762440019388455</code></td>
+</tr>
+</tbody>
+</table>
+<p>Gate:</p>
+<pre><code class="language-text">LEGACY_OPENING_TRACE_STILL_REQUIRED
+TERMWISE_GEOM_COMPLIANCE_INSUFFICIENT_FOR_MODEL
+TERMWISE_GEOM_COMPLIANCE_PHASE_DEPENDENT
+ELASTIC_MODEL_REQUIRES_SCALING
+</code></pre>
+<p>A extracao mostra que a serie direta e util como evidencia diagnostica, mas
+nao e uma tabela fisica pronta para <code>pressure_tabulated_geometric</code>. A serie
+incremental muda de sinal, a acumulada tem CV alto, e a comparacao entre
+pre-abertura e pos-sink indica dependencia de fase. O coupling moderno deve
+continuar sem consumir essa serie automaticamente.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser

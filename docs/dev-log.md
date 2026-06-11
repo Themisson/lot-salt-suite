@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.22A auditoria direta dos termos do balanco legado; commit/push pendente
+Fase ativa  : 10.22B compliance geometrica direta termo-a-termo; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
 Testes C++  : 242/242 passaram em 2026-06-10
-Testes Py   : 110/110 esperados apos Fase 10.22A em 2026-06-10
+Testes Py   : 118/118 esperados apos Fase 10.22B em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,78 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-10] Fase 10.22B — compliance geometrica direta termo-a-termo — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Objetivo:** consumir o trace termo-a-termo da 10.22A e extrair
+`C_geom_accumulated` e `C_geom_incremental` diretamente de `dV`, `Vi` e `dP`,
+sem alterar solver moderno, sem implementar `pressure_tabulated_geometric` e
+sem mexer em `legance/`.
+
+**Ferramenta criada:**
+
+```text
+tools/extract_phase10_22b_termwise_geometric_compliance.py
+```
+
+**Teste criado:**
+
+```text
+tests/python/test_extract_phase10_22b_termwise_geometric_compliance.py
+```
+
+**Fixture criado:**
+
+```text
+tests/fixtures/comparison/phase10_22b_termwise_geometric_fixture.csv
+```
+
+**Formulas:**
+
+```text
+C_geom_accumulated = dV_total_m3_rad / (Vi_m3_rad*dP_Pa)
+C_geom_incremental = dV_increment_m3_rad / (Vi_m3_rad*dP_increment_Pa)
+```
+
+**Regime source:**
+
+```text
+known_from_previous_phase_not_from_this_trace
+```
+
+**Resultados pre-abertura:**
+
+| Serie | mean [1/Pa] | median [1/Pa] | std [1/Pa] | CV | Classificacao |
+|---|---:|---:|---:|---:|---|
+| acumulada | `4.442167504384874e-10` | `1.5922475242866133e-10` | `4.226787367855454e-10` | `0.9515146296674275` | `TERMWISE_GEOM_COMPLIANCE_NOISY` |
+| incremental | `-3.8475791443484577e-8` | `1.508743863244543e-10` | `1.2633036771277306e-7` | `3.283372816341784` | `TERMWISE_GEOM_COMPLIANCE_NOISY` |
+
+**Comparacoes:**
+
+```text
+C_geom_constant_10_19C = 1.8571966938610005e-8
+C_geom_elastic_10_20C = 1.7242805809704984e-10
+pre_opening_accumulated_ratio_to_constant_10_19C = 0.023918670106771914
+pre_opening_incremental_ratio_to_constant_10_19C = -2.0717133285164167
+pre_opening_accumulated_ratio_to_elastic_10_20C = 2.5762440019388455
+```
+
+**Gate:**
+
+```text
+LEGACY_OPENING_TRACE_STILL_REQUIRED
+TERMWISE_GEOM_COMPLIANCE_INSUFFICIENT_FOR_MODEL
+TERMWISE_GEOM_COMPLIANCE_PHASE_DEPENDENT
+ELASTIC_MODEL_REQUIRES_SCALING
+```
+
+**Conclusao:** a serie direta e diagnostica, mas ruidosa e dependente de fase.
+`pressure_tabulated_geometric` permanece bloqueado ate existir trace
+complementar com `opened/sigmaTheta/margin` no mesmo registro.
 
 ---
 

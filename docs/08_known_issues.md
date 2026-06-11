@@ -787,6 +787,35 @@ exportados no mesmo ponto de `dP`. O primeiro sink positivo foi inferido em
 `540 s` por incremento de `dV_leakoff`; o instante exato de `opened` precisa
 ser exportado diretamente se a proxima fase quiser alinhar criterio de abertura
 e compliance termo-a-termo.
+
+**Atualizacao 10.22B:** a extracao direta de compliance geometrica do trace
+10.22A calculou:
+
+```text
+C_geom_accumulated = dV_total_m3_rad / (Vi_m3_rad*dP_Pa)
+C_geom_incremental = dV_increment_m3_rad / (Vi_m3_rad*dP_increment_Pa)
+```
+
+Resultado pre-abertura:
+
+| Serie | Media [1/Pa] | Mediana [1/Pa] | CV | Classificacao |
+|---|---:|---:|---:|---|
+| acumulada | `4.442167504384874e-10` | `1.5922475242866133e-10` | `0.9515146296674275` | `TERMWISE_GEOM_COMPLIANCE_NOISY` |
+| incremental | `-3.8475791443484577e-8` | `1.508743863244543e-10` | `3.283372816341784` | `TERMWISE_GEOM_COMPLIANCE_NOISY` |
+
+A fase tambem classificou a resposta como dependente de fase. Isso reforca que
+a rota `pressure_tabulated_geometric` ainda nao deve ser implementada. O gate
+permanece:
+
+```text
+LEGACY_OPENING_TRACE_STILL_REQUIRED
+TERMWISE_GEOM_COMPLIANCE_INSUFFICIENT_FOR_MODEL
+TERMWISE_GEOM_COMPLIANCE_PHASE_DEPENDENT
+ELASTIC_MODEL_REQUIRES_SCALING
+```
+
+Sem `opened/sigmaTheta/margin` no mesmo trace, qualquer tabela baseada nesses
+valores seria diagnostica e poderia misturar regimes fisicos distintos.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

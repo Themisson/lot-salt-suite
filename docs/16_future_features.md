@@ -290,3 +290,10 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   abertura nao foram exportados no mesmo registro. A proxima evolucao deve ser
   uma fase de analise/instrumentacao adicional ou uma tentativa diagnostica
   claramente opt-in usando a compliance termo-a-termo, nunca default runtime.
+- A Fase 10.22B tentou essa extracao diagnostica de compliance geometrica
+  direta. A serie acumulada pre-abertura teve media `4.44e-10 1/Pa`, apenas
+  `2.39%` do proxy `constant_geometric` da 10.19C, e CV `0.95`. A serie
+  incremental teve media negativa (`-3.85e-8 1/Pa`) e CV `3.28`. Ambas foram
+  classificadas como `TERMWISE_GEOM_COMPLIANCE_NOISY`, com dependencia de fase.
+  Assim, `pressure_tabulated_geometric` segue bloqueado ate existir trace
+  complementar com `opened/sigmaTheta/margin` no mesmo registro.

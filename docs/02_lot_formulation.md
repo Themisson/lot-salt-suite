@@ -1315,3 +1315,62 @@ numericamente, mas ainda nao ha base para promover `pressure_tabulated_geometric
 A proxima fase deve exportar `opened`/`sigmaTheta` no mesmo trace ou definir
 uma selecao de linha/camada que evite misturar iteracoes e camadas ao calcular
 compliance termo-a-termo.
+
+### Compliance geometrica direta termo-a-termo — Fase 10.22B
+
+**Status:** `TERMWISE_GEOM_COMPLIANCE_NOISY`.
+
+A Fase 10.22B consumiu o trace termo-a-termo da 10.22A e calculou a compliance
+geometrica diretamente do termo `dV`, sem usar a compliance aparente bruta e
+sem alterar o solver moderno.
+
+```text
+C_geom_accumulated = dV_total_m3_rad / (Vi_m3_rad * dP_Pa)
+C_geom_incremental = dV_increment_m3_rad / (Vi_m3_rad * dP_increment_Pa)
+```
+
+Quando os campos incrementais estavam vazios para as linhas representativas, a
+ferramenta reconstruiu `dV_increment` e `dP_increment` por diferenca temporal.
+Os regimes foram atribuidos por tempos conhecidos de fases anteriores, nao por
+um campo `opened` do trace:
+
+```text
+pre_opening_known: time_s < 510
+opening_step_known: time_s == 510
+first_sink_positive_known: time_s >= 540
+regime_source: known_from_previous_phase_not_from_this_trace
+```
+
+Resumo pre-abertura:
+
+| Serie | mean [1/Pa] | median [1/Pa] | std [1/Pa] | CV | corr. pressao | corr. tempo | Classificacao |
+|---|---:|---:|---:|---:|---:|---:|---|
+| `C_geom_accumulated` | `4.442167504384874e-10` | `1.5922475242866133e-10` | `4.226787367855454e-10` | `0.9515146296674275` | `0.3889444766416119` | `-0.25737458213185305` | `TERMWISE_GEOM_COMPLIANCE_NOISY` |
+| `C_geom_incremental` | `-3.8475791443484577e-8` | `1.508743863244543e-10` | `1.2633036771277306e-7` | `3.283372816341784` | `-0.20777313079760704` | `-0.30407267201730376` | `TERMWISE_GEOM_COMPLIANCE_NOISY` |
+
+Comparacao com modelos modernos:
+
+| Referencia | Valor |
+|---|---:|
+| `C_geom_constant_10_19C` | `1.8571966938610005e-8` |
+| `C_eff_constant_10_19C` | `1.9211966938610006e-8` |
+| `C_geom_elastic_10_20C` | `1.7242805809704984e-10` |
+| razao acumulada pre-abertura / constante 10.19C | `0.023918670106771914` |
+| razao incremental pre-abertura / constante 10.19C | `-2.0717133285164167` |
+| razao acumulada pre-abertura / elastica 10.20C | `2.5762440019388455` |
+
+Gate da fase:
+
+```text
+LEGACY_OPENING_TRACE_STILL_REQUIRED
+TERMWISE_GEOM_COMPLIANCE_INSUFFICIENT_FOR_MODEL
+TERMWISE_GEOM_COMPLIANCE_PHASE_DEPENDENT
+ELASTIC_MODEL_REQUIRES_SCALING
+```
+
+Conclusao: a compliance geometrica direta acumulada fica muito abaixo do proxy
+`constant_geometric` da 10.19C na janela pre-abertura e e ruidosa. A serie
+incremental muda de sinal e tambem e ruidosa. Portanto, a 10.22B nao libera
+`pressure_tabulated_geometric`; ainda e necessario um trace complementar com
+`opened`, `sigmaTheta` e `margin` no mesmo registro antes de transformar a serie
+em modelo opt-in.
