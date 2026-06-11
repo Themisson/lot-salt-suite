@@ -76,7 +76,16 @@ O dry-run calcula o plano e não grava YAMLs nem manifest.
 
 ## Validação com lot-sim
 
-A validação dos casos materializados é responsabilidade do fluxo chamador. A integração direta com o runner de sensibilidade fica para a Fase 11.2C.
+A Fase 11.2C conecta este materializador ao runner genérico:
+
+```text
+tools/run_lot_pkn_sensitivity_matrix.py
+```
+
+Quando o runner recebe uma matriz v2, ele materializa os casos em
+`<output-dir>/materialized_cases/` e então valida/roda esses YAMLs derivados.
+O materializador também pode continuar sendo usado diretamente para auditoria
+ou dry-run.
 
 ## Promoção manual
 

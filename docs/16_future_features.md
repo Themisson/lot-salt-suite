@@ -484,3 +484,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   O materializador é utilitário de validação/diagnóstico, não pré-processador
   obrigatório do runtime, e não promove casos automaticamente para
   `cases/validation/`.
+- A Fase 11.2C integra matrizes v2 ao runner genérico. O runner materializa
+  cenários em `<output-dir>/materialized_cases/`, registra
+  `materialized_case_path` em summary/metadata e preserva compatibilidade com
+  matrizes v1. A variante `buz67d_cgeom_sensitivity_v2` fica registrada no
+  índice de estudos.

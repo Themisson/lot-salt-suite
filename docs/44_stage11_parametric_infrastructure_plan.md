@@ -168,3 +168,16 @@ Status:
 ```text
 PARAMETRIC_CASE_MATERIALIZER_ADDED
 ```
+
+## Fase 11.2C runner v2
+
+A Fase 11.2C conecta o runner genérico ao materializador v2. O runner passa a
+aceitar tanto matrizes v1 quanto v2, materializando cenários v2 em
+`<output-dir>/materialized_cases/` antes de validar/rodar.
+
+Status:
+
+```text
+SENSITIVITY_RUNNER_SUPPORTS_PARAMETRIC_MATRIX_V2
+BUZ67D_CGEOM_SENSITIVITY_V2_REGISTERED
+```

@@ -10,3 +10,15 @@ studies:
       - cgeom
       - sensitivity
     caveat: Diagnostic sensitivity only; not automatic calibration.
+  - id: buz67d_cgeom_sensitivity_v2
+    title: BUZ-67D modern-refined C_geom sensitivity with parametric matrix v2
+    matrix: cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix_v2.yaml
+    route: modern-refined
+    status: active
+    tags:
+      - BUZ-67D
+      - modern-refined
+      - cgeom
+      - sensitivity
+      - parametric-v2
+    caveat: Diagnostic sensitivity only; generated cases stay in results unless manually promoted.

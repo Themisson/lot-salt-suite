@@ -1,0 +1,44 @@
+matrix_id: buz67d_modern_refined_cgeom_sensitivity_v2
+schema_version: 2
+description: >
+  Stage 11 parametric matrix v2 for BUZ-67D modern-refined C_geom sensitivity.
+  Diagnostic only; not automatic calibration and not legacy-equivalence mode.
+mode: lot-pkn
+base_case: cases/validation/sensitivity/buz67d_modern_refined_sens_baseline.yaml
+baseline_scenario: cgeom_100_next_step
+materialization:
+  output_subdir: materialized_cases
+  filename_template: "{scenario_id}.yaml"
+scenarios:
+  - id: cgeom_075_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000013928975203957504
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.75
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+  - id: cgeom_100_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000018571966938610005
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 1.0
+      sink_timing: next_step
+      interpretation: diagnostic_baseline
+  - id: cgeom_125_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000023214958673262507
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 1.25
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+  - id: cgeom_100_same_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000018571966938610005
+      lot.fracture.balance.sink_timing: same_step
+    metadata:
+      cgeom_factor: 1.0
+      sink_timing: same_step
+      interpretation: diagnostic_sink_timing_comparison

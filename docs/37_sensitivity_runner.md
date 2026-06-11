@@ -226,3 +226,33 @@ tools/materialize_lot_pkn_parametric_matrix.py
 Ele consome matrizes v2 e grava YAMLs derivados em `results/` ou diretório
 temporário. O runner ainda não chama esse materializador automaticamente nesta
 fase; essa integração fica para 11.2C.
+
+## Runner com suporte a matriz v2
+
+A Fase 11.2C integra o materializador ao runner. Quando a matriz declara
+`schema_version: 2`, o runner materializa os cenários em:
+
+```text
+<output-dir>/materialized_cases/
+```
+
+e usa esses YAMLs derivados para `lot-sim validate` e `lot-sim run`. Matrizes
+v1 continuam usando `scenarios[].case` como antes.
+
+Novas opções:
+
+| Opção | Efeito |
+|---|---|
+| `--materialized-dir` | Define diretório explícito para YAMLs derivados. |
+| `--force-materialize` | Permite sobrescrever YAMLs derivados existentes. |
+| `--keep-materialized` | Reservado; os arquivos em `output-dir` já são mantidos para rastreabilidade local. |
+
+O `summary.csv` e o `metadata.json` registram `materialized_case_path` para
+matrizes v2.
+
+Status:
+
+```text
+SENSITIVITY_RUNNER_SUPPORTS_PARAMETRIC_MATRIX_V2
+BUZ67D_CGEOM_SENSITIVITY_V2_REGISTERED
+```

@@ -7,11 +7,17 @@ import argparse
 import csv
 import json
 import subprocess
+import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 
 import yaml
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools import materialize_lot_pkn_parametric_matrix as materializer
 
 
 @dataclass(frozen=True)
@@ -19,6 +25,8 @@ class MatrixScenario:
     id: str
     case: str
     timeseries: str | None = None
+    metadata: dict | None = None
+    materialized_case_path: str | None = None
 
 
 @dataclass(frozen=True)
@@ -26,6 +34,7 @@ class MatrixSpec:
     matrix_id: str
     mode: str
     base_case: str | None
+    schema_version: int
     scenarios: list[MatrixScenario]
 
 
@@ -39,6 +48,7 @@ class SummaryRow:
     first_sink_positive_time_s: float | None
     sink_delay_s: float | None
     final_pressure_Pa: float | None
+    materialized_case_path: str | None = None
 
 
 def load_matrix(path: Path) -> MatrixSpec:
@@ -46,19 +56,38 @@ def load_matrix(path: Path) -> MatrixSpec:
         raise FileNotFoundError(path)
     data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     scenarios = data.get("scenarios") or []
+    version = int(data.get("schema_version", 1))
     if not data.get("matrix_id"):
         raise ValueError("matrix_id is required")
     if not scenarios:
         raise ValueError("scenarios is required")
+    if version not in {1, 2}:
+        raise ValueError(f"unsupported matrix schema_version: {data.get('schema_version')}")
     parsed = []
     for item in scenarios:
-        if not item.get("id") or not item.get("case"):
-            raise ValueError("each scenario requires id and case")
-        parsed.append(MatrixScenario(id=str(item["id"]), case=str(item["case"]), timeseries=item.get("timeseries")))
+        if not item.get("id"):
+            raise ValueError("each scenario requires id")
+        if version == 1:
+            if not item.get("case"):
+                raise ValueError("each scenario requires id and case")
+            case = str(item["case"])
+        else:
+            if not item.get("overrides"):
+                raise ValueError("each v2 scenario requires overrides")
+            case = ""
+        parsed.append(
+            MatrixScenario(
+                id=str(item["id"]),
+                case=case,
+                timeseries=item.get("timeseries"),
+                metadata=item.get("metadata") if isinstance(item.get("metadata"), dict) else None,
+            )
+        )
     return MatrixSpec(
         matrix_id=str(data["matrix_id"]),
         mode=str(data.get("mode", "lot-pkn")),
         base_case=data.get("base_case"),
+        schema_version=version,
         scenarios=parsed,
     )
 
@@ -135,6 +164,7 @@ def summarize_timeseries(path: Path, scenario: MatrixScenario) -> SummaryRow:
         first_sink_positive_time_s=sink_time,
         sink_delay_s=(sink_time - opened) if sink_time is not None and opened is not None else None,
         final_pressure_Pa=pressures[-1],
+        materialized_case_path=scenario.materialized_case_path,
     )
 
 
@@ -153,12 +183,46 @@ def run_matrix(spec: MatrixSpec, output_dir: Path, lot_sim: str, dry_run: bool, 
         scenario_output = output_dir / "runs" / scenario.id
         validate_cmd = [lot_sim, "validate", "--case", scenario.case]
         run_cmd = [lot_sim, "run", "--case", scenario.case, "--mode", spec.mode, "--output", str(scenario_output)]
-        actions.append({"scenario_id": scenario.id, "validate": validate_cmd, "run": run_cmd})
+        actions.append(
+            {
+                "scenario_id": scenario.id,
+                "validate": validate_cmd,
+                "run": run_cmd,
+                "materialized_case_path": scenario.materialized_case_path,
+                "metadata": scenario.metadata or {},
+            }
+        )
         if dry_run or skip_run:
             continue
         run_command(validate_cmd)
         run_command(run_cmd)
     return actions
+
+
+def materialize_v2_matrix(args: argparse.Namespace, matrix_path: Path, output_dir: Path) -> list[MatrixScenario]:
+    materialized_dir = args.materialized_dir or (output_dir / "materialized_cases")
+    mat_args = argparse.Namespace(
+        matrix=matrix_path,
+        output_dir=materialized_dir,
+        allow_create=False,
+        dry_run=args.dry_run,
+        force=args.force_materialize,
+        allow_versioned_output=False,
+        lot_sim=None,
+        manifest_name="materialization_manifest.json",
+    )
+    manifest = materializer.materialize(mat_args)
+    scenarios = []
+    for item in manifest["scenarios"]:
+        scenarios.append(
+            MatrixScenario(
+                id=item["scenario_id"],
+                case=item["output_case"] or "",
+                metadata={},
+                materialized_case_path=item["output_case"],
+            )
+        )
+    return scenarios
 
 
 def scenario_timeseries(output_dir: Path, scenario: MatrixScenario) -> Path:
@@ -179,6 +243,16 @@ def write_summary(path: Path, rows: list[SummaryRow]) -> None:
 def execute(args: argparse.Namespace) -> dict:
     spec = load_matrix(args.matrix)
     output_dir = args.output_dir
+    materialized = False
+    if spec.schema_version == 2:
+        spec = MatrixSpec(
+            matrix_id=spec.matrix_id,
+            mode=spec.mode,
+            base_case=spec.base_case,
+            schema_version=spec.schema_version,
+            scenarios=materialize_v2_matrix(args, args.matrix, output_dir),
+        )
+        materialized = True
     actions = run_matrix(spec, output_dir, args.lot_sim, args.dry_run, args.skip_run or args.only_summary)
     summary_rows: list[SummaryRow] = []
     if not args.dry_run:
@@ -190,11 +264,14 @@ def execute(args: argparse.Namespace) -> dict:
     metadata = {
         "matrix_id": spec.matrix_id,
         "mode": spec.mode,
+        "schema_version": spec.schema_version,
         "dry_run": args.dry_run,
         "skip_run": args.skip_run,
         "only_summary": args.only_summary,
         "legacy_csv": str(args.legacy_csv) if args.legacy_csv else None,
         "scenario_count": len(spec.scenarios),
+        "materialized": materialized,
+        "materialized_dir": str(args.materialized_dir or (output_dir / "materialized_cases")) if materialized else None,
         "actions": actions,
         "summary_csv": str(summary_csv) if summary_rows else None,
         "status": "GENERIC_LOT_PKN_SENSITIVITY_RUNNER_ADDED",
@@ -213,6 +290,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--skip-run", action="store_true")
     parser.add_argument("--only-summary", action="store_true")
     parser.add_argument("--lot-sim", default=default_lot_sim())
+    parser.add_argument("--materialized-dir", type=Path)
+    parser.add_argument("--keep-materialized", action="store_true", help="Reserved; materialized files are kept in output-dir by default.")
+    parser.add_argument("--force-materialize", action="store_true")
     return parser
 
 

@@ -17,6 +17,14 @@
     "runtime_preprocessor": false,
     "physical_validation": false
   },
+  "phase11_2c_sensitivity_runner_parametric_v2": {
+    "status": "SENSITIVITY_RUNNER_SUPPORTS_PARAMETRIC_MATRIX_V2",
+    "matrix_v1_compatibility": true,
+    "matrix_v2_materialization": "output_dir_materialized_cases",
+    "registered_study": "buz67d_cgeom_sensitivity_v2",
+    "derived_cases_versioned": false,
+    "physical_validation": false
+  },
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,

@@ -57,6 +57,34 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.2C — runner com matriz paramétrica v2 — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Runner atualizado:**
+
+```text
+tools/run_lot_pkn_sensitivity_matrix.py
+```
+
+**Matriz v2 criada:**
+
+```text
+cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix_v2.yaml
+```
+
+**Resultado esperado:**
+
+```text
+SENSITIVITY_RUNNER_SUPPORTS_PARAMETRIC_MATRIX_V2
+BUZ67D_CGEOM_SENSITIVITY_V2_REGISTERED
+```
+
+O runner preserva matrizes v1 e, para `schema_version: 2`, materializa cenários
+em `<output-dir>/materialized_cases/` antes de validar/rodar.
+
+---
+
 ### [2026-06-11] Fase 11.2B — materializador de casos paramétricos — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

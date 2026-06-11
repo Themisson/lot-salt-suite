@@ -132,4 +132,7 @@ PARAMETRIC_CASE_MATERIALIZER_ADDED
 
 ## Limitações
 
-A integração do runner com matrizes v2 fica para a Fase 11.2C.
+A Fase 11.2C integra o runner com matrizes v2. O runner detecta
+`schema_version: 2`, materializa cenários no `output-dir` e registra
+`materialized_case_path` em summary/metadata. Matrizes v1 permanecem
+compatíveis.

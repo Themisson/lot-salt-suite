@@ -100,3 +100,20 @@ validação estrutural da matriz fica com:
 ```text
 tools/validate_lot_pkn_parametric_matrix.py
 ```
+
+## Estudo v2 registrado
+
+A Fase 11.2C registra a variante:
+
+```text
+buz67d_cgeom_sensitivity_v2
+```
+
+Ela aponta para:
+
+```text
+cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix_v2.yaml
+```
+
+Essa matriz usa `base_case + overrides`; os casos derivados são gerados pelo
+runner em `results/` e não são versionados automaticamente.
