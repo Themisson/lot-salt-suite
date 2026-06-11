@@ -351,3 +351,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   moderna segue em `660 s` contra `510 s` no legado. A proxima decisao deve
   priorizar auditoria de `pressure_source`/timing ou mapeamento temporal antes
   de promover uma fonte runtime real de `SaltWallStressDiagnostics`.
+- A Fase 10.25C comparou 10.24C contra 10.25B e decidiu
+  `NEXT_MODEL_PRESSURE_SOURCE_TIMING_REVIEW`. Como a serie refinada nao alterou
+  o erro de abertura (`+150 s`), a proxima implementacao/auditoria deve focar a
+  amostragem e uso de `wellbore_pressure_before_step_Pa`,
+  `wellbore_pressure_trial_Pa` e `wellbore_pressure_after_step_Pa` no criterio
+  moderno antes de conectar fonte runtime real de tensao de sal.

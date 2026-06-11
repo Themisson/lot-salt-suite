@@ -911,6 +911,32 @@
       "No default runtime behavior changed."
     ]
   },
+  "phase10_25c_refined_sigma_theta_source_decision": {
+    "status": "NEXT_MODEL_PRESSURE_SOURCE_TIMING_REVIEW",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "tool": "tools/decide_phase10_25c_sigma_theta_source.py",
+    "phase10_24c_summary": "results/comparison/phase10_24c/phase10_24c_summary.csv",
+    "phase10_25b_summary": "results/comparison/phase10_25b/phase10_25b_summary.csv",
+    "decision_json": "results/comparison/phase10_25c/sigma_theta_source_decision.json",
+    "decision_md": "results/comparison/phase10_25c/sigma_theta_source_decision.md",
+    "metrics": {
+      "phase10_24c_opening_time_error_s": 150.0,
+      "phase10_25b_opening_time_error_s": 150.0,
+      "phase10_24c_relative_error_max_pressure": -0.02468924338685035,
+      "phase10_25b_relative_error_max_pressure": -0.02468924338685035,
+      "phase10_24c_sink_delay_error_s": 0.0,
+      "phase10_25b_sink_delay_error_s": 0.0
+    },
+    "caveats": [
+      "Diagnostic decision only; not physical validation.",
+      "Refined sigmaTheta did not improve the opening time shift.",
+      "Next step should audit pressure_source/timing before runtime salt stress wiring.",
+      "No default runtime behavior changed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

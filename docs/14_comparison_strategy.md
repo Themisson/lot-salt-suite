@@ -2380,3 +2380,50 @@ moderna permanece em `660 s`. Isso sugere que a próxima decisão deve auditar
 principalmente o timing/fonte de pressão usada no critério moderno ou o
 mapeamento temporal efetivo, antes de conectar uma fonte runtime de tensão de
 sal.
+
+## Fase 10.25C — decisão da fonte `sigmaTheta`
+
+A Fase 10.25C comparou os summaries:
+
+```text
+results/comparison/phase10_24c/phase10_24c_summary.csv
+results/comparison/phase10_25b/phase10_25b_summary.csv
+```
+
+com:
+
+```text
+tools/decide_phase10_25c_sigma_theta_source.py
+```
+
+Decisão:
+
+```text
+NEXT_MODEL_PRESSURE_SOURCE_TIMING_REVIEW
+```
+
+Racional:
+
+- a 10.24C e a 10.25B têm o mesmo erro de abertura: `+150 s`;
+- a série refinada não deslocou a abertura moderna de `660 s`;
+- a pressão máxima, a pressão na abertura, a pressão final e o sink delay seguem
+  em faixa diagnóstica boa;
+- portanto, a hipótese de fonte `sigmaTheta` esparsa/incorreta não explica
+  sozinha o erro remanescente.
+
+Comparação resumida:
+
+| Métrica | 10.24C | 10.25B |
+|---|---:|---:|
+| Classificação | `SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED` | `SIGMA_THETA_REFINED_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED` |
+| `relative_error_max_pressure` | `-0.02468924338685035` | `-0.02468924338685035` |
+| `opening_time_error_s` | `150.0` | `150.0` |
+| `sink_delay_error_s` | `0.0` | `0.0` |
+| `pressure_at_opening_relative_error` | `0.008415423398363079` | `0.008415423398363079` |
+| `final_pressure_relative_error` | `-0.009582917751452825` | `-0.009582917751452825` |
+
+A próxima fase deve auditar o uso de `wellbore_pressure_before_step_Pa`,
+`wellbore_pressure_trial_Pa` e `wellbore_pressure_after_step_Pa` no critério
+moderno, além do instante em que o provider é amostrado em relação ao avanço
+volumétrico. Ainda não há justificativa para conectar
+`SaltWallStressDiagnostics` como provider runtime.

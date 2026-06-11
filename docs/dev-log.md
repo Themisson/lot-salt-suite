@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.25B caso diagnostico com sigmaTheta refinado; commit/push em andamento
+Fase ativa  : 10.25C decisao da fonte sigmaTheta; commit/push em andamento
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 258/258 passaram apos Fase 10.24C em 2026-06-11
-Testes Py   : 156/156 passaram apos Fase 10.25B em 2026-06-11
+Testes Py   : 161/161 passaram apos Fase 10.25C em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,41 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.25C — decisão da fonte `sigmaTheta` — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_phase10_25c_sigma_theta_source.py
+```
+
+**Inputs comparados:**
+
+```text
+results/comparison/phase10_24c/phase10_24c_summary.csv
+results/comparison/phase10_25b/phase10_25b_summary.csv
+```
+
+**Decisão:**
+
+```text
+NEXT_MODEL_PRESSURE_SOURCE_TIMING_REVIEW
+```
+
+**Racional:** 10.24C e 10.25B mantêm `opening_time_error_s = 150.0` com
+pressão máxima, pressão na abertura, pressão final e sink delay em faixa
+diagnóstica boa. A série refinada não corrigiu a abertura deslocada, então a
+próxima auditoria deve focar `pressure_source`/timing (`before`, `trial`,
+`after`) e o instante de amostragem do provider, antes de conectar
+`SaltWallStressDiagnostics` como fonte runtime.
+
+**Escopo:** decisão documental/diagnóstica; nenhum `results/` versionado; nenhum
+default runtime alterado.
 
 ---
 
