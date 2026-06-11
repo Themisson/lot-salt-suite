@@ -124,3 +124,26 @@ A Fase 11.3A executou essa matriz e confirmou:
 PHASE11_3A_V2_SENSITIVITY_RUN_OK
 V2_REPRODUCES_V1_DIAGNOSTICS
 ```
+
+## Execução direta por study_id
+
+A Fase 11.3B adiciona:
+
+```text
+tools/run_lot_pkn_sensitivity_study.py
+```
+
+Agora o estudo pode ser executado pelo identificador do índice:
+
+```powershell
+python tools/run_lot_pkn_sensitivity_study.py `
+  --study-id buz67d_cgeom_sensitivity_v2 `
+  --studies-index cases/validation/sensitivity/studies_index.yaml `
+  --output-dir results/comparison/studies/buz67d_cgeom_sensitivity_v2 `
+  --dry-run
+```
+
+O wrapper exige `status: active` por padrão e escreve `study_metadata.json` no
+diretório de saída. Estudos inativos exigem `--allow-inactive`. A execução por
+`study_id` não altera a semântica das matrizes e continua gravando artefatos
+locais em `results/`.

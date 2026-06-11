@@ -493,3 +493,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `V2_REPRODUCES_V1_DIAGNOSTICS` para os cenários selecionados. Os YAMLs
   materializados continuam artefatos locais em `results/`, não casos
   versionados.
+- A Fase 11.3B adiciona execução por `study_id` com
+  `tools/run_lot_pkn_sensitivity_study.py`. O estudo
+  `buz67d_cgeom_sensitivity_v2` passa a ser executável a partir do índice sem
+  informar manualmente o caminho da matriz. O wrapper delega ao runner genérico
+  e mantém `results/` fora do Git.

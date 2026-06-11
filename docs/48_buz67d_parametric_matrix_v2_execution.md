@@ -147,3 +147,24 @@ python tools/verify_phase11_3a_v2_sensitivity_run.py `
 ## Próxima fase recomendada
 
 A próxima fase pode consolidar execução multi-estudo ou adicionar resolução por `study_id`, agora que a matriz v2 foi validada em execução real.
+
+## Fase 11.3B — resolução por study_id
+
+A resolução por `study_id` foi adicionada em:
+
+```text
+tools/run_lot_pkn_sensitivity_study.py
+```
+
+O estudo verificado nesta página pode ser executado pelo índice:
+
+```powershell
+python tools/run_lot_pkn_sensitivity_study.py `
+  --study-id buz67d_cgeom_sensitivity_v2 `
+  --studies-index cases/validation/sensitivity/studies_index.yaml `
+  --output-dir results/comparison/studies/buz67d_cgeom_sensitivity_v2 `
+  --dry-run
+```
+
+Isso preserva a matriz v2 como fonte versionada e mantém casos materializados
+em `results/`.

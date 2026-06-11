@@ -1,0 +1,27 @@
+studies:
+  - id: fixture_active
+    title: Fixture active study
+    matrix: fixture_matrix.yaml
+    route: modern-refined
+    status: active
+    tags:
+      - fixture
+      - active
+    caveat: Fixture study for unit tests only.
+  - id: fixture_inactive
+    title: Fixture inactive study
+    matrix: fixture_matrix.yaml
+    route: modern-refined
+    status: inactive
+    tags:
+      - fixture
+      - inactive
+    caveat: Fixture inactive study for unit tests only.
+  - id: fixture_missing_matrix
+    title: Fixture missing matrix study
+    matrix: missing_matrix.yaml
+    route: modern-refined
+    status: active
+    tags:
+      - fixture
+    caveat: Fixture missing matrix study for unit tests only.

@@ -187,3 +187,21 @@ BUZ67D_CGEOM_SENSITIVITY_V2_REGISTERED
 A Fase 11.3A executa a matriz v2 BUZ-67D com o runner genérico e confirma que
 os cenários materializados em `results/` reproduzem os diagnósticos v1
 documentados para `0.75x`, baseline, `1.25x` e `same_step`.
+
+## Fase 11.3B execução por study_id
+
+A Fase 11.3B adiciona uma camada operacional para executar estudos registrados
+no índice:
+
+```text
+tools/run_lot_pkn_sensitivity_study.py
+```
+
+Status:
+
+```text
+SENSITIVITY_STUDY_ID_EXECUTION_ADDED
+BUZ67D_CGEOM_SENSITIVITY_V2_RUNNABLE_BY_STUDY_ID
+```
+
+Essa etapa melhora usabilidade sem alterar solver, schema ou casos protegidos.

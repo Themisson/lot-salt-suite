@@ -33,6 +33,15 @@
     "materialized_cases_versioned": false,
     "physical_validation": false
   },
+  "phase11_3b_sensitivity_study_id_execution": {
+    "status": "SENSITIVITY_STUDY_ID_EXECUTION_ADDED",
+    "registered_study": "buz67d_cgeom_sensitivity_v2",
+    "study_execution_status": "BUZ67D_CGEOM_SENSITIVITY_V2_RUNNABLE_BY_STUDY_ID",
+    "wrapper": "tools/run_lot_pkn_sensitivity_study.py",
+    "delegates_to_matrix_runner": true,
+    "results_versioned": false,
+    "physical_validation": false
+  },
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,

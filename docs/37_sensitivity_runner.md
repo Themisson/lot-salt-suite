@@ -277,3 +277,34 @@ O verificador associado é:
 ```text
 tools/verify_phase11_3a_v2_sensitivity_run.py
 ```
+
+## Execução por study_id
+
+A Fase 11.3B adiciona o wrapper:
+
+```text
+tools/run_lot_pkn_sensitivity_study.py
+```
+
+Ele resolve `study_id` em `cases/validation/sensitivity/studies_index.yaml`,
+verifica `status: active`, resolve o caminho da matriz e delega a execução ao
+runner genérico. Essa camada não altera `run_lot_pkn_sensitivity_matrix.py` nem
+o runtime C++; ela apenas torna a execução de estudos registrados mais
+ergonômica e reproduzível.
+
+Exemplo:
+
+```powershell
+python tools/run_lot_pkn_sensitivity_study.py `
+  --study-id buz67d_cgeom_sensitivity_v2 `
+  --studies-index cases/validation/sensitivity/studies_index.yaml `
+  --output-dir results/comparison/studies/buz67d_cgeom_sensitivity_v2 `
+  --dry-run
+```
+
+Status:
+
+```text
+SENSITIVITY_STUDY_ID_EXECUTION_ADDED
+BUZ67D_CGEOM_SENSITIVITY_V2_RUNNABLE_BY_STUDY_ID
+```

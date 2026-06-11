@@ -57,6 +57,36 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.3B — execução de estudos por study_id — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/run_lot_pkn_sensitivity_study.py
+```
+
+**Documento criado:**
+
+```text
+docs/49_run_sensitivity_by_study_id.md
+```
+
+**Resultado esperado:**
+
+```text
+SENSITIVITY_STUDY_ID_EXECUTION_ADDED
+BUZ67D_CGEOM_SENSITIVITY_V2_RUNNABLE_BY_STUDY_ID
+```
+
+O estudo `buz67d_cgeom_sensitivity_v2` pode ser resolvido a partir de
+`cases/validation/sensitivity/studies_index.yaml` e executado por wrapper fino
+que delega ao runner genérico. A fase não altera solver, schema, runtime C++ ou
+casos protegidos.
+
+---
+
 ### [2026-06-11] Fase 11.3A — execução verificada da matriz v2 BUZ-67D — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.
