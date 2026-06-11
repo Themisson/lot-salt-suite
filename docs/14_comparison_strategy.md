@@ -2226,3 +2226,52 @@ Caveats:
 - a série temporal atual não vem de `SaltCreepTimeBridge`;
 - `sigma_theta_salt_runtime` ainda não existe;
 - o default de `lot-sim run --mode lot-pkn` não muda.
+
+## Fase 10.24C — diagnóstico final BUZ67D com `sigma_theta_time_series`
+
+A Fase 10.24C criou `tools/compare_phase10_24c.py` para avaliar o caso
+controlado `sigma_theta_time_series` com as métricas finais de pico, abertura,
+sink, pressão na abertura e shut-in. O diagnóstico usou a saída moderna de:
+
+```text
+results/comparison/phase10_24b/modern_sigma_theta_timeseries/timeseries.csv
+```
+
+comparada à trace legada auditada em:
+
+```text
+results/comparison/level1_buz67d/legacy_audit/buz67d_audit_timeseries.csv
+```
+
+Resultado:
+
+```text
+classification = SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED
+next_model_recommendation = NEXT_MODEL_SIGMA_THETA_TIMESERIES_NEEDS_BETTER_SOURCE
+
+max_pressure_legacy_Pa = 69035836.1743195
+max_pressure_modern_Pa = 67331393.612597
+relative_error_max_pressure = -0.02468924338685035
+
+legacy_first_opened_time_s = 510.0
+modern_fracture_initiation_time_s = 660.0
+opening_time_error_s = 150.0
+
+legacy_sink_delay_s = 30.0
+modern_sink_delay_s = 30.0
+sink_delay_error_s = 0.0
+
+legacy_pressure_at_opening_Pa = 66769500.0
+modern_pressure_at_opening_Pa = 67331393.612597
+pressure_at_opening_relative_error = 0.008415423398363079
+
+final_pressure_relative_error = -0.009582917751452825
+```
+
+Interpretação: `constant_geometric + next_step + sigma_theta_time_series`
+preserva a escala de pressão, a pressão na abertura e o atraso do sink dentro de
+faixas diagnósticas boas, mas não corrige a cronologia de abertura. Como a série
+10.24B é mínima e quase constante, a recomendação não é ainda conectar
+`SaltWallStressDiagnostics` ao runtime padrão; a próxima fase deve buscar uma
+fonte sigma-theta temporal mais representativa ou auditar por que a pressão
+trial moderna cruza `66666600 Pa` apenas em `660 s`.

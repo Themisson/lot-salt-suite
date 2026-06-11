@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.24B sigma_theta_time_series diagnostico; commit/push pendente
+Fase ativa  : 10.24C diagnostico final sigma_theta_time_series; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
-Testes C++  : 258/258 passaram apos Fase 10.24B em 2026-06-11
-Testes Py   : 139/139 passaram apos Fase 10.24B em 2026-06-11
+Testes C++  : 258/258 passaram apos Fase 10.24C em 2026-06-11
+Testes Py   : 144/144 passaram apos Fase 10.24C em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -57,9 +57,57 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
-### [2026-06-11] Fase 10.24B — sigma_theta_time_series diagnóstico — Codex
+### [2026-06-11] Fase 10.24C — diagnóstico final `sigma_theta_time_series` BUZ67D — Codex
 
 **Status:** Implementada localmente; commit/push pendente.
+
+**Classificação final:** `SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED`.
+
+**Próxima recomendação:** `NEXT_MODEL_SIGMA_THETA_TIMESERIES_NEEDS_BETTER_SOURCE`.
+
+**Objetivo:** diagnosticar o caso BUZ67D com `constant_geometric`,
+`sigma_theta_time_series`, `sink_timing: next_step`, pressão inicial, schedule
+injeção+shut-in e drill pipe, sem alterar o runtime padrão.
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase10_24c.py
+```
+
+**Resultado:**
+
+```text
+max_pressure_legacy_Pa = 69035836.1743195
+max_pressure_modern_Pa = 67331393.612597
+relative_error_max_pressure = -0.02468924338685035
+
+legacy_first_opened_time_s = 510.0
+modern_fracture_initiation_time_s = 660.0
+opening_time_error_s = 150.0
+
+legacy_sink_delay_s = 30.0
+modern_sink_delay_s = 30.0
+sink_delay_error_s = 0.0
+
+legacy_pressure_at_opening_Pa = 66769500.0
+modern_pressure_at_opening_Pa = 67331393.612597
+pressure_at_opening_relative_error = 0.008415423398363079
+
+final_pressure_relative_error = -0.009582917751452825
+```
+
+**Conclusão:** a escala de pressão, a pressão no ponto moderno de abertura, o
+sink delay e o final de shut-in estão coerentes em nível diagnóstico, mas a
+abertura permanece deslocada. A série temporal mínima da 10.24B não é fonte
+física suficiente para promover runtime de sal; a próxima fase deve melhorar a
+fonte `sigmaTheta` temporal ou auditar o cruzamento de pressão trial.
+
+---
+
+### [2026-06-11] Fase 10.24B — sigma_theta_time_series diagnóstico — Codex
+
+**Status:** Concluída, commitada e enviada em `6fa005b`.
 
 **Classificação:** `SIGMA_THETA_TIMESERIES_DIAGNOSTIC_ONLY`.
 

@@ -327,3 +327,10 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   de wiring e nao substitui uma fonte fisica real. As fases futuras devem
   avaliar se `SaltWallStressDiagnostics` pode ser a fonte runtime fisicamente
   controlada. O default de `lot-sim run --mode lot-pkn` permanece inalterado.
+- A Fase 10.24C diagnosticou o caso BUZ67D combinado e classificou a rota como
+  `SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED`. A pressao maxima, a
+  pressao na abertura, o shut-in final e o atraso de sink ficaram bons em escala
+  diagnostica, mas a abertura moderna ainda ocorreu em `660 s` contra `510 s`
+  no legado. A proxima fase deve melhorar/auditar a fonte temporal de
+  sigma-theta antes de promover `SaltWallStressDiagnostics` como provider
+  runtime.
