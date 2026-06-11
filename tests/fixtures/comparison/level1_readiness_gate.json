@@ -42,6 +42,16 @@
     "results_versioned": false,
     "physical_validation": false
   },
+  "phase11_3c_canonical_lot_pkn_study_runner": {
+    "status": "CANONICAL_LOT_PKN_STUDY_COMMAND_ADDED",
+    "registered_study": "buz67d_cgeom_sensitivity_v2",
+    "study_command_status": "BUZ67D_CGEOM_STUDY_END_TO_END_COMMAND_AVAILABLE",
+    "tool": "tools/run_lot_pkn_study.py",
+    "manifest": "study_manifest.json",
+    "commands_file": "run_commands.txt",
+    "results_versioned": false,
+    "physical_validation": false
+  },
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,

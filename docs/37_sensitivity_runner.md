@@ -308,3 +308,26 @@ Status:
 SENSITIVITY_STUDY_ID_EXECUTION_ADDED
 BUZ67D_CGEOM_SENSITIVITY_V2_RUNNABLE_BY_STUDY_ID
 ```
+
+## Comando canônico de estudo
+
+A Fase 11.3C adiciona:
+
+```text
+tools/run_lot_pkn_study.py
+```
+
+Esse comando resolve `study_id`, chama o wrapper por estudo, gera relatório
+quando há `summary.csv` real e escreve:
+
+```text
+study_manifest.json
+run_commands.txt
+```
+
+Status:
+
+```text
+CANONICAL_LOT_PKN_STUDY_COMMAND_ADDED
+BUZ67D_CGEOM_STUDY_END_TO_END_COMMAND_AVAILABLE
+```

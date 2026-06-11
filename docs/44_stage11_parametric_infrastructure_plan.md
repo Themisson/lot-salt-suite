@@ -205,3 +205,15 @@ BUZ67D_CGEOM_SENSITIVITY_V2_RUNNABLE_BY_STUDY_ID
 ```
 
 Essa etapa melhora usabilidade sem alterar solver, schema ou casos protegidos.
+
+## Fase 11.3C comando canônico
+
+A Fase 11.3C cria:
+
+```text
+tools/run_lot_pkn_study.py
+```
+
+O comando único resolve `study_id`, executa a matriz por meio dos wrappers
+existentes, gera relatório quando aplicável e escreve manifesto local. Ele é a
+entrada preferencial para execução reproduzível de estudos LOT/PKN registrados.

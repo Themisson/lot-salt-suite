@@ -498,3 +498,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `buz67d_cgeom_sensitivity_v2` passa a ser executável a partir do índice sem
   informar manualmente o caminho da matriz. O wrapper delega ao runner genérico
   e mantém `results/` fora do Git.
+- A Fase 11.3C adiciona `tools/run_lot_pkn_study.py` como comando canônico de
+  estudo. Ele resolve `study_id`, chama a execução por estudo, gera relatório
+  quando há outputs reais e escreve `study_manifest.json`/`run_commands.txt` em
+  `results/`.

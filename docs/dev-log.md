@@ -57,6 +57,35 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.3C — comando canônico LOT/PKN study — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/run_lot_pkn_study.py
+```
+
+**Documento criado:**
+
+```text
+docs/50_run_lot_pkn_study.md
+```
+
+**Resultado esperado:**
+
+```text
+CANONICAL_LOT_PKN_STUDY_COMMAND_ADDED
+BUZ67D_CGEOM_STUDY_END_TO_END_COMMAND_AVAILABLE
+```
+
+O comando resolve `study_id`, delega a execução ao wrapper por estudo, gera
+relatório quando há outputs reais e cria `study_manifest.json` e
+`run_commands.txt` no diretório local de `results/`.
+
+---
+
 ### [2026-06-11] Fase 11.3B — execução de estudos por study_id — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

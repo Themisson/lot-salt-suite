@@ -154,3 +154,23 @@ buz67d_cgeom_sensitivity
 
 The registration is metadata/discovery infrastructure. It does not duplicate the
 matrix and does not change the package runner.
+
+## Stage 11 canonical study command
+
+Phase 11.3C adds the study-oriented command:
+
+```text
+tools/run_lot_pkn_study.py
+```
+
+For the BUZ-67D C_geom v2 study:
+
+```powershell
+python tools/run_lot_pkn_study.py `
+  --study-id buz67d_cgeom_sensitivity_v2 `
+  --output-dir results/comparison/studies/buz67d_cgeom_sensitivity_v2 `
+  --lot-sim build/Debug/lot-sim.exe
+```
+
+This supersedes manual orchestration for routine local diagnostics, while the
+older package remains documented for historical reproducibility.

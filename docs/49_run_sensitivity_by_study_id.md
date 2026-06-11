@@ -120,3 +120,14 @@ tools/run_lot_pkn_sensitivity_matrix.py
 - O estudo BUZ-67D continua `modern-refined` diagnostico.
 - A matriz v2 nao e `legacy-equivalence`.
 - `results/` permanece local e fora do Git.
+
+## Evolucao 11.3C
+
+Para executar o estudo completo e gerar manifesto final, use:
+
+```text
+tools/run_lot_pkn_study.py
+```
+
+Esse comando reaproveita `run_lot_pkn_sensitivity_study.py`, chama o reporter
+quando há resultados reais e grava `study_manifest.json` e `run_commands.txt`.

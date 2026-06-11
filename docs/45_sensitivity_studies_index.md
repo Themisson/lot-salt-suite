@@ -147,3 +147,18 @@ O wrapper exige `status: active` por padrão e escreve `study_metadata.json` no
 diretório de saída. Estudos inativos exigem `--allow-inactive`. A execução por
 `study_id` não altera a semântica das matrizes e continua gravando artefatos
 locais em `results/`.
+
+## Comando único por estudo
+
+A Fase 11.3C adiciona `tools/run_lot_pkn_study.py`, que usa o mesmo índice e
+gera também `study_manifest.json` e `run_commands.txt`.
+
+```powershell
+python tools/run_lot_pkn_study.py `
+  --study-id buz67d_cgeom_sensitivity_v2 `
+  --output-dir results/comparison/studies/buz67d_cgeom_sensitivity_v2 `
+  --dry-run
+```
+
+Esse comando é a entrada recomendada para reproduzir estudos registrados em
+outro computador.
