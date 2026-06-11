@@ -417,3 +417,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   com dados completos; caso contrario, executar matriz de sensibilidade
   BUZ-67D sem transformar divergencias temporais ou numericas em erro
   automatico.
+- A Fase 10.28B aplicou esse gate. BUZ-29D foi encontrado no legado, mas nao
+  como caso PKN moderno pronto: fontes principais usam modelos alternativos ou
+  precisam de auditoria adicional, e saidas PKN nao bastam para criar YAML sem
+  inventar parametros. A rota escolhida para 10.28C e
+  `ADDITIONAL_WELL_BLOCKED_SENSITIVITY_SELECTED`, com matriz BUZ-67D
+  `modern-refined` S0-S3.

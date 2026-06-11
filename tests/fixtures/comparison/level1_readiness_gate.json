@@ -1248,6 +1248,33 @@
       "Strict LOT_Tese regression remains a separate track."
     ]
   },
+  "phase10_28b_additional_or_sensitivity_gate": {
+    "status": "ADDITIONAL_WELL_BLOCKED_SENSITIVITY_SELECTED",
+    "phase": "10.28B",
+    "route_decision": "ADDITIONAL_WELL_BLOCKED_SENSITIVITY_SELECTED",
+    "buz29d_status": "BUZ29D_NOT_PKN",
+    "selected_case": "BUZ67D_MODERN_REFINED_SENSITIVITY_MATRIX",
+    "sensitivity_matrix_status": "SENSITIVITY_MATRIX_READY",
+    "recommendation_for_10_28C": "RUN_BUZ67D_MODERN_REFINED_SENSITIVITY_MATRIX_IN_10_28C",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": true,
+    "tool": "tools/plan_phase10_28b_additional_or_sensitivity.py",
+    "document": "docs/34_phase10_28b_additional_or_sensitivity_gate.md",
+    "planned_scenarios": [
+      "S0_baseline",
+      "S1_lower_compliance",
+      "S2_higher_compliance",
+      "S3_same_step"
+    ],
+    "caveats": [
+      "BUZ-29D legacy material exists but is not a ready PKN modern-refined case.",
+      "Output-only PKN artifacts are not sufficient to create a modern YAML.",
+      "The selected route is BUZ-67D modern-refined sensitivity, not legacy-equivalence."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

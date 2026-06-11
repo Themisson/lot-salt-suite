@@ -57,6 +57,36 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 10.28B — gate BUZ-29D ou sensibilidade — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Documento criado:**
+
+```text
+docs/34_phase10_28b_additional_or_sensitivity_gate.md
+```
+
+**Ferramenta criada:**
+
+```text
+tools/plan_phase10_28b_additional_or_sensitivity.py
+```
+
+**Decisão:**
+
+```text
+ADDITIONAL_WELL_BLOCKED_SENSITIVITY_SELECTED
+SENSITIVITY_MATRIX_READY_FOR_10_28C
+```
+
+BUZ-29D foi localizado no legado, mas não ficou pronto como caso PKN moderno
+sem auditoria adicional. A Fase 10.28C deve executar a matriz BUZ-67D
+`modern-refined` S0-S3, sem classificar divergência temporal como erro físico
+ou regressão legacy-equivalence.
+
+---
+
 ### [2026-06-11] Fase 10.28A — pacote modern-refined para casos adicionais — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

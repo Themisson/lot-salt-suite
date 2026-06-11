@@ -123,3 +123,17 @@ Se houver dados completos de outro poço/caso, a próxima fase deve criar um
 pacote `modern-refined` adicional com o mesmo contrato do BUZ-67D. Se não
 houver, a próxima fase deve executar a matriz de sensibilidade BUZ-67D definida
 neste documento.
+
+## Gate 10.28B aplicado
+
+A Fase 10.28B aplicou este contrato e registrou:
+
+```text
+ADDITIONAL_WELL_BLOCKED_SENSITIVITY_SELECTED
+SENSITIVITY_MATRIX_READY_FOR_10_28C
+```
+
+O material BUZ-29D existe, mas não está pronto para virar caso PKN moderno sem
+auditoria adicional. A rota segura para 10.28C é a matriz BUZ-67D
+`modern-refined` com variação controlada de `constant_geometric` e
+`sink_timing`.

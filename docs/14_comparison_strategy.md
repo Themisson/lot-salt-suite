@@ -2784,3 +2784,24 @@ Gate:
 ```text
 ADDITIONAL_WELLS_OR_SENSITIVITY_MATRIX
 ```
+
+## Fase 10.28B — gate additional well ou sensibilidade
+
+A Fase 10.28B registra o documento:
+
+```text
+docs/34_phase10_28b_additional_or_sensitivity_gate.md
+```
+
+Resultado:
+
+```text
+ADDITIONAL_WELL_BLOCKED_SENSITIVITY_SELECTED
+SENSITIVITY_MATRIX_READY_FOR_10_28C
+```
+
+BUZ-29D possui fontes e saídas legadas, incluindo artefatos com `PKN` no nome,
+mas o gate não encontrou um caso PKN moderno pronto com parâmetros completos.
+Portanto, a comparação adicional não deve ser forçada nesta fase. A próxima
+execução diagnóstica deve usar matriz BUZ-67D `modern-refined`, mantendo
+`legacy-equivalence` em trilha separada.

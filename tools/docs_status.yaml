@@ -107,6 +107,7 @@ phases:
   phase_10_27b_buz67d_modern_refined_validation: completed
   phase_10_27c_post_roadmap: completed
   phase_10_28a_modern_refined_validation_package: completed
+  phase_10_28b_additional_or_sensitivity_gate: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -140,6 +141,7 @@ docs:
   buz67d_modern_refined_validation: implemented
   post_10_27_roadmap: implemented
   phase10_28a_modern_refined_validation_package: implemented
+  phase10_28b_additional_or_sensitivity_gate: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -205,12 +207,12 @@ validation:
 test_counts:
   cpp_tests: 263        # Catch2 lot-salt-suite — 263/263 previstos apos Fase 10.26B (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 211     # pytest lot-salt-suite — 211/211 previstos apos Fase 10.28A (2026-06-11)
+  python_tests: 218     # pytest lot-salt-suite — 218/218 previstos apos Fase 10.28B (2026-06-11)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-11"
-updated_by: "codex (Fase 10.28A modern-refined validation package)"
+updated_by: "codex (Fase 10.28B additional well or sensitivity gate)"
 project_version: "0.1.0"

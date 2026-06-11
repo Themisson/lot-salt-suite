@@ -130,3 +130,22 @@ com dados completos; se isso não estiver disponível, executar uma matriz de
 sensibilidade `modern-refined` baseada no BUZ-67D. A trilha
 `legacy-equivalence` permanece separada e condicionada ao consumo real de
 geometria/sampling APBSalt1D.
+
+## Fase 10.28B registrada
+
+A Fase 10.28B executa o gate duplo em:
+
+```text
+docs/34_phase10_28b_additional_or_sensitivity_gate.md
+```
+
+Resultado:
+
+```text
+ADDITIONAL_WELL_BLOCKED_SENSITIVITY_SELECTED
+SENSITIVITY_MATRIX_READY_FOR_10_28C
+```
+
+BUZ-29D foi localizado como material legado, mas não como caso PKN moderno
+pronto. A próxima fase deve executar a matriz BUZ-67D `modern-refined` S0-S3
+sem promover equivalência com o `LOT_Tese`.
