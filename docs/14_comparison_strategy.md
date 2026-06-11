@@ -2622,3 +2622,35 @@ implementar um provedor/sampler opt-in que consiga consumir `outer_radius_m`,
 `radial_elements`, `ratio`, `integration_order` e o ponto
 `legacy_elem0_sig_2_0`, ou classificar formalmente a malha moderna refinada como
 não equivalente ao legado.
+
+## Fase 10.26C — decisão de consumo APBSalt1D
+
+A Fase 10.26C formaliza que a configuração APBSalt1D da 10.26B ainda é
+metadata-only:
+
+```text
+APBSALT1D_METADATA_ONLY_CONFIRMED
+NEXT_PHASE_IMPLEMENT_SAMPLING_BRIDGE
+```
+
+A infraestrutura moderna já possui parte da base: `SaltCreepTimeBridge` consegue
+montar malha radial com raio externo e número de elementos, e
+`SaltWallStressDiagnostics` consegue expor amostras de tensão de parede. Porém,
+a equivalência APBSalt1D exige mais do que isso:
+
+- reproduzir ou mapear `ratio = 10`;
+- mapear a amostragem `elem0/sig(2,0)`;
+- conectar a tensão amostrada a um `SigmaThetaProvider` opt-in;
+- evitar que `lot/` dependa diretamente de `coupling/`, `salt/` ou
+  `external/saltcreep/`.
+
+Por isso, `pressure_source`/timing continua bloqueado:
+
+```text
+BLOCKED_UNTIL_APBSALT1D_GEOMETRY_IS_CONSUMED_OR_REJECTED
+```
+
+A próxima implementação recomendada é uma ponte de amostragem, não uma correção
+direta de pressão/timing. Se a ponte demonstrar que a malha APBSalt1D consumida
+continua abrindo em `660 s`, a análise de `before/trial/after` deve ser retomada
+com melhor rastreabilidade.

@@ -9,7 +9,7 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.26B APBSalt1D sigmaTheta equivalence metadata; commit/push em andamento
+Fase ativa  : 10.26C decisao consumo APBSalt1D sigmaTheta; commit/push em andamento
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
@@ -54,6 +54,38 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.26C — decisão de consumo APBSalt1D para `sigmaTheta` — Codex
+
+**Status:** Implementado localmente; testes/commit/push pendentes.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_phase10_26c_apbsalt1d_consumption.py
+```
+
+**Decisão:**
+
+```text
+apbsalt1d_consumption_status = APBSALT1D_METADATA_ONLY_CONFIRMED
+next_phase_recommendation = NEXT_PHASE_IMPLEMENT_SAMPLING_BRIDGE
+pressure_source_timing_gate = BLOCKED_UNTIL_APBSALT1D_GEOMETRY_IS_CONSUMED_OR_REJECTED
+```
+
+**Capacidades existentes:** malha radial L3 (`build_mesh_L3`), `outer_radius_m`,
+`radial_elements`, `integration_order = 3` via `AxisymL3`,
+`SaltWallStressDiagnostics` e contrato `SigmaThetaProvider`.
+
+**Capacidades ausentes:** `mesh_ratio_configurable`, amostragem
+`legacy_elem0_sig_2_0`, provider runtime de `SaltWallStressDiagnostics` para LOT
+e ponte sem dependencia circular entre `lot/`, `coupling/` e `salt/`.
+
+**Interpretação:** a metadata APBSalt1D da 10.26B continua nao consumida. Nao ha
+base para corrigir `pressure_source`/timing antes de implementar uma ponte de
+amostragem ou documentar formalmente a nao equivalencia da malha moderna.
 
 ---
 

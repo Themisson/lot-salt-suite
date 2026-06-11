@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">87/94</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">88/95</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">263</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">173</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">180</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -7476,6 +7476,80 @@ malha moderna refinada diferente deve ser usada.</p>
 <li><code>APBSalt1D_CONFIG_DECLARED_NOT_CONSUMED</code> deve bloquear qualquer alegação de
   equivalência física.</li>
 </ul>
+<h2 id="decisao-sobre-consumo-real-da-geometria-apbsalt1d-fase-1026c">Decisão sobre consumo real da geometria APBSalt1D (Fase 10.26C)</h2>
+<p>A Fase 10.26C auditou se a metadata APBSalt1D da 10.26B já poderia ser
+consumida por uma rota moderna real de <code>sigmaTheta</code>. A decisão é:</p>
+<pre><code class="language-text">apbsalt1d_consumption_status = APBSALT1D_METADATA_ONLY_CONFIRMED
+next_phase_recommendation = NEXT_PHASE_IMPLEMENT_SAMPLING_BRIDGE
+pressure_source_timing_gate = BLOCKED_UNTIL_APBSALT1D_GEOMETRY_IS_CONSUMED_OR_REJECTED
+</code></pre>
+<p>Capacidades existentes:</p>
+<table>
+<thead>
+<tr>
+<th>Capacidade</th>
+<th>Existe?</th>
+<th>Fonte moderna</th>
+<th>Observação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>malha radial L3</td>
+<td>sim</td>
+<td><code>SaltCreepTimeBridge</code> / <code>build_mesh_L3</code></td>
+<td>permite <code>inner_radius_m</code>, <code>outer_radius_m</code>, <code>radial_elements</code></td>
+</tr>
+<tr>
+<td><code>outer_radius_m</code></td>
+<td>sim</td>
+<td><code>SaltCreepTimeBridgeConfig</code>, <code>LotSaltBridgeConfigOptions</code></td>
+<td>configurável</td>
+</tr>
+<tr>
+<td><code>radial_elements</code></td>
+<td>sim</td>
+<td><code>SaltCreepTimeBridgeConfig</code>, <code>LotSaltBridgeConfigOptions</code></td>
+<td>configurável</td>
+</tr>
+<tr>
+<td><code>integration_order = 3</code></td>
+<td>parcialmente</td>
+<td><code>AxisymL3</code></td>
+<td>disponível, mas não como opção YAML runtime</td>
+</tr>
+<tr>
+<td><code>SaltWallStressDiagnostics</code></td>
+<td>sim</td>
+<td><code>SaltCreepTimeBridge::wall_stress_diagnostics()</code></td>
+<td>amostra pontos de parede/minor <code>r_m</code></td>
+</tr>
+<tr>
+<td><code>SigmaThetaProvider</code></td>
+<td>sim</td>
+<td><code>lot/SigmaThetaProvider.hpp</code></td>
+<td>contrato existe, provider atual é série temporal</td>
+</tr>
+</tbody>
+</table>
+<p>Capacidades ausentes para equivalência real:</p>
+<ul>
+<li><code>mesh_ratio_configurable</code>: o <code>ratio = 10</code> do APBSalt1D não é consumido por
+  <code>build_mesh_L3</code>;</li>
+<li><code>legacy_elem0_sig_2_0_sampling_available</code>: não há API moderna que selecione
+  explicitamente <code>mdl-&gt;getElem(0)-&gt;getSigmaTheta(); sig(2,0)</code>;</li>
+<li><code>salt_wall_stress_runtime_provider_available</code>: o LOT ainda não recebe
+  <code>SaltWallStressDiagnostics</code> como provider de <code>sigmaTheta</code>;</li>
+<li><code>lot_provider_can_consume_wall_stress</code>: o provider LOT atual recebe série
+  temporal, não um bridge de tensão;</li>
+<li>existe risco de dependência circular se <code>lot/</code> conhecer diretamente
+  <code>coupling/</code> ou <code>salt/</code>.</li>
+</ul>
+<p>Assim, a próxima fase não deve voltar a corrigir <code>pressure_source</code>/timing. A
+fase seguinte deve criar uma ponte de amostragem opt-in ou uma decisão formal de
+não equivalência: <code>CaseData</code>/metadata APBSalt1D -&gt; configuração de bridge -&gt;
+amostragem equivalente -&gt; provider <code>sigmaTheta</code>, mantendo <code>lot/</code> sem depender
+diretamente de <code>external/saltcreep</code>.</p>
 </div>
 </section>
 

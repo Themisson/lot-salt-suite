@@ -3195,3 +3195,44 @@ Caveats:
 - `lot-sim run --mode lot-pkn` continua desacoplado do sal runtime;
 - `APBSalt1D_CONFIG_DECLARED_NOT_CONSUMED` deve bloquear qualquer alegação de
   equivalência física.
+
+## Decisão sobre consumo real da geometria APBSalt1D (Fase 10.26C)
+
+A Fase 10.26C auditou se a metadata APBSalt1D da 10.26B já poderia ser
+consumida por uma rota moderna real de `sigmaTheta`. A decisão é:
+
+```text
+apbsalt1d_consumption_status = APBSALT1D_METADATA_ONLY_CONFIRMED
+next_phase_recommendation = NEXT_PHASE_IMPLEMENT_SAMPLING_BRIDGE
+pressure_source_timing_gate = BLOCKED_UNTIL_APBSALT1D_GEOMETRY_IS_CONSUMED_OR_REJECTED
+```
+
+Capacidades existentes:
+
+| Capacidade | Existe? | Fonte moderna | Observação |
+|---|---|---|---|
+| malha radial L3 | sim | `SaltCreepTimeBridge` / `build_mesh_L3` | permite `inner_radius_m`, `outer_radius_m`, `radial_elements` |
+| `outer_radius_m` | sim | `SaltCreepTimeBridgeConfig`, `LotSaltBridgeConfigOptions` | configurável |
+| `radial_elements` | sim | `SaltCreepTimeBridgeConfig`, `LotSaltBridgeConfigOptions` | configurável |
+| `integration_order = 3` | parcialmente | `AxisymL3` | disponível, mas não como opção YAML runtime |
+| `SaltWallStressDiagnostics` | sim | `SaltCreepTimeBridge::wall_stress_diagnostics()` | amostra pontos de parede/minor `r_m` |
+| `SigmaThetaProvider` | sim | `lot/SigmaThetaProvider.hpp` | contrato existe, provider atual é série temporal |
+
+Capacidades ausentes para equivalência real:
+
+- `mesh_ratio_configurable`: o `ratio = 10` do APBSalt1D não é consumido por
+  `build_mesh_L3`;
+- `legacy_elem0_sig_2_0_sampling_available`: não há API moderna que selecione
+  explicitamente `mdl->getElem(0)->getSigmaTheta(); sig(2,0)`;
+- `salt_wall_stress_runtime_provider_available`: o LOT ainda não recebe
+  `SaltWallStressDiagnostics` como provider de `sigmaTheta`;
+- `lot_provider_can_consume_wall_stress`: o provider LOT atual recebe série
+  temporal, não um bridge de tensão;
+- existe risco de dependência circular se `lot/` conhecer diretamente
+  `coupling/` ou `salt/`.
+
+Assim, a próxima fase não deve voltar a corrigir `pressure_source`/timing. A
+fase seguinte deve criar uma ponte de amostragem opt-in ou uma decisão formal de
+não equivalência: `CaseData`/metadata APBSalt1D -> configuração de bridge ->
+amostragem equivalente -> provider `sigmaTheta`, mantendo `lot/` sem depender
+diretamente de `external/saltcreep`.

@@ -1041,6 +1041,44 @@
       "No default runtime behavior changed."
     ]
   },
+  "phase10_26c_apbsalt1d_consumption_decision": {
+    "status": "APBSALT1D_METADATA_ONLY_CONFIRMED",
+    "next_phase_recommendation": "NEXT_PHASE_IMPLEMENT_SAMPLING_BRIDGE",
+    "pressure_source_timing_gate": "BLOCKED_UNTIL_APBSALT1D_GEOMETRY_IS_CONSUMED_OR_REJECTED",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "tool": "tools/decide_phase10_26c_apbsalt1d_consumption.py",
+    "output_json": "results/comparison/phase10_26c/apbsalt1d_consumption_decision.json",
+    "output_md": "results/comparison/phase10_26c/apbsalt1d_consumption_decision.md",
+    "existing_capabilities": [
+      "radial_mesh_generation",
+      "outer_radius_configurable",
+      "radial_elements_configurable",
+      "integration_order_three_available",
+      "wall_stress_diagnostics_available",
+      "sigma_theta_provider_contract"
+    ],
+    "missing_capabilities": [
+      "mesh_ratio_configurable",
+      "legacy_elem0_sig_2_0_sampling_available",
+      "salt_wall_stress_runtime_provider_available",
+      "lot_provider_can_consume_wall_stress"
+    ],
+    "risk_flags": [
+      "PRESSURE_SOURCE_TIMING_REMAINS_BLOCKED_BY_GEOMETRY",
+      "CIRCULAR_DEPENDENCY_RISK",
+      "NO_PHYSICAL_VALIDATION",
+      "NO_DEFAULT_RUNTIME_CHANGE"
+    ],
+    "caveats": [
+      "Diagnostic decision only; not physical validation.",
+      "APBSalt1D metadata is not consumed by a runtime provider.",
+      "Do not change pressure_source or timing before implementing a sampling bridge or rejecting geometry equivalence.",
+      "No default runtime behavior changed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

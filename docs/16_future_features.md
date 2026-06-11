@@ -377,3 +377,11 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   deve consumir essa geometria em `SaltWallStressDiagnostics`/bridge opt-in ou
   documentar formalmente que a malha moderna refinada nao busca equivalencia
   com o legado.
+- A Fase 10.26C decidiu formalmente
+  `APBSALT1D_METADATA_ONLY_CONFIRMED` e
+  `NEXT_PHASE_IMPLEMENT_SAMPLING_BRIDGE`. O moderno ja tem malha radial L3,
+  `outer_radius_m`, `radial_elements` e diagnostico de tensao de parede, mas
+  ainda falta consumir `ratio = 10`, expor a amostragem
+  `legacy_elem0_sig_2_0` e ligar essa amostra a um `SigmaThetaProvider` opt-in.
+  `pressure_source`/timing segue bloqueado ate que a geometria seja consumida
+  ou rejeitada explicitamente.
