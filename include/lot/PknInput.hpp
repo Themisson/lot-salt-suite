@@ -9,6 +9,8 @@ namespace lss::lot {
 
 enum class PknPressureModel { PknDirect, VolumetricBalance };
 
+enum class FractureSinkTiming { SameStep, NextStep };
+
 struct BreakdownConfig {
   BreakdownMethod method = BreakdownMethod::PressureThreshold;
   double pressure_Pa = 0.0;
@@ -63,6 +65,7 @@ struct PknInput {
   double fluid_compressibility_per_Pa = 0.0;
   VolumetricComplianceConfig volumetric_compliance;
   double initial_pressure_Pa = 0.0;
+  FractureSinkTiming sink_timing = FractureSinkTiming::SameStep;
   FractureInitiationCriterion fracture_initiation =
       FractureInitiationCriterion::ConstantPressure;
   SigmaThetaFractureCriterion sigma_theta_fracture;

@@ -2735,6 +2735,82 @@ nao libera `pressure_tabulated_geometric` como default ou modelo opt-in de
 producao. A saida continua sendo evidencia para revisao humana e para uma fase
 futura de formulacao controlada.
 
+## Sink timing opt-in no volumetric_balance (Fase 10.23A)
+
+A Fase 10.23A adiciona um controle diagnostico opt-in para a cronologia do sink
+de fratura/leakoff no modelo `volumetric_balance`:
+
+```yaml
+lot:
+  fracture:
+    balance:
+      sink_timing: same_step   # default
+      # ou
+      sink_timing: next_step
+```
+
+O default global permanece `same_step`, preservando o comportamento anterior e
+mantendo `lot-sim run --mode lot-pkn` sem mudanca para casos existentes. A rota
+`next_step` e restrita a casos que declaram explicitamente o campo e serve para
+testar a cronologia observada no trace legado unificado da Fase 10.22C:
+
+```text
+first_opened_time_s = 510.0
+first_sink_positive_time_s = 540.0
+sink_delay_s = 30.0
+```
+
+Semantica implementada:
+
+- `same_step`: quando a fratura abre, os incrementos de volume de fratura e
+  leakoff daquele mesmo passo entram imediatamente no balanco volumetrico.
+- `next_step`: no passo em que a fratura abre, o sink e marcado como
+  `sink_deferred_this_step`; o sink so pode entrar a partir do passo seguinte.
+- O volume acumulado pre-abertura nao e aplicado de uma vez no passo seguinte,
+  porque os acumuladores de volume historico continuam sendo atualizados a cada
+  passo.
+
+Campos exportados em `timeseries.csv` e `result.json` para auditoria:
+
+```text
+sink_timing
+sink_deferred_this_step
+sink_active_this_step
+fracture_initiated_before_step
+fracture_initiated_after_step
+fracture_started_this_step
+fracture_sink_applied_m3
+leakoff_sink_applied_m3
+```
+
+A ferramenta diagnostica:
+
+```text
+tools/compare_phase10_23a.py
+```
+
+compara a rota `same_step` e a rota `next_step` contra o trace legado da 10.22C
+e classifica o resultado como `NEXT_STEP_SINK_EFFECTIVE` quando o atraso moderno
+de sink reproduz o atraso diagnostico de `30 s`.
+
+Resultado diagnostico BUZ-67D controlado:
+
+| Rota | Inicio abertura moderno [s] | Primeiro sink positivo [s] | Atraso [s] | Max pressure [Pa] | Erro vs legado |
+|---|---:|---:|---:|---:|---:|
+| legado 10.22C | `510.0` | `540.0` | `30.0` | `69035836.1743195` | n/a |
+| `same_step` | `690.0` | `690.0` | `0.0` | `67331393.612597` | `-0.02468924338685035` |
+| `next_step` | `690.0` | `720.0` | `30.0` | `69176810.81439006` | `0.0020420501565967626` |
+
+Classificacao:
+
+```text
+NEXT_STEP_SINK_EFFECTIVE
+```
+
+Esta fase nao compara fisica de fratura, nao valida `sigmaTheta`, nao implementa
+Zamora, nao libera `pressure_tabulated_geometric` e nao torna `next_step` default
+runtime. A evidencia e exclusivamente de cronologia estrutural do sink.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que

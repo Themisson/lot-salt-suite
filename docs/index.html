@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">75/82</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">242</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">123</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">76/83</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">245</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">125</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -2118,6 +2118,33 @@ do sink/leakoff apos a abertura, mas ainda nao valida equivalencia fisica com o
 solver moderno. <code>pressure_tabulated_geometric</code> permanece bloqueado como modelo
 runtime ate haver formulacao controlada para transformar essa evidencia em um
 modelo opt-in testavel.</p>
+<h3 id="sink-timing-do-balanco-volumetrico-fase-1023a">Sink timing do balanço volumétrico — Fase 10.23A</h3>
+<p>O <code>volumetric_balance</code> possui, a partir da Fase 10.23A, um controle opt-in de
+cronologia do sink de fratura/leakoff:</p>
+<pre><code class="language-yaml">lot:
+  fracture:
+    balance:
+      sink_timing: same_step   # default
+      # ou
+      sink_timing: next_step
+</code></pre>
+<p>O default <code>same_step</code> preserva a formulação anterior: quando o criterio de
+abertura e satisfeito em um passo, os incrementos de volume de fratura e leakoff
+daquele mesmo passo entram no balanco. Em <code>next_step</code>, o passo de abertura marca
+<code>sink_deferred_this_step = 1</code> e aplica o sink apenas no passo seguinte. Os
+acumuladores historicos de volume continuam avancando a cada passo, portanto o
+volume acumulado pre-abertura nao e aplicado de uma vez.</p>
+<p>Esta opcao existe para diagnosticar a cronologia observada no <code>LOT_Tese</code>
+(<code>first_opened_time_s = 510 s</code>, <code>first_sink_positive_time_s = 540 s</code>). Ela nao e
+validacao fisica de fratura, nao altera <code>pkn_direct</code>, nao altera casos existentes
+e nao libera novos modelos de compliance.</p>
+<p>No caso controlado BUZ-67D da Fase 10.23A, <code>next_step</code> reproduziu atraso moderno
+de sink de <code>30 s</code> e foi classificado como <code>NEXT_STEP_SINK_EFFECTIVE</code>. A pressao
+maxima moderna passou de <code>67331393.612597 Pa</code> em <code>same_step</code> para
+<code>69176810.81439006 Pa</code> em <code>next_step</code>, contra <code>69035836.1743195 Pa</code> no trace
+legado. Esse ajuste de cronologia ainda e diagnostico estrutural; a abertura
+moderna permanece em <code>690 s</code>, enquanto o trace legado indicou abertura em
+<code>510 s</code>.</p>
 </div>
 </section>
 
@@ -6887,6 +6914,95 @@ Isso nao e validacao fisica moderna, nao conecta o runtime LOT/PKN ao legado e
 nao libera <code>pressure_tabulated_geometric</code> como default ou modelo opt-in de
 producao. A saida continua sendo evidencia para revisao humana e para uma fase
 futura de formulacao controlada.</p>
+<h2 id="sink-timing-opt-in-no-volumetric_balance-fase-1023a">Sink timing opt-in no volumetric_balance (Fase 10.23A)</h2>
+<p>A Fase 10.23A adiciona um controle diagnostico opt-in para a cronologia do sink
+de fratura/leakoff no modelo <code>volumetric_balance</code>:</p>
+<pre><code class="language-yaml">lot:
+  fracture:
+    balance:
+      sink_timing: same_step   # default
+      # ou
+      sink_timing: next_step
+</code></pre>
+<p>O default global permanece <code>same_step</code>, preservando o comportamento anterior e
+mantendo <code>lot-sim run --mode lot-pkn</code> sem mudanca para casos existentes. A rota
+<code>next_step</code> e restrita a casos que declaram explicitamente o campo e serve para
+testar a cronologia observada no trace legado unificado da Fase 10.22C:</p>
+<pre><code class="language-text">first_opened_time_s = 510.0
+first_sink_positive_time_s = 540.0
+sink_delay_s = 30.0
+</code></pre>
+<p>Semantica implementada:</p>
+<ul>
+<li><code>same_step</code>: quando a fratura abre, os incrementos de volume de fratura e
+  leakoff daquele mesmo passo entram imediatamente no balanco volumetrico.</li>
+<li><code>next_step</code>: no passo em que a fratura abre, o sink e marcado como
+  <code>sink_deferred_this_step</code>; o sink so pode entrar a partir do passo seguinte.</li>
+<li>O volume acumulado pre-abertura nao e aplicado de uma vez no passo seguinte,
+  porque os acumuladores de volume historico continuam sendo atualizados a cada
+  passo.</li>
+</ul>
+<p>Campos exportados em <code>timeseries.csv</code> e <code>result.json</code> para auditoria:</p>
+<pre><code class="language-text">sink_timing
+sink_deferred_this_step
+sink_active_this_step
+fracture_initiated_before_step
+fracture_initiated_after_step
+fracture_started_this_step
+fracture_sink_applied_m3
+leakoff_sink_applied_m3
+</code></pre>
+<p>A ferramenta diagnostica:</p>
+<pre><code class="language-text">tools/compare_phase10_23a.py
+</code></pre>
+<p>compara a rota <code>same_step</code> e a rota <code>next_step</code> contra o trace legado da 10.22C
+e classifica o resultado como <code>NEXT_STEP_SINK_EFFECTIVE</code> quando o atraso moderno
+de sink reproduz o atraso diagnostico de <code>30 s</code>.</p>
+<p>Resultado diagnostico BUZ-67D controlado:</p>
+<table>
+<thead>
+<tr>
+<th>Rota</th>
+<th style="text-align: right;">Inicio abertura moderno [s]</th>
+<th style="text-align: right;">Primeiro sink positivo [s]</th>
+<th style="text-align: right;">Atraso [s]</th>
+<th style="text-align: right;">Max pressure [Pa]</th>
+<th style="text-align: right;">Erro vs legado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>legado 10.22C</td>
+<td style="text-align: right;"><code>510.0</code></td>
+<td style="text-align: right;"><code>540.0</code></td>
+<td style="text-align: right;"><code>30.0</code></td>
+<td style="text-align: right;"><code>69035836.1743195</code></td>
+<td style="text-align: right;">n/a</td>
+</tr>
+<tr>
+<td><code>same_step</code></td>
+<td style="text-align: right;"><code>690.0</code></td>
+<td style="text-align: right;"><code>690.0</code></td>
+<td style="text-align: right;"><code>0.0</code></td>
+<td style="text-align: right;"><code>67331393.612597</code></td>
+<td style="text-align: right;"><code>-0.02468924338685035</code></td>
+</tr>
+<tr>
+<td><code>next_step</code></td>
+<td style="text-align: right;"><code>690.0</code></td>
+<td style="text-align: right;"><code>720.0</code></td>
+<td style="text-align: right;"><code>30.0</code></td>
+<td style="text-align: right;"><code>69176810.81439006</code></td>
+<td style="text-align: right;"><code>0.0020420501565967626</code></td>
+</tr>
+</tbody>
+</table>
+<p>Classificacao:</p>
+<pre><code class="language-text">NEXT_STEP_SINK_EFFECTIVE
+</code></pre>
+<p>Esta fase nao compara fisica de fratura, nao valida <code>sigmaTheta</code>, nao implementa
+Zamora, nao libera <code>pressure_tabulated_geometric</code> e nao torna <code>next_step</code> default
+runtime. A evidencia e exclusivamente de cronologia estrutural do sink.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser

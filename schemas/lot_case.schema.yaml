@@ -282,6 +282,13 @@ properties:
                       const: sigma_theta_static
                 then:
                   required: [source, pressure_source, comparison, sigma_theta]
+          balance:
+            type: object
+            additionalProperties: false
+            properties:
+              sink_timing:
+                type: string
+                enum: [same_step, next_step]
       leakoff:
         type: object
         required: [enabled, model]

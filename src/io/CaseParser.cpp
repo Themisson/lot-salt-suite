@@ -370,6 +370,11 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
           data.lot.sigma_theta_fracture.type);
     }
   }
+  if (fracture["balance"] && fracture["balance"]["sink_timing"]) {
+    data.lot.fracture_sink_timing =
+        require_as<std::string>(fracture["balance"]["sink_timing"],
+                                "lot.fracture.balance.sink_timing");
+  }
   if (lot["injection"]) {
     const YAML::Node injection = lot["injection"];
     data.lot.injection_rate_m3_s =
@@ -591,6 +596,11 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
         data.lot.pressure_model != "volumetric_balance") {
       throw std::runtime_error(
           "Validacao falhou: LOT/PKN exige pressure_model.type pkn_direct ou volumetric_balance");
+    }
+    if (data.lot.fracture_sink_timing != "same_step" &&
+        data.lot.fracture_sink_timing != "next_step") {
+      throw std::runtime_error(
+          "Validacao falhou: lot.fracture.balance.sink_timing exige same_step ou next_step");
     }
     if (data.lot.volumetric_compliance.enabled) {
       const auto& compliance = data.lot.volumetric_compliance;

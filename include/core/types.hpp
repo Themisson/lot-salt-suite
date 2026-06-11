@@ -147,6 +147,7 @@ struct LotConfig {
   double fracture_initial_width_m = 0.0;
   std::string breakdown_method;
   double breakdown_pressure_Pa = 0.0;
+  std::string fracture_sink_timing = "same_step";
   SigmaThetaFractureCriterionData sigma_theta_fracture;
   VolumetricComplianceData volumetric_compliance;
   bool leakoff_enabled = false;

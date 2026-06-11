@@ -25,6 +25,8 @@ constexpr const char* kBuz67dSigmaThetaStaticCasePath =
     "cases/validation/buz67d_pkn_legacy_sigma_theta_static.yaml";
 constexpr const char* kBuz67dComplianceCasePath =
     "cases/validation/buz67d_pkn_legacy_compliance.yaml";
+constexpr const char* kBuz67dNextStepSinkCasePath =
+    "cases/validation/buz67d_pkn_legacy_compliance_next_step_sink.yaml";
 
 void check_finite_series(const lss::lot::PknResult& result) {
   REQUIRE_FALSE(result.time_series_s.empty());
@@ -45,6 +47,20 @@ void check_finite_series(const lss::lot::PknResult& result) {
           result.balance_fracture_volume_increment_series_m3.size());
   REQUIRE(result.time_series_s.size() ==
           result.balance_leakoff_volume_increment_series_m3.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.sink_deferred_this_step_series.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.sink_active_this_step_series.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.fracture_initiated_before_step_series.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.fracture_initiated_after_step_series.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.fracture_started_this_step_series.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.fracture_sink_applied_series_m3.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.leakoff_sink_applied_series_m3.size());
   REQUIRE(result.time_series_s.size() ==
           result.fracture_initiation_pressure_series_Pa.size());
   REQUIRE(result.time_series_s.size() ==
@@ -67,6 +83,8 @@ void check_finite_series(const lss::lot::PknResult& result) {
     CHECK(std::isfinite(result.balance_injected_volume_increment_series_m3[i]));
     CHECK(std::isfinite(result.balance_fracture_volume_increment_series_m3[i]));
     CHECK(std::isfinite(result.balance_leakoff_volume_increment_series_m3[i]));
+    CHECK(std::isfinite(result.fracture_sink_applied_series_m3[i]));
+    CHECK(std::isfinite(result.leakoff_sink_applied_series_m3[i]));
     CHECK(std::isfinite(result.fracture_initiation_pressure_series_Pa[i]));
     CHECK(std::isfinite(result.fracture_initiation_sigma_theta_series_Pa[i]));
     CHECK(std::isfinite(result.fracture_initiation_margin_series_Pa[i]));
@@ -109,6 +127,18 @@ std::string command_prefix() {
 #endif
 }
 
+std::size_t single_started_step_index(const lss::lot::PknResult& result) {
+  std::size_t found = result.time_series_s.size();
+  for (std::size_t i = 0; i < result.fracture_started_this_step_series.size(); ++i) {
+    if (result.fracture_started_this_step_series[i] != 0) {
+      REQUIRE(found == result.time_series_s.size());
+      found = i;
+    }
+  }
+  REQUIRE(found < result.time_series_s.size());
+  return found;
+}
+
 }  // namespace
 
 TEST_CASE("PknRunner executes minimal LOT PKN case") {
@@ -117,7 +147,9 @@ TEST_CASE("PknRunner executes minimal LOT PKN case") {
 
   CHECK(data.mode == "lot-pkn");
   CHECK(data.lot.pressure_model == "pkn_direct");
+  CHECK(data.lot.fracture_sink_timing == "same_step");
   CHECK(run.input.pressure_model == lss::lot::PknPressureModel::PknDirect);
+  CHECK(run.input.sink_timing == lss::lot::FractureSinkTiming::SameStep);
   CHECK(run.input.fracture_height_m > 0.0);
   CHECK(run.input.fluid_viscosity_Pa_s > 0.0);
   CHECK(run.input.plane_strain_modulus_Pa > 0.0);
@@ -171,7 +203,9 @@ TEST_CASE("PknRunner enables opt-in volumetric balance for legacy-aligned case")
   const auto run = lss::lot::run_pkn_case(data);
 
   CHECK(data.lot.pressure_model == "volumetric_balance");
+  CHECK(data.lot.fracture_sink_timing == "same_step");
   CHECK(run.input.pressure_model == lss::lot::PknPressureModel::VolumetricBalance);
+  CHECK(run.input.sink_timing == lss::lot::FractureSinkTiming::SameStep);
   CHECK(run.input.annular_volume_m3 ==
         Catch::Approx(run.result.initial_annular_volume_m3));
   CHECK(run.input.fluid_compressibility_per_Pa == Catch::Approx(6.40e-10));
@@ -225,9 +259,77 @@ TEST_CASE("PknRunner enables opt-in geometric compliance") {
         Catch::Approx(1.8571966938610005e-8));
   CHECK(run.result.effective_compressibility_per_Pa ==
         Catch::Approx(1.9211966938610006e-8));
+  CHECK(run.result.sink_timing == "same_step");
   REQUIRE(run.result.balance_delta_pressure_series_Pa.size() > 1);
   CHECK(run.result.balance_delta_pressure_series_Pa[1] ==
         Catch::Approx(1845417.2017930523).epsilon(1.0e-6));
+}
+
+TEST_CASE("PknRunner defaults fracture sink timing to same step") {
+  const auto data = lss::io::parse_yaml(kBuz67dComplianceCasePath);
+  const auto run = lss::lot::run_pkn_case(data);
+
+  CHECK(run.input.sink_timing == lss::lot::FractureSinkTiming::SameStep);
+  CHECK(run.result.sink_timing == "same_step");
+  const std::size_t opened = single_started_step_index(run.result);
+  CHECK(run.result.sink_deferred_this_step_series[opened] == 0);
+  CHECK(run.result.sink_active_this_step_series[opened] == 1);
+  CHECK(run.result.fracture_initiated_before_step_series[opened] == 0);
+  CHECK(run.result.fracture_initiated_after_step_series[opened] == 1);
+  CHECK(run.result.fracture_sink_applied_series_m3[opened] ==
+        Catch::Approx(run.result.balance_fracture_volume_increment_series_m3[opened]));
+  CHECK(run.result.leakoff_sink_applied_series_m3[opened] ==
+        Catch::Approx(run.result.balance_leakoff_volume_increment_series_m3[opened]));
+  CHECK(run.result.fracture_sink_applied_series_m3[opened] +
+            run.result.leakoff_sink_applied_series_m3[opened] >
+        0.0);
+}
+
+TEST_CASE("PknRunner supports opt-in next-step fracture sink timing") {
+  const auto data = lss::io::parse_yaml(kBuz67dNextStepSinkCasePath);
+  const auto run = lss::lot::run_pkn_case(data);
+
+  CHECK(data.name == "buz67d_pkn_legacy_compliance_next_step_sink");
+  CHECK(data.lot.fracture_sink_timing == "next_step");
+  CHECK(run.input.sink_timing == lss::lot::FractureSinkTiming::NextStep);
+  CHECK(run.result.sink_timing == "next_step");
+  const std::size_t opened = single_started_step_index(run.result);
+  REQUIRE(opened + 1 < run.result.time_series_s.size());
+  CHECK(run.result.fracture_started_this_step_series[opened] == 1);
+  CHECK(run.result.sink_deferred_this_step_series[opened] == 1);
+  CHECK(run.result.sink_active_this_step_series[opened] == 0);
+  CHECK(run.result.fracture_sink_applied_series_m3[opened] == 0.0);
+  CHECK(run.result.leakoff_sink_applied_series_m3[opened] == 0.0);
+  CHECK(run.result.fracture_initiated_before_step_series[opened + 1] == 1);
+  CHECK(run.result.sink_deferred_this_step_series[opened + 1] == 0);
+  CHECK(run.result.sink_active_this_step_series[opened + 1] == 1);
+  CHECK(run.result.fracture_sink_applied_series_m3[opened + 1] +
+            run.result.leakoff_sink_applied_series_m3[opened + 1] >
+        0.0);
+  CHECK(run.result.fracture_initiation_time_s ==
+        Catch::Approx(run.result.time_series_s[opened]));
+}
+
+TEST_CASE("CaseParser rejects unsupported fracture sink timing") {
+  const auto path = std::filesystem::temp_directory_path() /
+                    "lss_invalid_sink_timing_case.yaml";
+  {
+    std::ifstream in(kBuz67dComplianceCasePath);
+    REQUIRE(in.good());
+    std::ofstream out(path);
+    REQUIRE(out.good());
+    std::string line;
+    while (std::getline(in, line)) {
+      out << line << '\n';
+      if (line == "        mapping_status: STATIC_FROM_LEGACY_AUDIT") {
+        out << "    balance:\n";
+        out << "      sink_timing: previous_step\n";
+      }
+    }
+  }
+
+  CHECK_THROWS_AS(lss::io::parse_yaml(path), std::runtime_error);
+  std::filesystem::remove(path);
 }
 
 #if LSS_ENABLE_CLI_SUBPROCESS_TESTS

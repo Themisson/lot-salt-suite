@@ -1414,3 +1414,37 @@ do sink/leakoff apos a abertura, mas ainda nao valida equivalencia fisica com o
 solver moderno. `pressure_tabulated_geometric` permanece bloqueado como modelo
 runtime ate haver formulacao controlada para transformar essa evidencia em um
 modelo opt-in testavel.
+
+### Sink timing do balanço volumétrico — Fase 10.23A
+
+O `volumetric_balance` possui, a partir da Fase 10.23A, um controle opt-in de
+cronologia do sink de fratura/leakoff:
+
+```yaml
+lot:
+  fracture:
+    balance:
+      sink_timing: same_step   # default
+      # ou
+      sink_timing: next_step
+```
+
+O default `same_step` preserva a formulação anterior: quando o criterio de
+abertura e satisfeito em um passo, os incrementos de volume de fratura e leakoff
+daquele mesmo passo entram no balanco. Em `next_step`, o passo de abertura marca
+`sink_deferred_this_step = 1` e aplica o sink apenas no passo seguinte. Os
+acumuladores historicos de volume continuam avancando a cada passo, portanto o
+volume acumulado pre-abertura nao e aplicado de uma vez.
+
+Esta opcao existe para diagnosticar a cronologia observada no `LOT_Tese`
+(`first_opened_time_s = 510 s`, `first_sink_positive_time_s = 540 s`). Ela nao e
+validacao fisica de fratura, nao altera `pkn_direct`, nao altera casos existentes
+e nao libera novos modelos de compliance.
+
+No caso controlado BUZ-67D da Fase 10.23A, `next_step` reproduziu atraso moderno
+de sink de `30 s` e foi classificado como `NEXT_STEP_SINK_EFFECTIVE`. A pressao
+maxima moderna passou de `67331393.612597 Pa` em `same_step` para
+`69176810.81439006 Pa` em `next_step`, contra `69035836.1743195 Pa` no trace
+legado. Esse ajuste de cronologia ainda e diagnostico estrutural; a abertura
+moderna permanece em `690 s`, enquanto o trace legado indicou abertura em
+`510 s`.

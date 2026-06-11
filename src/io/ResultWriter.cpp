@@ -72,6 +72,13 @@ void ensure_series_sizes(const lss::lot::PknResult& result) {
       result.balance_injected_volume_increment_series_m3.size() != size ||
       result.balance_fracture_volume_increment_series_m3.size() != size ||
       result.balance_leakoff_volume_increment_series_m3.size() != size ||
+      result.sink_deferred_this_step_series.size() != size ||
+      result.sink_active_this_step_series.size() != size ||
+      result.fracture_initiated_before_step_series.size() != size ||
+      result.fracture_initiated_after_step_series.size() != size ||
+      result.fracture_started_this_step_series.size() != size ||
+      result.fracture_sink_applied_series_m3.size() != size ||
+      result.leakoff_sink_applied_series_m3.size() != size ||
       result.fracture_initiation_pressure_series_Pa.size() != size ||
       result.fracture_initiation_sigma_theta_series_Pa.size() != size ||
       result.fracture_initiation_margin_series_Pa.size() != size ||
@@ -112,6 +119,10 @@ void ensure_finite_values(const lss::lot::PknResult& result) {
                  "summary.balance_fracture_volume_increment_m3");
   require_finite(result.balance_leakoff_volume_increment_m3,
                  "summary.balance_leakoff_volume_increment_m3");
+  require_finite(result.fracture_sink_applied_m3,
+                 "summary.fracture_sink_applied_m3");
+  require_finite(result.leakoff_sink_applied_m3,
+                 "summary.leakoff_sink_applied_m3");
   require_finite(result.fracture_initiation_time_s,
                  "summary.fracture_initiation_time_s");
   require_finite(result.fracture_initiation_pressure_Pa,
@@ -154,6 +165,10 @@ void ensure_finite_values(const lss::lot::PknResult& result) {
                    "series.balance_fracture_volume_increment_m3");
     require_finite(result.balance_leakoff_volume_increment_series_m3[i],
                    "series.balance_leakoff_volume_increment_m3");
+    require_finite(result.fracture_sink_applied_series_m3[i],
+                   "series.fracture_sink_applied_m3");
+    require_finite(result.leakoff_sink_applied_series_m3[i],
+                   "series.leakoff_sink_applied_m3");
     require_finite(result.fracture_initiation_pressure_series_Pa[i],
                    "series.fracture_initiation_pressure_Pa");
     require_finite(result.fracture_initiation_sigma_theta_series_Pa[i],
@@ -180,6 +195,14 @@ void write_timeseries_csv(const std::filesystem::path& path,
          "balance_injected_volume_increment_m3,"
          "balance_fracture_volume_increment_m3,"
          "balance_leakoff_volume_increment_m3,"
+         "sink_timing,"
+         "sink_deferred_this_step,"
+         "sink_active_this_step,"
+         "fracture_initiated_before_step,"
+         "fracture_initiated_after_step,"
+         "fracture_started_this_step,"
+         "fracture_sink_applied_m3,"
+         "leakoff_sink_applied_m3,"
          "fracture_initiated,"
          "fracture_initiation_pressure_Pa,"
          "fracture_initiation_sigma_theta_Pa,"
@@ -202,6 +225,14 @@ void write_timeseries_csv(const std::filesystem::path& path,
         << result.balance_injected_volume_increment_series_m3[i] << ','
         << result.balance_fracture_volume_increment_series_m3[i] << ','
         << result.balance_leakoff_volume_increment_series_m3[i] << ','
+        << escape_csv(result.sink_timing) << ','
+        << result.sink_deferred_this_step_series[i] << ','
+        << result.sink_active_this_step_series[i] << ','
+        << result.fracture_initiated_before_step_series[i] << ','
+        << result.fracture_initiated_after_step_series[i] << ','
+        << result.fracture_started_this_step_series[i] << ','
+        << result.fracture_sink_applied_series_m3[i] << ','
+        << result.leakoff_sink_applied_series_m3[i] << ','
         << result.fracture_initiated_series[i] << ','
         << result.fracture_initiation_pressure_series_Pa[i] << ','
         << result.fracture_initiation_sigma_theta_series_Pa[i] << ','
@@ -263,6 +294,21 @@ void write_summary_json(const std::filesystem::path& path, const std::string& ca
       << result.balance_fracture_volume_increment_m3 << ",\n";
   out << "    \"final_balance_leakoff_volume_increment_m3\": "
       << result.balance_leakoff_volume_increment_m3 << ",\n";
+  out << "    \"sink_timing\": \"" << escape_json(result.sink_timing) << "\",\n";
+  out << "    \"sink_deferred_this_step\": "
+      << (result.sink_deferred_this_step ? "true" : "false") << ",\n";
+  out << "    \"sink_active_this_step\": "
+      << (result.sink_active_this_step ? "true" : "false") << ",\n";
+  out << "    \"fracture_initiated_before_step\": "
+      << (result.fracture_initiated_before_step ? "true" : "false") << ",\n";
+  out << "    \"fracture_initiated_after_step\": "
+      << (result.fracture_initiated_after_step ? "true" : "false") << ",\n";
+  out << "    \"fracture_started_this_step\": "
+      << (result.fracture_started_this_step ? "true" : "false") << ",\n";
+  out << "    \"final_fracture_sink_applied_m3\": "
+      << result.fracture_sink_applied_m3 << ",\n";
+  out << "    \"final_leakoff_sink_applied_m3\": "
+      << result.leakoff_sink_applied_m3 << ",\n";
   out << "    \"fracture_initiated\": "
       << (result.fracture_initiated ? "true" : "false") << ",\n";
   out << "    \"fracture_initiation_type\": \""

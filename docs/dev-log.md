@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.22C trace legado unificado de balanco, abertura e sink; commit/push pendente
+Fase ativa  : 10.23A sink timing next_step opt-in; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
-Testes C++  : 242/242 passaram em 2026-06-10
-Testes Py   : 123/123 passaram apos Fase 10.22C em 2026-06-10
+Testes C++  : 245/245 passaram em 2026-06-10
+Testes Py   : 125/125 passaram apos Fase 10.23A em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,51 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-10] Fase 10.23A — sink timing next_step opt-in — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Objetivo:** adicionar a rota opt-in `lot.fracture.balance.sink_timing:
+next_step` ao `volumetric_balance`, preservando o default `same_step` e sem
+alterar `pkn_direct`.
+
+**Implementacao:** `PknInput` agora possui `FractureSinkTiming`; o parser aceita
+`same_step` e `next_step`; o schema documenta o novo campo; o `PknModel` posterga
+apenas o sink de fratura/leakoff no passo em que a fratura abre quando a opcao
+`next_step` e usada. O volume acumulado antes da abertura nao e aplicado de uma
+vez, pois os acumuladores historicos continuam avancando a cada passo.
+
+**Novos diagnosticos exportados:** `sink_timing`, `sink_deferred_this_step`,
+`sink_active_this_step`, `fracture_initiated_before_step`,
+`fracture_initiated_after_step`, `fracture_started_this_step`,
+`fracture_sink_applied_m3` e `leakoff_sink_applied_m3`.
+
+**Caso controlado criado:**
+
+```text
+cases/validation/buz67d_pkn_legacy_compliance_next_step_sink.yaml
+```
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase10_23a.py
+```
+
+**Resultado diagnostico:** `NEXT_STEP_SINK_EFFECTIVE`.
+
+| Rota | Inicio abertura moderno [s] | Primeiro sink positivo [s] | Atraso [s] | Max pressure [Pa] | Erro vs legado |
+|---|---:|---:|---:|---:|---:|
+| legado 10.22C | `510.0` | `540.0` | `30.0` | `69035836.1743195` | n/a |
+| `same_step` | `690.0` | `690.0` | `0.0` | `67331393.612597` | `-0.02468924338685035` |
+| `next_step` | `690.0` | `720.0` | `30.0` | `69176810.81439006` | `0.0020420501565967626` |
+
+**Caveat:** esta fase alinha a cronologia diagnostica do sink com a evidencia
+legada da 10.22C, mas nao valida equivalencia fisica moderna nem libera
+`pressure_tabulated_geometric` ou qualquer novo modelo runtime.
 
 ---
 

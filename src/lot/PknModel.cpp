@@ -21,6 +21,16 @@ const char* pressure_model_label(PknPressureModel model) {
   throw std::invalid_argument("PknModel: unsupported pressure model");
 }
 
+const char* sink_timing_label(FractureSinkTiming timing) {
+  switch (timing) {
+    case FractureSinkTiming::SameStep:
+      return "same_step";
+    case FractureSinkTiming::NextStep:
+      return "next_step";
+  }
+  throw std::invalid_argument("PknModel: unsupported fracture sink timing");
+}
+
 const char* fracture_initiation_label(FractureInitiationCriterion criterion) {
   switch (criterion) {
     case FractureInitiationCriterion::ConstantPressure:
@@ -258,6 +268,19 @@ void append_point(PknResult& series, const PknResult& point) {
       point.balance_fracture_volume_increment_m3);
   series.balance_leakoff_volume_increment_series_m3.push_back(
       point.balance_leakoff_volume_increment_m3);
+  series.sink_deferred_this_step_series.push_back(
+      point.sink_deferred_this_step ? 1 : 0);
+  series.sink_active_this_step_series.push_back(
+      point.sink_active_this_step ? 1 : 0);
+  series.fracture_initiated_before_step_series.push_back(
+      point.fracture_initiated_before_step ? 1 : 0);
+  series.fracture_initiated_after_step_series.push_back(
+      point.fracture_initiated_after_step ? 1 : 0);
+  series.fracture_started_this_step_series.push_back(
+      point.fracture_started_this_step ? 1 : 0);
+  series.fracture_sink_applied_series_m3.push_back(
+      point.fracture_sink_applied_m3);
+  series.leakoff_sink_applied_series_m3.push_back(point.leakoff_sink_applied_m3);
   series.fracture_initiation_pressure_series_Pa.push_back(
       point.fracture_initiation_pressure_Pa);
   series.fracture_initiation_sigma_theta_series_Pa.push_back(
@@ -291,6 +314,15 @@ void copy_scalar_result(PknResult& target, const PknResult& point) {
       point.balance_fracture_volume_increment_m3;
   target.balance_leakoff_volume_increment_m3 =
       point.balance_leakoff_volume_increment_m3;
+  target.sink_timing = point.sink_timing;
+  target.sink_deferred_this_step = point.sink_deferred_this_step;
+  target.sink_active_this_step = point.sink_active_this_step;
+  target.fracture_initiated_before_step =
+      point.fracture_initiated_before_step;
+  target.fracture_initiated_after_step = point.fracture_initiated_after_step;
+  target.fracture_started_this_step = point.fracture_started_this_step;
+  target.fracture_sink_applied_m3 = point.fracture_sink_applied_m3;
+  target.leakoff_sink_applied_m3 = point.leakoff_sink_applied_m3;
   target.fracture_initiated = point.fracture_initiated;
   target.fracture_initiation_time_s = point.fracture_initiation_time_s;
   target.fracture_initiation_pressure_Pa =
@@ -338,10 +370,14 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
                                geometric_compressibility_per_Pa);
 
   for (std::size_t i = 0; i < series.time_series_s.size(); ++i) {
+    const bool fracture_initiated_before_step = fracture_opened;
     const double injected_increment_m3 =
         series.injected_volume_series_m3[i] - previous_injected_m3;
     double fracture_increment_m3 = 0.0;
     double leakoff_increment_m3 = 0.0;
+    bool fracture_started_this_step = false;
+    bool sink_deferred_this_step = false;
+    bool sink_active_this_step = false;
 
     const double trial_delta_pressure_Pa =
         volumetricPressureIncrement(injected_increment_m3,
@@ -358,6 +394,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
         const double margin_Pa = trial_pressure_Pa - sigma_theta_Pa;
         if (margin_Pa > 0.0) {
           fracture_opened = true;
+          fracture_started_this_step = !fracture_initiated_before_step;
           initiation_pressure_Pa = trial_pressure_Pa;
           initiation_sigma_theta_Pa = sigma_theta_Pa;
           initiation_margin_Pa = margin_Pa;
@@ -367,6 +404,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
                  trial_pressure_Pa - input.initial_pressure_Pa >=
                      input.breakdown.pressure_Pa) {
         fracture_opened = true;
+        fracture_started_this_step = !fracture_initiated_before_step;
         initiation_pressure_Pa = trial_pressure_Pa;
         initiation_margin_Pa =
             trial_pressure_Pa - input.initial_pressure_Pa -
@@ -375,10 +413,18 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
       }
     }
 
-    if (fracture_opened) {
+    bool apply_sink_this_step = fracture_opened;
+    if (input.sink_timing == FractureSinkTiming::NextStep &&
+        fracture_started_this_step) {
+      apply_sink_this_step = false;
+      sink_deferred_this_step = true;
+    }
+
+    if (apply_sink_this_step) {
       fracture_increment_m3 =
           std::max(0.0, series.fracture_volume_series_m3[i] - previous_fracture_m3);
       leakoff_increment_m3 = series.leakoff_volume_series_m3[i] - previous_leakoff_m3;
+      sink_active_this_step = fracture_opened;
     }
 
     const double effective_increment_m3 =
@@ -395,6 +441,15 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
     series.balance_injected_volume_increment_series_m3[i] = injected_increment_m3;
     series.balance_fracture_volume_increment_series_m3[i] = fracture_increment_m3;
     series.balance_leakoff_volume_increment_series_m3[i] = leakoff_increment_m3;
+    series.sink_deferred_this_step_series[i] = sink_deferred_this_step ? 1 : 0;
+    series.sink_active_this_step_series[i] = sink_active_this_step ? 1 : 0;
+    series.fracture_initiated_before_step_series[i] =
+        fracture_initiated_before_step ? 1 : 0;
+    series.fracture_initiated_after_step_series[i] = fracture_opened ? 1 : 0;
+    series.fracture_started_this_step_series[i] =
+        fracture_started_this_step ? 1 : 0;
+    series.fracture_sink_applied_series_m3[i] = fracture_increment_m3;
+    series.leakoff_sink_applied_series_m3[i] = leakoff_increment_m3;
     series.fracture_initiated_series[i] = fracture_opened ? 1 : 0;
     series.fracture_initiation_pressure_series_Pa[i] = initiation_pressure_Pa;
     series.fracture_initiation_sigma_theta_series_Pa[i] =
@@ -407,6 +462,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
   }
 
   series.pressure_model = pressure_model_label(input.pressure_model);
+  series.sink_timing = sink_timing_label(input.sink_timing);
   series.fracture_initiation_type =
       fracture_initiation_label(input.fracture_initiation);
   series.fracture_initiation_layer_id = input.sigma_theta_fracture.layer_id;
@@ -431,6 +487,20 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
         series.balance_fracture_volume_increment_series_m3.back();
     series.balance_leakoff_volume_increment_m3 =
         series.balance_leakoff_volume_increment_series_m3.back();
+    series.sink_deferred_this_step =
+        series.sink_deferred_this_step_series.back() != 0;
+    series.sink_active_this_step =
+        series.sink_active_this_step_series.back() != 0;
+    series.fracture_initiated_before_step =
+        series.fracture_initiated_before_step_series.back() != 0;
+    series.fracture_initiated_after_step =
+        series.fracture_initiated_after_step_series.back() != 0;
+    series.fracture_started_this_step =
+        series.fracture_started_this_step_series.back() != 0;
+    series.fracture_sink_applied_m3 =
+        series.fracture_sink_applied_series_m3.back();
+    series.leakoff_sink_applied_m3 =
+        series.leakoff_sink_applied_series_m3.back();
     series.fracture_initiated = fracture_opened;
     series.fracture_initiation_time_s = initiation_time_s;
     series.fracture_initiation_pressure_Pa = initiation_pressure_Pa;
@@ -556,6 +626,7 @@ PknResult PknModel::evaluate(const PknInput& input, double elapsed_time_s) const
     }
   }
   point.pressure_model = pressure_model_label(input.pressure_model);
+  point.sink_timing = sink_timing_label(input.sink_timing);
   point.fluid_compressibility_per_Pa = input.fluid_compressibility_per_Pa;
   point.geometric_compressibility_per_Pa = geometric_compressibility_per_Pa;
   point.effective_compressibility_per_Pa =

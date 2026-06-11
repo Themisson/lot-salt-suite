@@ -27,6 +27,14 @@ struct PknResult {
   double balance_injected_volume_increment_m3 = 0.0;
   double balance_fracture_volume_increment_m3 = 0.0;
   double balance_leakoff_volume_increment_m3 = 0.0;
+  std::string sink_timing = "same_step";
+  bool sink_deferred_this_step = false;
+  bool sink_active_this_step = false;
+  bool fracture_initiated_before_step = false;
+  bool fracture_initiated_after_step = false;
+  bool fracture_started_this_step = false;
+  double fracture_sink_applied_m3 = 0.0;
+  double leakoff_sink_applied_m3 = 0.0;
   bool fracture_initiated = false;
   double fracture_initiation_time_s = 0.0;
   double fracture_initiation_pressure_Pa = 0.0;
@@ -63,6 +71,13 @@ struct PknResult {
   std::vector<double> balance_injected_volume_increment_series_m3;
   std::vector<double> balance_fracture_volume_increment_series_m3;
   std::vector<double> balance_leakoff_volume_increment_series_m3;
+  std::vector<int> sink_deferred_this_step_series;
+  std::vector<int> sink_active_this_step_series;
+  std::vector<int> fracture_initiated_before_step_series;
+  std::vector<int> fracture_initiated_after_step_series;
+  std::vector<int> fracture_started_this_step_series;
+  std::vector<double> fracture_sink_applied_series_m3;
+  std::vector<double> leakoff_sink_applied_series_m3;
   std::vector<double> fracture_initiation_pressure_series_Pa;
   std::vector<double> fracture_initiation_sigma_theta_series_Pa;
   std::vector<double> fracture_initiation_margin_series_Pa;

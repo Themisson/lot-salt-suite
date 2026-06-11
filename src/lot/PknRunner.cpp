@@ -127,6 +127,17 @@ PknPressureModel parse_pressure_model(const std::string& model) {
   throw std::runtime_error("PknRunner: unsupported pressure model: " + model);
 }
 
+FractureSinkTiming parse_sink_timing(const std::string& timing) {
+  if (timing.empty() || timing == "same_step") {
+    return FractureSinkTiming::SameStep;
+  }
+  if (timing == "next_step") {
+    return FractureSinkTiming::NextStep;
+  }
+  throw std::runtime_error("PknRunner: unsupported fracture sink timing: " +
+                           timing);
+}
+
 FractureInitiationCriterion parse_fracture_initiation(
     const lss::core::SigmaThetaFractureCriterionData& criterion) {
   if (!criterion.enabled) {
@@ -231,6 +242,7 @@ PknInput make_pkn_input(const lss::core::CaseData& data) {
   input.leakoff_coefficient_m_sqrt_s = data.lot.leakoff_coefficient_m_sqrt_s;
   input.leakoff_constant_rate_m3_s = data.lot.leakoff_constant_rate_m3_s;
   input.pressure_model = parse_pressure_model(data.lot.pressure_model);
+  input.sink_timing = parse_sink_timing(data.lot.fracture_sink_timing);
   input.initial_pressure_Pa = data.lot.initial_pressure_Pa;
   input.volumetric_compliance.enabled =
       data.lot.volumetric_compliance.enabled;
