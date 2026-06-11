@@ -405,3 +405,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   diferenca documentada e nao regressao estrita. A proxima evolucao deve
   validar/sensibilizar o modo moderno em mais casos ou preparar graficos de
   publicacao antes de qualquer tentativa de solver APBSalt1D equivalente.
+- A Fase 10.27C registrou o roadmap pos-10.27 em
+  `docs/32_post_10_27_roadmap.md`. A proxima fase recomendada e `10.28A`,
+  consolidando `modern-refined mode` em casos adicionais, seguida por
+  sensibilidade de malha/dominio/sampling (`10.28B`) e graficos de publicacao
+  (`10.28C`). A rota `legacy-equivalence` com solver APBSalt1D fica opcional e
+  condicionada a necessidade explicita de regressao estrita.

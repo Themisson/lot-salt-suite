@@ -159,3 +159,16 @@ Para exigir abertura em `510 s`, seria necessário operar em
 3. Planejar `SaltWallStressDiagnostics` runtime opt-in.
 4. Só estudar solver-equivalence APBSalt1D se regressão estrita contra
    `LOT_Tese` for necessária.
+
+## Roadmap associado
+
+A Fase 10.27C consolidou o roadmap pós-10.27 em:
+
+```text
+docs/32_post_10_27_roadmap.md
+```
+
+A próxima fase recomendada é `10.28A`, focada em aplicar o pacote
+`modern-refined` a casos adicionais. A sensibilidade de malha/domínio/sampling
+fica planejada para `10.28B`, e os gráficos de comparação para tese/artigo para
+`10.28C`.

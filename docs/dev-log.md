@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.27B pacote BUZ67D modern-refined; commit/push em andamento
+Fase ativa  : 10.27C roadmap pos-10.27 registrado
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 258/258 passaram apos Fase 10.24C em 2026-06-11
-Testes Py   : 200/200 previstos apos Fase 10.27B em 2026-06-11
+Testes Py   : 207/207 previstos apos Fase 10.27C em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -57,9 +57,39 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 10.27C — roadmap pós-10.27 — Codex
+
+**Status:** Roadmap registrado; testes/commit/push em andamento.
+
+**Documento criado:**
+
+```text
+docs/32_post_10_27_roadmap.md
+```
+
+**Ferramenta criada:**
+
+```text
+tools/plan_phase10_27c_next_steps.py
+```
+
+**Status:**
+
+```text
+POST_10_27_ROADMAP_RECORDED
+NEXT_PHASE_MODERN_REFINED_VALIDATION_OR_SENSITIVITY
+```
+
+**Próxima fase recomendada:** `10.28A — modern-refined validation package for
+additional wells/cases`, seguida por sensibilidade `10.28B` e gráficos
+`10.28C`, antes de qualquer solver APBSalt1D equivalente ou integração runtime
+de sal.
+
+---
+
 ### [2026-06-11] Fase 10.27B — pacote BUZ-67D modern-refined — Codex
 
-**Status:** Implementado localmente; testes/commit/push pendentes.
+**Status:** Publicado em `096b245`.
 
 **Documento criado:**
 

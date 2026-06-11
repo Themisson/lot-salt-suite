@@ -1191,6 +1191,37 @@
       "pressure_source/timing review remains blocked by geometry."
     ]
   },
+  "phase10_27c_post_roadmap": {
+    "status": "POST_10_27_ROADMAP_RECORDED",
+    "current_recommended_next_phase": "10.28A",
+    "current_recommended_next_phase_classification": "NEXT_PHASE_MODERN_REFINED_VALIDATION_OR_SENSITIVITY",
+    "tool": "tools/plan_phase10_27c_next_steps.py",
+    "document": "docs/32_post_10_27_roadmap.md",
+    "output_json": "results/comparison/phase10_27c/post_10_27_roadmap.json",
+    "output_md": "results/comparison/phase10_27c/post_10_27_roadmap.md",
+    "planned_phases": [
+      "10.28A",
+      "10.28B",
+      "10.28C",
+      "10.29A",
+      "10.29B",
+      "10.30A",
+      "10.30B",
+      "10.31A",
+      "10.31B"
+    ],
+    "blocked_gates": [
+      "APBSALT1D_SAMPLING_BRIDGE_BLOCKED",
+      "PRESSURE_SOURCE_TIMING_REVIEW_BLOCKED_BY_GEOMETRY",
+      "APBSALT1D_SOLVER_EQUIVALENCE_REQUIRED_FOR_STRICT_MATCH",
+      "SIGMATHETA_RUNTIME_STILL_FUTURE_WORK"
+    ],
+    "caveats": [
+      "The next recommended route is modern-refined validation or sensitivity.",
+      "Legacy-equivalence remains optional and requires real APBSalt1D solver/sampler equivalence.",
+      "pressure_source/timing remains blocked for strict legacy-equivalence claims."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

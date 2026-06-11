@@ -261,3 +261,24 @@ O pacote confirma:
 - `sink_delay_s = 30 s` é preservado;
 - abertura moderna em `660 s` é diferença documentada, não erro automático;
 - exigir `510 s` permanece condicionado ao `legacy-equivalence mode`.
+
+## Roadmap pós-10.27 (Fase 10.27C)
+
+A Fase 10.27C registra o roadmap técnico em:
+
+```text
+docs/32_post_10_27_roadmap.md
+```
+
+Status:
+
+```text
+POST_10_27_ROADMAP_RECORDED
+NEXT_PHASE_MODERN_REFINED_VALIDATION_OR_SENSITIVITY
+```
+
+A prioridade imediata é consolidar o `modern-refined mode` em casos adicionais
+ou em estudo de sensibilidade de malha/domínio/sampling. A rota
+`legacy-equivalence` permanece disponível para regressão estrita, mas deve ser
+tratada como rota separada e opcional, condicionada a solver/sampler APBSalt1D
+equivalente.
