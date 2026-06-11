@@ -1351,6 +1351,32 @@
       "No physical fracture validation is claimed."
     ]
   },
+  "phase10_29b_sensitivity_runner": {
+    "status": "GENERIC_LOT_PKN_SENSITIVITY_RUNNER_ADDED",
+    "phase": "10.29B",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": true,
+    "tool": "tools/run_lot_pkn_sensitivity_matrix.py",
+    "document": "docs/37_sensitivity_runner.md",
+    "fixture": "tests/fixtures/comparison/phase10_29b_sensitivity_matrix_fixture.yaml",
+    "supported_features": [
+      "matrix_yaml",
+      "dry_run",
+      "skip_run",
+      "only_summary",
+      "custom_lot_sim",
+      "summary_csv",
+      "metadata_json"
+    ],
+    "caveats": [
+      "The runner is a diagnostic tool, not runtime solver logic.",
+      "The runner does not create physical validation or automatic calibration.",
+      "results/ outputs remain local and must not be versioned."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

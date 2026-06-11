@@ -186,3 +186,22 @@ MODERN_REFINED_COMPLIANCE_SENSITIVITY_DOCUMENTED
 
 A próxima fase recomendada é infraestrutura genérica de sensitivity runner para
 evitar duplicação de scripts por fase.
+
+## Fase 10.29B registrada
+
+A Fase 10.29B cria o runner genérico:
+
+```text
+tools/run_lot_pkn_sensitivity_matrix.py
+docs/37_sensitivity_runner.md
+```
+
+Status:
+
+```text
+GENERIC_LOT_PKN_SENSITIVITY_RUNNER_ADDED
+```
+
+O runner aceita uma matriz YAML, valida/roda cenários LOT/PKN, coleta
+`timeseries.csv` e gera `summary.csv`/`metadata.json`. Ele permanece ferramenta
+diagnóstica em `tools/`, sem alterar runtime C++.

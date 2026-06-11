@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.28A pacote modern-refined para casos adicionais
+Fase ativa  : 10.29B generic LOT-PKN sensitivity runner
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
-Testes C++  : 263/263 passaram apos Fase 10.27C em 2026-06-11
-Testes Py   : 211/211 previstos apos Fase 10.28A em 2026-06-11
+Testes C++  : 263/263 passaram apos Fase 10.29B em 2026-06-11
+Testes Py   : 235/235 previstos apos Fase 10.29B em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,34 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.29B — runner genérico de sensibilidade LOT/PKN — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Documento criado:**
+
+```text
+docs/37_sensitivity_runner.md
+```
+
+**Ferramenta criada:**
+
+```text
+tools/run_lot_pkn_sensitivity_matrix.py
+```
+
+**Resultado:**
+
+```text
+GENERIC_LOT_PKN_SENSITIVITY_RUNNER_ADDED
+```
+
+O runner aceita matriz YAML, valida e roda cenários `lot-pkn`, sumariza
+`timeseries.csv` e gera `summary.csv`/`metadata.json`. A ferramenta permanece
+diagnóstica em `tools/` e não altera runtime C++ nem casos protegidos.
 
 ---
 

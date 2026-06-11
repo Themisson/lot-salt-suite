@@ -433,3 +433,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   por abertura e score combinado foi `0.75x`; o melhor fator por pressao maxima
   isolada foi `0.60x`. A conclusao tecnica e que a abertura modern-refined e
   fortemente controlada por `constant_geometric`, ainda como diagnostico.
+- A Fase 10.29B criou `tools/run_lot_pkn_sensitivity_matrix.py` como
+  infraestrutura generica para matrizes LOT/PKN. A ferramenta valida/roda casos
+  declarados em YAML e sumariza `timeseries.csv`, mas permanece pos-processo de
+  diagnostico em `tools/`: nao muda runtime C++, nao cria modelo fisico novo e
+  nao transforma sensibilidade em calibracao automatica.
