@@ -65,6 +65,23 @@
     "results_versioned": false,
     "physical_validation": false
   },
+  "phase11_4b_lot_pkn_study_result_verifier": {
+    "status": "LOT_PKN_STUDY_RESULTS_VERIFIER_ADDED",
+    "verification_status": "STUDY_MANIFEST_VERIFICATION_AVAILABLE",
+    "tool": "tools/verify_lot_pkn_study_results.py",
+    "manifest_schema_version": 1,
+    "classifications": [
+      "LOT_PKN_STUDY_RESULTS_OK",
+      "LOT_PKN_STUDY_RESULTS_DRY_RUN_OK",
+      "LOT_PKN_STUDY_RESULTS_PARTIAL",
+      "LOT_PKN_STUDY_RESULTS_FAILED",
+      "LOT_PKN_STUDY_RESULTS_INVALID_MANIFEST",
+      "LOT_PKN_STUDY_RESULTS_MISSING_OUTPUTS",
+      "LOT_PKN_STUDY_RESULTS_INCONCLUSIVE"
+    ],
+    "results_versioned": false,
+    "physical_validation": false
+  },
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,

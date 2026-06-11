@@ -1,0 +1,1 @@
+python tools/run_lot_pkn_study.py --study-id fixture_study --output-dir fixture

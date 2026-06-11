@@ -145,3 +145,21 @@ cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix_v2.yaml
 
 O comando e infraestrutura operacional de validacao/diagnostico. Ele nao altera
 solver, parser, CMake, schemas, casos protegidos ou runtime LOT/PKN.
+
+## Verificação de resultados
+
+A Fase 11.4B adiciona:
+
+```text
+tools/verify_lot_pkn_study_results.py
+```
+
+`run_commands.txt` registra o comando:
+
+```powershell
+python tools/verify_lot_pkn_study_results.py --result-dir <output-dir>
+```
+
+Use `--allow-dry-run` para validar manifestos gerados sem simulação e
+`--require-report` para exigir `sensitivity_report.json` e
+`sensitivity_report.md`.

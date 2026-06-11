@@ -506,3 +506,6 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   provenance operacional completa aos estudos LOT/PKN: Git, ambiente Python,
   plataforma, executável `lot-sim`, matriz, `base_case`, outputs, cenários e
   comandos de reprodução.
+- A Fase 11.4B adiciona verificação formal de diretórios de resultado por
+  `tools/verify_lot_pkn_study_results.py`, cobrindo manifesto v1, outputs,
+  resumo, metadados, relatórios opcionais e cenários.

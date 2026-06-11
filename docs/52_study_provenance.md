@@ -52,3 +52,9 @@ Em execucao completa, o manifesto registra `study_status=completed` quando o
 Provenance melhora reproducibilidade operacional, mas nao muda a natureza dos
 resultados. Estudos `modern-refined` continuam diagnosticos ate que gates
 fisicos independentes sejam definidos.
+
+## Verificador
+
+A Fase 11.4B conecta a proveniência ao verificador
+`tools/verify_lot_pkn_study_results.py`. Ele confirma integridade operacional do
+diretório de resultados e pode gerar relatório JSON/Markdown local.

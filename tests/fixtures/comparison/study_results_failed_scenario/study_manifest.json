@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "study_id": "fixture_failed",
+  "study_status": "completed",
+  "matrix_path": "tests/fixtures/comparison/fixture_matrix.yaml",
+  "outputs": {
+    "summary_csv": "summary.csv",
+    "metadata_json": "metadata.json",
+    "run_commands_txt": "run_commands.txt"
+  },
+  "scenarios": [
+    {
+      "id": "cgeom_100",
+      "status": "failed"
+    }
+  ]
+}

@@ -224,3 +224,10 @@ A Fase 11.4A adiciona provenance completa ao `study_manifest.json` v1,
 registrando Git, ambiente Python, plataforma, executável `lot-sim`, matriz,
 `base_case`, outputs, cenários e comandos de reprodução. A etapa não altera
 solver, schema, C++ ou casos protegidos.
+
+## Fase 11.4B verificador de resultados
+
+A Fase 11.4B adiciona `tools/verify_lot_pkn_study_results.py`. O verificador
+confirma integridade operacional de diretórios de estudo produzidos pelo comando
+canônico: manifesto v1, outputs, resumo, metadados, relatório opcional e status
+dos cenários.

@@ -93,3 +93,10 @@ Campos principais:
 O manifesto e uma trilha operacional. Ele nao prova equivalencia com o
 `LOT_Tese`, nao valida fisicamente fratura e nao deve ser usado para versionar
 artefatos em `results/`.
+
+## Verificação
+
+A Fase 11.4B adiciona `tools/verify_lot_pkn_study_results.py` para verificar
+diretórios que contenham manifesto v1. O verificador checa campos obrigatórios,
+arquivos esperados e status de cenários, mas não valida fisicamente os
+resultados.

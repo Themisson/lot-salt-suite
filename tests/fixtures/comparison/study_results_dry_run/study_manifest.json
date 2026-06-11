@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "study_id": "fixture_dry_run",
+  "study_status": "dry_run",
+  "matrix_path": "tests/fixtures/comparison/fixture_matrix.yaml",
+  "outputs": {
+    "summary_csv": "summary.csv",
+    "metadata_json": "metadata.json",
+    "report_json": "sensitivity_report.json",
+    "report_md": "sensitivity_report.md",
+    "run_commands_txt": "run_commands.txt"
+  },
+  "scenarios": [
+    {
+      "id": "cgeom_100",
+      "status": "dry_run",
+      "case_path": "case.yaml",
+      "materialized_case_path": null,
+      "metadata": {}
+    }
+  ]
+}

@@ -339,3 +339,10 @@ A Fase 11.4A adiciona `study_manifest.json` v1 ao comando canônico
 ambiente, Git, executável `lot-sim`, comandos e artefatos esperados. O runner de
 matriz permanece focado em executar cenários; a proveniência consolidada mora no
 comando canônico.
+
+## Verificação de resultados de estudo
+
+A Fase 11.4B adiciona `tools/verify_lot_pkn_study_results.py` para validar um
+diretório produzido pelo comando canônico. A ferramenta verifica manifesto v1,
+outputs esperados, `summary.csv`, `metadata.json`, relatórios opcionais e status
+dos cenários. Ela não valida física nem equivalência com o legado.

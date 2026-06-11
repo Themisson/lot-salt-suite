@@ -57,6 +57,36 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.4B — verificador de resultados LOT/PKN — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/verify_lot_pkn_study_results.py
+```
+
+**Documento criado:**
+
+```text
+docs/53_verify_lot_pkn_study_results.md
+```
+
+**Resultado esperado:**
+
+```text
+LOT_PKN_STUDY_RESULTS_VERIFIER_ADDED
+STUDY_MANIFEST_VERIFICATION_AVAILABLE
+```
+
+O verificador checa `study_manifest.json` v1, outputs esperados, `summary.csv`,
+`metadata.json`, relatórios opcionais e status de cenários. A verificação é
+operacional; não valida fisicamente o modelo nem declara equivalência com o
+legado.
+
+---
+
 ### [2026-06-11] Fase 11.4A — provenance de estudos LOT/PKN — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

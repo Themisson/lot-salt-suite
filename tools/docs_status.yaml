@@ -126,6 +126,7 @@ phases:
   phase_11_3b_sensitivity_study_id_execution: completed
   phase_11_3c_canonical_lot_pkn_study_runner: completed
   phase_11_4a_lot_pkn_study_provenance: completed
+  phase_11_4b_lot_pkn_study_result_verifier: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -178,6 +179,7 @@ docs:
   stage11_3b_sensitivity_study_id_execution: implemented
   stage11_3c_canonical_lot_pkn_study_runner: implemented
   stage11_4a_lot_pkn_study_provenance: implemented
+  stage11_4b_lot_pkn_study_result_verifier: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
