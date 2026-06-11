@@ -816,6 +816,16 @@ ELASTIC_MODEL_REQUIRES_SCALING
 
 Sem `opened/sigmaTheta/margin` no mesmo trace, qualquer tabela baseada nesses
 valores seria diagnostica e poderia misturar regimes fisicos distintos.
+
+**Atualizacao 10.22C:** a instrumentacao temporaria unificada do `LOT_Tese`
+capturou balanco, `pw`, `sigmaTheta`, `margin`, `opened` e `dV_leakoff` no
+mesmo trace. O primeiro registro aberto ocorreu em `510.0 s`, com
+`pw = 66769500.0 Pa`, `sigmaTheta = 66666600.0 Pa` e
+`margin = 102865.0 Pa`. O primeiro sink positivo (`dV_leakoff > 0`) ocorreu em
+`540.0 s`, resultando em `sink_delay_s = 30.0`. A classificacao da fase foi
+`PHASE_DEPENDENCE_EXPLAINED_BY_SINK`, mas isso e apenas evidencia diagnostica
+interna do legado. Nao ha validacao fisica moderna nem liberacao de
+`pressure_tabulated_geometric` como rota runtime.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver `docs/23_lot_salt_sign_convention.md`
 - [ ] Confirmar convenção de sinal de `u_wall` no wrapper legado antes de usar

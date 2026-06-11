@@ -1374,3 +1374,43 @@ incremental muda de sinal e tambem e ruidosa. Portanto, a 10.22B nao libera
 `pressure_tabulated_geometric`; ainda e necessario um trace complementar com
 `opened`, `sigmaTheta` e `margin` no mesmo registro antes de transformar a serie
 em modelo opt-in.
+
+### Trace legado unificado de abertura e sink — Fase 10.22C
+
+**Status:** `UNIFIED_TRACE_COMPLETE`, diagnostico apenas.
+
+A Fase 10.22C instrumentou temporariamente o `LOT_Tese` para capturar, no mesmo
+passo temporal, os termos do balanco volumetrico e o criterio de abertura:
+
+```text
+dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC))/(Vi*k)
+pw = pi + dP
+margin = pw - sigmaTheta
+opened = pw > sigmaTheta
+sink_positive = dV_leakoff > 0
+```
+
+A instrumentacao foi removida antes do commit; apenas a ferramenta de analise,
+testes com fixture reduzida e documentacao foram versionados. O trace real foi
+mantido em `results/comparison/phase10_22c/`, fora do Git.
+
+Resultado diagnostico:
+
+| Campo | Valor |
+|-------|-------|
+| `trace_classification` | `UNIFIED_TRACE_COMPLETE` |
+| `opening_classification` | `OPENING_CRITERION_CONFIRMED` |
+| `sink_classification` | `SINK_TIMING_CONFIRMED` |
+| `phase_dependence_classification` | `PHASE_DEPENDENCE_EXPLAINED_BY_SINK` |
+| `first_opened_time_s` | `510.0` |
+| `first_sink_positive_time_s` | `540.0` |
+| `sink_delay_s` | `30.0` |
+| `first_pw_Pa` | `66769500.0` |
+| `first_sigmaTheta_Pa` | `66666600.0` |
+| `first_margin_Pa` | `102865.0` |
+
+Essa fase explica a dependencia de fase observada como consequencia do inicio
+do sink/leakoff apos a abertura, mas ainda nao valida equivalencia fisica com o
+solver moderno. `pressure_tabulated_geometric` permanece bloqueado como modelo
+runtime ate haver formulacao controlada para transformar essa evidencia em um
+modelo opt-in testavel.

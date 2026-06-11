@@ -297,3 +297,10 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   classificadas como `TERMWISE_GEOM_COMPLIANCE_NOISY`, com dependencia de fase.
   Assim, `pressure_tabulated_geometric` segue bloqueado ate existir trace
   complementar com `opened/sigmaTheta/margin` no mesmo registro.
+- A Fase 10.22C produziu esse trace complementar de forma temporaria e
+  read-only sobre `LOT_Tese`, confirmando `opened` em `510 s`, primeiro sink
+  positivo em `540 s` e `sink_delay_s = 30 s`. A classificacao
+  `PHASE_DEPENDENCE_EXPLAINED_BY_SINK` melhora a evidencia para uma fase de
+  formulacao, mas ainda nao libera runtime: uma evolucao futura deve decidir se
+  a informacao vira apenas diagnostico, uma tabela opt-in controlada ou um
+  modelo mecanico de acomodacao/sink mais explicito.

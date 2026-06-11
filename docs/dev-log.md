@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.22B compliance geometrica direta termo-a-termo; commit/push pendente
+Fase ativa  : 10.22C trace legado unificado de balanco, abertura e sink; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
 Testes C++  : 242/242 passaram em 2026-06-10
-Testes Py   : 118/118 esperados apos Fase 10.22B em 2026-06-10
+Testes Py   : 123/123 passaram apos Fase 10.22C em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,57 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-10] Fase 10.22C — trace legado unificado de balanco, abertura e sink — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Objetivo:** instrumentar temporariamente o `LOT_Tese` para capturar, no mesmo
+trace, termos do balanco, `pw`, `sigmaTheta`, `margin`, criterio `opened` e
+inicio de sink (`dV_leakoff > 0`), sem versionar nenhuma alteracao em `legance/`
+e sem alterar solver moderno.
+
+**Ferramenta criada:**
+
+```text
+tools/analyze_phase10_22c_unified_legacy_trace.py
+```
+
+**Teste criado:**
+
+```text
+tests/python/test_analyze_phase10_22c_unified_legacy_trace.py
+```
+
+**Fixture criada:**
+
+```text
+tests/fixtures/comparison/phase10_22c_unified_trace_fixture.csv
+```
+
+**Resultado diagnostico do trace real:**
+
+| Campo | Valor |
+|-------|-------|
+| `trace_classification` | `UNIFIED_TRACE_COMPLETE` |
+| `opening_classification` | `OPENING_CRITERION_CONFIRMED` |
+| `sink_classification` | `SINK_TIMING_CONFIRMED` |
+| `phase_dependence_classification` | `PHASE_DEPENDENCE_EXPLAINED_BY_SINK` |
+| `first_opened_time_s` | `510.0` |
+| `first_sink_positive_time_s` | `540.0` |
+| `sink_delay_s` | `30.0` |
+| `first_pw_Pa` | `66769500.0` |
+| `first_sigmaTheta_Pa` | `66666600.0` |
+| `first_margin_Pa` | `102865.0` |
+| `row_counts` | `56146 total`, `48744 balance`, `7402 opening` |
+
+**Gate:** `LEGACY_OPENING_AND_SINK_TRACE_READY_FOR_REVIEW`.
+
+**Caveat:** esta fase confirma a cronologia interna do legado, mas nao valida
+equivalencia fisica moderna nem libera `pressure_tabulated_geometric` para
+runtime.
 
 ---
 

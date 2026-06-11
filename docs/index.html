@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">74/81</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">75/82</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">242</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">103</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">123</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -2049,6 +2049,75 @@ incremental muda de sinal e tambem e ruidosa. Portanto, a 10.22B nao libera
 <code>pressure_tabulated_geometric</code>; ainda e necessario um trace complementar com
 <code>opened</code>, <code>sigmaTheta</code> e <code>margin</code> no mesmo registro antes de transformar a serie
 em modelo opt-in.</p>
+<h3 id="trace-legado-unificado-de-abertura-e-sink-fase-1022c">Trace legado unificado de abertura e sink — Fase 10.22C</h3>
+<p><strong>Status:</strong> <code>UNIFIED_TRACE_COMPLETE</code>, diagnostico apenas.</p>
+<p>A Fase 10.22C instrumentou temporariamente o <code>LOT_Tese</code> para capturar, no mesmo
+passo temporal, os termos do balanco volumetrico e o criterio de abertura:</p>
+<pre><code class="language-text">dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC))/(Vi*k)
+pw = pi + dP
+margin = pw - sigmaTheta
+opened = pw &gt; sigmaTheta
+sink_positive = dV_leakoff &gt; 0
+</code></pre>
+<p>A instrumentacao foi removida antes do commit; apenas a ferramenta de analise,
+testes com fixture reduzida e documentacao foram versionados. O trace real foi
+mantido em <code>results/comparison/phase10_22c/</code>, fora do Git.</p>
+<p>Resultado diagnostico:</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>trace_classification</code></td>
+<td><code>UNIFIED_TRACE_COMPLETE</code></td>
+</tr>
+<tr>
+<td><code>opening_classification</code></td>
+<td><code>OPENING_CRITERION_CONFIRMED</code></td>
+</tr>
+<tr>
+<td><code>sink_classification</code></td>
+<td><code>SINK_TIMING_CONFIRMED</code></td>
+</tr>
+<tr>
+<td><code>phase_dependence_classification</code></td>
+<td><code>PHASE_DEPENDENCE_EXPLAINED_BY_SINK</code></td>
+</tr>
+<tr>
+<td><code>first_opened_time_s</code></td>
+<td><code>510.0</code></td>
+</tr>
+<tr>
+<td><code>first_sink_positive_time_s</code></td>
+<td><code>540.0</code></td>
+</tr>
+<tr>
+<td><code>sink_delay_s</code></td>
+<td><code>30.0</code></td>
+</tr>
+<tr>
+<td><code>first_pw_Pa</code></td>
+<td><code>66769500.0</code></td>
+</tr>
+<tr>
+<td><code>first_sigmaTheta_Pa</code></td>
+<td><code>66666600.0</code></td>
+</tr>
+<tr>
+<td><code>first_margin_Pa</code></td>
+<td><code>102865.0</code></td>
+</tr>
+</tbody>
+</table>
+<p>Essa fase explica a dependencia de fase observada como consequencia do inicio
+do sink/leakoff apos a abertura, mas ainda nao valida equivalencia fisica com o
+solver moderno. <code>pressure_tabulated_geometric</code> permanece bloqueado como modelo
+runtime ate haver formulacao controlada para transformar essa evidencia em um
+modelo opt-in testavel.</p>
 </div>
 </section>
 
@@ -3396,7 +3465,16 @@ TERMWISE_GEOM_COMPLIANCE_PHASE_DEPENDENT
 ELASTIC_MODEL_REQUIRES_SCALING
 </code></pre>
 <p>Sem <code>opened/sigmaTheta/margin</code> no mesmo trace, qualquer tabela baseada nesses
-valores seria diagnostica e poderia misturar regimes fisicos distintos.
+valores seria diagnostica e poderia misturar regimes fisicos distintos.</p>
+<p><strong>Atualizacao 10.22C:</strong> a instrumentacao temporaria unificada do <code>LOT_Tese</code>
+capturou balanco, <code>pw</code>, <code>sigmaTheta</code>, <code>margin</code>, <code>opened</code> e <code>dV_leakoff</code> no
+mesmo trace. O primeiro registro aberto ocorreu em <code>510.0 s</code>, com
+<code>pw = 66769500.0 Pa</code>, <code>sigmaTheta = 66666600.0 Pa</code> e
+<code>margin = 102865.0 Pa</code>. O primeiro sink positivo (<code>dV_leakoff &gt; 0</code>) ocorreu em
+<code>540.0 s</code>, resultando em <code>sink_delay_s = 30.0</code>. A classificacao da fase foi
+<code>PHASE_DEPENDENCE_EXPLAINED_BY_SINK</code>, mas isso e apenas evidencia diagnostica
+interna do legado. Nao ha validacao fisica moderna nem liberacao de
+<code>pressure_tabulated_geometric</code> como rota runtime.
 - [x] Definir contrato moderno de pressao/deslocamento/fechamento LOT-saltcreep
       — Fase 7.1, ver <code>docs/23_lot_salt_sign_convention.md</code>
 - [ ] Confirmar convenção de sinal de <code>u_wall</code> no wrapper legado antes de usar
@@ -6733,6 +6811,82 @@ nao e uma tabela fisica pronta para <code>pressure_tabulated_geometric</code>. A
 incremental muda de sinal, a acumulada tem CV alto, e a comparacao entre
 pre-abertura e pos-sink indica dependencia de fase. O coupling moderno deve
 continuar sem consumir essa serie automaticamente.</p>
+<h2 id="trace-legado-unificado-de-balanco-abertura-e-sink-fase-1022c">Trace legado unificado de balanco, abertura e sink (Fase 10.22C)</h2>
+<p>A Fase 10.22C criou uma auditoria instrumentada temporaria no <code>LOT_Tese</code> para
+exportar, no mesmo registro diagnostico, balanco volumetrico, criterio de
+abertura e inicio do sink:</p>
+<pre><code class="language-text">dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC))/(Vi*k)
+pw = pi + dP
+sigmaTheta = -getSigmaTheta()
+margin = pw - sigmaTheta
+opened = pw &gt; sigmaTheta
+sink_positive = dV_leakoff &gt; 0
+</code></pre>
+<p>A instrumentacao foi removida antes do commit e o patch temporario ficou apenas
+em <code>results/comparison/phase10_22c/legacy_unified_audit.patch</code>, fora do Git. A
+ferramenta versionada para consumir o trace e:</p>
+<pre><code class="language-text">tools/analyze_phase10_22c_unified_legacy_trace.py
+</code></pre>
+<p>Resultados principais do trace real:</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>row_counts.total</code></td>
+<td style="text-align: right;"><code>56146</code></td>
+</tr>
+<tr>
+<td><code>row_counts.balance</code></td>
+<td style="text-align: right;"><code>48744</code></td>
+</tr>
+<tr>
+<td><code>row_counts.opening</code></td>
+<td style="text-align: right;"><code>7402</code></td>
+</tr>
+<tr>
+<td><code>first_opened_time_s</code></td>
+<td style="text-align: right;"><code>510.0</code></td>
+</tr>
+<tr>
+<td><code>first_sink_positive_time_s</code></td>
+<td style="text-align: right;"><code>540.0</code></td>
+</tr>
+<tr>
+<td><code>sink_delay_s</code></td>
+<td style="text-align: right;"><code>30.0</code></td>
+</tr>
+<tr>
+<td><code>first_pw_Pa</code></td>
+<td style="text-align: right;"><code>66769500.0</code></td>
+</tr>
+<tr>
+<td><code>first_sigmaTheta_Pa</code></td>
+<td style="text-align: right;"><code>66666600.0</code></td>
+</tr>
+<tr>
+<td><code>first_margin_Pa</code></td>
+<td style="text-align: right;"><code>102865.0</code></td>
+</tr>
+</tbody>
+</table>
+<p>Classificacoes:</p>
+<pre><code class="language-text">UNIFIED_TRACE_COMPLETE
+OPENING_CRITERION_CONFIRMED
+SINK_TIMING_CONFIRMED
+PHASE_DEPENDENCE_EXPLAINED_BY_SINK
+LEGACY_OPENING_AND_SINK_TRACE_READY_FOR_REVIEW
+</code></pre>
+<p>Esta fase confirma a cronologia interna do legado: o criterio <code>pw &gt; sigmaTheta</code>
+aparece antes do primeiro sink positivo, com atraso diagnostico de <code>30 s</code>.
+Isso nao e validacao fisica moderna, nao conecta o runtime LOT/PKN ao legado e
+nao libera <code>pressure_tabulated_geometric</code> como default ou modelo opt-in de
+producao. A saida continua sendo evidencia para revisao humana e para uma fase
+futura de formulacao controlada.</p>
 <h2 id="dependencia-eigen-no-acoplamento">Dependencia Eigen no acoplamento</h2>
 <p>Targets novos do <code>lot-salt-suite</code> devem receber Eigen por <code>lss::eigen</code>, que
 aponta para <code>include/Eigen/</code>. O acoplamento com <code>external/saltcreep/</code> deve ser

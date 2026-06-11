@@ -2032,3 +2032,40 @@ usar essa serie para diagnostico estrutural, mas nao deve comparar fratura
 fisica, nem criar equivalencia quantitativa de `pressure_tabulated_geometric`.
 Antes disso, e preciso um trace que una `opened`, `sigmaTheta`, `margin`, `dV`,
 `Vi`, `dP` e os termos volumetricos na mesma linha temporal/camada.
+
+## Fase 10.22C — trace legado unificado de abertura e sink
+
+A Fase 10.22C fechou a lacuna principal da 10.22B: `opened`, `sigmaTheta`,
+`margin`, termos de balanco e `dV_leakoff` foram capturados no mesmo trace
+temporario do `LOT_Tese`.
+
+O analisador versionado e:
+
+```text
+tools/analyze_phase10_22c_unified_legacy_trace.py
+```
+
+O teste de contrato usa:
+
+```text
+tests/fixtures/comparison/phase10_22c_unified_trace_fixture.csv
+tests/python/test_analyze_phase10_22c_unified_legacy_trace.py
+```
+
+Resultado real:
+
+| Campo | Valor |
+|---|---:|
+| `trace_classification` | `UNIFIED_TRACE_COMPLETE` |
+| `opening_classification` | `OPENING_CRITERION_CONFIRMED` |
+| `sink_classification` | `SINK_TIMING_CONFIRMED` |
+| `phase_dependence_classification` | `PHASE_DEPENDENCE_EXPLAINED_BY_SINK` |
+| `first_opened_time_s` | `510.0` |
+| `first_sink_positive_time_s` | `540.0` |
+| `sink_delay_s` | `30.0` |
+
+Esse resultado melhora a rastreabilidade da comparacao legado-moderno, mas nao
+promove nenhum campo para equivalencia fisica. `pw`, `sigmaTheta`, `margin`,
+`opened` e `sink_positive` continuam sendo evidencias internas do legado; a
+comparacao moderna ainda precisa de uma fase de formulacao antes de qualquer
+validacao quantitativa.

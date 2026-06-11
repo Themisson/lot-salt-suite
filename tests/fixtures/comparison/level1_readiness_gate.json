@@ -643,6 +643,59 @@
       "No pressure_tabulated_geometric model was implemented."
     ]
   },
+  "phase10_22c_unified_legacy_opening_balance_trace": {
+    "status": "PHASE10_22C_UNIFIED_LEGACY_TRACE_COMPLETE",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "legacy_instrumented": true,
+    "legacy_instrumentation_committable": false,
+    "tool": "tools/analyze_phase10_22c_unified_legacy_trace.py",
+    "fixture": "tests/fixtures/comparison/phase10_22c_unified_trace_fixture.csv",
+    "legacy_trace": "results/comparison/phase10_22c/legacy_unified_balance_opening_trace.csv",
+    "output_dir": "results/comparison/phase10_22c",
+    "classification": {
+      "trace": "UNIFIED_TRACE_COMPLETE",
+      "opening": "OPENING_CRITERION_CONFIRMED",
+      "sink": "SINK_TIMING_CONFIRMED",
+      "phase_dependence": "PHASE_DEPENDENCE_EXPLAINED_BY_SINK"
+    },
+    "first_opened_time_s": 510.0,
+    "first_opened_step": 1.0,
+    "first_pw_Pa": 66769500.0,
+    "first_sigmaTheta_Pa": 66666600.0,
+    "first_margin_Pa": 102865.0,
+    "first_sink_positive_time_s": 540.0,
+    "first_sink_positive_step": 43.0,
+    "sink_delay_s": 30.0,
+    "row_counts": {
+      "total": 56146,
+      "balance": 48744,
+      "opening": 7402
+    },
+    "compliance": {
+      "C_geom_accumulated_mean_1_Pa": 1.176926268428816e-8,
+      "C_geom_accumulated_median_1_Pa": 9.524987549570865e-11,
+      "C_geom_accumulated_cv": 1.7449403198701166,
+      "C_geom_incremental_mean_1_Pa": -3.4653564909765664e-8,
+      "C_geom_incremental_median_1_Pa": -6.143714074068743e-10,
+      "C_geom_incremental_cv": 1.7195927791058696
+    },
+    "gate": [
+      "LEGACY_OPENING_AND_SINK_TRACE_READY_FOR_REVIEW",
+      "OPENING_CRITERION_CONFIRMED",
+      "SINK_TIMING_CONFIRMED",
+      "PHASE_DEPENDENCE_EXPLAINED_BY_SINK",
+      "NO_PHYSICAL_VALIDATION"
+    ],
+    "caveats": [
+      "Temporary LOT_Tese instrumentation was restored before commit.",
+      "Generated results/comparison/phase10_22c artifacts are diagnostic outputs and must not be versioned.",
+      "The trace confirms legacy internal timing only; it does not validate modern physical equivalence.",
+      "pressure_tabulated_geometric remains blocked from runtime use."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

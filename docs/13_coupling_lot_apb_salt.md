@@ -2681,6 +2681,60 @@ incremental muda de sinal, a acumulada tem CV alto, e a comparacao entre
 pre-abertura e pos-sink indica dependencia de fase. O coupling moderno deve
 continuar sem consumir essa serie automaticamente.
 
+## Trace legado unificado de balanco, abertura e sink (Fase 10.22C)
+
+A Fase 10.22C criou uma auditoria instrumentada temporaria no `LOT_Tese` para
+exportar, no mesmo registro diagnostico, balanco volumetrico, criterio de
+abertura e inicio do sink:
+
+```text
+dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC))/(Vi*k)
+pw = pi + dP
+sigmaTheta = -getSigmaTheta()
+margin = pw - sigmaTheta
+opened = pw > sigmaTheta
+sink_positive = dV_leakoff > 0
+```
+
+A instrumentacao foi removida antes do commit e o patch temporario ficou apenas
+em `results/comparison/phase10_22c/legacy_unified_audit.patch`, fora do Git. A
+ferramenta versionada para consumir o trace e:
+
+```text
+tools/analyze_phase10_22c_unified_legacy_trace.py
+```
+
+Resultados principais do trace real:
+
+| Campo | Valor |
+|---|---:|
+| `row_counts.total` | `56146` |
+| `row_counts.balance` | `48744` |
+| `row_counts.opening` | `7402` |
+| `first_opened_time_s` | `510.0` |
+| `first_sink_positive_time_s` | `540.0` |
+| `sink_delay_s` | `30.0` |
+| `first_pw_Pa` | `66769500.0` |
+| `first_sigmaTheta_Pa` | `66666600.0` |
+| `first_margin_Pa` | `102865.0` |
+
+Classificacoes:
+
+```text
+UNIFIED_TRACE_COMPLETE
+OPENING_CRITERION_CONFIRMED
+SINK_TIMING_CONFIRMED
+PHASE_DEPENDENCE_EXPLAINED_BY_SINK
+LEGACY_OPENING_AND_SINK_TRACE_READY_FOR_REVIEW
+```
+
+Esta fase confirma a cronologia interna do legado: o criterio `pw > sigmaTheta`
+aparece antes do primeiro sink positivo, com atraso diagnostico de `30 s`.
+Isso nao e validacao fisica moderna, nao conecta o runtime LOT/PKN ao legado e
+nao libera `pressure_tabulated_geometric` como default ou modelo opt-in de
+producao. A saida continua sendo evidencia para revisao humana e para uma fase
+futura de formulacao controlada.
+
 ## Dependencia Eigen no acoplamento
 
 Targets novos do `lot-salt-suite` devem receber Eigen por `lss::eigen`, que
