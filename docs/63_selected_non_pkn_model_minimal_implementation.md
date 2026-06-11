@@ -90,3 +90,19 @@ selected_integration_path = diagnostic_adapter
 
 Isso mantém o núcleo fora do `lot-pkn` e direciona a próxima fase para uma
 especificação de adapter diagnóstico.
+
+## Resultado da Fase 11.8C
+
+A especificação do adapter diagnóstico foi registrada em
+`docs/65_penny_diagnostic_adapter_spec.md`, com fixture versionada em
+`tests/fixtures/comparison/phase11_8c_penny_adapter_input.yaml`.
+
+```text
+status = PENNY_ADAPTER_SPEC_VALID
+runtime_integration = false
+parser_schema_changed = false
+buz29_validation = false
+```
+
+Ela prepara a Fase 11.8D para criar um adapter C++ opt-in em torno do núcleo
+isolado, ainda sem conexão com `PknModel`, `PknRunner`, CLI ou parser.

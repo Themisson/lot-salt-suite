@@ -1,0 +1,36 @@
+case:
+  id: penny_adapter_synthetic_fixture
+  description: Synthetic diagnostic PennyShaped adapter fixture for Phase 11.8C.
+
+model:
+  type: penny_shaped_diagnostic
+  integration_path: diagnostic_adapter
+
+elasticity:
+  young_modulus_Pa: 5710000.0
+  poisson_ratio: 0.36
+
+fluid:
+  viscosity_Pa_min: 180.0
+
+injection:
+  flow_rate_m3_min: 0.05
+
+initiation:
+  elapsed_since_opening_min: 1.0
+  wellbore_pressure_Pa: 67000000.0
+  sigma_theta_compression_positive_Pa: 66000000.0
+
+legacy_options:
+  volume_multiplier: 10.0
+
+diagnostics:
+  source: synthetic
+  caveat: Diagnostic adapter only; not BUZ29 validation; not legacy equivalence.
+
+expected_outputs:
+  - plane_strain_modulus_Pa
+  - opening_m
+  - radius_m
+  - pressure_factor
+  - fracture_volume_proxy_m3

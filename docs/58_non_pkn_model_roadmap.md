@@ -135,6 +135,19 @@ Rotas de CLI/schema/runtime oficial permanecem bloqueadas ou adiadas. A próxima
 fase deve especificar um adapter diagnóstico opt-in antes de qualquer código de
 integração adicional.
 
+## Fase 11.8C — especificação do adapter diagnóstico
+
+A Fase 11.8C registra o contrato mínimo do adapter diagnóstico opt-in:
+
+```text
+status = PENNY_ADAPTER_SPEC_VALID
+fixture = tests/fixtures/comparison/phase11_8c_penny_adapter_input.yaml
+recommended_next_phase = PHASE11_8D_PENNY_DIAGNOSTIC_ADAPTER_IMPLEMENTATION
+```
+
+A especificação usa os campos reais do `PennyShapedInput`, mantém caveat
+explícito de não validação BUZ29 e não cria rota oficial de parser/schema/CLI.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

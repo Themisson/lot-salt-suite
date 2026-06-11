@@ -1885,6 +1885,34 @@
       "The selected adapter path must remain opt-in and diagnostic."
     ]
   },
+  "phase11_8c_penny_adapter_spec": {
+    "status": "PENNY_ADAPTER_SPEC_VALID",
+    "phase": "11.8C",
+    "selected_track": "PENNY_SHAPED",
+    "integration_path": "diagnostic_adapter",
+    "fixture": "tests/fixtures/comparison/phase11_8c_penny_adapter_input.yaml",
+    "tool": "tools/validate_phase11_8c_penny_adapter_spec.py",
+    "document": "docs/65_penny_diagnostic_adapter_spec.md",
+    "recommended_next_phase": "PHASE11_8D_PENNY_DIAGNOSTIC_ADAPTER_IMPLEMENTATION",
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "buz29_validation": false,
+    "parser_schema_changed": false,
+    "runtime_integration": false,
+    "expected_outputs": [
+      "plane_strain_modulus_Pa",
+      "opening_m",
+      "radius_m",
+      "pressure_factor",
+      "fracture_volume_proxy_m3"
+    ],
+    "caveats": [
+      "The fixture is a diagnostic adapter contract, not a runtime case schema.",
+      "Phase 11.8C does not validate BUZ29.",
+      "Phase 11.8C does not declare legacy equivalence."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

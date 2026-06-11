@@ -551,3 +551,6 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 - A Fase 11.8B seleciona `PENNY_ADAPTER_OPT_IN_SELECTED` como caminho seguro de
   integração. O próximo passo é especificar um adapter diagnóstico opt-in, sem
   promover `penny_shaped` a rota oficial do `lot-sim`.
+- A Fase 11.8C especifica o contrato desse adapter diagnóstico opt-in usando
+  os campos reais do `PennyShapedInput`. A especificação é fixture-only,
+  sem schema runtime, sem CLI e sem validação BUZ29.

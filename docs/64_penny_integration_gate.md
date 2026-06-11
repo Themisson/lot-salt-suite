@@ -71,3 +71,16 @@ O adapter diagnóstico deve ser opt-in, receber SI puro, chamar
 ```text
 PHASE11_8C_PENNY_ADAPTER_SPEC
 ```
+
+## Resultado da Fase 11.8C
+
+A fase seguinte especificou o contrato do adapter diagnóstico:
+
+```text
+status = PENNY_ADAPTER_SPEC_VALID
+fixture = tests/fixtures/comparison/phase11_8c_penny_adapter_input.yaml
+tool = tools/validate_phase11_8c_penny_adapter_spec.py
+```
+
+O contrato continua opt-in e diagnóstico. Ele não valida BUZ29, não altera o
+schema oficial e não promove `penny_shaped` a modo runtime do `lot-sim`.

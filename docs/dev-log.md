@@ -6135,3 +6135,23 @@ fluid:
   surface_pressure_Pa: 0.0
 ```
 → Este modo deve ser incorporado ao schema `schemas/lot_case.schema.yaml` na Fase 5.
+
+---
+
+### [2026-06-11] Fase 11.8C — Especificação do adapter diagnóstico PennyShaped
+
+**Status:** Concluído.
+
+**Classificação:** `PENNY_ADAPTER_SPEC_VALID`.
+
+**Entregáveis:**
+- `docs/65_penny_diagnostic_adapter_spec.md`
+- `tests/fixtures/comparison/phase11_8c_penny_adapter_input.yaml`
+- `tools/validate_phase11_8c_penny_adapter_spec.py`
+- `tests/python/test_validate_phase11_8c_penny_adapter_spec.py`
+
+**Escopo:** especificação/fixture/validador apenas. Não altera C++, CMake,
+parser, schema, CLI, `PknModel`, `PknRunner`, casos protegidos ou runtime
+`lot-pkn`.
+
+**Próxima fase:** `PHASE11_8D_PENNY_DIAGNOSTIC_ADAPTER_IMPLEMENTATION`.
