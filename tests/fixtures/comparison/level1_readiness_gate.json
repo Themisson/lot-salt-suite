@@ -102,6 +102,27 @@
       "Generated results/ artifacts remain local and must not be versioned."
     ]
   },
+  "phase11_5b_buz67d_cgeom_sink_timing_sensitivity": {
+    "status": "PHASE11_5B_CGEOM_SINK_TIMING_MATRIX_ADDED",
+    "study_status": "BUZ67D_CGEOM_SINK_TIMING_STUDY_REGISTERED",
+    "analysis_status": "CGEOM_SINK_TIMING_MATRIX_ANALYZED",
+    "study_id": "buz67d_cgeom_sink_timing_sensitivity_v2",
+    "matrix": "cases/validation/sensitivity/buz67d_modern_refined_cgeom_sink_timing_matrix_v2.yaml",
+    "tool": "tools/analyze_phase11_5b_cgeom_sink_timing.py",
+    "document": "docs/55_buz67d_cgeom_sink_timing_sensitivity.md",
+    "scenario_count": 8,
+    "mean_opening_delta_next_minus_same_s": 0.0,
+    "mean_sink_delay_delta_next_minus_same_s": 30.0,
+    "mean_max_pressure_delta_next_minus_same_Pa": 1821956.0465000253,
+    "sink_delay_reproduced_where_expected": true,
+    "results_versioned": false,
+    "physical_validation": false,
+    "caveats": [
+      "The C_geom x sink_timing matrix is diagnostic sensitivity, not automatic calibration.",
+      "sink_timing affects sink delay while opening remains controlled by compliance in the paired scenarios.",
+      "Generated results/ artifacts remain local and must not be versioned."
+    ]
+  },
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,

@@ -89,3 +89,9 @@ ao Git. Essa última checagem continua sendo gate de fase via `git status` e
 A matriz ampliada `buz67d_cgeom_extended_sensitivity_v2` foi verificada com
 `--require-report`, produzindo classificação operacional
 `LOT_PKN_STUDY_RESULTS_OK`.
+
+## Uso em 11.5B
+
+A matriz cruzada `buz67d_cgeom_sink_timing_sensitivity_v2` também foi verificada
+com `--require-report`, produzindo `LOT_PKN_STUDY_RESULTS_OK` sem avisos. A
+verificação é operacional e não declara calibração física.

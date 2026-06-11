@@ -512,3 +512,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 - A Fase 11.5A amplia a sensibilidade BUZ-67D `modern-refined` de `C_geom` com
   matriz v2 e execução por `study_id`, mantendo a interpretação como
   diagnóstico e não calibração física.
+- A Fase 11.5B adiciona a matriz cruzada BUZ-67D `C_geom x sink_timing` por
+  `study_id`. Ela separa efeitos de compliance e temporização do sink, confirma
+  o atraso operacional de 30 s para `next_step` nos pares com abertura e mantém
+  a classificação como diagnóstico, não calibração física.

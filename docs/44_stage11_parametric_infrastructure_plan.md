@@ -238,3 +238,11 @@ A Fase 11.5A registra e executa
 `buz67d_cgeom_extended_sensitivity_v2`, uma matriz v2 ampliada de `C_geom` para
 BUZ-67D `modern-refined`. O resultado é diagnóstico: `cgeom_075_next_step` foi o
 melhor por abertura e score combinado, mas isso não é calibração física.
+
+## Fase 11.5B matriz C_geom x sink_timing
+
+A Fase 11.5B registra e executa
+`buz67d_cgeom_sink_timing_sensitivity_v2`, uma matriz v2 2D que cruza quatro
+fatores de `C_geom` com `same_step` e `next_step`. O estudo confirma a separação
+operacional entre abertura controlada por compliance e atraso de sink controlado
+por `sink_timing`, ainda como diagnóstico `modern-refined`.

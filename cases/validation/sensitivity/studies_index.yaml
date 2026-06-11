@@ -34,3 +34,16 @@ studies:
       - sensitivity
       - extended
     caveat: Diagnostic sensitivity only; not automatic calibration.
+  - id: buz67d_cgeom_sink_timing_sensitivity_v2
+    title: BUZ-67D modern-refined C_geom x sink_timing sensitivity
+    matrix: cases/validation/sensitivity/buz67d_modern_refined_cgeom_sink_timing_matrix_v2.yaml
+    route: modern-refined
+    status: active
+    tags:
+      - BUZ-67D
+      - modern-refined
+      - cgeom
+      - sink_timing
+      - sensitivity
+      - two-factor
+    caveat: Diagnostic sensitivity only; not automatic calibration.

@@ -172,3 +172,15 @@ python tools/run_lot_pkn_study.py `
   --output-dir results/comparison/phase11_5a/buz67d_cgeom_extended `
   --lot-sim build/Debug/lot-sim.exe
 ```
+
+## Exemplo 11.5B
+
+```powershell
+python tools/run_lot_pkn_study.py `
+  --study-id buz67d_cgeom_sink_timing_sensitivity_v2 `
+  --output-dir results/comparison/phase11_5b/buz67d_cgeom_sink_timing `
+  --lot-sim build/Debug/lot-sim.exe
+```
+
+Esse estudo executa a matriz cruzada `C_geom x sink_timing` e deve continuar
+sendo interpretado como diagnóstico modern-refined, não como calibração física.

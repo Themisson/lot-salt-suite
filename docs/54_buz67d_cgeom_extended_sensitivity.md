@@ -103,3 +103,10 @@ promovido automaticamente a parâmetro calibrado.
 
 A próxima etapa é a Fase 11.5B: matriz cruzada `C_geom x sink_timing`, para
 separar o efeito da compliance do efeito da temporização do sink.
+
+## Fase 11.5B executada
+
+A Fase 11.5B foi registrada como
+`buz67d_cgeom_sink_timing_sensitivity_v2`. Ela confirmou que, para a matriz
+cruzada, `sink_timing=next_step` reproduz o atraso diagnóstico de 30 s, enquanto
+o tempo de abertura permanece controlado principalmente pelo fator `C_geom`.

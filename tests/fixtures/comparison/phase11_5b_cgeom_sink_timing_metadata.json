@@ -1,0 +1,6 @@
+{
+  "matrix_id": "buz67d_modern_refined_cgeom_sink_timing_v2",
+  "study_id": "buz67d_cgeom_sink_timing_sensitivity_v2",
+  "route": "modern-refined",
+  "caveat": "Diagnostic sensitivity only; not automatic calibration."
+}

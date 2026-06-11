@@ -64,3 +64,7 @@ diretório de resultados e pode gerar relatório JSON/Markdown local.
 A Fase 11.5A usa o mesmo manifesto v1 para registrar o estudo
 `buz67d_cgeom_extended_sensitivity_v2`. Os artefatos permanecem locais em
 `results/` e não são versionados.
+
+A Fase 11.5B usa o mesmo contrato para registrar
+`buz67d_cgeom_sink_timing_sensitivity_v2`, incluindo matriz, base case, cenários
+materializados localmente, comandos de reprodução e verificação.

@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.5A BUZ-67D extended C_geom sensitivity
+Fase ativa  : 11.5B BUZ-67D C_geom sink_timing sensitivity
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 284/284 previstos apos Fase 11.1B em 2026-06-11
+Testes Py   : 355/355 previstos apos Fase 11.5B em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,51 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 11.5B — matriz C_geom x sink_timing BUZ-67D — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Matriz criada:**
+
+```text
+cases/validation/sensitivity/buz67d_modern_refined_cgeom_sink_timing_matrix_v2.yaml
+```
+
+**Estudo registrado:**
+
+```text
+buz67d_cgeom_sink_timing_sensitivity_v2
+```
+
+**Ferramenta criada:**
+
+```text
+tools/analyze_phase11_5b_cgeom_sink_timing.py
+```
+
+**Documento criado:**
+
+```text
+docs/55_buz67d_cgeom_sink_timing_sensitivity.md
+```
+
+**Resultado diagnóstico observado:**
+
+```text
+classification = CGEOM_SINK_TIMING_MATRIX_ANALYZED
+scenario_count = 8
+mean_opening_delta_next_minus_same_s = 0.0
+mean_sink_delay_delta_next_minus_same_s = 30.0
+mean_max_pressure_delta_next_minus_same_Pa = 1821956.0465000253
+sink_delay_reproduced_where_expected = true
+```
+
+**Caveat:** a matriz separa efeitos diagnósticos de `C_geom` e
+`sink_timing`, mas não estabelece calibração física nem equivalência estrita
+com o legado.
 
 ---
 

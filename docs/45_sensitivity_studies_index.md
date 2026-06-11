@@ -181,3 +181,17 @@ buz67d_cgeom_extended_sensitivity_v2
 Esse estudo aponta para
 `cases/validation/sensitivity/buz67d_modern_refined_cgeom_extended_matrix_v2.yaml`
 e avalia fatores `0.50..1.25` com `sink_timing=next_step`.
+
+## Estudo cruzado C_geom x sink_timing
+
+A Fase 11.5B registra:
+
+```text
+buz67d_cgeom_sink_timing_sensitivity_v2
+```
+
+Esse estudo aponta para
+`cases/validation/sensitivity/buz67d_modern_refined_cgeom_sink_timing_matrix_v2.yaml`
+e cruza fatores `0.60`, `0.75`, `1.00` e `1.25` com `same_step` e
+`next_step`. A matriz separa efeitos diagnósticos de compliance e temporização
+do sink, mas não calibra fisicamente o modelo.
