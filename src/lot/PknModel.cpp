@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstddef>
 #include <stdexcept>
+#include <string>
 
 namespace lss::lot {
 namespace {
@@ -37,8 +38,30 @@ const char* fracture_initiation_label(FractureInitiationCriterion criterion) {
       return "constant_pressure";
     case FractureInitiationCriterion::SigmaThetaStatic:
       return "sigma_theta_static";
+    case FractureInitiationCriterion::SigmaThetaProviderRuntime:
+      return "sigma_theta_provider_runtime";
   }
   throw std::invalid_argument("PknModel: unsupported fracture initiation criterion");
+}
+
+void validate_sigma_theta_point(const SigmaThetaRuntimePoint& point) {
+  if (!point.valid) {
+    throw std::invalid_argument("PknModel: sigma theta provider returned invalid point");
+  }
+  if (!std::isfinite(point.time_s) || point.time_s < 0.0) {
+    throw std::invalid_argument(
+        "PknModel: sigma theta provider returned invalid time_s");
+  }
+  if (!std::isfinite(point.sigma_theta_compression_positive_Pa) ||
+      point.sigma_theta_compression_positive_Pa <= 0.0) {
+    throw std::invalid_argument(
+        "PknModel: sigma theta provider returned non-positive sigma theta");
+  }
+  if (!std::isfinite(point.influence_depth_m) ||
+      point.influence_depth_m < 0.0) {
+    throw std::invalid_argument(
+        "PknModel: sigma theta provider returned invalid influence_depth_m");
+  }
 }
 
 void validate_input(const PknInput& input) {
@@ -129,8 +152,9 @@ void validate_input(const PknInput& input) {
       }
     }
   }
-  if (input.fracture_initiation ==
-      FractureInitiationCriterion::SigmaThetaStatic) {
+  if (input.pressure_model == PknPressureModel::VolumetricBalance &&
+      input.fracture_initiation ==
+          FractureInitiationCriterion::SigmaThetaStatic) {
     const auto& criterion = input.sigma_theta_fracture;
     if (!criterion.enabled) {
       throw std::invalid_argument(
@@ -158,6 +182,13 @@ void validate_input(const PknInput& input) {
       throw std::invalid_argument(
           "PknModel: sigma_theta_static requires legacy_algebra comparison");
     }
+  }
+  if (input.pressure_model == PknPressureModel::VolumetricBalance &&
+      input.fracture_initiation ==
+          FractureInitiationCriterion::SigmaThetaProviderRuntime &&
+      input.sigma_theta_provider == nullptr) {
+    throw std::invalid_argument(
+        "PknModel: sigma_theta_provider_runtime requires provider");
   }
 }
 
@@ -287,6 +318,8 @@ void append_point(PknResult& series, const PknResult& point) {
       point.fracture_initiation_sigma_theta_Pa);
   series.fracture_initiation_margin_series_Pa.push_back(
       point.fracture_initiation_margin_Pa);
+  series.sigma_theta_lookup_time_series_s.push_back(
+      point.sigma_theta_lookup_time_s);
   series.fracture_initiated_series.push_back(point.fracture_initiated ? 1 : 0);
 }
 
@@ -334,6 +367,11 @@ void copy_scalar_result(PknResult& target, const PknResult& point) {
   target.fracture_initiation_layer_id = point.fracture_initiation_layer_id;
   target.fracture_initiation_depth_m = point.fracture_initiation_depth_m;
   target.fracture_initiation_source = point.fracture_initiation_source;
+  target.sigma_theta_provider_type = point.sigma_theta_provider_type;
+  target.sigma_theta_source = point.sigma_theta_source;
+  target.sigma_theta_lookup_time_s = point.sigma_theta_lookup_time_s;
+  target.sigma_theta_layer_id = point.sigma_theta_layer_id;
+  target.sigma_theta_mapping_status = point.sigma_theta_mapping_status;
 }
 
 void apply_volumetric_balance(const PknInput& input, PknResult& series) {
@@ -346,6 +384,10 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
   double initiation_sigma_theta_Pa = 0.0;
   double initiation_margin_Pa = 0.0;
   double initiation_time_s = 0.0;
+  double sigma_theta_lookup_time_s = 0.0;
+  std::string sigma_theta_layer_id;
+  std::string sigma_theta_source;
+  std::string sigma_theta_mapping_status;
   double geometric_compressibility_per_Pa = 0.0;
   std::string mechanical_compliance_status = "none";
   if (input.volumetric_compliance.enabled) {
@@ -392,11 +434,37 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
         const double sigma_theta_Pa =
             input.sigma_theta_fracture.sigma_theta_compression_positive_Pa;
         const double margin_Pa = trial_pressure_Pa - sigma_theta_Pa;
+        sigma_theta_lookup_time_s = series.time_series_s[i];
+        sigma_theta_layer_id = input.sigma_theta_fracture.layer_id;
+        sigma_theta_source = input.sigma_theta_fracture.source;
+        sigma_theta_mapping_status = input.sigma_theta_fracture.mapping_status;
         if (margin_Pa > 0.0) {
           fracture_opened = true;
           fracture_started_this_step = !fracture_initiated_before_step;
           initiation_pressure_Pa = trial_pressure_Pa;
           initiation_sigma_theta_Pa = sigma_theta_Pa;
+          initiation_margin_Pa = margin_Pa;
+          initiation_time_s = series.time_series_s[i];
+        }
+      } else if (input.fracture_initiation ==
+                 FractureInitiationCriterion::SigmaThetaProviderRuntime) {
+        const SigmaThetaRuntimePoint sigma_theta =
+            input.sigma_theta_provider->sample(series.time_series_s[i],
+                                               trial_pressure_Pa);
+        validate_sigma_theta_point(sigma_theta);
+        const double margin_Pa =
+            trial_pressure_Pa -
+            sigma_theta.sigma_theta_compression_positive_Pa;
+        sigma_theta_lookup_time_s = sigma_theta.time_s;
+        sigma_theta_layer_id = sigma_theta.layer_id;
+        sigma_theta_source = sigma_theta.source;
+        sigma_theta_mapping_status = sigma_theta.mapping_status;
+        if (margin_Pa > 0.0) {
+          fracture_opened = true;
+          fracture_started_this_step = !fracture_initiated_before_step;
+          initiation_pressure_Pa = trial_pressure_Pa;
+          initiation_sigma_theta_Pa =
+              sigma_theta.sigma_theta_compression_positive_Pa;
           initiation_margin_Pa = margin_Pa;
           initiation_time_s = series.time_series_s[i];
         }
@@ -455,6 +523,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
     series.fracture_initiation_sigma_theta_series_Pa[i] =
         initiation_sigma_theta_Pa;
     series.fracture_initiation_margin_series_Pa[i] = initiation_margin_Pa;
+    series.sigma_theta_lookup_time_series_s[i] = sigma_theta_lookup_time_s;
 
     previous_injected_m3 = series.injected_volume_series_m3[i];
     previous_fracture_m3 = series.fracture_volume_series_m3[i];
@@ -469,6 +538,18 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
   series.fracture_initiation_depth_m =
       input.sigma_theta_fracture.influence_depth_m;
   series.fracture_initiation_source = input.sigma_theta_fracture.source;
+  series.sigma_theta_provider_type =
+      input.fracture_initiation ==
+              FractureInitiationCriterion::SigmaThetaProviderRuntime
+          ? "runtime"
+          : (input.fracture_initiation ==
+                     FractureInitiationCriterion::SigmaThetaStatic
+                 ? "static"
+                 : "none");
+  series.sigma_theta_source = sigma_theta_source;
+  series.sigma_theta_lookup_time_s = sigma_theta_lookup_time_s;
+  series.sigma_theta_layer_id = sigma_theta_layer_id;
+  series.sigma_theta_mapping_status = sigma_theta_mapping_status;
   series.fluid_compressibility_per_Pa = input.fluid_compressibility_per_Pa;
   series.geometric_compressibility_per_Pa = geometric_compressibility_per_Pa;
   series.effective_compressibility_per_Pa = effective_compressibility_per_Pa;
@@ -506,6 +587,7 @@ void apply_volumetric_balance(const PknInput& input, PknResult& series) {
     series.fracture_initiation_pressure_Pa = initiation_pressure_Pa;
     series.fracture_initiation_sigma_theta_Pa = initiation_sigma_theta_Pa;
     series.fracture_initiation_margin_Pa = initiation_margin_Pa;
+    series.sigma_theta_lookup_time_s = sigma_theta_lookup_time_s;
   }
 }
 

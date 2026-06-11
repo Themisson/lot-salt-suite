@@ -2881,3 +2881,35 @@ A Fase 6.11 completou a migracao Eigen do saltcreep (`MIGRATION_COMPLETED`):
 `external/saltcreep/CMakeLists.txt` agora auto-detecta o contexto `lot-salt-suite`
 e usa `include/Eigen` por padrao. A duplicacao de Eigen (via proxy no build dir)
 e aceitavel ate o adapter `SaltCreepSaltcreepAdapter` estabilizar.
+
+## Contrato SigmaThetaProvider LOT/PKN runtime (Fase 10.24A)
+
+A Fase 10.24A introduziu um contrato neutro em `lot/` para permitir que o
+runtime LOT/PKN consulte `sigma_theta_compression_positive_Pa` de uma fonte
+externa futura sem incluir headers de `external/saltcreep/` e sem depender de
+`coupling/`.
+
+O contrato criado é `include/lot/SigmaThetaProvider.hpp`. Ele contém
+`SigmaThetaRuntimePoint` e a interface `SigmaThetaProvider`. O `PknModel` aceita
+essa fonte apenas quando configurado programaticamente com
+`FractureInitiationCriterion::SigmaThetaProviderRuntime`.
+
+```text
+opened = wellbore_pressure_trial_Pa > sigma_theta_compression_positive_Pa
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+```
+
+Limites da fase:
+
+- não há provider real de `saltcreep`;
+- `SaltCreepTimeBridge` não foi instanciado no runtime LOT/PKN;
+- `SaltWallStressDiagnostics` ainda não alimenta `PknModel`;
+- `sigma_theta_time_series` ainda não foi exposto em YAML;
+- o default global permanece `constant_pressure`/`pkn_direct` conforme os casos
+  existentes;
+- `sigma_theta_static` segue suportado como proxy diagnóstico fixo.
+
+Os campos `sigma_theta_provider_type`, `sigma_theta_source`,
+`sigma_theta_lookup_time_s`, `sigma_theta_layer_id` e
+`sigma_theta_mapping_status` foram adicionados ao resultado moderno para manter
+rastreável a origem da tensão quando um provider opt-in for usado.

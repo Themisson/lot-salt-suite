@@ -2141,3 +2141,31 @@ phase_dependent_compliance_priority = false
 A proxima fase recomendada deve formular/implementar uma rota opt-in de
 sigma-theta runtime ou um criterio de abertura mais fiel, ainda sem tornar isso
 default de `lot-sim run --mode lot-pkn`.
+
+## Fase 10.24A — contrato SigmaThetaProvider runtime
+
+A Fase 10.24A estabeleceu o contrato arquitetural para a rota indicada pela
+10.23C: um `SigmaThetaProvider` opt-in em `lot/`, independente de
+`external/saltcreep/`, capaz de fornecer
+`sigma_theta_compression_positive_Pa` para o criterio de abertura do
+`volumetric_balance`.
+
+Gate:
+
+```text
+SIGMA_THETA_PROVIDER_CONTRACT_IMPLEMENTATION_ALLOWED
+```
+
+O contrato não compara ainda `sigmaTheta` legado contra tensão moderna real. Ele
+apenas torna rastreável a fonte futura do threshold por meio dos campos
+`sigma_theta_provider_type`, `sigma_theta_source`, `sigma_theta_lookup_time_s`,
+`sigma_theta_layer_id` e `sigma_theta_mapping_status`.
+
+Comparabilidade:
+
+- `sigma_theta_static` continua sendo proxy fixo;
+- `sigma_theta_provider_runtime` é opt-in programático;
+- `sigma_theta_time_series` e `sigma_theta_salt_runtime` permanecem fases
+  futuras;
+- nenhuma conclusão de equivalência física deve ser extraída da existência do
+  contrato.

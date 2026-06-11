@@ -11,6 +11,33 @@
 
 namespace {
 
+class FixedSigmaThetaProvider final : public lss::lot::SigmaThetaProvider {
+ public:
+  explicit FixedSigmaThetaProvider(double sigma_theta_Pa)
+      : sigma_theta_Pa_(sigma_theta_Pa) {}
+
+  lss::lot::SigmaThetaRuntimePoint sample(
+      double time_s, double wellbore_pressure_trial_Pa) const override {
+    last_time_s = time_s;
+    last_pressure_Pa = wellbore_pressure_trial_Pa;
+    ++call_count;
+    lss::lot::SigmaThetaRuntimePoint point;
+    point.time_s = time_s;
+    point.sigma_theta_compression_positive_Pa = sigma_theta_Pa_;
+    point.layer_id = "runtime_layer";
+    point.influence_depth_m = 4374.0;
+    point.valid = true;
+    point.source = "fixed_test_provider";
+    point.mapping_status = "RUNTIME_PROVIDER_TEST";
+    return point;
+  }
+
+  double sigma_theta_Pa_ = 0.0;
+  mutable int call_count = 0;
+  mutable double last_time_s = 0.0;
+  mutable double last_pressure_Pa = 0.0;
+};
+
 lss::lot::PknInput synthetic_input() {
   lss::lot::PknInput input;
   input.injection.rate_m3_s = 0.001;
@@ -57,6 +84,8 @@ void check_finite_non_negative_series(const lss::lot::PknResult& result) {
           result.fracture_initiation_sigma_theta_series_Pa.size());
   REQUIRE(result.time_series_s.size() ==
           result.fracture_initiation_margin_series_Pa.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.sigma_theta_lookup_time_series_s.size());
   REQUIRE(result.time_series_s.size() == result.fracture_initiated_series.size());
 
   for (std::size_t i = 0; i < result.time_series_s.size(); ++i) {
@@ -77,6 +106,7 @@ void check_finite_non_negative_series(const lss::lot::PknResult& result) {
     CHECK(std::isfinite(result.fracture_initiation_pressure_series_Pa[i]));
     CHECK(std::isfinite(result.fracture_initiation_sigma_theta_series_Pa[i]));
     CHECK(std::isfinite(result.fracture_initiation_margin_series_Pa[i]));
+    CHECK(std::isfinite(result.sigma_theta_lookup_time_series_s[i]));
     CHECK(result.injected_volume_series_m3[i] >= 0.0);
     CHECK(result.fracture_length_series_m[i] >= 0.0);
     CHECK(result.fracture_width_series_m[i] >= 0.0);
@@ -108,7 +138,40 @@ lss::lot::PknInput sigma_theta_input(double sigma_theta_Pa) {
   return input;
 }
 
+lss::lot::PknInput runtime_sigma_theta_input(
+    const lss::lot::SigmaThetaProvider& provider, double sigma_theta_Pa) {
+  auto input = synthetic_input();
+  input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  input.annular_volume_m3 = 10.0;
+  input.fluid_compressibility_per_Pa = 1.0e-9;
+  input.breakdown.pressure_Pa = 1.0e12;
+  input.fracture_initiation =
+      lss::lot::FractureInitiationCriterion::SigmaThetaProviderRuntime;
+  input.sigma_theta_provider = &provider;
+  (void)sigma_theta_Pa;
+  return input;
+}
+
 }  // namespace
+
+TEST_CASE("Sigma theta runtime point stores pressure threshold data") {
+  lss::lot::SigmaThetaRuntimePoint point;
+  point.time_s = 30.0;
+  point.sigma_theta_compression_positive_Pa = 66.0e6;
+  point.layer_id = "legacy_layer_16";
+  point.influence_depth_m = 4374.0;
+  point.valid = true;
+  point.source = "unit_test";
+  point.mapping_status = "RUNTIME_CONTRACT";
+
+  CHECK(point.time_s == Catch::Approx(30.0));
+  CHECK(point.sigma_theta_compression_positive_Pa == Catch::Approx(66.0e6));
+  CHECK(point.layer_id == "legacy_layer_16");
+  CHECK(point.influence_depth_m == Catch::Approx(4374.0));
+  CHECK(point.valid);
+  CHECK(point.source == "unit_test");
+  CHECK(point.mapping_status == "RUNTIME_CONTRACT");
+}
 
 TEST_CASE("Minimal SI PKN model returns non-negative finite values") {
   const lss::lot::PknModel model;
@@ -202,6 +265,58 @@ TEST_CASE("Minimal SI PKN model is deterministic") {
   CHECK(first.leakoff_volume_series_m3 == second.leakoff_volume_series_m3);
   CHECK(first.fracture_volume_series_m3 == second.fracture_volume_series_m3);
   CHECK(first.wellbore_pressure_series_Pa == second.wellbore_pressure_series_Pa);
+}
+
+TEST_CASE("Sigma theta provider absence preserves existing behavior") {
+  const lss::lot::PknModel model;
+  auto input = synthetic_input();
+  input.pressure_model = lss::lot::PknPressureModel::VolumetricBalance;
+  input.annular_volume_m3 = 10.0;
+  input.fluid_compressibility_per_Pa = 1.0e-9;
+  input.breakdown.pressure_Pa = 1.0e12;
+
+  const auto result = model.simulate(input);
+
+  CHECK(result.fracture_initiation_type == "constant_pressure");
+  CHECK(result.sigma_theta_provider_type == "none");
+  CHECK(result.fracture_initiation_sigma_theta_Pa == 0.0);
+  CHECK(result.fracture_initiation_margin_Pa == 0.0);
+}
+
+TEST_CASE("Sigma theta provider contract opens from runtime threshold") {
+  const lss::lot::PknModel model;
+  FixedSigmaThetaProvider provider(50.0);
+  const auto input = runtime_sigma_theta_input(provider, 50.0);
+
+  const auto result = model.simulate(input);
+
+  CHECK(provider.call_count > 0);
+  CHECK(result.fracture_initiated);
+  CHECK(result.fracture_initiation_type == "sigma_theta_provider_runtime");
+  CHECK(result.sigma_theta_provider_type == "runtime");
+  CHECK(result.sigma_theta_source == "fixed_test_provider");
+  CHECK(result.sigma_theta_layer_id == "runtime_layer");
+  CHECK(result.sigma_theta_mapping_status == "RUNTIME_PROVIDER_TEST");
+  CHECK(result.fracture_initiation_sigma_theta_Pa == Catch::Approx(50.0));
+  CHECK(result.fracture_initiation_margin_Pa > 0.0);
+  CHECK(result.sigma_theta_lookup_time_s ==
+        Catch::Approx(result.fracture_initiation_time_s));
+}
+
+TEST_CASE("Sigma theta provider contract does not affect pkn_direct") {
+  const lss::lot::PknModel model;
+  FixedSigmaThetaProvider provider(1.0);
+  auto input = synthetic_input();
+  input.fracture_initiation =
+      lss::lot::FractureInitiationCriterion::SigmaThetaProviderRuntime;
+  input.sigma_theta_provider = &provider;
+
+  const auto result = model.simulate(input);
+
+  CHECK(provider.call_count == 0);
+  CHECK(result.pressure_model == "pkn_direct");
+  CHECK(result.fracture_initiation_type == "constant_pressure");
+  CHECK(result.sigma_theta_provider_type == "none");
 }
 
 TEST_CASE("Volumetric balance pressure model increases pressure with injection") {

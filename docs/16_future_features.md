@@ -318,3 +318,11 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   em uma rota opt-in para sigma-theta runtime ou criterio de abertura mais fiel.
   `pressure_tabulated_geometric` permanece bloqueado e `constant_geometric`
   continua apenas diagnostico.
+- A Fase 10.24A implementou o primeiro contrato arquitetural dessa rota:
+  `SigmaThetaProvider` em `lot/`. Ele permite que o `PknModel` consulte
+  `sigma_theta_compression_positive_Pa` de uma fonte runtime opt-in, sem incluir
+  `saltcreep`, `SaltCreepTimeBridge` ou `SaltWallStressDiagnostics`. As fases
+  futuras devem implementar primeiro um provider diagnostico por serie temporal
+  e, somente depois, avaliar se `SaltWallStressDiagnostics` pode ser a fonte
+  runtime fisicamente controlada. O default de `lot-sim run --mode lot-pkn`
+  permanece inalterado.

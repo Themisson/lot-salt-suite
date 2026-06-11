@@ -4,6 +4,7 @@
 
 #include "lot/InjectionSchedule.hpp"
 #include "lot/LeakoffModel.hpp"
+#include "lot/SigmaThetaProvider.hpp"
 
 namespace lss::lot {
 
@@ -19,6 +20,7 @@ struct BreakdownConfig {
 enum class FractureInitiationCriterion {
   ConstantPressure,
   SigmaThetaStatic,
+  SigmaThetaProviderRuntime,
 };
 
 struct SigmaThetaFractureCriterion {
@@ -69,6 +71,7 @@ struct PknInput {
   FractureInitiationCriterion fracture_initiation =
       FractureInitiationCriterion::ConstantPressure;
   SigmaThetaFractureCriterion sigma_theta_fracture;
+  const SigmaThetaProvider* sigma_theta_provider = nullptr;
 };
 
 }  // namespace lss::lot

@@ -82,6 +82,7 @@ void ensure_series_sizes(const lss::lot::PknResult& result) {
       result.fracture_initiation_pressure_series_Pa.size() != size ||
       result.fracture_initiation_sigma_theta_series_Pa.size() != size ||
       result.fracture_initiation_margin_series_Pa.size() != size ||
+      result.sigma_theta_lookup_time_series_s.size() != size ||
       result.fracture_initiated_series.size() != size) {
     throw std::runtime_error("ResultWriter: PKN result series have different sizes");
   }
@@ -133,6 +134,8 @@ void ensure_finite_values(const lss::lot::PknResult& result) {
                  "summary.fracture_initiation_margin_Pa");
   require_finite(result.fracture_initiation_depth_m,
                  "summary.fracture_initiation_depth_m");
+  require_finite(result.sigma_theta_lookup_time_s,
+                 "summary.sigma_theta_lookup_time_s");
   require_finite(result.initial_annular_volume_per_radian_m3,
                  "summary.initial_annular_volume_per_radian_m3");
   require_finite(result.initial_annular_volume_m3,
@@ -175,6 +178,8 @@ void ensure_finite_values(const lss::lot::PknResult& result) {
                    "series.fracture_initiation_sigma_theta_Pa");
     require_finite(result.fracture_initiation_margin_series_Pa[i],
                    "series.fracture_initiation_margin_Pa");
+    require_finite(result.sigma_theta_lookup_time_series_s[i],
+                   "series.sigma_theta_lookup_time_s");
   }
 }
 
@@ -207,6 +212,11 @@ void write_timeseries_csv(const std::filesystem::path& path,
          "fracture_initiation_pressure_Pa,"
          "fracture_initiation_sigma_theta_Pa,"
          "fracture_initiation_margin_Pa,"
+         "sigma_theta_provider_type,"
+         "sigma_theta_source,"
+         "sigma_theta_lookup_time_s,"
+         "sigma_theta_layer_id,"
+         "sigma_theta_mapping_status,"
          "fluid_compressibility_1_Pa,"
          "geometric_compressibility_1_Pa,"
          "effective_compressibility_1_Pa,"
@@ -237,6 +247,11 @@ void write_timeseries_csv(const std::filesystem::path& path,
         << result.fracture_initiation_pressure_series_Pa[i] << ','
         << result.fracture_initiation_sigma_theta_series_Pa[i] << ','
         << result.fracture_initiation_margin_series_Pa[i] << ','
+        << escape_csv(result.sigma_theta_provider_type) << ','
+        << escape_csv(result.sigma_theta_source) << ','
+        << result.sigma_theta_lookup_time_series_s[i] << ','
+        << escape_csv(result.sigma_theta_layer_id) << ','
+        << escape_csv(result.sigma_theta_mapping_status) << ','
         << result.fluid_compressibility_per_Pa << ','
         << result.geometric_compressibility_per_Pa << ','
         << result.effective_compressibility_per_Pa << ','
@@ -327,6 +342,16 @@ void write_summary_json(const std::filesystem::path& path, const std::string& ca
       << result.fracture_initiation_depth_m << ",\n";
   out << "    \"fracture_initiation_source\": \""
       << escape_json(result.fracture_initiation_source) << "\",\n";
+  out << "    \"sigma_theta_provider_type\": \""
+      << escape_json(result.sigma_theta_provider_type) << "\",\n";
+  out << "    \"sigma_theta_source\": \""
+      << escape_json(result.sigma_theta_source) << "\",\n";
+  out << "    \"sigma_theta_lookup_time_s\": "
+      << result.sigma_theta_lookup_time_s << ",\n";
+  out << "    \"sigma_theta_layer_id\": \""
+      << escape_json(result.sigma_theta_layer_id) << "\",\n";
+  out << "    \"sigma_theta_mapping_status\": \""
+      << escape_json(result.sigma_theta_mapping_status) << "\",\n";
   out << "    \"initial_annular_volume_per_radian_m3\": "
       << result.initial_annular_volume_per_radian_m3 << ",\n";
   out << "    \"initial_annular_volume_m3\": " << result.initial_annular_volume_m3 << ",\n";

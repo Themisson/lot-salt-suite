@@ -44,6 +44,11 @@ struct PknResult {
   std::string fracture_initiation_layer_id;
   double fracture_initiation_depth_m = 0.0;
   std::string fracture_initiation_source;
+  std::string sigma_theta_provider_type = "none";
+  std::string sigma_theta_source;
+  double sigma_theta_lookup_time_s = 0.0;
+  std::string sigma_theta_layer_id;
+  std::string sigma_theta_mapping_status;
   double initial_annular_volume_per_radian_m3 = 0.0;
   double initial_annular_volume_m3 = 0.0;
   double annular_outer_radius_m = 0.0;
@@ -81,6 +86,7 @@ struct PknResult {
   std::vector<double> fracture_initiation_pressure_series_Pa;
   std::vector<double> fracture_initiation_sigma_theta_series_Pa;
   std::vector<double> fracture_initiation_margin_series_Pa;
+  std::vector<double> sigma_theta_lookup_time_series_s;
   std::vector<int> fracture_initiated_series;
 };
 

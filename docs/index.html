@@ -265,8 +265,8 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">78/85</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">245</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">79/86</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">249</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">133</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
@@ -2163,6 +2163,30 @@ do sink, mas ainda desloca a abertura em relacao ao legado (<code>660 s</code> m
 contra <code>510 s</code> legado). Portanto, a evidencia favorece uma proxima fase de
 decisao/formulacao sobre criterio de abertura e sigma-theta runtime, e nao uma
 promocao automatica de <code>constant_geometric</code> ou <code>next_step</code> a default fisico.</p>
+<h3 id="contrato-runtime-sigmathetaprovider-fase-1024a">Contrato runtime SigmaThetaProvider — Fase 10.24A</h3>
+<p>A Fase 10.24A criou um contrato interno opt-in para que o runtime LOT/PKN possa
+consultar, futuramente, um valor dinamico de
+<code>sigma_theta_compression_positive_Pa</code> sem depender diretamente de
+<code>external/saltcreep/</code> ou de <code>coupling/</code>.</p>
+<p>O contrato neutro fica em <code>include/lot/SigmaThetaProvider.hpp</code> e define
+<code>SigmaThetaRuntimePoint</code> e <code>SigmaThetaProvider::sample(time_s,
+wellbore_pressure_trial_Pa)</code>.</p>
+<p>No <code>volumetric_balance</code>, a rota programatica
+<code>FractureInitiationCriterion::SigmaThetaProviderRuntime</code> usa a algebra:</p>
+<pre><code class="language-text">margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa &gt; 0
+</code></pre>
+<p>Essa fase nao altera YAML, parser, casos existentes ou o default runtime. Sem
+provider, o comportamento existente permanece <code>constant_pressure</code> ou
+<code>sigma_theta_static</code>, conforme configurado. <code>pkn_direct</code> continua ignorando o
+criterio runtime e nao instancia provider.</p>
+<p>Campos diagnosticos adicionais passaram a ser exportados em <code>PknResult</code>, CSV e
+JSON: <code>sigma_theta_provider_type</code>, <code>sigma_theta_source</code>,
+<code>sigma_theta_lookup_time_s</code>, <code>sigma_theta_layer_id</code> e
+<code>sigma_theta_mapping_status</code>.</p>
+<p>Status fisico: contrato arquitetural apenas. Nao ha provider real de
+<code>saltcreep</code>, nao ha <code>SaltCreepTimeBridge</code> no runtime LOT/PKN, e
+<code>sigma_theta_time_series</code> fica reservado para fase posterior.</p>
 </div>
 </section>
 
@@ -2899,6 +2923,22 @@ x(x.rows()-1) = mdl-&gt;getNodalDisplacement();  // linha 1197
 <p>onde <code>dV</code> = variação de volume calculada a partir de <code>u_wall</code>.</p>
 <p><strong>Sentido físico:</strong> Se o sal flui para dentro (fechamento), <code>u_wall &gt; 0</code> →
 volume anular reduz (<code>dV &lt; 0</code>) → pressão de sal parcialmente alivia APB térmico.</p>
+<hr />
+<h2 id="fa05-sigma-theta-runtime-e-contrato-opt-in-nao-validacao-fisica">FA05 — Sigma-theta runtime é contrato opt-in, não validação física</h2>
+<p><strong>Severidade:</strong> Alta | <strong>Status:</strong> Em formulação controlada</p>
+<p>A Fase 10.24A adicionou o contrato <code>SigmaThetaProvider</code> para permitir que o
+LOT/PKN consulte <code>sigma_theta_compression_positive_Pa</code> em tempo de execução,
+mas essa camada ainda é apenas arquitetural. Ela não conecta <code>saltcreep</code>, não
+usa <code>SaltWallStressDiagnostics</code> real e não torna sigma-theta runtime default.</p>
+<p>Até validação física futura:</p>
+<ul>
+<li><code>sigma_theta_static</code> permanece proxy diagnóstico fixo;</li>
+<li><code>sigma_theta_provider_runtime</code> deve ser usado apenas por código opt-in;</li>
+<li><code>pkn_direct</code> não deve ser afetado;</li>
+<li>a comparação <code>wellbore_pressure_trial_Pa &gt; sigma_theta_compression_positive_Pa</code>
+  segue a álgebra legado-moderna documentada, mas não prova equivalência física
+  de ruptura.</li>
+</ul>
 <p><strong>Nota de acoplamento fraco:</strong> O deslocamento do sal é calculado fora do loop iterativo
 de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativo (linhas
 560–868) recalcula pressão sem iterar no sal. Isto é acoplamento <strong>sequencial fraco</strong>
@@ -7125,6 +7165,32 @@ resolver headers Eigen.</p>
 <code>external/saltcreep/CMakeLists.txt</code> agora auto-detecta o contexto <code>lot-salt-suite</code>
 e usa <code>include/Eigen</code> por padrao. A duplicacao de Eigen (via proxy no build dir)
 e aceitavel ate o adapter <code>SaltCreepSaltcreepAdapter</code> estabilizar.</p>
+<h2 id="contrato-sigmathetaprovider-lotpkn-runtime-fase-1024a">Contrato SigmaThetaProvider LOT/PKN runtime (Fase 10.24A)</h2>
+<p>A Fase 10.24A introduziu um contrato neutro em <code>lot/</code> para permitir que o
+runtime LOT/PKN consulte <code>sigma_theta_compression_positive_Pa</code> de uma fonte
+externa futura sem incluir headers de <code>external/saltcreep/</code> e sem depender de
+<code>coupling/</code>.</p>
+<p>O contrato criado é <code>include/lot/SigmaThetaProvider.hpp</code>. Ele contém
+<code>SigmaThetaRuntimePoint</code> e a interface <code>SigmaThetaProvider</code>. O <code>PknModel</code> aceita
+essa fonte apenas quando configurado programaticamente com
+<code>FractureInitiationCriterion::SigmaThetaProviderRuntime</code>.</p>
+<pre><code class="language-text">opened = wellbore_pressure_trial_Pa &gt; sigma_theta_compression_positive_Pa
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+</code></pre>
+<p>Limites da fase:</p>
+<ul>
+<li>não há provider real de <code>saltcreep</code>;</li>
+<li><code>SaltCreepTimeBridge</code> não foi instanciado no runtime LOT/PKN;</li>
+<li><code>SaltWallStressDiagnostics</code> ainda não alimenta <code>PknModel</code>;</li>
+<li><code>sigma_theta_time_series</code> ainda não foi exposto em YAML;</li>
+<li>o default global permanece <code>constant_pressure</code>/<code>pkn_direct</code> conforme os casos
+  existentes;</li>
+<li><code>sigma_theta_static</code> segue suportado como proxy diagnóstico fixo.</li>
+</ul>
+<p>Os campos <code>sigma_theta_provider_type</code>, <code>sigma_theta_source</code>,
+<code>sigma_theta_lookup_time_s</code>, <code>sigma_theta_layer_id</code> e
+<code>sigma_theta_mapping_status</code> foram adicionados ao resultado moderno para manter
+rastreável a origem da tensão quando um provider opt-in for usado.</p>
 </div>
 </section>
 
@@ -8897,7 +8963,7 @@ provado.</p>
 
   </div>
 </main>
-<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-10 por <span class="mono">generate_docs_index.py</span></footer>
+<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-11 por <span class="mono">generate_docs_index.py</span></footer>
 <script>
   const sidebar = document.getElementById('sidebar');
   const menuBtn = document.getElementById('menuBtn');

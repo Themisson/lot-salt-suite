@@ -1472,3 +1472,36 @@ do sink, mas ainda desloca a abertura em relacao ao legado (`660 s` moderno
 contra `510 s` legado). Portanto, a evidencia favorece uma proxima fase de
 decisao/formulacao sobre criterio de abertura e sigma-theta runtime, e nao uma
 promocao automatica de `constant_geometric` ou `next_step` a default fisico.
+
+### Contrato runtime SigmaThetaProvider — Fase 10.24A
+
+A Fase 10.24A criou um contrato interno opt-in para que o runtime LOT/PKN possa
+consultar, futuramente, um valor dinamico de
+`sigma_theta_compression_positive_Pa` sem depender diretamente de
+`external/saltcreep/` ou de `coupling/`.
+
+O contrato neutro fica em `include/lot/SigmaThetaProvider.hpp` e define
+`SigmaThetaRuntimePoint` e `SigmaThetaProvider::sample(time_s,
+wellbore_pressure_trial_Pa)`.
+
+No `volumetric_balance`, a rota programatica
+`FractureInitiationCriterion::SigmaThetaProviderRuntime` usa a algebra:
+
+```text
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa > 0
+```
+
+Essa fase nao altera YAML, parser, casos existentes ou o default runtime. Sem
+provider, o comportamento existente permanece `constant_pressure` ou
+`sigma_theta_static`, conforme configurado. `pkn_direct` continua ignorando o
+criterio runtime e nao instancia provider.
+
+Campos diagnosticos adicionais passaram a ser exportados em `PknResult`, CSV e
+JSON: `sigma_theta_provider_type`, `sigma_theta_source`,
+`sigma_theta_lookup_time_s`, `sigma_theta_layer_id` e
+`sigma_theta_mapping_status`.
+
+Status fisico: contrato arquitetural apenas. Nao ha provider real de
+`saltcreep`, nao ha `SaltCreepTimeBridge` no runtime LOT/PKN, e
+`sigma_theta_time_series` fica reservado para fase posterior.

@@ -67,6 +67,8 @@ void check_finite_series(const lss::lot::PknResult& result) {
           result.fracture_initiation_sigma_theta_series_Pa.size());
   REQUIRE(result.time_series_s.size() ==
           result.fracture_initiation_margin_series_Pa.size());
+  REQUIRE(result.time_series_s.size() ==
+          result.sigma_theta_lookup_time_series_s.size());
   REQUIRE(result.time_series_s.size() == result.fracture_initiated_series.size());
 
   for (std::size_t i = 0; i < result.time_series_s.size(); ++i) {
@@ -88,6 +90,7 @@ void check_finite_series(const lss::lot::PknResult& result) {
     CHECK(std::isfinite(result.fracture_initiation_pressure_series_Pa[i]));
     CHECK(std::isfinite(result.fracture_initiation_sigma_theta_series_Pa[i]));
     CHECK(std::isfinite(result.fracture_initiation_margin_series_Pa[i]));
+    CHECK(std::isfinite(result.sigma_theta_lookup_time_series_s[i]));
   }
 }
 

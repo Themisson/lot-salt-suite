@@ -9,11 +9,11 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.23C decisao do proximo modelo; commit/push pendente
+Fase ativa  : 10.24A contrato SigmaThetaProvider runtime; commit/push pendente
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-10
-Testes C++  : 245/245 passaram em 2026-06-10
+Testes C++  : 249/249 passaram apos Fase 10.24A em 2026-06-11
 Testes Py   : 133/133 passaram apos Fase 10.23C em 2026-06-10
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
@@ -54,6 +54,38 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.24A — contrato SigmaThetaProvider runtime — Codex
+
+**Status:** Implementada localmente; commit/push pendente.
+
+**Gate:** `SIGMA_THETA_PROVIDER_CONTRACT_IMPLEMENTATION_ALLOWED`.
+
+**Objetivo:** criar um contrato neutro e opt-in para que o runtime LOT/PKN possa
+consultar `sigma_theta_compression_positive_Pa` sem depender de
+`external/saltcreep/`, `SaltCreepTimeBridge`, `SaltWallStressDiagnostics` ou
+`coupling/`.
+
+**Implementacao:** foi criado `include/lot/SigmaThetaProvider.hpp` com
+`SigmaThetaRuntimePoint` e a interface `SigmaThetaProvider`. O `PknInput` agora
+aceita `FractureInitiationCriterion::SigmaThetaProviderRuntime` e um ponteiro
+nao proprietario `sigma_theta_provider`. O `PknModel` usa essa rota apenas no
+`volumetric_balance` quando explicitamente configurada, avaliando:
+
+```text
+margin_Pa = wellbore_pressure_trial_Pa - sigma_theta_compression_positive_Pa
+opened = margin_Pa > 0
+```
+
+**Diagnosticos exportados:** `sigma_theta_provider_type`,
+`sigma_theta_source`, `sigma_theta_lookup_time_s`, `sigma_theta_layer_id` e
+`sigma_theta_mapping_status`.
+
+**Preservacoes:** sem provider, `constant_pressure` e `sigma_theta_static`
+permanecem como antes; `pkn_direct` ignora a rota runtime; nenhum YAML, parser
+ou caso default foi alterado. Nao ha provider real de saltcreep nesta fase.
 
 ---
 

@@ -743,6 +743,30 @@
     "justification": "The combined route matches pressure scale and sink delay, but opening remains shifted.",
     "next_phase_recommendation": "Prioritize an opt-in sigma-theta runtime provider or a better opening criterion before adding pressure_tabulated_geometric."
   },
+  "phase10_24a_sigma_theta_provider_contract": {
+    "status": "SIGMA_THETA_PROVIDER_CONTRACT_IMPLEMENTATION_ALLOWED",
+    "contract_available": true,
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "saltcreep_runtime_connected": false,
+    "sigma_theta_time_series_connected": false,
+    "pressure_tabulated_geometric_allowed": false,
+    "diagnostic_fields": [
+      "sigma_theta_provider_type",
+      "sigma_theta_source",
+      "sigma_theta_lookup_time_s",
+      "sigma_theta_layer_id",
+      "sigma_theta_mapping_status"
+    ],
+    "caveats": [
+      "The provider contract is architectural and opt-in only.",
+      "No SaltCreepTimeBridge or SaltWallStressDiagnostics runtime source is connected.",
+      "sigma_theta_static remains supported as a fixed diagnostic proxy.",
+      "pkn_direct remains unaffected."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

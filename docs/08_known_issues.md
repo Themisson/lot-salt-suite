@@ -158,6 +158,26 @@ onde `dV` = variação de volume calculada a partir de `u_wall`.
 **Sentido físico:** Se o sal flui para dentro (fechamento), `u_wall > 0` →
 volume anular reduz (`dV < 0`) → pressão de sal parcialmente alivia APB térmico.
 
+---
+
+## FA05 — Sigma-theta runtime é contrato opt-in, não validação física
+
+**Severidade:** Alta | **Status:** Em formulação controlada
+
+A Fase 10.24A adicionou o contrato `SigmaThetaProvider` para permitir que o
+LOT/PKN consulte `sigma_theta_compression_positive_Pa` em tempo de execução,
+mas essa camada ainda é apenas arquitetural. Ela não conecta `saltcreep`, não
+usa `SaltWallStressDiagnostics` real e não torna sigma-theta runtime default.
+
+Até validação física futura:
+
+- `sigma_theta_static` permanece proxy diagnóstico fixo;
+- `sigma_theta_provider_runtime` deve ser usado apenas por código opt-in;
+- `pkn_direct` não deve ser afetado;
+- a comparação `wellbore_pressure_trial_Pa > sigma_theta_compression_positive_Pa`
+  segue a álgebra legado-moderna documentada, mas não prova equivalência física
+  de ruptura.
+
 **Nota de acoplamento fraco:** O deslocamento do sal é calculado fora do loop iterativo
 de pressão (linhas 511–546), usando estado do passo anterior. O loop iterativo (linhas
 560–868) recalcula pressão sem iterar no sal. Isto é acoplamento **sequencial fraco**

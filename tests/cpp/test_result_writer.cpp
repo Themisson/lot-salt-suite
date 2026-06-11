@@ -62,6 +62,11 @@ TEST_CASE("ResultWriter creates PKN CSV and JSON outputs") {
   CHECK(csv.find("fracture_initiated,fracture_initiation_pressure_Pa,"
                  "fracture_initiation_sigma_theta_Pa,"
                  "fracture_initiation_margin_Pa,"
+                 "sigma_theta_provider_type,"
+                 "sigma_theta_source,"
+                 "sigma_theta_lookup_time_s,"
+                 "sigma_theta_layer_id,"
+                 "sigma_theta_mapping_status,"
                  "fluid_compressibility_1_Pa,"
                  "geometric_compressibility_1_Pa,"
                  "effective_compressibility_1_Pa,"
@@ -69,6 +74,9 @@ TEST_CASE("ResultWriter creates PKN CSV and JSON outputs") {
   CHECK(json.find("\"fracture_initiation_type\": \"constant_pressure\"") !=
         std::string::npos);
   CHECK(json.find("\"fracture_initiation_pressure_Pa\"") != std::string::npos);
+  CHECK(json.find("\"sigma_theta_provider_type\": \"none\"") !=
+        std::string::npos);
+  CHECK(json.find("\"sigma_theta_lookup_time_s\"") != std::string::npos);
 
   std::filesystem::remove_all(output_dir);
 }
