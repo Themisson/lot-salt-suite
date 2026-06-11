@@ -57,6 +57,40 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.8A — núcleo mínimo penny-shaped — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**C++ criado:**
+
+```text
+include/lot/PennyShapedModel.hpp
+src/lot/PennyShapedModel.cpp
+tests/cpp/test_penny_shaped_model.cpp
+```
+
+**Documento criado:**
+
+```text
+docs/63_selected_non_pkn_model_minimal_implementation.md
+```
+
+**Resultado:**
+
+```text
+SELECTED_NON_PKN_MINIMAL_MODEL_IMPLEMENTED
+selected_track = PENNY_SHAPED
+runtime_integration = false
+parser_schema_changed = false
+physical_validation = false
+```
+
+**Interpretação:** a fase implementa apenas as fórmulas isoladas auditadas para
+`penny_shaped`. Não conecta parser, schema oficial, CLI, PKN, BUZ29 ou runtime
+LOT/APB/sal.
+
+---
+
 ### [2026-06-11] Fase 11.7C — especificação YAML/IO penny-shaped — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

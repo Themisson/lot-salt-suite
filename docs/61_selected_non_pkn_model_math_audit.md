@@ -118,3 +118,16 @@ O contrato exige unidades explícitas para `young_modulus`,
 `wellbore_pressure` e `sigma_theta_compression_positive`, além do fator legado
 `volume_multiplier = 10.0`. O parser principal e os schemas oficiais continuam
 inalterados.
+
+## Resultado da Fase 11.8A
+
+A Fase 11.8A implementa essas relações em um núcleo C++ isolado:
+
+```text
+include/lot/PennyShapedModel.hpp
+src/lot/PennyShapedModel.cpp
+tests/cpp/test_penny_shaped_model.cpp
+```
+
+O escopo permanece restrito a formulas auditadas e testes unitários. Nenhum
+runtime LOT/PKN, parser ou caso BUZ29 foi conectado.

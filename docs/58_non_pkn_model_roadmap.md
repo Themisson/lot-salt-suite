@@ -108,6 +108,19 @@ Essa especificação usa fixture em `tests/fixtures/comparison/` e validador
 externo em `tools/`. Ela não altera o schema oficial, parser, runtime, CLI ou
 casos protegidos.
 
+## Fase 11.8A — núcleo mínimo penny-shaped
+
+A Fase 11.8A implementa um núcleo C++ isolado para a trilha `PENNY_SHAPED`,
+com API em `include/lot/PennyShapedModel.hpp` e testes Catch2. O núcleo calcula
+`E'`, abertura, raio, `pressureFactor` e volume proxy, mas não é conectado ao
+parser, CLI, `PknModel`, `PknRunner` ou casos BUZ29.
+
+```text
+status = SELECTED_NON_PKN_MINIMAL_MODEL_IMPLEMENTED
+runtime_integration = false
+physical_validation = false
+```
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

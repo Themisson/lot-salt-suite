@@ -544,3 +544,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   fixture versionada, com validador Python e status
   `SPEC_FIXTURE_ONLY_NOT_RUNTIME_SCHEMA`. Isso prepara a 11.8A sem alterar
   parser, schema oficial, runtime ou casos protegidos.
+- A Fase 11.8A adiciona o núcleo C++ isolado `lot::PennyShapedModel`, com
+  testes Catch2 para as fórmulas auditadas. O código não é conectado ao CLI,
+  parser, `PknRunner`, `PknModel` ou BUZ29; permanece base diagnóstica para
+  decisão futura de integração.

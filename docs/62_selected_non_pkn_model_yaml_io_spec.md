@@ -124,6 +124,12 @@ Esta especificacao ainda nao e aceita pelo parser principal. A proxima fase pode
 implementar um nucleo C++ isolado usando os mesmos nomes conceituais, sem
 conectar automaticamente ao LOT/PKN ou ao CLI.
 
+## Resultado da Fase 11.8A
+
+A Fase 11.8A implementa o núcleo C++ isolado previsto por esta especificação.
+O contrato permanece útil como referência de IO, mas ainda não foi promovido a
+schema oficial.
+
 ## Caveats
 
 - Nao ha validacao BUZ29 nesta fase.

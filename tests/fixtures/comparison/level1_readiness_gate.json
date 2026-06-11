@@ -1835,6 +1835,33 @@
       "The legacy volume multiplier remains explicit."
     ]
   },
+  "phase11_8a_selected_non_pkn_minimal_model": {
+    "status": "SELECTED_NON_PKN_MINIMAL_MODEL_IMPLEMENTED",
+    "phase": "11.8A",
+    "selected_track": "PENNY_SHAPED",
+    "runtime_integration": false,
+    "parser_schema_changed": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "header": "include/lot/PennyShapedModel.hpp",
+    "source": "src/lot/PennyShapedModel.cpp",
+    "test": "tests/cpp/test_penny_shaped_model.cpp",
+    "document": "docs/63_selected_non_pkn_model_minimal_implementation.md",
+    "implemented_outputs": [
+      "plane_strain_modulus_Pa",
+      "opening_m",
+      "radius_m",
+      "pressure_factor",
+      "fracture_volume_proxy_m3"
+    ],
+    "recommended_next_phase": "PHASE11_8B_NON_PKN_MODEL_ADAPTER_OR_CASE_GATE",
+    "caveats": [
+      "The implementation is an isolated formula kernel only.",
+      "No BUZ29 YAML, parser route, CLI route or LOT/PKN runtime integration is added.",
+      "No physical validation or strict legacy equivalence is claimed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
