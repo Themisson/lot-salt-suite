@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">89/96</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">90/97</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">263</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">186</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">194</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -7604,6 +7604,35 @@ ou uma rejeicao formal da equivalencia APBSalt1D
 <code>SaltWallStressDiagnostics</code> ou uma ponte equivalente que exponha amostras
 espaciais de <code>sigmaTheta</code> com raio/índice/status de mapeamento, sem alterar o
 default de <code>lot-sim run --mode lot-pkn</code>.</p>
+<h2 id="matriz-legacy-equivalence-vs-modern-refined-fase-1027a">Matriz legacy-equivalence vs modern-refined (Fase 10.27A)</h2>
+<p>A Fase 10.27A registra a decisão de separar formalmente dois modos de uso:</p>
+<pre><code class="language-text">legacy-equivalence mode
+modern-refined mode
+</code></pre>
+<p><code>legacy-equivalence mode</code> é uma rota de regressão histórica contra o
+<code>LOT_Tese</code>. Ela só pode exigir abertura em <code>510 s</code> quando domínio radial, malha,
+<code>ratio</code>, ordem de integração, ponto <code>legacy_elem0_sig_2_0</code> e tempo de consulta
+forem consumidos de forma real.</p>
+<p><code>modern-refined mode</code> é uma rota analítica moderna. Nela, uma abertura em
+<code>660 s</code> não deve ser automaticamente classificada como erro, pois a rota atual
+usa uma fonte <code>sigma_theta_time_series</code> sem amostras espaciais e não reproduz a
+geometria APBSalt1D.</p>
+<p>Gate registrado:</p>
+<pre><code class="language-text">LEGACY_EQUIVALENCE_VS_MODERN_REFINED_DECISION_RECORDED
+</code></pre>
+<p>Classificações associadas:</p>
+<pre><code class="language-text">LEGACY_EQUIVALENCE_MODE_REQUIRED_FOR_REGRESSION
+MODERN_REFINED_MODE_ACCEPTABLE_FOR_ANALYSIS
+MODERN_REFINED_MODE_NOT_LEGACY_EQUIVALENT
+PRESSURE_SOURCE_TIMING_REVIEW_BLOCKED_BY_GEOMETRY
+APBSALT1D_SAMPLING_BRIDGE_BLOCKED
+APBSALT1D_SOLVER_EQUIVALENCE_REQUIRED_FOR_STRICT_MATCH
+CONSTANT_GEOMETRIC_REMAINS_DIAGNOSTIC_BASELINE
+SIGMATHETA_RUNTIME_STILL_FUTURE_WORK
+</code></pre>
+<p>O documento principal da decisão é:</p>
+<pre><code class="language-text">docs/30_legacy_equivalence_vs_modern_refined.md
+</code></pre>
 </div>
 </section>
 

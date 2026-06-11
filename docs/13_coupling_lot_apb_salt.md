@@ -3318,3 +3318,47 @@ O próximo passo recomendado é implementar um provider/sampler opt-in baseado e
 `SaltWallStressDiagnostics` ou uma ponte equivalente que exponha amostras
 espaciais de `sigmaTheta` com raio/índice/status de mapeamento, sem alterar o
 default de `lot-sim run --mode lot-pkn`.
+
+## Matriz legacy-equivalence vs modern-refined (Fase 10.27A)
+
+A Fase 10.27A registra a decisão de separar formalmente dois modos de uso:
+
+```text
+legacy-equivalence mode
+modern-refined mode
+```
+
+`legacy-equivalence mode` é uma rota de regressão histórica contra o
+`LOT_Tese`. Ela só pode exigir abertura em `510 s` quando domínio radial, malha,
+`ratio`, ordem de integração, ponto `legacy_elem0_sig_2_0` e tempo de consulta
+forem consumidos de forma real.
+
+`modern-refined mode` é uma rota analítica moderna. Nela, uma abertura em
+`660 s` não deve ser automaticamente classificada como erro, pois a rota atual
+usa uma fonte `sigma_theta_time_series` sem amostras espaciais e não reproduz a
+geometria APBSalt1D.
+
+Gate registrado:
+
+```text
+LEGACY_EQUIVALENCE_VS_MODERN_REFINED_DECISION_RECORDED
+```
+
+Classificações associadas:
+
+```text
+LEGACY_EQUIVALENCE_MODE_REQUIRED_FOR_REGRESSION
+MODERN_REFINED_MODE_ACCEPTABLE_FOR_ANALYSIS
+MODERN_REFINED_MODE_NOT_LEGACY_EQUIVALENT
+PRESSURE_SOURCE_TIMING_REVIEW_BLOCKED_BY_GEOMETRY
+APBSALT1D_SAMPLING_BRIDGE_BLOCKED
+APBSALT1D_SOLVER_EQUIVALENCE_REQUIRED_FOR_STRICT_MATCH
+CONSTANT_GEOMETRIC_REMAINS_DIAGNOSTIC_BASELINE
+SIGMATHETA_RUNTIME_STILL_FUTURE_WORK
+```
+
+O documento principal da decisão é:
+
+```text
+docs/30_legacy_equivalence_vs_modern_refined.md
+```

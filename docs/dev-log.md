@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.26D sampling bridge APBSalt1D sigmaTheta; commit/push em andamento
+Fase ativa  : 10.27A matriz legacy-equivalence vs modern-refined; commit/push em andamento
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 258/258 passaram apos Fase 10.24C em 2026-06-11
-Testes Py   : 186/186 previstos apos Fase 10.26D em 2026-06-11
+Testes Py   : 194/194 previstos apos Fase 10.27A em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -57,9 +57,57 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
-### [2026-06-11] Fase 10.26D — APBSalt1D sampling bridge para `sigmaTheta` — Codex
+### [2026-06-11] Fase 10.27A — matriz legacy-equivalence vs modern-refined — Codex
 
 **Status:** Implementado localmente; testes/commit/push pendentes.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_phase10_27a_legacy_vs_modern_mode.py
+```
+
+**Documento principal criado:**
+
+```text
+docs/30_legacy_equivalence_vs_modern_refined.md
+```
+
+**Decisão padrão:**
+
+```text
+NEXT_PHASE_MODERN_REFINED_DOCUMENTATION_AND_VALIDATION
+```
+
+**Gate registrado:**
+
+```text
+LEGACY_EQUIVALENCE_VS_MODERN_REFINED_DECISION_RECORDED
+```
+
+**Classificações:**
+
+```text
+LEGACY_EQUIVALENCE_MODE_REQUIRED_FOR_REGRESSION
+MODERN_REFINED_MODE_ACCEPTABLE_FOR_ANALYSIS
+MODERN_REFINED_MODE_NOT_LEGACY_EQUIVALENT
+PRESSURE_SOURCE_TIMING_REVIEW_BLOCKED_BY_GEOMETRY
+APBSALT1D_SAMPLING_BRIDGE_BLOCKED
+APBSALT1D_SOLVER_EQUIVALENCE_REQUIRED_FOR_STRICT_MATCH
+CONSTANT_GEOMETRIC_REMAINS_DIAGNOSTIC_BASELINE
+SIGMATHETA_RUNTIME_STILL_FUTURE_WORK
+```
+
+**Interpretação:** equivalência com o legado passa a ser um modo de regressão,
+não sinônimo de validação física. A abertura moderna em `660 s` não deve ser
+tratada automaticamente como erro fora do modo `legacy-equivalence`; para
+exigir `510 s`, a geometria APBSalt1D precisa ser consumida de forma real.
+
+---
+
+### [2026-06-11] Fase 10.26D — APBSalt1D sampling bridge para `sigmaTheta` — Codex
+
+**Status:** Publicado em `3d0dc61`.
 
 **Gate:**
 

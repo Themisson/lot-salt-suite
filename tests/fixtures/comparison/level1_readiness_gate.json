@@ -1119,6 +1119,44 @@
       "No default runtime behavior changed."
     ]
   },
+  "phase10_27a_legacy_vs_modern_mode_decision": {
+    "status": "LEGACY_EQUIVALENCE_VS_MODERN_REFINED_DECISION_RECORDED",
+    "main_decision": "NEXT_PHASE_MODERN_REFINED_DOCUMENTATION_AND_VALIDATION",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "runtime_default_changed": false,
+    "tool": "tools/decide_phase10_27a_legacy_vs_modern_mode.py",
+    "document": "docs/30_legacy_equivalence_vs_modern_refined.md",
+    "output_json": "results/comparison/phase10_27a/legacy_vs_modern_decision.json",
+    "output_md": "results/comparison/phase10_27a/legacy_vs_modern_decision.md",
+    "classifications": [
+      "LEGACY_EQUIVALENCE_MODE_REQUIRED_FOR_REGRESSION",
+      "MODERN_REFINED_MODE_ACCEPTABLE_FOR_ANALYSIS",
+      "MODERN_REFINED_MODE_NOT_LEGACY_EQUIVALENT",
+      "PRESSURE_SOURCE_TIMING_REVIEW_BLOCKED_BY_GEOMETRY",
+      "APBSALT1D_SAMPLING_BRIDGE_BLOCKED",
+      "APBSALT1D_SOLVER_EQUIVALENCE_REQUIRED_FOR_STRICT_MATCH",
+      "CONSTANT_GEOMETRIC_REMAINS_DIAGNOSTIC_BASELINE",
+      "SIGMATHETA_RUNTIME_STILL_FUTURE_WORK"
+    ],
+    "mode_policy": {
+      "legacy_equivalence_mode": "Use only for strict LOT_Tese regression after APBSalt1D geometry/sampling are consumed.",
+      "modern_refined_mode": "Use for modern analysis when domain, mesh and sampling differ and are documented."
+    },
+    "gates": [
+      "APBSALT1D_METADATA_ONLY_CONFIRMED",
+      "APBSALT1D_SAMPLING_BRIDGE_BLOCKED",
+      "PRESSURE_SOURCE_TIMING_REVIEW_BLOCKED_BY_GEOMETRY",
+      "LEGACY_EQUIVALENCE_VS_MODERN_REFINED_DECISION_RECORDED"
+    ],
+    "caveats": [
+      "Equivalence with legacy is not physical validation.",
+      "Modern opening at 660 s is not automatically an error outside legacy-equivalence mode.",
+      "Strict 510 s opening requires real APBSalt1D geometry and sampling consumption.",
+      "pressure_source/timing review remains blocked by geometry unless explicitly overridden."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

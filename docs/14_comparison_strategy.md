@@ -2696,3 +2696,39 @@ Impacto sobre a estratégia legado-moderno:
   validação física;
 - a próxima fase deve criar uma fonte espacial real ou rejeitar formalmente a
   equivalência APBSalt1D.
+
+## Fase 10.27A — matriz legacy-equivalence vs modern-refined
+
+A Fase 10.27A consolida a estratégia de comparação em dois modos explícitos:
+
+- `legacy-equivalence mode`: regressão histórica contra `LOT_Tese`, exigindo
+  equivalência de domínio, malha, `ratio`, sampling e tempo de consulta;
+- `modern-refined mode`: análise moderna com parâmetros documentados, sem
+  exigir abertura em `510 s` quando a malha/domínio/amostragem são diferentes.
+
+A ferramenta:
+
+```text
+tools/decide_phase10_27a_legacy_vs_modern_mode.py
+```
+
+gera uma matriz com `radial_domain`, `radial_mesh`, `mesh_ratio`,
+`integration_order`, `sigmaTheta_sampling_point`, `sigmaTheta_source`,
+`pressure_source_timing`, `compliance_model`, `sink_timing`, `thermal_term`,
+`dMl_leakoff_terms`, `runtime_salt_coupling` e `validation_status`.
+
+Decisão padrão:
+
+```text
+NEXT_PHASE_MODERN_REFINED_DOCUMENTATION_AND_VALIDATION
+```
+
+Essa decisão não impede uma fase futura de regressão estrita. Ela apenas impede
+que a abertura moderna em `660 s` seja chamada de erro sem antes declarar se o
+objetivo é equivalência com o legado ou análise moderna.
+
+Gate novo:
+
+```text
+LEGACY_EQUIVALENCE_VS_MODERN_REFINED_DECISION_RECORDED
+```

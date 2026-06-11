@@ -103,6 +103,7 @@ phases:
   phase_10_26b_apbsalt1d_sigma_theta_equivalence_mode: completed
   phase_10_26c_apbsalt1d_consumption_decision: completed
   phase_10_26d_apbsalt1d_sampling_bridge: completed
+  phase_10_27a_legacy_vs_modern_mode_decision: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -132,6 +133,7 @@ docs:
   comparison_strategy:    implemented
   field_normalization:    implemented
   future_features:        planned
+  legacy_vs_modern_mode_decision: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -197,12 +199,12 @@ validation:
 test_counts:
   cpp_tests: 263        # Catch2 lot-salt-suite — 263/263 previstos apos Fase 10.26B (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 186     # pytest lot-salt-suite — 186/186 previstos apos Fase 10.26D (2026-06-11)
+  python_tests: 194     # pytest lot-salt-suite — 194/194 previstos apos Fase 10.27A (2026-06-11)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-11"
-updated_by: "codex (Fase 10.26D APBSalt1D sigmaTheta sampling bridge gate)"
+updated_by: "codex (Fase 10.27A legacy-equivalence vs modern-refined decision)"
 project_version: "0.1.0"

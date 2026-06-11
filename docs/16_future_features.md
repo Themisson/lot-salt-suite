@@ -393,3 +393,10 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   provider/sampler opt-in baseado em amostras de parede, ou documentar
   formalmente que a equivalencia APBSalt1D nao sera perseguida. Ajustes de
   `pressure_source`/timing continuam bloqueados ate essa decisao.
+- A Fase 10.27A registrou a decisao estrategica entre `legacy-equivalence mode`
+  e `modern-refined mode`. Abertura em `510 s` so deve ser exigida quando o
+  objetivo for regressao estrita contra o `LOT_Tese` e a geometria APBSalt1D
+  for consumida de forma real. Em `modern-refined mode`, abertura em `660 s`
+  pode ser uma divergencia aceitavel de malha/dominio/amostragem, nao erro
+  automatico. O gate novo e
+  `LEGACY_EQUIVALENCE_VS_MODERN_REFINED_DECISION_RECORDED`.
