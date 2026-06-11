@@ -78,21 +78,39 @@ executado.
 
 ## Manifesto
 
+`study_manifest.json` usa `schema_version: 1` a partir da Fase 11.4A. O schema
+informal esta definido em `docs/51_lot_pkn_study_manifest.md`.
+
 `study_manifest.json` inclui:
 
 - `study_id`;
+- `study_status`;
 - `matrix_path`;
+- `matrix_id`;
 - `matrix_schema_version`;
+- `base_case`;
+- `studies_index`;
 - `output_dir`;
-- `summary_path`;
-- `metadata_path`;
-- `report_json_path`;
-- `report_md_path`;
+- `created_at_utc`;
+- `command`;
 - `commands`;
-- `status`;
-- `dry_run`;
-- `git_commit`;
-- `git_branch`.
+- `environment`;
+- `git`;
+- `lot_sim`;
+- `outputs`;
+- `scenarios`;
+- `caveats`.
+
+Em `--dry-run`, o manifesto registra os artefatos planejados e marca
+`study_status=dry_run`. Em execucao completa, `study_status=completed` se o
+runner produzir `summary.csv`.
+
+## Provenance
+
+A Fase 11.4A adiciona provenance operacional completa ao estudo. O manifesto
+registra commit/branch, estado dirty quando disponivel, versao do Python,
+plataforma, executavel `lot-sim`, comandos de reproducao e cenarios. Falha em
+ler Git nao interrompe a execucao; o manifesto registra caveat.
 
 ## Uso em outro computador
 

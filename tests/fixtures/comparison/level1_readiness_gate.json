@@ -52,6 +52,19 @@
     "results_versioned": false,
     "physical_validation": false
   },
+  "phase11_4a_lot_pkn_study_provenance": {
+    "status": "STUDY_MANIFEST_SCHEMA_V1_ADDED",
+    "provenance_status": "LOT_PKN_STUDY_PROVENANCE_RECORDED",
+    "tool": "tools/run_lot_pkn_study.py",
+    "manifest_schema_version": 1,
+    "manifest": "study_manifest.json",
+    "documents": [
+      "docs/51_lot_pkn_study_manifest.md",
+      "docs/52_study_provenance.md"
+    ],
+    "results_versioned": false,
+    "physical_validation": false
+  },
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,

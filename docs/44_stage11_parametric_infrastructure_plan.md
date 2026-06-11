@@ -217,3 +217,10 @@ tools/run_lot_pkn_study.py
 O comando único resolve `study_id`, executa a matriz por meio dos wrappers
 existentes, gera relatório quando aplicável e escreve manifesto local. Ele é a
 entrada preferencial para execução reproduzível de estudos LOT/PKN registrados.
+
+## Fase 11.4A provenance de estudos
+
+A Fase 11.4A adiciona provenance completa ao `study_manifest.json` v1,
+registrando Git, ambiente Python, plataforma, executável `lot-sim`, matriz,
+`base_case`, outputs, cenários e comandos de reprodução. A etapa não altera
+solver, schema, C++ ou casos protegidos.

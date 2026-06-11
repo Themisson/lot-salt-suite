@@ -57,6 +57,37 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.4A — provenance de estudos LOT/PKN — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Contrato criado:**
+
+```text
+study_manifest.json schema_version = 1
+```
+
+**Documentos criados:**
+
+```text
+docs/51_lot_pkn_study_manifest.md
+docs/52_study_provenance.md
+```
+
+**Resultado esperado:**
+
+```text
+STUDY_MANIFEST_SCHEMA_V1_ADDED
+LOT_PKN_STUDY_PROVENANCE_RECORDED
+```
+
+O comando canônico `tools/run_lot_pkn_study.py` agora registra provenance de
+estudo, matriz, `base_case`, ambiente, Git, executável `lot-sim`, outputs,
+cenários e comandos de reprodução. `results/` permanece artefato local não
+versionado.
+
+---
+
 ### [2026-06-11] Fase 11.3C — comando canônico LOT/PKN study — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

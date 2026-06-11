@@ -162,3 +162,10 @@ python tools/run_lot_pkn_study.py `
 
 Esse comando é a entrada recomendada para reproduzir estudos registrados em
 outro computador.
+
+## Provenance
+
+Desde a Fase 11.4A, `tools/run_lot_pkn_study.py` copia a resolução do
+`study_id` para `study_manifest.json` v1. Isso registra o `studies_index`, a
+matriz resolvida, o `matrix_id`, o `base_case` e os comandos de reprodução sem
+versionar `results/`.

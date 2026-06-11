@@ -502,3 +502,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   estudo. Ele resolve `study_id`, chama a execução por estudo, gera relatório
   quando há outputs reais e escreve `study_manifest.json`/`run_commands.txt` em
   `results/`.
+- A Fase 11.4A define `study_manifest.json` `schema_version: 1` e adiciona
+  provenance operacional completa aos estudos LOT/PKN: Git, ambiente Python,
+  plataforma, executável `lot-sim`, matriz, `base_case`, outputs, cenários e
+  comandos de reprodução.

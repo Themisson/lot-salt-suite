@@ -331,3 +331,11 @@ Status:
 CANONICAL_LOT_PKN_STUDY_COMMAND_ADDED
 BUZ67D_CGEOM_STUDY_END_TO_END_COMMAND_AVAILABLE
 ```
+
+## Provenance do estudo canônico
+
+A Fase 11.4A adiciona `study_manifest.json` v1 ao comando canônico
+`tools/run_lot_pkn_study.py`. O manifesto registra estudo, matriz, `base_case`,
+ambiente, Git, executável `lot-sim`, comandos e artefatos esperados. O runner de
+matriz permanece focado em executar cenários; a proveniência consolidada mora no
+comando canônico.
