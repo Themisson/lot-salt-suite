@@ -470,3 +470,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `docs/44_stage11_parametric_infrastructure_plan.md`. A primeira implementação
   recomendada é `STAGE11_1B_MULTI_STUDY_MATRIX_INDEX`, mantendo solver e casos
   protegidos inalterados.
+- A Fase 11.1B adiciona `cases/validation/sensitivity/studies_index.yaml` e
+  `tools/list_lot_pkn_sensitivity_studies.py`, registrando
+  `buz67d_cgeom_sensitivity` como primeiro estudo ativo. O runner permanece
+  inalterado e continua recebendo matrizes por caminho explícito.

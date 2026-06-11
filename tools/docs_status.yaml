@@ -118,6 +118,7 @@ phases:
   phase_10_31a_buz67d_modern_refined_reproducible_package: completed
   phase_10_31b_phase10_closure_stage11_handoff: completed
   phase_11_1a_parametric_infrastructure_plan: completed
+  phase_11_1b_sensitivity_studies_index: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -162,6 +163,7 @@ docs:
   phase10_31a_buz67d_reproducible_package: implemented
   phase10_31b_phase10_closure_handoff: implemented
   stage11_parametric_infrastructure_plan: implemented
+  stage11_1b_sensitivity_studies_index: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -227,12 +229,12 @@ validation:
 test_counts:
   cpp_tests: 263        # Catch2 lot-salt-suite — 263/263 previstos apos Fase 10.26B (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 276     # pytest lot-salt-suite — 276/276 previstos apos Fase 11.1A (2026-06-11)
+  python_tests: 284     # pytest lot-salt-suite — 284/284 previstos apos Fase 11.1B (2026-06-11)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-11"
-updated_by: "codex (Fase 11.1A parametric infrastructure plan)"
+updated_by: "codex (Fase 11.1B sensitivity studies index)"
 project_version: "0.1.0"

@@ -137,3 +137,20 @@ STAGE11_PARAMETRIC_INFRASTRUCTURE_RECOMMENDED
 
 The package remains diagnostic. `C_geom = 0.75x` is not automatic calibration,
 and generated `results/` artifacts remain local and unversioned.
+
+## Stage 11 study registration
+
+Phase 11.1B registers the BUZ-67D C_geom matrix as a sensitivity study:
+
+```text
+cases/validation/sensitivity/studies_index.yaml
+```
+
+Study id:
+
+```text
+buz67d_cgeom_sensitivity
+```
+
+The registration is metadata/discovery infrastructure. It does not duplicate the
+matrix and does not change the package runner.

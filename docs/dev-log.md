@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.1A Stage 11 parametric infrastructure plan
+Fase ativa  : 11.1B Sensitivity studies index
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 276/276 previstos apos Fase 11.1A em 2026-06-11
+Testes Py   : 284/284 previstos apos Fase 11.1B em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,41 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 11.1B — índice multi-estudo de sensibilidade — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Índice criado:**
+
+```text
+cases/validation/sensitivity/studies_index.yaml
+```
+
+**Ferramenta criada:**
+
+```text
+tools/list_lot_pkn_sensitivity_studies.py
+```
+
+**Documento criado:**
+
+```text
+docs/45_sensitivity_studies_index.md
+```
+
+**Resultado:**
+
+```text
+STAGE11_1B_MULTI_STUDY_INDEX_ADDED
+BUZ67D_CGEOM_SENSITIVITY_REGISTERED_AS_STUDY
+```
+
+O estudo `buz67d_cgeom_sensitivity` registra a matriz BUZ-67D C_geom
+`modern-refined` existente. O runner permanece inalterado nesta fase e continua
+recebendo `--matrix`; resolução por `study_id` fica como evolução futura.
 
 ---
 

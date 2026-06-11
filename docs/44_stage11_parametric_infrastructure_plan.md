@@ -102,3 +102,28 @@ STAGE11_1B_MULTI_STUDY_MATRIX_INDEX
 A próxima fase deve criar `cases/validation/sensitivity/studies_index.yaml`,
 registrar a matriz BUZ-67D existente e adicionar uma ferramenta de listagem e
 validação do índice.
+
+## Fase 11.1B implementada
+
+A Fase 11.1B adiciona o índice canônico:
+
+```text
+cases/validation/sensitivity/studies_index.yaml
+```
+
+e a ferramenta:
+
+```text
+tools/list_lot_pkn_sensitivity_studies.py
+```
+
+Status:
+
+```text
+STAGE11_1B_MULTI_STUDY_INDEX_ADDED
+BUZ67D_CGEOM_SENSITIVITY_REGISTERED_AS_STUDY
+```
+
+O runner `tools/run_lot_pkn_sensitivity_matrix.py` permanece inalterado nesta
+fase. A execução por `study_id` fica reservada para uma fase futura, depois que
+o contrato do índice estiver estável.

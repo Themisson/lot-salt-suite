@@ -1,0 +1,12 @@
+studies:
+  - id: buz67d_cgeom_sensitivity
+    title: BUZ-67D modern-refined C_geom sensitivity
+    matrix: cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix.yaml
+    route: modern-refined
+    status: active
+    tags:
+      - BUZ-67D
+      - modern-refined
+      - cgeom
+      - sensitivity
+    caveat: Diagnostic sensitivity only; not automatic calibration.

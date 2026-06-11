@@ -1552,6 +1552,27 @@
       "The first implementation should register studies without duplicating matrices."
     ]
   },
+  "phase11_1b_sensitivity_studies_index": {
+    "status": "STAGE11_1B_MULTI_STUDY_INDEX_ADDED",
+    "registered_study_status": "BUZ67D_CGEOM_SENSITIVITY_REGISTERED_AS_STUDY",
+    "phase": "11.1B",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": true,
+    "index": "cases/validation/sensitivity/studies_index.yaml",
+    "tool": "tools/list_lot_pkn_sensitivity_studies.py",
+    "document": "docs/45_sensitivity_studies_index.md",
+    "registered_studies": [
+      "buz67d_cgeom_sensitivity"
+    ],
+    "caveats": [
+      "The studies index is discovery metadata, not a solver path.",
+      "The BUZ-67D C_geom study remains diagnostic and not automatic calibration.",
+      "The generic runner remains matrix-path based in this phase."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

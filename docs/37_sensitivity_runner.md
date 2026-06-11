@@ -178,3 +178,16 @@ Status:
 ```text
 BUZ67D_MODERN_REFINED_PACKAGE_RUNNER_ADDED
 ```
+
+## Índice de estudos de sensibilidade
+
+A Fase 11.1B adiciona `cases/validation/sensitivity/studies_index.yaml` e
+`tools/list_lot_pkn_sensitivity_studies.py`. O índice permite descobrir matrizes
+versionadas sem duplicar conteúdo:
+
+```powershell
+python tools/list_lot_pkn_sensitivity_studies.py --index cases/validation/sensitivity/studies_index.yaml --validate
+```
+
+O runner ainda recebe `--matrix` diretamente. A resolução de `study_id` fica
+como evolução futura, se o índice permanecer estável.

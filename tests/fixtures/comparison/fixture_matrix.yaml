@@ -1,0 +1,5 @@
+matrix_id: fixture_matrix
+mode: lot-pkn
+scenarios:
+  - id: cgeom_100
+    case: cases/validation/sensitivity/buz67d_modern_refined_sens_baseline.yaml

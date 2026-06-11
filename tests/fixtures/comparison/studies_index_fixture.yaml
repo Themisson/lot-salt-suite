@@ -1,0 +1,19 @@
+studies:
+  - id: fixture_cgeom
+    title: Fixture C_geom study
+    matrix: fixture_matrix.yaml
+    route: modern-refined
+    status: active
+    tags:
+      - fixture
+      - modern-refined
+    caveat: Fixture diagnostic only.
+  - id: fixture_archived
+    title: Fixture archived study
+    matrix: fixture_archived_matrix.yaml
+    route: modern-refined
+    status: archived
+    tags:
+      - fixture
+      - archived
+    caveat: Fixture archived diagnostic only.
