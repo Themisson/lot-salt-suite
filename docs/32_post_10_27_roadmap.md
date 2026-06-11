@@ -245,3 +245,22 @@ VERSIONED_BUZ67D_CGEOM_SENSITIVITY_MATRIX_ADDED
 A matriz permite reproduzir a sensibilidade `modern-refined` com o runner
 genérico, mantendo `legacy-equivalence` separada e sem promover fatores de
 compliance a calibração automática.
+
+## Fase 10.30B registrada
+
+A Fase 10.30B executa e verifica a matriz versionada:
+
+```text
+tools/verify_phase10_30b_sensitivity_run.py
+docs/40_buz67d_versioned_sensitivity_run.md
+```
+
+Status:
+
+```text
+VERSIONED_SENSITIVITY_RUN_OK
+```
+
+Essa fase estabelece que a matriz BUZ-67D `modern-refined` é reproduzível pelo
+runner genérico. Os resultados continuam locais em `results/` e não são
+tratados como calibração automática.

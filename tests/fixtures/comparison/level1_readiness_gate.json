@@ -1416,6 +1416,37 @@
       "legacy-equivalence remains a separate track."
     ]
   },
+  "phase10_30b_versioned_sensitivity_run": {
+    "status": "VERSIONED_SENSITIVITY_RUN_OK",
+    "phase": "10.30B",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": true,
+    "matrix": "cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix.yaml",
+    "runner": "tools/run_lot_pkn_sensitivity_matrix.py",
+    "verifier": "tools/verify_phase10_30b_sensitivity_run.py",
+    "document": "docs/40_buz67d_versioned_sensitivity_run.md",
+    "summary_csv": "results/comparison/phase10_30b/buz67d_cgeom_matrix/summary.csv",
+    "metadata_json": "results/comparison/phase10_30b/buz67d_cgeom_matrix/metadata.json",
+    "scenario_count": 10,
+    "baseline_scenario": "cgeom_100_next_step",
+    "diagnostic_scenario": "cgeom_075_next_step",
+    "same_step_scenario": "cgeom_100_same_step",
+    "observations": {
+      "cgeom_075_next_step_opening_time_s": 510.0,
+      "cgeom_100_next_step_opening_time_s": 660.0,
+      "cgeom_125_next_step_opening_time_s": null,
+      "cgeom_100_same_step_sink_delay_s": 0.0
+    },
+    "caveats": [
+      "The run verifies reproducibility of the versioned matrix, not physical validation.",
+      "The 0.75x scenario remains a diagnostic sensitivity point, not automatic calibration.",
+      "results/ outputs are local and must not be versioned.",
+      "legacy-equivalence remains a separate track."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

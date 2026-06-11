@@ -94,3 +94,28 @@ runs/<scenario_id>/result.json
 
 A Fase 10.30B deve executar a matriz versionada com o runner genérico e criar
 um verificador dos resultados gerados.
+
+## Resultado da Fase 10.30B
+
+A Fase 10.30B executou esta matriz com:
+
+```text
+tools/run_lot_pkn_sensitivity_matrix.py
+```
+
+e verificou `summary.csv`/`metadata.json` com:
+
+```text
+tools/verify_phase10_30b_sensitivity_run.py
+```
+
+Classificação:
+
+```text
+VERSIONED_SENSITIVITY_RUN_OK
+```
+
+A execução confirmou a presença dos 10 cenários versionados. O cenário
+`cgeom_075_next_step` abriu em `510 s`, o baseline `cgeom_100_next_step` abriu
+em `660 s`, e `cgeom_100_same_step` preservou abertura em `660 s` com
+`sink_delay = 0 s`. A interpretação continua diagnóstica.

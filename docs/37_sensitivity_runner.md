@@ -119,3 +119,29 @@ VERSIONED_BUZ67D_CGEOM_SENSITIVITY_MATRIX_ADDED
 
 A matriz continua diagnóstica e não promove nenhum fator a calibração
 automática.
+
+## Execução verificada da matriz BUZ-67D
+
+A Fase 10.30B executa a matriz versionada com o runner genérico e verifica os
+artefatos locais `summary.csv` e `metadata.json` por meio de:
+
+```text
+tools/verify_phase10_30b_sensitivity_run.py
+```
+
+O verificador confirma:
+
+- `matrix_id = buz67d_modern_refined_cgeom_sensitivity`;
+- 10 cenários no resumo;
+- presença de `cgeom_100_next_step`;
+- presença de `cgeom_075_next_step`;
+- presença de `cgeom_100_same_step`;
+- ausência de ação marcada como falha.
+
+Status:
+
+```text
+VERSIONED_SENSITIVITY_RUN_OK
+```
+
+Os resultados continuam em `results/` e não são versionados.

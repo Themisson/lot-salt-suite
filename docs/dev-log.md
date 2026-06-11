@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.30A versioned BUZ-67D sensitivity matrix
+Fase ativa  : 10.30B versioned BUZ-67D sensitivity run verification
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 247/247 previstos apos Fase 10.30A em 2026-06-11
+Testes Py   : 253/253 previstos apos Fase 10.30B em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,41 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.30B — execução verificada da matriz BUZ-67D versionada — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Runner usado:**
+
+```text
+tools/run_lot_pkn_sensitivity_matrix.py
+```
+
+**Verificador criado:**
+
+```text
+tools/verify_phase10_30b_sensitivity_run.py
+```
+
+**Documento criado:**
+
+```text
+docs/40_buz67d_versioned_sensitivity_run.md
+```
+
+**Resultado:**
+
+```text
+VERSIONED_SENSITIVITY_RUN_OK
+```
+
+A matriz versionada executou 10 cenários. O cenário `0.75x` abriu em `510 s`,
+o baseline `1.0x` abriu em `660 s`, `1.25x` não abriu na janela e `same_step`
+preservou abertura em `660 s` com `sink_delay = 0 s`. Esses resultados seguem
+como sensibilidade diagnóstica, não calibração automática nem validação física.
 
 ---
 

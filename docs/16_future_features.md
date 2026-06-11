@@ -448,3 +448,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   deve ser a entrada preferencial para reproducao local da sensibilidade por
   `tools/run_lot_pkn_sensitivity_matrix.py`. Ela nao altera solver nem promove
   fator de compliance a calibracao automatica.
+- A Fase 10.30B executou essa matriz versionada e adicionou verificacao de
+  `summary.csv`/`metadata.json` por
+  `tools/verify_phase10_30b_sensitivity_run.py`. A classificacao
+  `VERSIONED_SENSITIVITY_RUN_OK` confirma reprodutibilidade operacional da
+  matriz, nao calibracao fisica.
