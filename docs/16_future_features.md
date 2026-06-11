@@ -479,3 +479,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `tools/validate_lot_pkn_parametric_matrix.py`. A geração materializada e a
   integração com o runner ficam planejadas para 11.2B/11.2C; casos derivados
   devem permanecer em `results/` até promoção manual.
+- A Fase 11.2B adiciona `tools/materialize_lot_pkn_parametric_matrix.py` para
+  gerar YAMLs derivados de matrizes v2 em `results/` ou diretório temporário.
+  O materializador é utilitário de validação/diagnóstico, não pré-processador
+  obrigatório do runtime, e não promove casos automaticamente para
+  `cases/validation/`.

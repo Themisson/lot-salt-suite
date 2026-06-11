@@ -214,3 +214,15 @@ PARAMETRIC_MATRIX_VALIDATOR_ADDED
 
 Nesta fase o runner permanece compatível com v1. A materialização de casos
 derivados e a execução direta de matrizes v2 ficam para as fases 11.2B e 11.2C.
+
+## Materialização de casos paramétricos
+
+A Fase 11.2B adiciona o utilitário:
+
+```text
+tools/materialize_lot_pkn_parametric_matrix.py
+```
+
+Ele consome matrizes v2 e grava YAMLs derivados em `results/` ou diretório
+temporário. O runner ainda não chama esse materializador automaticamente nesta
+fase; essa integração fica para 11.2C.

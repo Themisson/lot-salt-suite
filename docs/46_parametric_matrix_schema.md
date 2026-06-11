@@ -111,6 +111,25 @@ MATRIX_MISSING_SCENARIO_CASE
 MATRIX_DUPLICATE_SCENARIO_ID
 ```
 
+## Materialização
+
+A Fase 11.2B adiciona:
+
+```text
+tools/materialize_lot_pkn_parametric_matrix.py
+docs/47_parametric_case_materialization.md
+```
+
+O materializador lê matrizes v2, aplica overrides em uma cópia do `base_case`,
+grava casos derivados em `results/` ou diretório temporário, e escreve
+`materialization_manifest.json`. A escrita em `cases/` exige opção explícita.
+
+Status:
+
+```text
+PARAMETRIC_CASE_MATERIALIZER_ADDED
+```
+
 ## Limitações
 
-Esta fase especifica e valida o formato. A geração real dos casos derivados fica para a Fase 11.2B, e a integração com o runner para a Fase 11.2C.
+A integração do runner com matrizes v2 fica para a Fase 11.2C.

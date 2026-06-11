@@ -57,6 +57,35 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.2B — materializador de casos paramétricos — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/materialize_lot_pkn_parametric_matrix.py
+```
+
+**Documento criado:**
+
+```text
+docs/47_parametric_case_materialization.md
+```
+
+**Resultado esperado:**
+
+```text
+PARAMETRIC_CASE_MATERIALIZER_ADDED
+```
+
+O materializador consome matrizes `schema_version: 2`, aplica overrides em
+cópias do `base_case`, grava YAMLs derivados fora de `cases/` por padrão e
+registra `materialization_manifest.json`. A integração automática com o runner
+fica para 11.2C.
+
+---
+
 ### [2026-06-11] Fase 11.2A — schema v2 de matriz paramétrica — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

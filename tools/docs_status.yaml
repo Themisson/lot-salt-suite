@@ -120,6 +120,7 @@ phases:
   phase_11_1a_parametric_infrastructure_plan: completed
   phase_11_1b_sensitivity_studies_index: completed
   phase_11_2a_parametric_matrix_schema: completed
+  phase_11_2b_parametric_case_materializer: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -166,6 +167,7 @@ docs:
   stage11_parametric_infrastructure_plan: implemented
   stage11_1b_sensitivity_studies_index: implemented
   stage11_2a_parametric_matrix_schema: implemented
+  stage11_2b_parametric_case_materialization: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented

@@ -148,3 +148,23 @@ Status:
 PARAMETRIC_MATRIX_SCHEMA_V2_SPECIFIED
 PARAMETRIC_MATRIX_VALIDATOR_ADDED
 ```
+
+## Fase 11.2B materializador
+
+A Fase 11.2B adiciona materialização explícita de casos derivados a partir de
+matrizes v2. O utilitário aplica overrides em cópias do `base_case` e grava os
+YAMLs derivados em `results/` ou diretório temporário, nunca em
+`cases/validation/` por padrão.
+
+Artefatos:
+
+```text
+tools/materialize_lot_pkn_parametric_matrix.py
+docs/47_parametric_case_materialization.md
+```
+
+Status:
+
+```text
+PARAMETRIC_CASE_MATERIALIZER_ADDED
+```

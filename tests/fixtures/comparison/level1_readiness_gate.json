@@ -10,6 +10,13 @@
     "runner_integration_phase": "11.2C",
     "physical_validation": false
   },
+  "phase11_2b_parametric_case_materialization": {
+    "status": "PARAMETRIC_CASE_MATERIALIZER_ADDED",
+    "derived_cases_default_location": "results_or_temporary_directory",
+    "versioned_output_requires_explicit_flag": true,
+    "runtime_preprocessor": false,
+    "physical_validation": false
+  },
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,

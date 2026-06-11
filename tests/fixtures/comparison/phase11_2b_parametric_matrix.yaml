@@ -1,0 +1,18 @@
+matrix_id: phase11_2b_fixture
+schema_version: 2
+mode: lot-pkn
+base_case: tests/fixtures/comparison/phase11_2b_base_case.yaml
+materialization:
+  filename_template: "{scenario_id}.yaml"
+scenarios:
+  - id: cgeom_075
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000013928975203957504
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.75
+  - id: same_step
+    overrides:
+      lot.fracture.balance.sink_timing: same_step
+    metadata:
+      sink_timing: same_step

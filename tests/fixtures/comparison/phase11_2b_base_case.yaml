@@ -1,0 +1,13 @@
+metadata:
+  name: phase11_2b_base
+simulation:
+  mode: lot-pkn
+lot:
+  fracture:
+    balance:
+      sink_timing: next_step
+  volumetric_balance:
+    compliance:
+      geometric_compressibility:
+        value: 0.000000018571966938610005
+        unit: "1/Pa"
