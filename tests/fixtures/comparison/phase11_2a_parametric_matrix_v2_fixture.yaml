@@ -1,0 +1,27 @@
+matrix_id: phase11_2a_parametric_fixture
+schema_version: 2
+description: >
+  Fixture for Stage 11 parametric matrix schema v2 using base_case plus
+  scenario overrides. Diagnostic only.
+mode: lot-pkn
+base_case: cases/validation/sensitivity/buz67d_modern_refined_sens_baseline.yaml
+materialization:
+  output_subdir: generated_cases
+  filename_template: "{scenario_id}.yaml"
+scenarios:
+  - id: cgeom_075_next_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000013928975203957504
+      lot.fracture.balance.sink_timing: next_step
+    metadata:
+      cgeom_factor: 0.75
+      sink_timing: next_step
+      interpretation: diagnostic_sensitivity
+  - id: cgeom_100_same_step
+    overrides:
+      lot.volumetric_balance.compliance.geometric_compressibility.value: 0.000000018571966938610005
+      lot.fracture.balance.sink_timing: same_step
+    metadata:
+      cgeom_factor: 1.0
+      sink_timing: same_step
+      interpretation: diagnostic_sink_timing_comparison

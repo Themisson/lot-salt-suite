@@ -1,6 +1,15 @@
 {
   "phase": "10.15B",
   "status": "LEVEL1B_LEGACY_AUDIT_VISUAL_DIAGNOSTIC_COMPLETE",
+  "phase11_2a_parametric_matrix_schema": {
+    "status": "PARAMETRIC_MATRIX_SCHEMA_V2_SPECIFIED",
+    "validator_status": "PARAMETRIC_MATRIX_VALIDATOR_ADDED",
+    "matrix_v1_compatibility": true,
+    "matrix_v2_contract": "base_case_plus_overrides",
+    "materialization_phase": "11.2B",
+    "runner_integration_phase": "11.2C",
+    "physical_validation": false
+  },
   "level1_ready": false,
   "physical_validation": false,
   "numeric_equivalence": false,

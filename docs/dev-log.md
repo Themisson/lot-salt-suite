@@ -57,6 +57,35 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 11.2A — schema v2 de matriz paramétrica — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Documento criado:**
+
+```text
+docs/46_parametric_matrix_schema.md
+```
+
+**Ferramenta criada:**
+
+```text
+tools/validate_lot_pkn_parametric_matrix.py
+```
+
+**Resultado esperado:**
+
+```text
+PARAMETRIC_MATRIX_SCHEMA_V2_SPECIFIED
+PARAMETRIC_MATRIX_VALIDATOR_ADDED
+```
+
+O contrato v2 declara `base_case + scenario.overrides` e preserva o formato v1
+baseado em `scenario.case`. A fase ainda não materializa casos derivados nem
+altera o runner; isso fica para 11.2B/11.2C.
+
+---
+
 ### [2026-06-11] Fase 11.1B — índice multi-estudo de sensibilidade — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

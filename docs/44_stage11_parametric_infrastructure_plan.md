@@ -127,3 +127,24 @@ BUZ67D_CGEOM_SENSITIVITY_REGISTERED_AS_STUDY
 O runner `tools/run_lot_pkn_sensitivity_matrix.py` permanece inalterado nesta
 fase. A execução por `study_id` fica reservada para uma fase futura, depois que
 o contrato do índice estiver estável.
+
+## Fase 11.2A especificada
+
+A Fase 11.2A define o contrato `schema_version: 2` para matrizes paramétricas
+LOT/PKN com `base_case + overrides`, sem alterar solver nem runtime. O formato
+v1 baseado em `scenario.case` permanece válido.
+
+Artefatos:
+
+```text
+docs/46_parametric_matrix_schema.md
+tools/validate_lot_pkn_parametric_matrix.py
+tests/fixtures/comparison/phase11_2a_parametric_matrix_v2_fixture.yaml
+```
+
+Status:
+
+```text
+PARAMETRIC_MATRIX_SCHEMA_V2_SPECIFIED
+PARAMETRIC_MATRIX_VALIDATOR_ADDED
+```

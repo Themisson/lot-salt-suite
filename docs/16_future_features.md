@@ -474,3 +474,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `tools/list_lot_pkn_sensitivity_studies.py`, registrando
   `buz67d_cgeom_sensitivity` como primeiro estudo ativo. O runner permanece
   inalterado e continua recebendo matrizes por caminho explícito.
+- A Fase 11.2A especifica o contrato `schema_version: 2` para matrizes
+  paramétricas `base_case + overrides`, com validador dedicado em
+  `tools/validate_lot_pkn_parametric_matrix.py`. A geração materializada e a
+  integração com o runner ficam planejadas para 11.2B/11.2C; casos derivados
+  devem permanecer em `results/` até promoção manual.

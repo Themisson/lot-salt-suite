@@ -88,3 +88,15 @@ diagnóstico:
 3. Declarar `route`, `status`, `tags` e `caveat`.
 4. Rodar a ferramenta com `--validate`.
 5. Manter `results/` fora do Git.
+
+## Relação com matriz paramétrica v2
+
+A Fase 11.2A adiciona a especificação `schema_version: 2` para matrizes
+paramétricas baseadas em `base_case + overrides`. O índice pode apontar tanto
+para matrizes v1 quanto, em fases futuras, para matrizes v2. A validação do
+índice continua verificando apenas a existência do arquivo de matriz; a
+validação estrutural da matriz fica com:
+
+```text
+tools/validate_lot_pkn_parametric_matrix.py
+```

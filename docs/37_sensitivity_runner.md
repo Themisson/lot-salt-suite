@@ -191,3 +191,26 @@ python tools/list_lot_pkn_sensitivity_studies.py --index cases/validation/sensit
 
 O runner ainda recebe `--matrix` diretamente. A resolução de `study_id` fica
 como evolução futura, se o índice permanecer estável.
+
+## Parametric matrix schema v2
+
+A Fase 11.2A especifica o contrato de matriz paramétrica `schema_version: 2`
+em [docs/46_parametric_matrix_schema.md](46_parametric_matrix_schema.md).
+O formato v2 permite declarar `base_case + scenario.overrides`, preservando a
+compatibilidade com o formato v1 baseado em `scenario.case`.
+
+Ferramenta adicionada:
+
+```text
+tools/validate_lot_pkn_parametric_matrix.py
+```
+
+Status:
+
+```text
+PARAMETRIC_MATRIX_SCHEMA_V2_SPECIFIED
+PARAMETRIC_MATRIX_VALIDATOR_ADDED
+```
+
+Nesta fase o runner permanece compatível com v1. A materialização de casos
+derivados e a execução direta de matrizes v2 ficam para as fases 11.2B e 11.2C.
