@@ -57,6 +57,44 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-11] Fase 10.28C — matriz de sensibilidade modern-refined — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Documento criado:**
+
+```text
+docs/35_phase10_28c_modern_refined_diagnostic.md
+```
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase10_28c_modern_refined_route.py
+```
+
+**Casos criados:**
+
+```text
+cases/validation/sensitivity/buz67d_modern_refined_sens_baseline.yaml
+cases/validation/sensitivity/buz67d_modern_refined_sens_cgeom_075.yaml
+cases/validation/sensitivity/buz67d_modern_refined_sens_cgeom_125.yaml
+cases/validation/sensitivity/buz67d_modern_refined_sens_same_step.yaml
+```
+
+**Resultado:**
+
+```text
+PHASE10_28C_SENSITIVITY_MATRIX_RUN_OK
+```
+
+O cenário `0.75x C_geom` aproximou a abertura de `510 s`; `1.25x C_geom` não
+abriu na janela executada; `same_step` removeu o atraso de sink. O resultado é
+diagnóstico de sensibilidade, não calibração automática e não regressão
+legacy-equivalence.
+
+---
+
 ### [2026-06-11] Fase 10.28B — gate BUZ-29D ou sensibilidade — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

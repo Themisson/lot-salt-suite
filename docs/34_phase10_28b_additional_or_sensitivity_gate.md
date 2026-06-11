@@ -98,3 +98,21 @@ Executar a Fase 10.28C pela Rota B:
 ```text
 PHASE10_28C_SENSITIVITY_MATRIX_EXECUTED
 ```
+
+## Resultado da Fase 10.28C
+
+A Fase 10.28C executou a rota B e criou:
+
+```text
+docs/35_phase10_28c_modern_refined_diagnostic.md
+```
+
+Classificação:
+
+```text
+PHASE10_28C_SENSITIVITY_MATRIX_RUN_OK
+```
+
+O gate da 10.28B permanece válido: nenhum caso adicional foi promovido a YAML
+moderno, e a sensibilidade BUZ-67D foi tratada como diagnóstico
+`modern-refined`.

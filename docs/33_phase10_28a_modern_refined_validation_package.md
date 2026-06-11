@@ -137,3 +137,21 @@ O material BUZ-29D existe, mas não está pronto para virar caso PKN moderno sem
 auditoria adicional. A rota segura para 10.28C é a matriz BUZ-67D
 `modern-refined` com variação controlada de `constant_geometric` e
 `sink_timing`.
+
+## Execução 10.28C
+
+A matriz planejada foi executada na Fase 10.28C e documentada em:
+
+```text
+docs/35_phase10_28c_modern_refined_diagnostic.md
+```
+
+Resultado:
+
+```text
+PHASE10_28C_SENSITIVITY_MATRIX_RUN_OK
+```
+
+A matriz mostra sensibilidade forte a `constant_geometric`: `0.75x` aproximou
+a abertura de `510 s`, enquanto `1.25x` não abriu na janela executada. Esse
+achado não deve ser usado como calibração automática.

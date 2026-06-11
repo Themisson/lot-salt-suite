@@ -1275,6 +1275,56 @@
       "The selected route is BUZ-67D modern-refined sensitivity, not legacy-equivalence."
     ]
   },
+  "phase10_28c_modern_refined_diagnostic": {
+    "status": "PHASE10_28C_SENSITIVITY_MATRIX_RUN_OK",
+    "phase": "10.28C",
+    "route": "sensitivity",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": true,
+    "tool": "tools/compare_phase10_28c_modern_refined_route.py",
+    "document": "docs/35_phase10_28c_modern_refined_diagnostic.md",
+    "summary_csv": "results/comparison/phase10_28c/phase10_28c_summary.csv",
+    "metadata_json": "results/comparison/phase10_28c/phase10_28c_metadata.json",
+    "scenarios": {
+      "baseline": {
+        "c_geom_factor": 1.0,
+        "sink_timing": "next_step",
+        "max_pressure_Pa": 67331393.612597,
+        "fracture_initiation_time_s": 660.0,
+        "sink_delay_s": 30.0
+      },
+      "cgeom_075": {
+        "c_geom_factor": 0.75,
+        "sink_timing": "next_step",
+        "max_pressure_Pa": 68102290.56498069,
+        "fracture_initiation_time_s": 510.0,
+        "sink_delay_s": 30.0
+      },
+      "cgeom_125": {
+        "c_geom_factor": 1.25,
+        "sink_timing": "next_step",
+        "max_pressure_Pa": 63888110.8869083,
+        "fracture_initiation_time_s": null,
+        "sink_delay_s": null
+      },
+      "same_step": {
+        "c_geom_factor": 1.0,
+        "sink_timing": "same_step",
+        "max_pressure_Pa": 65485976.41080395,
+        "fracture_initiation_time_s": 660.0,
+        "sink_delay_s": 0.0
+      }
+    },
+    "caveats": [
+      "The 0.75x compliance scenario approaching 510 s is a sensitivity observation, not automatic calibration.",
+      "The matrix is modern-refined, not legacy-equivalence.",
+      "APBSalt1D metadata remains non-consumed.",
+      "No physical fracture validation is claimed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

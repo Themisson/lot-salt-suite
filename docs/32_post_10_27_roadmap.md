@@ -149,3 +149,22 @@ SENSITIVITY_MATRIX_READY_FOR_10_28C
 BUZ-29D foi localizado como material legado, mas não como caso PKN moderno
 pronto. A próxima fase deve executar a matriz BUZ-67D `modern-refined` S0-S3
 sem promover equivalência com o `LOT_Tese`.
+
+## Fase 10.28C registrada
+
+A Fase 10.28C executa a matriz de sensibilidade em:
+
+```text
+docs/35_phase10_28c_modern_refined_diagnostic.md
+```
+
+Resultado:
+
+```text
+PHASE10_28C_SENSITIVITY_MATRIX_EXECUTED
+PHASE10_28C_SENSITIVITY_MATRIX_RUN_OK
+```
+
+O cenário `0.75x C_geom` aproximou a abertura de `510 s`, mas isso foi
+registrado apenas como sensibilidade diagnóstica. `constant_geometric` continua
+baseline diagnóstico, não calibração automática nem validação física.

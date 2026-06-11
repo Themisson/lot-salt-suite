@@ -2805,3 +2805,16 @@ mas o gate não encontrou um caso PKN moderno pronto com parâmetros completos.
 Portanto, a comparação adicional não deve ser forçada nesta fase. A próxima
 execução diagnóstica deve usar matriz BUZ-67D `modern-refined`, mantendo
 `legacy-equivalence` em trilha separada.
+
+## Fase 10.28C — matriz de sensibilidade modern-refined
+
+A Fase 10.28C executa a matriz BUZ-67D S0-S3 e registra:
+
+```text
+PHASE10_28C_SENSITIVITY_MATRIX_RUN_OK
+```
+
+O cenário `0.75x C_geom` aproxima o tempo de abertura de `510 s`, mas a
+estratégia de comparação continua a tratar esse resultado como sensibilidade
+diagnóstica. A matriz não reabre `legacy-equivalence`, não consome APBSalt1D e
+não estabelece validação física de fratura.

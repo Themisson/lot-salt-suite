@@ -423,3 +423,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   inventar parametros. A rota escolhida para 10.28C e
   `ADDITIONAL_WELL_BLOCKED_SENSITIVITY_SELECTED`, com matriz BUZ-67D
   `modern-refined` S0-S3.
+- A Fase 10.28C executou a matriz S0-S3. O resultado
+  `PHASE10_28C_SENSITIVITY_MATRIX_RUN_OK` mostra sensibilidade relevante a
+  `constant_geometric`: `0.75x` aproximou a abertura de `510 s`, `1.25x` nao
+  abriu na janela e `same_step` removeu o atraso de sink. Esse achado deve
+  orientar novas sensibilidades ou auditoria de compliance, mas nao autoriza
+  calibracao automatica nem mistura com `legacy-equivalence`.
