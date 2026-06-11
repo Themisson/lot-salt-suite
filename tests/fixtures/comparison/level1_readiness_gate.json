@@ -1471,6 +1471,36 @@
       "results/ outputs are local and must not be versioned."
     ]
   },
+  "phase10_31a_buz67d_reproducible_package": {
+    "status": "BUZ67D_MODERN_REFINED_REPRODUCIBLE_PACKAGE_ADDED",
+    "package_runner_status": "BUZ67D_MODERN_REFINED_PACKAGE_RUNNER_ADDED",
+    "phase": "10.31A",
+    "level1_ready": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_refined": true,
+    "tool": "tools/run_buz67d_modern_refined_package.py",
+    "document": "docs/42_buz67d_modern_refined_reproducible_package.md",
+    "matrix": "cases/validation/sensitivity/buz67d_modern_refined_cgeom_matrix.yaml",
+    "runner": "tools/run_lot_pkn_sensitivity_matrix.py",
+    "reporter": "tools/report_lot_pkn_sensitivity_matrix.py",
+    "default_output_dir": "results/comparison/buz67d_modern_refined_package",
+    "local_outputs": [
+      "package_metadata.json",
+      "run_commands.txt",
+      "sensitivity_summary.csv",
+      "sensitivity_metadata.json",
+      "sensitivity_report.json",
+      "sensitivity_report.md"
+    ],
+    "caveats": [
+      "The package is operational and reproducible, but remains diagnostic.",
+      "The 0.75x factor is not automatic calibration or physical validation.",
+      "Generated results/ artifacts are local and must not be versioned.",
+      "No C++ runtime behavior is changed."
+    ]
+  },
   "blocked_items": [
     "sigmaTheta",
     "pw",

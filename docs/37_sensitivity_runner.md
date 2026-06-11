@@ -160,3 +160,21 @@ gera JSON/Markdown com ranking por abertura, pressão máxima e score combinado.
 Quando alvos legados não são fornecidos, o relatório é relativo ao baseline.
 Quando alvos legados documentados são fornecidos, os resultados continuam
 diagnósticos e não viram calibração automática.
+
+## Pacote reproduzível BUZ-67D
+
+A Fase 10.31A adiciona um orquestrador operacional:
+
+```text
+tools/run_buz67d_modern_refined_package.py
+```
+
+Ele valida os casos mínimos, valida os casos da matriz versionada, roda a
+matriz com o runner genérico e chama o gerador de relatório. Os artefatos são
+gravados em `results/` e permanecem fora do Git.
+
+Status:
+
+```text
+BUZ67D_MODERN_REFINED_PACKAGE_RUNNER_ADDED
+```

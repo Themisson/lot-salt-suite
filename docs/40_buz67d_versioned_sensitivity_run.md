@@ -68,3 +68,15 @@ diagnostic interpretation:
 - best combined-score factor: `0.75x`.
 
 These are report rankings, not automatic calibration.
+
+## Phase 10.31A reproducible package
+
+Phase 10.31A wraps the matrix run and reporting commands in:
+
+```text
+tools/run_buz67d_modern_refined_package.py
+```
+
+The wrapper logs commands, validates cases, runs the matrix, and generates the
+same sensitivity report under a chosen local `results/` directory. It does not
+change runtime behavior and does not version generated outputs.

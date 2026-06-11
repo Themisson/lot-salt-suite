@@ -57,3 +57,15 @@ These are reporting results, not automatic calibration. The factor that best app
 - Modern-refined sensitivity remains separate from strict LOT_Tese legacy-equivalence.
 - A best factor by score is a diagnostic ranking, not a solver parameter update.
 - The report generator is Python post-processing, not runtime solver logic.
+
+## Reproducible package integration
+
+Phase 10.31A integrates the reporter into:
+
+```text
+tools/run_buz67d_modern_refined_package.py
+```
+
+The package runner calls this reporter after the sensitivity matrix has produced
+`summary.csv` and `metadata.json`. The reporter outputs remain local artifacts
+under `results/`.

@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 10.30C LOT-PKN sensitivity report generator
+Fase ativa  : 10.31A BUZ-67D modern-refined reproducible package
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-11
 Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 261/261 previstos apos Fase 10.30C em 2026-06-11
+Testes Py   : 267/267 previstos apos Fase 10.31A em 2026-06-11
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,37 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-11] Fase 10.31A — pacote reproduzível BUZ-67D modern-refined — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/run_buz67d_modern_refined_package.py
+```
+
+**Documento criado:**
+
+```text
+docs/42_buz67d_modern_refined_reproducible_package.md
+```
+
+**Resultado:**
+
+```text
+BUZ67D_MODERN_REFINED_REPRODUCIBLE_PACKAGE_ADDED
+BUZ67D_MODERN_REFINED_PACKAGE_RUNNER_ADDED
+```
+
+O pacote orquestra validações mínimas, validações dos casos da matriz,
+execução da matriz BUZ-67D `modern-refined` e geração de relatório
+JSON/Markdown. Os artefatos permanecem locais em `results/` e não devem ser
+versionados. A sensibilidade continua diagnóstica; `0.75x` não é calibração
+automática nem validação física.
 
 ---
 

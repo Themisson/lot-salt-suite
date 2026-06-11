@@ -283,3 +283,22 @@ SENSITIVITY_REPORT_GENERATED
 A ferramenta consolida ranking por abertura, pressão máxima e score combinado.
 Ela e pós-processamento diagnóstico, não runtime C++ e não calibração
 automática.
+
+## Fase 10.31A registrada
+
+A Fase 10.31A cria o pacote reproduzível end-to-end BUZ-67D `modern-refined`:
+
+```text
+tools/run_buz67d_modern_refined_package.py
+docs/42_buz67d_modern_refined_reproducible_package.md
+```
+
+Status:
+
+```text
+BUZ67D_MODERN_REFINED_REPRODUCIBLE_PACKAGE_ADDED
+BUZ67D_MODERN_REFINED_PACKAGE_RUNNER_ADDED
+```
+
+O pacote é operacional e reproduzível, mas continua diagnóstico. Ele não altera
+solver, não cria calibração automática e mantém `results/` fora do versionamento.

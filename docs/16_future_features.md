@@ -457,3 +457,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   relatorios JSON/Markdown reproduziveis a partir de `summary.csv` e
   `metadata.json`. O ranking de fatores e diagnostico e nao deve ser usado como
   calibracao automatica.
+- A Fase 10.31A criou `tools/run_buz67d_modern_refined_package.py` e
+  `docs/42_buz67d_modern_refined_reproducible_package.md`, consolidando o fluxo
+  end-to-end BUZ-67D `modern-refined` para outro computador/agente. O pacote
+  continua diagnostico e grava artefatos apenas em `results/`.

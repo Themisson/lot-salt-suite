@@ -119,3 +119,15 @@ A execução confirmou a presença dos 10 cenários versionados. O cenário
 `cgeom_075_next_step` abriu em `510 s`, o baseline `cgeom_100_next_step` abriu
 em `660 s`, e `cgeom_100_same_step` preservou abertura em `660 s` com
 `sink_delay = 0 s`. A interpretação continua diagnóstica.
+
+## Pacote reproduzível 10.31A
+
+A matriz é a entrada padrão do pacote reproduzível:
+
+```text
+tools/run_buz67d_modern_refined_package.py
+```
+
+Esse pacote permite reproduzir validação, execução da matriz e relatório em
+outro computador, desde que `lot-sim` esteja compilado ou disponível no `PATH`.
+Os resultados gerados continuam locais em `results/`.
