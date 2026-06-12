@@ -3278,6 +3278,32 @@
       "The PKN behavior remains unchanged."
     ]
   },
+  "phase11_11a_diagnostic_pre_runner_controlled_validation": {
+    "status": "PHASE11_11A_DIAGNOSTIC_PRE_RUNNER_CONTROLLED_CASES_VALIDATED",
+    "phase": "11.11A",
+    "validation_status": "DIAGNOSTIC_PRE_RUNNER_CONTROLLED_CASES_VALID",
+    "diagnostic_opt_in_behavior_valid": true,
+    "default_disabled_behavior_valid": true,
+    "dispatch_runtime_enabled_true_rejected": true,
+    "invalid_mode_rejected": true,
+    "missing_sigmatheta_blocks": true,
+    "diagnostic_output_isolated": true,
+    "runtime_physical_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "required_statuses": [
+      "PHASE11_11A_DIAGNOSTIC_PRE_RUNNER_CONTROLLED_CASES_VALIDATED",
+      "DIAGNOSTIC_PRE_RUNNER_CONTROLLED_CASES_VALID",
+      "RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED"
+    ],
+    "recommended_next_phase": "PHASE11_11B_COMPARE_PKN_RESULTS_WITH_DIAGNOSTIC_DISABLED_ENABLED",
+    "caveats": [
+      "Phase 11.11A validates controlled diagnostic fixtures only.",
+      "It does not perform physical BUZ29 validation.",
+      "It does not enable runtime physical dispatch.",
+      "It does not compare physical PKN outputs in depth; Phase 11.11B does that."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

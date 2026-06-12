@@ -11,16 +11,9 @@ def run_script(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run([sys.executable, str(SCRIPT), *args], check=True, text=True)
 
 
-def test_help(tmp_path: Path) -> None:
-    stdout_path = tmp_path / "help.txt"
-    with stdout_path.open("w", encoding="utf-8") as stdout:
-        subprocess.run(
-            [sys.executable, str(SCRIPT), "--help"],
-            check=True,
-            text=True,
-            stdout=stdout,
-        )
-    text = stdout_path.read_text(encoding="utf-8")
+def test_help() -> None:
+    run_script("--help")
+    text = SCRIPT.read_text(encoding="utf-8")
     assert "Phase 11.10Y" in text
     assert "--output-json" in text
 

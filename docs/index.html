@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">159/166</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">160/167</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">359</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">768</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">781</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8433,6 +8433,15 @@ RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
 <p>A fase cria fixtures de contrato para exercitar o diagnostico pre-runner sem
 habilitar dispatch fisico. A proxima etapa pode validar casos controlados com o
 diagnostico habilitado, mantendo o resultado PKN fisico separado.</p>
+<h2 id="fase-1111a-validacao-controlada-do-diagnostic-pre-runner">Fase 11.11A — validacao controlada do diagnostic pre-runner</h2>
+<p>Status registrado:</p>
+<pre><code class="language-text">PHASE11_11A_DIAGNOSTIC_PRE_RUNNER_CONTROLLED_CASES_VALIDATED
+DIAGNOSTIC_PRE_RUNNER_CONTROLLED_CASES_VALID
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+</code></pre>
+<p>A fase valida o contrato das fixtures sem comparar ainda os outputs fisicos PKN
+em profundidade. Essa comparacao fica para a 11.11B.</p>
 </div>
 </section>
 

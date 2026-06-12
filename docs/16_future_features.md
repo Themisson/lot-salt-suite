@@ -847,3 +847,17 @@ RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
 A fase cria fixtures de contrato para exercitar o diagnostico pre-runner sem
 habilitar dispatch fisico. A proxima etapa pode validar casos controlados com o
 diagnostico habilitado, mantendo o resultado PKN fisico separado.
+
+## Fase 11.11A — validacao controlada do diagnostic pre-runner
+
+Status registrado:
+
+```text
+PHASE11_11A_DIAGNOSTIC_PRE_RUNNER_CONTROLLED_CASES_VALIDATED
+DIAGNOSTIC_PRE_RUNNER_CONTROLLED_CASES_VALID
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+```
+
+A fase valida o contrato das fixtures sem comparar ainda os outputs fisicos PKN
+em profundidade. Essa comparacao fica para a 11.11B.

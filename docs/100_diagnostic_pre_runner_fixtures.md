@@ -77,3 +77,17 @@ PHASE11_11A_VALIDATE_DIAGNOSTIC_PRE_RUNNER_ON_CONTROLLED_CASES
 
 Essa proxima fase pode executar casos controlados com diagnostico habilitado,
 mantendo a separacao entre diagnostico e resultado fisico.
+
+## Atualizacao 11.11A — validacao controlada
+
+A Fase 11.11A consome estas fixtures e registra:
+
+```text
+PHASE11_11A_DIAGNOSTIC_PRE_RUNNER_CONTROLLED_CASES_VALIDATED
+DIAGNOSTIC_PRE_RUNNER_CONTROLLED_CASES_VALID
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+```
+
+Essa validacao ainda nao compara os outputs fisicos PKN em profundidade; isso
+fica reservado para a 11.11B.

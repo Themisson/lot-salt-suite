@@ -118,3 +118,10 @@ Essas fixtures cobrem default disabled, PKN diagnostico, `PENNY_SHAPED`
 diagnostico, `dispatch_runtime_enabled=true` invalido, mode invalido e bloqueio
 por sigma_theta inicial ausente. Elas sao contrato diagnostico, nao casos de
 producao e nao executam BUZ29-PENNY.
+
+## Atualizacao 11.11A — comportamento controlado validado
+
+A 11.11A confirma, a partir das fixtures da 11.10Z, que o diagnostico pre-runner
+e opt-in, que o default disabled permanece valido, que erros esperados sao
+rejeitados e que sigma_theta inicial ausente bloqueia o gate em vez de executar
+fratura.

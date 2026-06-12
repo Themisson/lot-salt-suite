@@ -173,6 +173,7 @@ phases:
   phase_11_10x_runtime_integration_gate: completed
   phase_11_10y_diagnostic_pre_runner_runtime_gate: completed
   phase_11_10z_diagnostic_pre_runner_fixtures: completed
+  phase_11_11a_diagnostic_pre_runner_controlled_validation: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -272,6 +273,7 @@ docs:
   stage11_10x_runtime_integration_gate: implemented
   stage11_10y_diagnostic_pre_runner_runtime_gate: implemented
   stage11_10z_diagnostic_pre_runner_fixtures: implemented
+  stage11_11a_diagnostic_pre_runner_controlled_validation: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -337,12 +339,12 @@ validation:
 test_counts:
   cpp_tests: 359        # Catch2 lot-salt-suite — 359/359 esperados apos Fase 11.10Y (2026-06-12)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 768     # pytest lot-salt-suite — 768/768 esperados apos Fase 11.10Z (2026-06-12)
+  python_tests: 781     # pytest lot-salt-suite — 781/781 esperados apos Fase 11.11A (2026-06-12)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-12"
-updated_by: "codex (Fase 11.10Z diagnostic pre-runner fixtures)"
+updated_by: "codex (Fase 11.11A diagnostic pre-runner controlled validation)"
 project_version: "0.1.0"

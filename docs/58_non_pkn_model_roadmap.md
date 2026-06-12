@@ -757,3 +757,16 @@ BUZ29_EXECUTION_BLOCKED
 ```
 
 O status permanece documental/diagnostico; nenhum runner nao-PKN e executado.
+
+## Fase 11.11A — validacao controlada do pre-runner
+
+A Fase 11.11A valida os cenarios controlados do diagnostico pre-runner. Para a
+trilha nao-PKN, a conclusao permanece:
+
+```text
+PENNY_SHAPED = diagnostic_only
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+```
+
+Nenhum adapter penny-shaped e chamado como runtime fisico.
