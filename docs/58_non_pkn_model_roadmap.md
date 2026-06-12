@@ -443,6 +443,31 @@ parcial: faltam campos adapter-ready e algumas semânticas de pressão/tempo e
 `sigmaTheta` seguem diferidas. A próxima fase segura é especificar o runner
 futuro, não implementá-lo.
 
+## Fase 11.10I — seleção unificada por `fracture_model`
+
+A Fase 11.10I reconcilia a recomendação anterior de um runner não-PKN com a
+decisão arquitetural de evitar rotas runtime paralelas. A rota futura deve ser
+LOT/fracture unificada, com seleção por input:
+
+```text
+lot.fracture.fracture_model
+```
+
+Status registrado:
+
+```text
+UNIFIED_LOT_FRACTURE_RUNTIME_SELECTED
+PKN_DEFAULT_FRACTURE_MODEL
+PENNY_SHAPED_EXPLICIT_OPT_IN_ONLY
+UNSUPPORTED_FRACTURE_MODELS_BLOCKED
+```
+
+O comportamento default futuro, quando `fracture_model` estiver ausente, deve
+permanecer PKN. `PENNY_SHAPED` continua diagnóstico e só poderá ser ativado por
+opt-in explícito. `KGD`, `RADIAL`, `ELLIPTICAL` e variantes seguem bloqueados.
+Esta fase não altera parser, schema, C++, CLI, `PknModel`, `PknRunner` ou
+`lot-pkn`.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

@@ -375,3 +375,11 @@ LOT_PKN_IMPACT_NOT_ALLOWED
 
 O writer implementado na 11.10G pode participar de uma especificação futura de
 runner, mas a 11.10H não implementa esse runner e não executa BUZ29-PENNY.
+
+## Resultado da Fase 11.10I
+
+A 11.10I especificou que o writer diagnóstico PennyShaped deve ser consumido,
+se vier a ser consumido por runtime, dentro de uma rota LOT/fracture unificada
+selecionada por `lot.fracture.fracture_model`. O default futuro deve ser `PKN`
+quando o campo estiver ausente, e `PENNY_SHAPED` deve permanecer opt-in
+explícito, diagnóstico e não fisicamente validado.

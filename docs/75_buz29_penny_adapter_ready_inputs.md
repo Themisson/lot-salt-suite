@@ -214,3 +214,11 @@ O runner futuro pode ser especificado, mas não implementado nesta fase. A
 execução BUZ29-PENNY segue proibida até que os campos ausentes e as semânticas
 de pressão, tempo desde abertura e `sigmaTheta` sejam resolvidos por gate
 posterior.
+
+## Resultado da Fase 11.10I
+
+A 11.10I redefiniu a próxima arquitetura como seleção unificada por
+`lot.fracture.fracture_model`, não como runner paralelo por modelo. Isso não
+torna o candidato BUZ29 adapter-ready: `PENNY_SHAPED` segue opt-in explícito,
+diagnóstico, não equivalente ao legado e bloqueado para execução runtime até
+novo gate.

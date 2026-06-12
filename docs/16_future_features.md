@@ -640,3 +640,10 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   de pressão, tempo e `sigmaTheta` permanecem diferidos. A implementação de
   runner, execução BUZ29-PENNY e qualquer impacto em `lot-pkn` continuam
   proibidos nesta fase.
+- A Fase 11.10I reconcilia a trilha anterior com a decisão arquitetural de
+  manter uma rota LOT/fracture unificada. O futuro seletor deve usar
+  `lot.fracture.fracture_model`, com `PKN` como default quando o campo estiver
+  ausente e `PENNY_SHAPED` apenas como opt-in explícito, diagnóstico e não
+  fisicamente validado. `KGD`, `RADIAL`, `ELLIPTICAL` e variantes permanecem
+  bloqueados. A fase não implementa runner, parser/schema ou execução
+  BUZ29-PENNY.

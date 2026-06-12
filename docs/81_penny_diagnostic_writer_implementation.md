@@ -242,3 +242,11 @@ recommended_next_phase = PHASE11_10I_SPECIFY_NON_PKN_DIAGNOSTIC_RUNNER
 
 O writer continua implementado e disponível como componente opt-in, mas não há
 runner não-PKN nem execução BUZ29-PENNY nesta fase.
+
+## Resultado da Fase 11.10I
+
+A 11.10I preserva o writer como componente opt-in, mas altera a recomendação
+arquitetural: em vez de criar uma rota oficial não-PKN paralela, a evolução
+futura deve usar uma seleção unificada de modelo por
+`lot.fracture.fracture_model`. `PKN` permanece o default; `PENNY_SHAPED` só
+pode ser selecionado por opt-in explícito e continua diagnóstico.

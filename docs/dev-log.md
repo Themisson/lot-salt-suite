@@ -57,6 +57,43 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-12] Fase 11.10I — seleção unificada `fracture_model` — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_phase11_10i_unified_fracture_model_selection.py
+```
+
+**Documento criado:**
+
+```text
+docs/83_unified_fracture_model_selection.md
+```
+
+**Decisão arquitetural:**
+
+```text
+UNIFIED_LOT_FRACTURE_RUNTIME_SELECTED
+PKN_DEFAULT_FRACTURE_MODEL
+PENNY_SHAPED_EXPLICIT_OPT_IN_ONLY
+UNSUPPORTED_FRACTURE_MODELS_BLOCKED
+FRACTURE_INITIATION_GATE_REQUIRED
+SIGMATHETA_SIGN_CONVENTION_REQUIRED
+```
+
+**Interpretação:** a recomendação anterior de runner não-PKN fica reconciliada
+como um futuro selector guard dentro de uma rota LOT/fracture unificada.
+`lot.fracture.fracture_model` é o campo recomendado, `PKN` permanece default
+quando ausente e `PENNY_SHAPED` segue opt-in explícito, diagnóstico, não
+fisicamente validado e sem equivalência legada. A fase não implementa runner,
+não altera C++, parser, schema ou `lot-pkn`, e não executa BUZ29-PENNY.
+
+---
+
 ### [2026-06-12] Fase 11.10H — gate do runner diagnóstico não-PKN — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase se todos os

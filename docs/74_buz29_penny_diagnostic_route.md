@@ -165,3 +165,16 @@ Com isso, a rota BUZ29-PENNY continua diagnóstica e inativa. A divergência
 principal não é uma correção matemática imediata do núcleo, mas a falta de um
 contrato explícito para `fracture_volume_proxy_m3` entre base interna de 1 rad
 e volume total equivalente 2π.
+
+## Resultado da 11.10I
+
+A 11.10I especificou que o futuro caminho PennyShaped não deve criar uma rota
+oficial paralela ao LOT. A seleção deverá ser feita por:
+
+```text
+lot.fracture.fracture_model
+```
+
+com `PKN` como default quando o campo estiver ausente e `PENNY_SHAPED` apenas
+como opt-in explícito, diagnóstico e não fisicamente validado. BUZ29-PENNY
+continua não executado e fora de validação física.

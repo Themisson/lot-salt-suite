@@ -2480,6 +2480,58 @@
       "The future runner must remain opt-in and outside lot-pkn."
     ]
   },
+  "phase11_10i_unified_fracture_model_selection": {
+    "status": "PHASE11_10I_UNIFIED_FRACTURE_MODEL_SELECTION_SPECIFIED",
+    "phase": "11.10I",
+    "decision": "UNIFIED_LOT_FRACTURE_RUNTIME_SELECTED",
+    "selection_field": "lot.fracture.fracture_model",
+    "default_fracture_model": "PKN",
+    "missing_fracture_model_behavior": "DEFAULT_TO_PKN",
+    "supported_fracture_models": [
+      "PKN",
+      "PENNY_SHAPED"
+    ],
+    "explicit_opt_in_models": [
+      "PENNY_SHAPED"
+    ],
+    "blocked_fracture_models": [
+      "KGD",
+      "KGD_CIRCULAR",
+      "KGD_ELLIPTICAL",
+      "RADIAL",
+      "ELLIPTICAL",
+      "UNKNOWN",
+      "EXPLICIT_EMPTY"
+    ],
+    "pkn_runtime_status": "OFFICIAL_RUNTIME_AVAILABLE",
+    "penny_shaped_runtime_status": "DIAGNOSTIC_ONLY_NOT_PHYSICALLY_VALIDATED",
+    "fracture_initiation_gate_required": true,
+    "criterion_requires_sign_convention": true,
+    "runtime_implementation_allowed_now": false,
+    "parser_schema_change_allowed_now": false,
+    "buz29_penny_execution_allowed_now": false,
+    "legacy_equivalence_claim_allowed_now": false,
+    "lot_pkn_behavior_change_allowed_now": false,
+    "tool": "tools/decide_phase11_10i_unified_fracture_model_selection.py",
+    "document": "docs/83_unified_fracture_model_selection.md",
+    "required_statuses": [
+      "PHASE11_10I_UNIFIED_FRACTURE_MODEL_SELECTION_SPECIFIED",
+      "UNIFIED_LOT_FRACTURE_RUNTIME_SELECTED",
+      "PKN_DEFAULT_FRACTURE_MODEL",
+      "PENNY_SHAPED_EXPLICIT_OPT_IN_ONLY",
+      "UNSUPPORTED_FRACTURE_MODELS_BLOCKED",
+      "FRACTURE_INITIATION_GATE_REQUIRED",
+      "SIGMATHETA_SIGN_CONVENTION_REQUIRED"
+    ],
+    "recommended_next_phase": "PHASE11_10J_SPECIFY_FRACTURE_MODEL_SELECTOR_GUARD",
+    "caveats": [
+      "Phase 11.10I is specification only.",
+      "No runner, parser, schema or C++ implementation is added.",
+      "PKN remains the default when fracture_model is absent.",
+      "PENNY_SHAPED remains explicit opt-in, diagnostic and not physically validated.",
+      "BUZ29-PENNY is not executed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

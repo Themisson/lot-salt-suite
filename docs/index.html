@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">141/148</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">142/149</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">281</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">531</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">543</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8272,7 +8272,14 @@ unidades reais usadas no <code>LOT_APB_v5</code> antes de aceitar nomes ou dimen
   mas BUZ29 continua parcial para execução: campos adapter-ready e semânticas
   de pressão, tempo e <code>sigmaTheta</code> permanecem diferidos. A implementação de
   runner, execução BUZ29-PENNY e qualquer impacto em <code>lot-pkn</code> continuam
-  proibidos nesta fase.</p>
+  proibidos nesta fase.
+- A Fase 11.10I reconcilia a trilha anterior com a decisão arquitetural de
+  manter uma rota LOT/fracture unificada. O futuro seletor deve usar
+  <code>lot.fracture.fracture_model</code>, com <code>PKN</code> como default quando o campo estiver
+  ausente e <code>PENNY_SHAPED</code> apenas como opt-in explícito, diagnóstico e não
+  fisicamente validado. <code>KGD</code>, <code>RADIAL</code>, <code>ELLIPTICAL</code> e variantes permanecem
+  bloqueados. A fase não implementa runner, parser/schema ou execução
+  BUZ29-PENNY.</p>
 </div>
 </section>
 

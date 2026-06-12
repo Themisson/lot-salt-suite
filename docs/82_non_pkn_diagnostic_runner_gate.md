@@ -188,3 +188,21 @@ PHASE11_10I_SPECIFY_NON_PKN_DIAGNOSTIC_RUNNER
 A 11.10I deve especificar o contrato do runner futuro, ainda sem implementá-lo,
 ou bloquear a especificação se decidir que as lacunas de entrada/semântica
 precisam ser resolvidas antes.
+
+## Reconciliação da Fase 11.10I
+
+A Fase 11.10I substitui a direção de "runner não-PKN" como rota paralela por
+uma decisão arquitetural mais estreita:
+
+```text
+UNIFIED_LOT_FRACTURE_RUNTIME_SELECTED
+PKN_DEFAULT_FRACTURE_MODEL
+PENNY_SHAPED_EXPLICIT_OPT_IN_ONLY
+UNSUPPORTED_FRACTURE_MODELS_BLOCKED
+```
+
+O futuro contrato deve introduzir `lot.fracture.fracture_model` como seletor
+de modelo. Quando ausente, o default deve continuar PKN. `PENNY_SHAPED`
+continua opt-in explícito, diagnóstico, não fisicamente validado e não
+equivalente ao legado. A 11.10I não implementa runner, parser, schema ou
+execução BUZ29-PENNY.
