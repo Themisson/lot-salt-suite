@@ -576,3 +576,11 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `BUZ29_PRESSURE_AND_OPENING_EVIDENCE_COMPLETE`, com
   `can_reopen_11_10A_gate = true`, mas isso apenas recomenda a 11.9F para
   reavaliar readiness; não cria YAML BUZ29-PENNY nem inicia simulação.
+- A Fase 11.9F reavalia esse readiness e registra
+  `BUZ29_PENNY_CANDIDATE_PARTIAL_BUT_DIAGNOSTIC_SAFE`, com gate
+  `BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A`. Isso autoriza apenas a
+  preparação diagnóstica 11.10A, sem validação física, sem equivalência com o
+  legado e sem YAML criado pela 11.9F. O caveat
+  `PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED` fica obrigatório:
+  `fracture_volume_proxy_m3` não deve ser tratado automaticamente como volume
+  circular completo em 2π sem auditoria matemática específica.

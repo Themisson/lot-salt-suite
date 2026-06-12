@@ -89,3 +89,19 @@ recommended_next_phase = PHASE11_9F_REEVALUATE_BUZ29_PENNY_READINESS_AFTER_PRESS
 A 11.9D permanece correta como snapshot histórico do gate antes da descoberta
 focal da 11.9E. A próxima fase deve reavaliar formalmente o readiness; a 11.9E
 não inicia a 11.10A diretamente.
+
+## Resultado da 11.9F
+
+A reavaliação formal foi executada na Fase 11.9F:
+
+```text
+updated_readiness = BUZ29_PENNY_CANDIDATE_PARTIAL_BUT_DIAGNOSTIC_SAFE
+can_start_11_10A = true
+gate = BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A
+recommended_next_phase = PHASE11_10A_START_BUZ29_PENNY_DIAGNOSTIC_ROUTE
+```
+
+Esse resultado substitui o gate operacional da 11.9D para fases futuras, mas
+não muda o significado histórico da 11.9D. A 11.10A continua autorizada apenas
+como preparação diagnóstica, sem validação física e sem YAML criado pela
+11.9F.

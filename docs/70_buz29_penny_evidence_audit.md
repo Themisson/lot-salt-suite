@@ -131,3 +131,19 @@ detalhado está em `docs/72_buz29_pressure_opening_evidence_audit.md`.
 Essa atualização não executa BUZ29-PENNY, não cria YAML candidato e não valida
 fisicamente o caso. Ela recomenda a 11.9F para reavaliar readiness antes de
 qualquer 11.10A.
+
+## Atualização 11.9F
+
+A Fase 11.9F reavaliou o readiness com a evidência consumível da 11.9E:
+
+```text
+updated_readiness = BUZ29_PENNY_CANDIDATE_PARTIAL_BUT_DIAGNOSTIC_SAFE
+can_start_11_10A = true
+gate = BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A
+recommended_next_phase = PHASE11_10A_START_BUZ29_PENNY_DIAGNOSTIC_ROUTE
+```
+
+A decisão é estritamente diagnóstica. `sigmaTheta`, `pw`, `margin` e `opened`
+continuam não exportados diretamente no `.dat`, e o caveat
+`PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED` impede interpretar o
+proxy de volume como volume circular completo em 2π sem auditoria matemática.

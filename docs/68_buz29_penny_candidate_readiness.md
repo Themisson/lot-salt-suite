@@ -103,6 +103,30 @@ focal de pressão/abertura e exige uma fase 11.9F para reavaliar o readiness
 com os demais campos ainda não exportados diretamente (`sigmaTheta`, `pw`,
 `margin`, `opened`).
 
+## Phase 11.9F readiness reevaluation
+
+A Fase 11.9F consumiu a evidência de pressão e abertura da 11.9E e atualizou o
+readiness:
+
+```text
+updated_readiness = BUZ29_PENNY_CANDIDATE_PARTIAL_BUT_DIAGNOSTIC_SAFE
+can_start_11_10A = true
+gate = BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A
+recommended_next_phase = PHASE11_10A_START_BUZ29_PENNY_DIAGNOSTIC_ROUTE
+```
+
+Esse gate permite apenas iniciar a preparação diagnóstica 11.10A. Ele não cria
+YAML BUZ29-PENNY, não executa BUZ29 e não valida fisicamente o caso.
+
+Novo caveat obrigatório:
+
+```text
+PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED
+```
+
+O proxy de volume do `PennyShapedModel` não deve ser tratado automaticamente
+como volume circular completo em 2π.
+
 ## Caveats
 
 - Esta fase não cria YAML BUZ29.

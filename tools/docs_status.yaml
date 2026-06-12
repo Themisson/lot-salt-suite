@@ -144,6 +144,8 @@ phases:
   phase_11_9b_buz29_penny_readiness: completed
   phase_11_9c_buz29_penny_evidence: completed
   phase_11_9d_buz29_penny_readiness_update: completed
+  phase_11_9e_buz29_pressure_opening_evidence: completed
+  phase_11_9f_buz29_penny_readiness_after_pressure_opening: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -215,6 +217,7 @@ docs:
   stage11_9c_buz29_penny_evidence: implemented
   stage11_9d_buz29_penny_readiness_update: implemented
   stage11_9e_buz29_pressure_opening_evidence: implemented
+  stage11_9f_buz29_penny_readiness_after_pressure_opening: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -280,12 +283,12 @@ validation:
 test_counts:
   cpp_tests: 273        # Catch2 lot-salt-suite — 273/273 previstos apos Fase 11.8D (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 421     # pytest lot-salt-suite — 421/421 previstos apos Fase 11.9E (2026-06-12)
+  python_tests: 429     # pytest lot-salt-suite — 429/429 previstos apos Fase 11.9F (2026-06-12)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-12"
-updated_by: "codex (Fase 11.9E BUZ29 pressure/opening evidence audit)"
+updated_by: "codex (Fase 11.9F BUZ29 PennyShaped readiness reevaluation)"
 project_version: "0.1.0"

@@ -57,6 +57,40 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-12] Fase 11.9F — readiness BUZ29-PENNY após pressão e abertura — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/reevaluate_phase11_9f_buz29_penny_readiness.py
+```
+
+**Documento criado:**
+
+```text
+docs/73_buz29_penny_readiness_after_pressure_opening.md
+```
+
+**Resultado:**
+
+```text
+updated_readiness = BUZ29_PENNY_CANDIDATE_PARTIAL_BUT_DIAGNOSTIC_SAFE
+can_start_11_10A = true
+gate = BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A
+recommended_next_phase = PHASE11_10A_START_BUZ29_PENNY_DIAGNOSTIC_ROUTE
+axisymmetric_interpretation = PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED
+```
+
+**Interpretação:** a 11.10A pode iniciar apenas como preparação diagnóstica.
+A 11.9F não executa BUZ29-PENNY, não cria YAML candidato, não cria `study_id`,
+não valida BUZ29 fisicamente e não declara equivalência com o legado. O proxy
+de volume do `PennyShapedModel` deve ser tratado como formulação axissimétrica
+de 1 rad, não como volume circular completo em 2π.
+
+---
+
 ### [2026-06-12] Fase 11.9E — evidência BUZ29 de pressão e abertura — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

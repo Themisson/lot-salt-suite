@@ -164,6 +164,24 @@ promover BUZ29 de candidato parcial para rota diagnóstica segura, ou se os
 campos restantes (`sigmaTheta`, `pw`, `margin`, `opened`) ainda bloqueiam a
 11.10A.
 
+## Resultado da 11.9F
+
+A Fase 11.9F consumiu esta evidência e classificou BUZ29-PENNY como rota
+parcial, mas segura para preparação diagnóstica:
+
+```text
+updated_readiness = BUZ29_PENNY_CANDIDATE_PARTIAL_BUT_DIAGNOSTIC_SAFE
+can_start_11_10A = true
+gate = BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A
+recommended_next_phase = PHASE11_10A_START_BUZ29_PENNY_DIAGNOSTIC_ROUTE
+```
+
+O documento da decisão é
+`docs/73_buz29_penny_readiness_after_pressure_opening.md`. A decisão registra o
+caveat `PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED`: o proxy de
+volume do modelo PennyShaped não deve ser interpretado como volume circular
+completo em 2π sem auditoria matemática específica.
+
 ## Caveats
 
 - Esta fase não executa simulação BUZ29.

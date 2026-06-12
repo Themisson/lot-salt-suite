@@ -237,6 +237,30 @@ blocos `dP`, `dV_leakoff` e `Momento da quebra: 10.4`. A fase não cria YAML
 BUZ29-PENNY, não executa BUZ29 e não valida fisicamente a rota; ela apenas
 habilita uma reavaliação formal de readiness na próxima fase.
 
+## Fase 11.9F — readiness após pressão e abertura
+
+A Fase 11.9F consumiu a evidência da 11.9E e reavaliou formalmente o gate
+BUZ29-PENNY:
+
+```text
+updated_readiness = BUZ29_PENNY_CANDIDATE_PARTIAL_BUT_DIAGNOSTIC_SAFE
+can_start_11_10A = true
+gate = BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A
+recommended_next_phase = PHASE11_10A_START_BUZ29_PENNY_DIAGNOSTIC_ROUTE
+```
+
+Essa abertura é limitada: a próxima fase pode preparar uma rota diagnóstica,
+mas não validar BUZ29 fisicamente, não declarar equivalência com o legado e não
+criar interpretação forte de volume. O caveat novo é:
+
+```text
+PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED
+```
+
+O `fracture_volume_proxy_m3` do núcleo/adapter PennyShaped deve ser interpretado
+no contexto axissimétrico de 1 rad e não como volume circular completo em 2π sem
+auditoria matemática específica.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

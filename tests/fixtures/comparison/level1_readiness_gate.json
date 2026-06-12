@@ -2081,6 +2081,40 @@
       "Complete pressure/opening evidence only reopens the readiness review path; it does not start Phase 11.10A automatically."
     ]
   },
+  "phase11_9f_buz29_penny_readiness_after_pressure_opening": {
+    "status": "PHASE11_9F_BUZ29_PENNY_READINESS_REEVALUATED",
+    "phase": "11.9F",
+    "track": "PENNY_SHAPED",
+    "case": "BUZ29-VISCO-first-well",
+    "previous_readiness": "BUZ29_PENNY_CANDIDATE_PARTIAL",
+    "pressure_history_status": "PRESSURE_HISTORY_FOUND_CONSUMABLE",
+    "opening_time_status": "OPENING_TIME_FOUND_CONSUMABLE",
+    "pressure_opening_evidence_classification": "BUZ29_PRESSURE_AND_OPENING_EVIDENCE_COMPLETE",
+    "axisymmetric_interpretation": "PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED",
+    "updated_readiness": "BUZ29_PENNY_CANDIDATE_PARTIAL_BUT_DIAGNOSTIC_SAFE",
+    "can_start_11_10A": true,
+    "gate": "BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A",
+    "tool": "tools/reevaluate_phase11_9f_buz29_penny_readiness.py",
+    "document": "docs/73_buz29_penny_readiness_after_pressure_opening.md",
+    "recommended_next_phase": "PHASE11_10A_START_BUZ29_PENNY_DIAGNOSTIC_ROUTE",
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_yaml_created": false,
+    "study_id_created": false,
+    "simulation_executed": false,
+    "nonblocking_gaps": [
+      "sigmaTheta BUZ29 is not exported directly",
+      "pw, margin and opened are not exported directly",
+      "PennyShaped fracture volume proxy requires 1-rad axisymmetric interpretation"
+    ],
+    "caveats": [
+      "Phase 11.9F does not execute BUZ29-PENNY.",
+      "Phase 11.9F does not create a BUZ29-PENNY candidate YAML or study_id.",
+      "Phase 11.9F only opens Phase 11.10A for diagnostic preparation.",
+      "fracture_volume_proxy_m3 must not be interpreted as full 2pi circular fracture volume without a dedicated math audit."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
