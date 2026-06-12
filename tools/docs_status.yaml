@@ -177,6 +177,7 @@ phases:
   phase_11_11b_pkn_diagnostic_regression_comparison: completed
   phase_11_11c_runtime_wiring_readiness_decision: completed
   phase_11_11d_limited_fracture_gate_runtime_integration_spec: completed
+  phase_11_11e_limited_fracture_gate_runtime_integration: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -280,6 +281,7 @@ docs:
   stage11_11b_pkn_diagnostic_regression_comparison: implemented
   stage11_11c_runtime_wiring_readiness_decision: implemented
   stage11_11d_limited_fracture_gate_runtime_integration_spec: implemented
+  stage11_11e_limited_fracture_gate_runtime_integration: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -343,14 +345,14 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 359        # Catch2 lot-salt-suite — 359/359 esperados apos Fase 11.10Y (2026-06-12)
+  cpp_tests: 373        # Catch2 lot-salt-suite — atualizar apos execucao da Fase 11.11E (2026-06-12)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 801     # pytest lot-salt-suite — 801/801 esperados apos Fase 11.11D (2026-06-12)
+  python_tests: 809     # pytest lot-salt-suite — atualizar apos execucao da Fase 11.11E (2026-06-12)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-12"
-updated_by: "codex (Fase 11.11D limited fracture gate runtime integration spec)"
+updated_by: "codex (Fase 11.11E limited fracture gate runtime integration)"
 project_version: "0.1.0"

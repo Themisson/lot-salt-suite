@@ -239,7 +239,7 @@ properties:
                 type: boolean
               mode:
                 type: string
-                enum: [pre_runner, diagnostic_only]
+                enum: [pre_runner, diagnostic_only, limited_gate]
               dispatch_runtime_enabled:
                 type: boolean
           fluid_viscosity_cP: {type: number}

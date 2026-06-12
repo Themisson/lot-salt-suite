@@ -908,3 +908,11 @@ BUZ29_EXECUTION_BLOCKED
 A especificacao permite uma implementacao futura apenas diagnostica. A proxima
 fase deve provar novamente que `result.json` e `timeseries.csv` permanecem
 preservados e que `diagnostic_fracture_gate.json` e isolado.
+A Fase 11.11E adiciona a integracao runtime limitada do fracture gate. Esta
+etapa reduz a lacuna entre diagnostico pre-runner e runtime, mas ainda nao
+habilita dispatch fisico. O proximo incremento deve adicionar fixtures
+controladas para `limited_gate` e continuar bloqueando BUZ29-PENNY.
+
+```text
+PHASE11_11F_ADD_LIMITED_GATE_CASE_FIXTURES
+```

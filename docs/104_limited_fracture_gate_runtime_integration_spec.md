@@ -82,3 +82,25 @@ penny_diagnostic_only = true
 ```text
 PHASE11_11E_IMPLEMENT_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION
 ```
+
+## Implementacao 11.11E
+
+A 11.11E implementou a especificacao como helper C++ isolado:
+
+```text
+LimitedFractureGateRuntimeIntegration
+```
+
+O modo `limited_gate` foi adicionado ao parser/schema e avalia o
+`FractureGateRuntimeWiring` sem habilitar dispatch fisico. O resultado
+diagnostico permanece separado em `diagnostic_fracture_gate.json`; os arquivos
+fisicos `result.json` e `timeseries.csv` continuam protegidos pela comparacao
+disabled/enabled.
+
+Status:
+
+```text
+PHASE11_11E_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED
+RUNTIME_DISPATCH_NOT_ENABLED
+PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE
+```

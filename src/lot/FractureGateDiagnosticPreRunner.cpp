@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "lot/LimitedFractureGateRuntimeIntegration.hpp"
+
 namespace lss::lot {
 namespace {
 
@@ -96,8 +98,15 @@ evaluate_fracture_gate_diagnostic_pre_runner(
     return result;
   }
 
-  result.runtime_result = evaluate_fracture_gate_runtime(
-      make_fracture_gate_runtime_input_from_case(data));
+  LimitedFractureGateRuntimeIntegrationInput input;
+  input.diagnostics_enabled = result.fracture_gate_diagnostics_enabled;
+  input.mode = result.mode;
+  input.dispatch_runtime_enabled = result.dispatch_runtime_enabled;
+  input.gate_input = make_fracture_gate_runtime_input_from_case(data);
+
+  const auto integration =
+      evaluate_limited_fracture_gate_runtime_integration(input);
+  result.runtime_result = integration.gate_result;
   return result;
 }
 

@@ -115,6 +115,7 @@ set(LSS_CORE_SOURCES
   src/lot/FractureModelSelector.cpp
   src/lot/InjectionSchedule.cpp
   src/lot/LeakoffModel.cpp
+  src/lot/LimitedFractureGateRuntimeIntegration.cpp
   src/lot/PennyShapedDiagnosticAdapter.cpp
   src/lot/PennyShapedDiagnosticWriter.cpp
   src/lot/PennyShapedModel.cpp
@@ -180,6 +181,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_fracture_gate_diagnostic_pre_runner.cpp
     tests/cpp/test_fracture_gate_runtime_wiring.cpp
     tests/cpp/test_fracture_model_selector.cpp
+    tests/cpp/test_limited_fracture_gate_runtime_integration.cpp
     tests/cpp/test_leakoff_model.cpp
     tests/cpp/test_penny_shaped_diagnostic_adapter.cpp
     tests/cpp/test_penny_shaped_diagnostic_writer.cpp

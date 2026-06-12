@@ -33,6 +33,7 @@ def test_help_contract_is_declared() -> None:
     text = SCRIPT.read_text(encoding="utf-8")
     assert "Phase 11.11B" in text
     assert "--fixture-root" in text
+    assert "--diagnostic-mode" in text
 
 
 def test_fixture_pairs_generate_ok_report(tmp_path: Path) -> None:
@@ -44,6 +45,7 @@ def test_fixture_pairs_generate_ok_report(tmp_path: Path) -> None:
 
     report = json.loads(output.read_text(encoding="utf-8"))
     assert report["comparison_status"] == "PKN_OUTPUTS_UNCHANGED_WITH_DIAGNOSTICS"
+    assert report["diagnostic_mode"] == "pre_runner"
     assert report["physical_outputs_identical"] is True
     assert report["diagnostic_output_isolated"] is True
     assert report["pkn_behavior_changed"] is False
@@ -83,6 +85,33 @@ def test_missing_diagnostic_output_is_rejected(tmp_path: Path) -> None:
 
     report = json.loads(output.read_text(encoding="utf-8"))
     assert report["diagnostic_output_isolated"] is False
+
+
+def test_limited_gate_mode_is_reported(tmp_path: Path) -> None:
+    fixtures = tmp_path / "fixtures"
+    write_pair(fixtures, "minimal")
+    output = tmp_path / "report.json"
+
+    assert (
+        tool.main(
+            [
+                "--fixture-root",
+                str(fixtures),
+                "--diagnostic-mode",
+                "limited_gate",
+                "--phase-label",
+                "11.11E",
+                "--output-json",
+                str(output),
+            ]
+        )
+        == 0
+    )
+
+    report = json.loads(output.read_text(encoding="utf-8"))
+    assert report["phase"] == "11.11E"
+    assert report["diagnostic_mode"] == "limited_gate"
+    assert report["comparison_status"] == "PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE"
 
 
 def test_empty_fixture_root_fails(tmp_path: Path) -> None:

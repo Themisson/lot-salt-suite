@@ -144,8 +144,9 @@ TEST_CASE("Diagnostic pre-runner rejects dispatch runtime enabled") {
   std::filesystem::remove(path);
 }
 
-TEST_CASE("Diagnostic pre-runner accepts pre_runner and diagnostic_only modes") {
-  for (const std::string mode : {"pre_runner", "diagnostic_only"}) {
+TEST_CASE("Diagnostic pre-runner accepts pre_runner diagnostic_only and limited_gate modes") {
+  for (const std::string mode :
+       {"pre_runner", "diagnostic_only", "limited_gate"}) {
     const auto path = write_case_with_diagnostics(
         "    fracture_gate_diagnostics:\n"
         "      enabled: true\n"

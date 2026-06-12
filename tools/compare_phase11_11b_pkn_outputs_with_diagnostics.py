@@ -20,6 +20,8 @@ from typing import Any
 PHASE = "11.11B"
 STATUS_OK = "PKN_OUTPUTS_UNCHANGED_WITH_DIAGNOSTICS"
 STATUS_FAILED = "PKN_OUTPUTS_CHANGED_OR_DIAGNOSTIC_NOT_ISOLATED"
+LIMITED_GATE_STATUS_OK = "PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE"
+LIMITED_GATE_STATUS_FAILED = "PKN_OUTPUTS_CHANGED_OR_LIMITED_GATE_NOT_ISOLATED"
 RECOMMENDED_NEXT_PHASE = "PHASE11_11C_DECIDE_RUNTIME_WIRING_INTEGRATION_READINESS"
 DEFAULT_CASES = [
     Path("cases/validation/lot_pkn_minimal.yaml"),
@@ -50,9 +52,13 @@ def write_text(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-def inject_diagnostic_block(case_text: str) -> str:
+def inject_diagnostic_block(case_text: str, diagnostic_mode: str = "pre_runner") -> str:
     if "fracture_gate_diagnostics:" in case_text:
         return case_text
+    if diagnostic_mode not in {"pre_runner", "diagnostic_only", "limited_gate"}:
+        raise ValueError(
+            "diagnostic mode must be pre_runner, diagnostic_only or limited_gate"
+        )
     lines = case_text.splitlines()
     output: list[str] = []
     inserted = False
@@ -63,7 +69,7 @@ def inject_diagnostic_block(case_text: str) -> str:
                 [
                     "    fracture_gate_diagnostics:",
                     "      enabled: true",
-                    "      mode: pre_runner",
+                    f"      mode: {diagnostic_mode}",
                     "      dispatch_runtime_enabled: false",
                 ]
             )
@@ -101,7 +107,7 @@ def run_lot_sim(lot_sim: Path, case_path: Path, output_dir: Path) -> None:
 
 
 def prepare_and_run_cases(
-    cases: list[Path], lot_sim: Path, work_dir: Path
+    cases: list[Path], lot_sim: Path, work_dir: Path, diagnostic_mode: str
 ) -> list[CaseComparison]:
     comparisons: list[CaseComparison] = []
     for case_path in cases:
@@ -114,7 +120,7 @@ def prepare_and_run_cases(
 
         source = read_text(case_path)
         write_text(disabled_case, source)
-        write_text(enabled_case, inject_diagnostic_block(source))
+        write_text(enabled_case, inject_diagnostic_block(source, diagnostic_mode))
 
         run_lot_sim(lot_sim, disabled_case, disabled_output)
         run_lot_sim(lot_sim, enabled_case, enabled_output)
@@ -159,14 +165,24 @@ def comparisons_from_fixture(fixture_root: Path) -> list[CaseComparison]:
     return comparisons
 
 
-def build_report(comparisons: list[CaseComparison], source: str) -> dict[str, Any]:
+def build_report(
+    comparisons: list[CaseComparison],
+    source: str,
+    diagnostic_mode: str = "pre_runner",
+    phase_label: str = PHASE,
+) -> dict[str, Any]:
     physical_outputs_identical = all(item.physical_outputs_identical for item in comparisons)
     diagnostic_output_isolated = all(item.diagnostic_output_isolated for item in comparisons)
     ok = physical_outputs_identical and diagnostic_output_isolated
+    status_ok = LIMITED_GATE_STATUS_OK if diagnostic_mode == "limited_gate" else STATUS_OK
+    status_failed = (
+        LIMITED_GATE_STATUS_FAILED if diagnostic_mode == "limited_gate" else STATUS_FAILED
+    )
     return {
-        "phase": PHASE,
+        "phase": phase_label,
         "source": source,
-        "comparison_status": STATUS_OK if ok else STATUS_FAILED,
+        "diagnostic_mode": diagnostic_mode,
+        "comparison_status": status_ok if ok else status_failed,
         "physical_outputs_identical": physical_outputs_identical,
         "diagnostic_output_isolated": diagnostic_output_isolated,
         "pkn_behavior_changed": not physical_outputs_identical,
@@ -197,6 +213,7 @@ def write_markdown(path: Path, report: dict[str, Any]) -> None:
         "# Phase 11.11B PKN Diagnostic Regression",
         "",
         f"- phase: `{report['phase']}`",
+        f"- diagnostic_mode: `{report['diagnostic_mode']}`",
         f"- comparison_status: `{report['comparison_status']}`",
         f"- physical_outputs_identical: `{report['physical_outputs_identical']}`",
         f"- diagnostic_output_isolated: `{report['diagnostic_output_isolated']}`",
@@ -233,6 +250,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=Path,
         default=Path("results/comparison/phase11_11b/pkn_diagnostic_regression"),
     )
+    parser.add_argument(
+        "--diagnostic-mode",
+        choices=["pre_runner", "diagnostic_only", "limited_gate"],
+        default="pre_runner",
+    )
+    parser.add_argument("--phase-label", default=PHASE)
     parser.add_argument("--fixture-root", type=Path)
     parser.add_argument("--case", dest="cases", type=Path, action="append")
     return parser.parse_args(argv)
@@ -242,13 +265,22 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     if args.fixture_root:
         comparisons = comparisons_from_fixture(args.fixture_root)
-        report = build_report(comparisons, "FIXTURE_OUTPUT_PAIRS")
+        report = build_report(
+            comparisons, "FIXTURE_OUTPUT_PAIRS", args.diagnostic_mode, args.phase_label
+        )
     else:
         cases = args.cases or DEFAULT_CASES
         if args.work_dir.exists():
             shutil.rmtree(args.work_dir)
-        comparisons = prepare_and_run_cases(cases, args.lot_sim, args.work_dir)
-        report = build_report(comparisons, "LOT_SIM_RUN_OUTPUTS")
+        comparisons = prepare_and_run_cases(
+            cases, args.lot_sim, args.work_dir, args.diagnostic_mode
+        )
+        report = build_report(
+            comparisons,
+            "LOT_SIM_RUN_OUTPUTS",
+            args.diagnostic_mode,
+            args.phase_label,
+        )
 
     if args.output_json:
         write_text(args.output_json, json.dumps(report, indent=2) + "\n")
@@ -256,10 +288,11 @@ def main(argv: list[str] | None = None) -> int:
         write_markdown(args.output_md, report)
 
     print(f"phase={report['phase']}")
+    print(f"diagnostic_mode={report['diagnostic_mode']}")
     print(f"comparison_status={report['comparison_status']}")
     print(f"physical_outputs_identical={report['physical_outputs_identical']}")
     print(f"diagnostic_output_isolated={report['diagnostic_output_isolated']}")
-    return 0 if report["comparison_status"] == STATUS_OK else 1
+    return 0 if report["physical_outputs_identical"] and report["diagnostic_output_isolated"] else 1
 
 
 if __name__ == "__main__":

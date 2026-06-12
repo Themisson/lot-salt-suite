@@ -3388,6 +3388,35 @@
       "BUZ29-PENNY remains blocked."
     ]
   },
+  "phase11_11e_limited_fracture_gate_runtime_integration": {
+    "status": "PHASE11_11E_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED",
+    "phase": "11.11E",
+    "integration_status": "LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED",
+    "limited_gate_mode_supported": true,
+    "runtime_dispatch_enabled": false,
+    "dispatch_runtime_enabled_true_rejected": true,
+    "pkn_behavior_changed": false,
+    "pkn_outputs_unchanged": true,
+    "diagnostic_output_isolated": true,
+    "buz29_execution_allowed": false,
+    "penny_shaped_runtime_enabled": false,
+    "physical_dispatch_enabled": false,
+    "required_statuses": [
+      "PHASE11_11E_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED",
+      "LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PENNY_SHAPED_RUNTIME_NOT_ENABLED"
+    ],
+    "recommended_next_phase": "PHASE11_11F_ADD_LIMITED_GATE_CASE_FIXTURES",
+    "caveats": [
+      "The integration is limited to diagnostic gate evaluation.",
+      "Dispatch statuses are not physical runtime calls.",
+      "PKN remains the default compatible runtime path.",
+      "BUZ29-PENNY is not executed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

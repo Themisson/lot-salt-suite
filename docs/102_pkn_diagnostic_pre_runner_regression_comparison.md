@@ -109,3 +109,11 @@ RUNTIME_WIRING_READY_FOR_LIMITED_GATE_SPEC
 
 Essa classificacao autoriza apenas a especificacao da integracao limitada na
 11.11D. Ela nao habilita dispatch fisico e nao executa BUZ29-PENNY.
+A comparacao da Fase 11.11B permanece a regressao fisica de referencia para a
+11.11E. A ferramenta aceita `--diagnostic-mode limited_gate` para provar que a
+integracao limitada tambem preserva `result.json` e `timeseries.csv` enquanto
+mantem `diagnostic_fracture_gate.json` isolado.
+
+```text
+PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE
+```

@@ -292,10 +292,11 @@ void parse_fracture_gate_diagnostics(const YAML::Node& fracture,
     return;
   }
 
-  if (config.mode != "pre_runner" && config.mode != "diagnostic_only") {
+  if (config.mode != "pre_runner" && config.mode != "diagnostic_only" &&
+      config.mode != "limited_gate") {
     throw std::runtime_error(
         "Validacao falhou: fracture_gate_diagnostics.mode exige pre_runner "
-        "ou diagnostic_only");
+        "diagnostic_only ou limited_gate");
   }
   if (config.dispatch_runtime_enabled) {
     throw std::runtime_error(

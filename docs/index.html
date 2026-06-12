@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">163/170</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">359</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">801</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">164/171</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">373</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">809</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8473,7 +8473,13 @@ BUZ29_EXECUTION_BLOCKED
 </code></pre>
 <p>A especificacao permite uma implementacao futura apenas diagnostica. A proxima
 fase deve provar novamente que <code>result.json</code> e <code>timeseries.csv</code> permanecem
-preservados e que <code>diagnostic_fracture_gate.json</code> e isolado.</p>
+preservados e que <code>diagnostic_fracture_gate.json</code> e isolado.
+A Fase 11.11E adiciona a integracao runtime limitada do fracture gate. Esta
+etapa reduz a lacuna entre diagnostico pre-runner e runtime, mas ainda nao
+habilita dispatch fisico. O proximo incremento deve adicionar fixtures
+controladas para <code>limited_gate</code> e continuar bloqueando BUZ29-PENNY.</p>
+<pre><code class="language-text">PHASE11_11F_ADD_LIMITED_GATE_CASE_FIXTURES
+</code></pre>
 </div>
 </section>
 

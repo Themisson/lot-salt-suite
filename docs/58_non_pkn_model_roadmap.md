@@ -789,3 +789,16 @@ nao-PKN. A proxima fase pode especificar integracao limitada, mas
 A especificacao limitada nao desbloqueia PennyShaped runtime. A proxima
 implementacao deve manter `PENNY_SHAPED = diagnostic_only`, nao chamar o adapter
 penny-shaped como modelo fisico e nao executar BUZ29-PENNY.
+A 11.11E implementa a integracao runtime limitada do fracture gate como rota
+diagnostica opt-in. O modo `limited_gate` avalia o wiring antes do PKN e escreve
+`diagnostic_fracture_gate.json`, mas nao habilita dispatch fisico. `PKN`
+permanece o default retrocompativel, `PENNY_SHAPED` permanece diagnostic-only e
+BUZ29-PENNY segue bloqueado.
+
+Status:
+
+```text
+PHASE11_11E_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED
+RUNTIME_DISPATCH_NOT_ENABLED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+```

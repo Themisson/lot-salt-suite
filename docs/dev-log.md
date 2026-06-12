@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11D limited fracture gate runtime integration spec
+Fase ativa  : 11.11E limited fracture gate runtime integration implementation
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : 359/359 esperados apos Fase 11.10Y em 2026-06-12
-Testes Py   : 801/801 esperados apos Fase 11.11D em 2026-06-12
+Testes C++  : atualizar apos Fase 11.11E
+Testes Py   : atualizar apos Fase 11.11E
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -56,6 +56,40 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ## Entradas de sessão
 
 ---
+
+### [2026-06-12] Fase 11.11E — limited fracture gate runtime integration — Codex
+
+**Status:** Implementado; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Helper C++ criado:**
+
+```text
+LimitedFractureGateRuntimeIntegration
+```
+
+**Documento criado:**
+
+```text
+docs/105_limited_fracture_gate_runtime_integration_implementation.md
+```
+
+**Status registrado:**
+
+```text
+PHASE11_11E_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED
+LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED
+RUNTIME_DISPATCH_NOT_ENABLED
+PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE11_11F_ADD_LIMITED_GATE_CASE_FIXTURES
+```
 
 ### [2026-06-12] Fase 11.11D — limited fracture gate runtime integration spec — Codex
 

@@ -144,3 +144,12 @@ fisico permanece desabilitado e BUZ29-PENNY segue bloqueado.
 A 11.11D define os gates da proxima implementacao: default disabled preservado,
 outputs PKN fisicos preservados, JSON diagnostico isolado e rejeicao continua de
 `dispatch_runtime_enabled=true`. Nenhuma execucao fisica nao-PKN e permitida.
+A Fase 11.11E formaliza a integracao runtime limitada do gate no mesmo ponto
+permitido: depois do parse/validate e antes de `run_pkn_case`. O novo modo
+`limited_gate` e equivalente a uma avaliacao diagnostica isolada; ele nao
+converte `PknEligible` ou `PennyDiagnosticEligible` em execucao fisica.
+
+```text
+LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED
+RUNTIME_DISPATCH_NOT_ENABLED
+```

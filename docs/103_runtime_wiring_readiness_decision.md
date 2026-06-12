@@ -84,3 +84,11 @@ pkn_behavior_change_allowed = false
 
 A proxima fase pode implementar somente o caminho diagnostico limitado, com
 `diagnostic_fracture_gate.json` isolado e sem dispatch fisico.
+A 11.11E consumiu esta decisao de readiness apenas para implementar a camada
+limitada. O dispatch fisico continua desabilitado, e a readiness nao autoriza
+BUZ29-PENNY nem runtime Penny.
+
+```text
+LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED
+RUNTIME_DISPATCH_NOT_ENABLED
+```
