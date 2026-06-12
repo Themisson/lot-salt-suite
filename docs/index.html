@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">140/147</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">141/148</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">281</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">521</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">531</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8266,7 +8266,13 @@ unidades reais usadas no <code>LOT_APB_v5</code> antes de aceitar nomes ou dimen
   memória, preserva <code>*_1rad_m3</code>, calcula equivalentes <code>*_equivalent_2pi_m3</code>
   com <code>source</code>, exige caveats diagnósticos e rejeita validação física,
   equivalência legada, caso ativo e <code>volume_multiplier</code> como <code>2π</code>. A fase não
-  implementa runner, não executa BUZ29-PENNY e não altera <code>lot-pkn</code>.</p>
+  implementa runner, não executa BUZ29-PENNY e não altera <code>lot-pkn</code>.
+- A Fase 11.10H registra o gate para runner diagnóstico não-PKN e classifica a
+  rota como <code>NON_PKN_DIAGNOSTIC_RUNNER_SPEC_PARTIAL</code>. Adapter e writer existem,
+  mas BUZ29 continua parcial para execução: campos adapter-ready e semânticas
+  de pressão, tempo e <code>sigmaTheta</code> permanecem diferidos. A implementação de
+  runner, execução BUZ29-PENNY e qualquer impacto em <code>lot-pkn</code> continuam
+  proibidos nesta fase.</p>
 </div>
 </section>
 

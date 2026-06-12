@@ -426,6 +426,23 @@ O writer preserva campos internos em 1 rad, calcula equivalentes volumétricos
 2π apenas com `source`, rejeita flags proibidas e permanece fora de
 `lot-pkn`, parser, schema, CLI e runner não-PKN.
 
+## Fase 11.10H — gate do runner diagnóstico não-PKN
+
+A Fase 11.10H registra o gate para uma futura especificação de runner
+diagnóstico não-PKN:
+
+```text
+NON_PKN_DIAGNOSTIC_RUNNER_SPEC_PARTIAL
+RUNNER_IMPLEMENTATION_NOT_ALLOWED_IN_11_10H
+BUZ29_RUNTIME_EXECUTION_NOT_ALLOWED
+LOT_PKN_IMPACT_NOT_ALLOWED
+```
+
+Adapter e writer existem e estão isolados, mas o candidato BUZ29 continua
+parcial: faltam campos adapter-ready e algumas semânticas de pressão/tempo e
+`sigmaTheta` seguem diferidas. A próxima fase segura é especificar o runner
+futuro, não implementá-lo.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

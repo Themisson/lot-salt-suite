@@ -158,3 +158,18 @@ O writer exige os caveats diagnósticos, preserva `*_1rad_m3`, calcula os
 equivalentes `*_equivalent_2pi_m3` com `source` explícito e rejeita
 `physically_validated=true`, `legacy_equivalent=true`,
 `active_simulation_case=true` e `volume_multiplier_is_2pi=true`.
+
+## Resultado da Fase 11.10H
+
+A 11.10H auditou o caminho adapter → writer e registrou:
+
+```text
+NON_PKN_DIAGNOSTIC_RUNNER_SPEC_PARTIAL
+runner_implementation_allowed_now = false
+buz29_runtime_execution_allowed = false
+lot_pkn_impact_allowed = false
+```
+
+O adapter e o writer podem ser conectados por especificação futura, mas a
+execução BUZ29-PENNY segue bloqueada por entradas parciais e semânticas ainda
+deferidas. Nenhum C++ foi alterado na 11.10H.

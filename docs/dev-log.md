@@ -57,6 +57,39 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-12] Fase 11.10H — gate do runner diagnóstico não-PKN — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_phase11_10h_non_pkn_diagnostic_runner_gate.py
+```
+
+**Documento criado:**
+
+```text
+docs/82_non_pkn_diagnostic_runner_gate.md
+```
+
+**Resultado:**
+
+```text
+NON_PKN_DIAGNOSTIC_RUNNER_SPEC_PARTIAL
+RUNNER_IMPLEMENTATION_NOT_ALLOWED_IN_11_10H
+BUZ29_RUNTIME_EXECUTION_NOT_ALLOWED
+LOT_PKN_IMPACT_NOT_ALLOWED
+```
+
+**Interpretação:** adapter e writer PennyShaped existem e estão isolados, mas
+o candidato BUZ29-PENNY continua parcial para execução. A fase autoriza apenas
+especificar um runner diagnóstico futuro; não implementa runner, não executa
+BUZ29-PENNY, não altera C++ e não toca no fluxo `lot-pkn`.
+
+---
+
 ### [2026-06-12] Fase 11.10G — writer diagnóstico PennyShaped opt-in — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase se todos os

@@ -361,3 +361,17 @@ VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI
 
 O writer permanece isolado, sem runner não-PKN, sem CLI, sem parser/schema e
 sem alteração do fluxo `lot-pkn`.
+
+## Resultado da Fase 11.10H
+
+A Fase 11.10H registrou o gate do runner diagnóstico não-PKN:
+
+```text
+NON_PKN_DIAGNOSTIC_RUNNER_SPEC_PARTIAL
+RUNNER_IMPLEMENTATION_NOT_ALLOWED_IN_11_10H
+BUZ29_RUNTIME_EXECUTION_NOT_ALLOWED
+LOT_PKN_IMPACT_NOT_ALLOWED
+```
+
+O writer implementado na 11.10G pode participar de uma especificação futura de
+runner, mas a 11.10H não implementa esse runner e não executa BUZ29-PENNY.

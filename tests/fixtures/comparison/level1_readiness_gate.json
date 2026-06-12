@@ -2436,6 +2436,50 @@
       "volume_multiplier remains empirical and is not the 1rad to 2pi conversion factor."
     ]
   },
+  "phase11_10h_non_pkn_diagnostic_runner_gate": {
+    "status": "PHASE11_10H_NON_PKN_DIAGNOSTIC_RUNNER_GATE_RECORDED",
+    "phase": "11.10H",
+    "track": "PENNY_SHAPED",
+    "decision": "NON_PKN_DIAGNOSTIC_RUNNER_SPEC_PARTIAL",
+    "adapter_available": true,
+    "writer_available": true,
+    "adapter_ready": false,
+    "partial_adapter_ready": true,
+    "runner_implementation_allowed_now": false,
+    "buz29_runtime_execution_allowed": false,
+    "lot_pkn_impact_allowed": false,
+    "physical_validation": false,
+    "physically_validated": false,
+    "legacy_equivalence": false,
+    "legacy_equivalent": false,
+    "official_lot_sim_route_allowed": false,
+    "tool": "tools/decide_phase11_10h_non_pkn_diagnostic_runner_gate.py",
+    "document": "docs/82_non_pkn_diagnostic_runner_gate.md",
+    "source_artifacts": [
+      "include/lot/PennyShapedDiagnosticAdapter.hpp",
+      "src/lot/PennyShapedDiagnosticAdapter.cpp",
+      "include/lot/PennyShapedDiagnosticWriter.hpp",
+      "src/lot/PennyShapedDiagnosticWriter.cpp",
+      "cases/validation/non_pkn/buz29_penny_candidate.yaml"
+    ],
+    "required_statuses": [
+      "NON_PKN_DIAGNOSTIC_RUNNER_SPEC_PARTIAL",
+      "RUNNER_IMPLEMENTATION_NOT_ALLOWED_IN_11_10H",
+      "BUZ29_RUNTIME_EXECUTION_NOT_ALLOWED",
+      "LOT_PKN_IMPACT_NOT_ALLOWED"
+    ],
+    "blocking_gaps": [
+      "BUZ29 candidate remains missing adapter-ready inputs",
+      "BUZ29 pressure/time/sigmaTheta semantics remain deferred for runtime execution"
+    ],
+    "recommended_next_phase": "PHASE11_10I_SPECIFY_NON_PKN_DIAGNOSTIC_RUNNER",
+    "caveats": [
+      "Phase 11.10H is a gate/specification phase only.",
+      "No non-PKN runner is implemented.",
+      "BUZ29-PENNY remains non-runtime and not physically validated.",
+      "The future runner must remain opt-in and outside lot-pkn."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

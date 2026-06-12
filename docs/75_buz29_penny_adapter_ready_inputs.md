@@ -196,3 +196,21 @@ equivalentes 2π apenas com `source`/caveat.
 - `sigmaTheta` BUZ29 segue ausente no output legado direto.
 - O volume proxy continua na convenção axissimétrica de 1 rad.
 - O candidato permanece fora do parser/schema/runtime oficial.
+
+## Resultado da Fase 11.10H
+
+A 11.10H manteve a classificação operacional do candidato como parcial no gate
+do runner não-PKN:
+
+```text
+decision = NON_PKN_DIAGNOSTIC_RUNNER_SPEC_PARTIAL
+adapter_ready = false
+partial_adapter_ready = true
+runner_implementation_allowed_now = false
+buz29_runtime_execution_allowed = false
+```
+
+O runner futuro pode ser especificado, mas não implementado nesta fase. A
+execução BUZ29-PENNY segue proibida até que os campos ausentes e as semânticas
+de pressão, tempo desde abertura e `sigmaTheta` sejam resolvidos por gate
+posterior.

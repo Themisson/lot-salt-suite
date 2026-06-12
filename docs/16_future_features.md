@@ -634,3 +634,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   com `source`, exige caveats diagnósticos e rejeita validação física,
   equivalência legada, caso ativo e `volume_multiplier` como `2π`. A fase não
   implementa runner, não executa BUZ29-PENNY e não altera `lot-pkn`.
+- A Fase 11.10H registra o gate para runner diagnóstico não-PKN e classifica a
+  rota como `NON_PKN_DIAGNOSTIC_RUNNER_SPEC_PARTIAL`. Adapter e writer existem,
+  mas BUZ29 continua parcial para execução: campos adapter-ready e semânticas
+  de pressão, tempo e `sigmaTheta` permanecem diferidos. A implementação de
+  runner, execução BUZ29-PENNY e qualquer impacto em `lot-pkn` continuam
+  proibidos nesta fase.
