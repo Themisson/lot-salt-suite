@@ -3618,6 +3618,32 @@
       "BUZ29-PENNY remains blocked."
     ]
   },
+  "phase11_11m_limited_gate_sigmatheta_source_plan": {
+    "status": "LIMITED_GATE_REMAINS_DIAGNOSTIC_SIGMATHETA_SOURCE_PLAN_RECORDED",
+    "phase": "11.11M",
+    "plan_status": "LIMITED_GATE_REMAINS_DIAGNOSTIC_SIGMATHETA_SOURCE_PLAN_RECORDED",
+    "implementation_performed": false,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "real_sigmatheta_source_status": "MISSING_RUNTIME_SOURCE",
+    "required_statuses": [
+      "LIMITED_GATE_REMAINS_DIAGNOSTIC_SIGMATHETA_SOURCE_PLAN_RECORDED",
+      "MISSING_RUNTIME_SIGMATHETA_INITIAL_SOURCE",
+      "MISSING_RUNTIME_SIGMATHETA_CURRENT_SOURCE",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PENNY_SHAPED_RUNTIME_NOT_ENABLED"
+    ],
+    "recommended_next_phase": "PHASE11_11N_IMPLEMENT_OR_CONNECT_SIGMATHETA_SOURCE",
+    "caveats": [
+      "No C++ implementation is performed in Phase 11.11M.",
+      "The limited gate remains diagnostic only.",
+      "Physical dispatch remains disabled.",
+      "PKN physical behavior remains unchanged."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

@@ -81,3 +81,21 @@ PHASE11_11M_KEEP_LIMITED_GATE_DIAGNOSTIC_AND_PLAN_SIGMATHETA_SOURCE
 A 11.11M deve seguir o caminho nao autorizado: nao implementar C++, manter o
 `limited_gate` diagnostico e registrar plano para obter/conectar a fonte real
 de sigma-theta.
+
+## Desfecho da 11.11M
+
+A Fase 11.11M seguiu o caminho conservador definido aqui e registrou:
+
+```text
+LIMITED_GATE_REMAINS_DIAGNOSTIC_SIGMATHETA_SOURCE_PLAN_RECORDED
+implementation_performed = false
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_changed = false
+```
+
+O plano versionado esta em:
+
+```text
+docs/113_limited_gate_remains_diagnostic_sigmatheta_source_plan.md
+```

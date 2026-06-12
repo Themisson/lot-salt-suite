@@ -903,3 +903,17 @@ LIMITED_GATE_NOT_READY_FOR_PHYSICAL_DISPATCH
 PENNY_SHAPED_RUNTIME_NOT_ENABLED
 BUZ29_EXECUTION_BLOCKED
 ```
+### Fase 11.11M — limited_gate permanece diagnostico
+
+A Fase 11.11M registrou o plano para completar a fonte real de sigma-theta sem
+habilitar runtime fisico nao PKN:
+
+```text
+LIMITED_GATE_REMAINS_DIAGNOSTIC_SIGMATHETA_SOURCE_PLAN_RECORDED
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+penny_shaped_runtime_enabled = false
+```
+
+O PENNY_SHAPED continua como contrato diagnostico. BUZ29-PENNY permanece
+bloqueado ate existir fonte runtime real de sigma-theta e novo gate explicito.

@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11L limited_gate real sigma-theta readiness decision
+Fase ativa  : 11.11M limited_gate sigma-theta source plan
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 373/373 em 2026-06-12
-Testes Py   : 898/898 em 2026-06-12
+Testes Py   : 908/908 em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,42 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.11M — limited_gate sigma-theta source plan — Codex
+
+**Status:** Implementado; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/plan_phase11_11m_sigmatheta_source_completion.py
+```
+
+**Documento criado:**
+
+```text
+docs/113_limited_gate_remains_diagnostic_sigmatheta_source_plan.md
+```
+
+**Status registrado:**
+
+```text
+LIMITED_GATE_REMAINS_DIAGNOSTIC_SIGMATHETA_SOURCE_PLAN_RECORDED
+implementation_performed = false
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_changed = false
+penny_shaped_runtime_enabled = false
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE11_11N_IMPLEMENT_OR_CONNECT_SIGMATHETA_SOURCE
+```
 
 ---
 

@@ -1038,3 +1038,29 @@ PKN_BEHAVIOR_NOT_CHANGED
 
 A próxima frente técnica deve especificar a fonte real de sigma_theta inicial
 pós-perfuração antes de qualquer tentativa de gate fisicamente alimentado.
+### Fase 11.11M — plano para completar fonte sigma-theta do limited_gate
+
+Status:
+
+```text
+LIMITED_GATE_REMAINS_DIAGNOSTIC_SIGMATHETA_SOURCE_PLAN_RECORDED
+```
+
+A fase registrou que o `limited_gate` permanece diagnostico enquanto nao houver
+fonte runtime real de sigma-theta inicial/current com semantica de pressao,
+convencao de sinal e referencial resolvidos.
+
+Proxima fase recomendada:
+
+```text
+PHASE11_11N_IMPLEMENT_OR_CONNECT_SIGMATHETA_SOURCE
+```
+
+Guardas preservados:
+
+```text
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_changed = false
+penny_shaped_runtime_enabled = false
+```
