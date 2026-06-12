@@ -681,3 +681,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `implementation_allowed_next = true`, mas `dispatch_allowed_next = false`:
   a próxima etapa pode implementar o guard de wiring, não executar BUZ29-PENNY
   nem liberar dispatch físico.
+- A Fase 11.10P implementa `SigmaThetaInitialStateGuard` como helper C++
+  isolado. O guard valida estado inicial, fonte, tempo, referencial, sinal e
+  compatibilidade pressão x sigma-theta, mas não é chamado pelo runtime. A
+  próxima fase planejada deve especificar a integração futura do guard ao
+  `fracture_initiation_gate` sem liberar BUZ29-PENNY.

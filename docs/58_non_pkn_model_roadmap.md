@@ -556,6 +556,24 @@ do poço após perfuração e antes do LOT, não um valor arbitrário de YAML.
 na próxima fase. `PENNY_SHAPED`, BUZ29-PENNY e dispatch físico continuam
 bloqueados.
 
+## Fase 11.10P — guard sigma-theta inicial isolado
+
+A Fase 11.10P implementa `SigmaThetaInitialStateGuard` como helper C++
+isolado. O status e `SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED`, mas o guard
+ainda nao e chamado pelo parser, schema, `PknModel`, `PknRunner` ou runtime.
+
+Status preservados:
+
+```text
+PARSER_SCHEMA_NOT_CHANGED
+RUNTIME_DISPATCH_NOT_CHANGED
+LOT_PKN_BEHAVIOR_NOT_CHANGED
+DISPATCH_REMAINS_BLOCKED
+```
+
+A proxima fase deve especificar o uso do guard pelo
+`fracture_initiation_gate`, sem executar BUZ29-PENNY.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

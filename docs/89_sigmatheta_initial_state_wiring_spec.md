@@ -192,3 +192,25 @@ FRACTURE_GATE_BLOCKED_UNTIL_SIGMATHETA_INITIALIZED
 PRESSURE_SIGMATHETA_COMPATIBILITY_REQUIRED
 DISPATCH_REMAINS_BLOCKED
 ```
+
+## Atualizacao 11.10P — guard implementado
+
+A Fase 11.10P implementa a parte permitida pela especificacao: um helper C++
+isolado para validar o estado inicial sigma-theta antes de qualquer futuro
+dispatch. O guard acumula motivos de bloqueio e so retorna
+`SIGMATHETA_INITIAL_STATE_READY` quando os campos obrigatorios estao presentes,
+finitos, positivos e semanticamente compativeis.
+
+Status da implementacao:
+
+```text
+PHASE11_10P_SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED
+SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED
+RUNTIME_DISPATCH_NOT_CHANGED
+PARSER_SCHEMA_NOT_CHANGED
+LOT_PKN_BEHAVIOR_NOT_CHANGED
+DISPATCH_REMAINS_BLOCKED
+```
+
+A fase nao conecta o helper ao `fracture_initiation_gate`, nao altera parser ou
+schema, nao executa BUZ29-PENNY e nao libera dispatch fisico.

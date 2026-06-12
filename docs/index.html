@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">148/155</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">306</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">620</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">149/156</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">321</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">631</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8313,7 +8313,12 @@ unidades reais usadas no <code>LOT_APB_v5</code> antes de aceitar nomes ou dimen
   <code>SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED</code>, com
   <code>implementation_allowed_next = true</code>, mas <code>dispatch_allowed_next = false</code>:
   a próxima etapa pode implementar o guard de wiring, não executar BUZ29-PENNY
-  nem liberar dispatch físico.</p>
+  nem liberar dispatch físico.
+- A Fase 11.10P implementa <code>SigmaThetaInitialStateGuard</code> como helper C++
+  isolado. O guard valida estado inicial, fonte, tempo, referencial, sinal e
+  compatibilidade pressão x sigma-theta, mas não é chamado pelo runtime. A
+  próxima fase planejada deve especificar a integração futura do guard ao
+  <code>fracture_initiation_gate</code> sem liberar BUZ29-PENNY.</p>
 </div>
 </section>
 

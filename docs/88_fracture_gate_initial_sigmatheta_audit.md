@@ -194,3 +194,20 @@ O contrato futuro exige que `sigma_theta_initial_compression_positive_Pa`
 represente o estado pós-perfuração e pré-LOT. A próxima fase permitida é
 implementar um guard de wiring; dispatch físico, runtime BUZ29-PENNY e
 equivalência legada continuam bloqueados.
+
+## Encaminhamento 11.10P
+
+A Fase 11.10P implementa o guard isolado
+`lot::SigmaThetaInitialStateGuard`, cobrindo as lacunas auditadas aqui:
+estado inicial ausente, valor nao finito ou nao positivo, fonte desconhecida,
+tempo de estado incorreto, referencial desconhecido, convencao de sinal
+desconhecida e incompatibilidade pressao x sigma-theta.
+
+O guard ainda nao e integrado ao runtime. Portanto, a conclusao da auditoria
+permanece operacionalmente bloqueante para dispatch fisico:
+
+```text
+SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED
+DISPATCH_REMAINS_BLOCKED
+BUZ29_RUNTIME_EXECUTION_NOT_ALLOWED
+```

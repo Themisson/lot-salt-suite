@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10O sigma-theta initial-state wiring specification
+Fase ativa  : 11.10P sigma-theta initial-state guard implementation
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : 306/306 esperados apos Fase 11.10M em 2026-06-12
-Testes Py   : 620/620 esperados apos Fase 11.10O em 2026-06-12
+Testes C++  : 321/321 esperados apos Fase 11.10P em 2026-06-12
+Testes Py   : 631/631 esperados apos Fase 11.10P em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,51 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10P — implementacao do guard sigma-theta inicial — Codex
+
+**Status:** Concluido; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Arquivos C++ criados:**
+
+```text
+include/lot/SigmaThetaInitialStateGuard.hpp
+src/lot/SigmaThetaInitialStateGuard.cpp
+tests/cpp/test_sigma_theta_initial_state_guard.cpp
+```
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase11_10p_sigmatheta_initial_state_guard.py
+```
+
+**Documento criado:**
+
+```text
+docs/90_sigmatheta_initial_state_guard_implementation.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10P_SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED
+SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED
+RUNTIME_DISPATCH_NOT_CHANGED
+PARSER_SCHEMA_NOT_CHANGED
+LOT_PKN_BEHAVIOR_NOT_CHANGED
+DISPATCH_REMAINS_BLOCKED
+```
+
+**Interpretação:** a fase implementa somente o helper isolado de validacao do
+estado inicial `sigma_theta_compression_positive_Pa`. O guard bloqueia
+sigma-theta ausente, invalido, fonte desconhecida, tempo incorreto,
+referencial desconhecido, sinal desconhecido e incompatibilidade pressao x
+sigma-theta. Ele ainda nao e integrado ao parser, schema, `PknModel`,
+`PknRunner`, CLI ou runtime; BUZ29-PENNY nao e executado.
 
 ---
 

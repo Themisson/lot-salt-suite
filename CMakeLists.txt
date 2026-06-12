@@ -118,6 +118,7 @@ set(LSS_CORE_SOURCES
   src/lot/PennyShapedModel.cpp
   src/lot/PknModel.cpp
   src/lot/PknRunner.cpp
+  src/lot/SigmaThetaInitialStateGuard.cpp
   src/lot/SigmaThetaProvider.cpp
   src/coupling/LotSaltBridgeConfigBuilder.cpp
   src/coupling/LotSaltCouplingConfigBuilder.cpp
@@ -192,6 +193,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_lot_salt_sigma_theta_driver.cpp
     tests/cpp/test_lot_pkn_salt_coupling_step.cpp
     tests/cpp/test_result_writer.cpp
+    tests/cpp/test_sigma_theta_initial_state_guard.cpp
     tests/cpp/test_salt_creep_adapter_config.cpp
     tests/cpp/test_salt_creep_adapter_state.cpp
     tests/cpp/test_salt_creep_interface.cpp

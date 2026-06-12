@@ -2859,6 +2859,40 @@
       "BUZ29-PENNY is not executed."
     ]
   },
+  "phase11_10p_sigmatheta_initial_state_guard": {
+    "status": "PHASE11_10P_SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED",
+    "phase": "11.10P",
+    "implementation_status": "SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED",
+    "preferred_source": "ELASTIC_INITIAL_WELLBORE_STATE",
+    "dispatch_allowed_next": false,
+    "runtime_execution_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "parser_schema_changed": false,
+    "runtime_dispatch_changed": false,
+    "lot_pkn_behavior_changed": false,
+    "source_files": [
+      "include/lot/SigmaThetaInitialStateGuard.hpp",
+      "src/lot/SigmaThetaInitialStateGuard.cpp",
+      "tests/cpp/test_sigma_theta_initial_state_guard.cpp"
+    ],
+    "required_statuses": [
+      "PHASE11_10P_SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED",
+      "SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED",
+      "FRACTURE_GATE_BLOCKED_MISSING_INITIAL_SIGMATHETA",
+      "FRACTURE_GATE_BLOCKED_INVALID_INITIAL_SIGMATHETA",
+      "FRACTURE_GATE_BLOCKED_PRESSURE_SIGMATHETA_MISMATCH",
+      "RUNTIME_DISPATCH_NOT_CHANGED",
+      "PARSER_SCHEMA_NOT_CHANGED",
+      "LOT_PKN_BEHAVIOR_NOT_CHANGED"
+    ],
+    "recommended_next_phase": "PHASE11_10Q_SPECIFY_FRACTURE_GATE_DISPATCH_WITH_SIGMATHETA_GUARD",
+    "caveats": [
+      "The guard is implemented as an isolated C++ helper.",
+      "The guard is not integrated into parser, schema, CLI or runtime dispatch.",
+      "BUZ29-PENNY is not executed.",
+      "No physical validation or legacy equivalence is claimed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
