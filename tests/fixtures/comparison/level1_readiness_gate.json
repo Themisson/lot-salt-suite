@@ -2355,6 +2355,45 @@
       "No legacy, legance or external/saltcreep code is modified by this audit."
     ]
   },
+  "phase11_10f_penny_diagnostic_writer_spec": {
+    "status": "PHASE11_10F_PENNY_DIAGNOSTIC_WRITER_SPECIFIED",
+    "phase": "11.10F",
+    "track": "PENNY_SHAPED",
+    "writer_spec_status": "PENNY_DIAGNOSTIC_WRITER_SPECIFIED",
+    "implementation_allowed": false,
+    "runtime_execution_allowed": false,
+    "requires_cpp_implementation_future": true,
+    "fixture_contract_valid": true,
+    "physical_validation": false,
+    "physically_validated": false,
+    "legacy_equivalence": false,
+    "legacy_equivalent": false,
+    "active_simulation_case": false,
+    "diagnostic_only": true,
+    "tool": "tools/spec_phase11_10f_penny_diagnostic_writer.py",
+    "document": "docs/80_penny_diagnostic_writer_spec.md",
+    "source_contract": "docs/77_axisymmetric_1rad_2pi_output_contract.md",
+    "source_fixtures": [
+      "tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_expected.json",
+      "tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_expected.csv",
+      "tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_metadata.json"
+    ],
+    "required_statuses": [
+      "PENNY_DIAGNOSTIC_WRITER_SPECIFIED",
+      "IMPLEMENTATION_NOT_ALLOWED_IN_11_10F",
+      "RUNTIME_EXECUTION_NOT_ALLOWED_IN_11_10F",
+      "VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI",
+      "AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_READY_FOR_WRITER_IMPLEMENTATION",
+      "FIXTURES_READY_FOR_WRITER_IMPLEMENTATION"
+    ],
+    "recommended_next_phase": "PHASE11_10G_IMPLEMENT_PENNY_DIAGNOSTIC_WRITER_OPT_IN",
+    "caveats": [
+      "Phase 11.10F specifies the writer only; it does not implement C++.",
+      "The future writer must remain opt-in and outside lot-pkn default runtime.",
+      "volume_multiplier remains empirical and must not be reused as 2pi.",
+      "The specification does not validate BUZ29-PENNY physically and does not declare legacy equivalence."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

@@ -223,3 +223,17 @@ AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_MATERIALIZED_AS_FIXTURE
 
 O resultado ainda é fixture-only. Não há writer runtime, não há execução
 BUZ29-PENNY e `volume_multiplier` continua separado do fator geométrico `2π`.
+
+## Resultado da Fase 11.10F
+
+A Fase 11.10F especificou como um writer diagnóstico PennyShaped futuro deverá
+materializar o contrato 1 rad ↔ 2π em JSON/CSV, mantendo:
+
+```text
+PENNY_DIAGNOSTIC_WRITER_SPECIFIED
+IMPLEMENTATION_NOT_ALLOWED_IN_11_10F
+RUNTIME_EXECUTION_NOT_ALLOWED_IN_11_10F
+```
+
+Essa especificação não altera a conclusão matemática desta auditoria: o núcleo
+continua diagnóstico, não fisicamente validado e não equivalente ao legado.

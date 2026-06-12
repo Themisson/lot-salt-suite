@@ -130,3 +130,18 @@ Os fixtures vivem em `tests/fixtures/comparison/phase11_10e/` e são validados
 por `tools/validate_phase11_10e_penny_output_fixtures.py`. Eles não representam
 execução BUZ29-PENNY nem writer C++ real; apenas fixam o contrato esperado para
 uma futura implementação opt-in.
+
+## Resultado da Fase 11.10F
+
+A 11.10F especificou o writer diagnóstico PennyShaped futuro, ainda sem alterar
+o adapter:
+
+```text
+PENNY_DIAGNOSTIC_WRITER_SPECIFIED
+IMPLEMENTATION_NOT_ALLOWED_IN_11_10F
+RUNTIME_EXECUTION_NOT_ALLOWED_IN_11_10F
+```
+
+O writer futuro deve ser opt-in, emitir JSON/CSV compatíveis com as fixtures
+11.10E e preservar `volume_multiplier` como empírico, separado da conversão
+geométrica `1rad -> 2pi`.

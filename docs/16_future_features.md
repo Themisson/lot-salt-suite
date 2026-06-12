@@ -620,3 +620,11 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   gerar `NaN`, e a referência legada deve permanecer acoplada ao `APB1da`.
   Comparações de deslocamento total legado versus deslocamento perturbacional
   moderno ficam bloqueadas até alinhamento de referencial.
+- A Fase 11.10F especifica, sem implementar, o writer diagnóstico
+  PennyShaped opt-in. O status é `PENNY_DIAGNOSTIC_WRITER_SPECIFIED`, com
+  `IMPLEMENTATION_NOT_ALLOWED_IN_11_10F` e
+  `RUNTIME_EXECUTION_NOT_ALLOWED_IN_11_10F`. A especificação preserva o
+  contrato 1 rad ↔ 2π da 11.10D, as fixtures da 11.10E, caveats obrigatórios e
+  a separação entre `volume_multiplier` empírico e fator geométrico `2π`. A
+  próxima fase provável é
+  `PHASE11_10G_IMPLEMENT_PENNY_DIAGNOSTIC_WRITER_OPT_IN`.

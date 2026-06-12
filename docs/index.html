@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">138/145</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">139/146</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">273</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">494</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">511</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8252,7 +8252,15 @@ unidades reais usadas no <code>LOT_APB_v5</code> antes de aceitar nomes ou dimen
   função de fluência normaliza por <code>norm_sigd</code>, o estado hidrostático puro pode
   gerar <code>NaN</code>, e a referência legada deve permanecer acoplada ao <code>APB1da</code>.
   Comparações de deslocamento total legado versus deslocamento perturbacional
-  moderno ficam bloqueadas até alinhamento de referencial.</p>
+  moderno ficam bloqueadas até alinhamento de referencial.
+- A Fase 11.10F especifica, sem implementar, o writer diagnóstico
+  PennyShaped opt-in. O status é <code>PENNY_DIAGNOSTIC_WRITER_SPECIFIED</code>, com
+  <code>IMPLEMENTATION_NOT_ALLOWED_IN_11_10F</code> e
+  <code>RUNTIME_EXECUTION_NOT_ALLOWED_IN_11_10F</code>. A especificação preserva o
+  contrato 1 rad ↔ 2π da 11.10D, as fixtures da 11.10E, caveats obrigatórios e
+  a separação entre <code>volume_multiplier</code> empírico e fator geométrico <code>2π</code>. A
+  próxima fase provável é
+  <code>PHASE11_10G_IMPLEMENT_PENNY_DIAGNOSTIC_WRITER_OPT_IN</code>.</p>
 </div>
 </section>
 

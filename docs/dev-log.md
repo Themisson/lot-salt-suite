@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10F-aux legacy SESTSAL standalone constraint
+Fase ativa  : 11.10F PennyShaped diagnostic writer specification
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 273/273 passaram apos Fase 11.10A em 2026-06-12
-Testes Py   : 494/494 esperados apos Fase 11.10F-aux em 2026-06-12
+Testes Py   : 511/511 esperados apos Fase 11.10F em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,42 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10F — especificação do writer diagnóstico PennyShaped — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/spec_phase11_10f_penny_diagnostic_writer.py
+```
+
+**Documento criado:**
+
+```text
+docs/80_penny_diagnostic_writer_spec.md
+```
+
+**Resultado:**
+
+```text
+writer_spec_status = PENNY_DIAGNOSTIC_WRITER_SPECIFIED
+implementation_allowed = false
+runtime_execution_allowed = false
+requires_cpp_implementation_future = true
+fixture_contract_valid = true
+recommended_next_phase = PHASE11_10G_IMPLEMENT_PENNY_DIAGNOSTIC_WRITER_OPT_IN
+```
+
+**Interpretação:** a fase especifica o writer diagnóstico PennyShaped futuro,
+mas não implementa C++, não executa BUZ29-PENNY, não altera `lot-pkn`, não
+declara validação física e não declara equivalência com legado. A especificação
+preserva as grandezas internas em 1 rad, equivalentes 2π com `source` e o
+`volume_multiplier` como empírico, não como fator geométrico `2π`.
 
 ---
 

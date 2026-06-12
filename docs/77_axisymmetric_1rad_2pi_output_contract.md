@@ -254,3 +254,19 @@ Esses fixtures preservam o campo interno `fracture_volume_proxy_1rad_m3`,
 reportam um equivalente `2π` separado com `source` e mantêm `volume_multiplier`
 como empírico, não como conversão geométrica. A fase não implementa writer e
 não valida BUZ29-PENNY.
+
+## Resultado da Fase 11.10F
+
+A Fase 11.10F especificou o writer diagnóstico futuro que deverá consumir este
+contrato em uma implementação opt-in:
+
+```text
+PENNY_DIAGNOSTIC_WRITER_SPECIFIED
+AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_READY_FOR_WRITER_IMPLEMENTATION
+FIXTURES_READY_FOR_WRITER_IMPLEMENTATION
+IMPLEMENTATION_NOT_ALLOWED_IN_11_10F
+```
+
+A especificação exige que o writer preserve simultaneamente os campos de origem
+em 1 rad e os equivalentes 2π com `source`. O campo `volume_multiplier` continua
+empírico e fora da conversão geométrica.

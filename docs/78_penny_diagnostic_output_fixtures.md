@@ -126,3 +126,22 @@ A próxima fase pode especificar como um writer diagnóstico opt-in consumiria
 esse contrato. A implementação ainda deve permanecer separada do fluxo LOT/PKN
 padrão e preservar as flags de diagnóstico até existir validação física
 dedicada.
+
+## Resultado da Fase 11.10F
+
+A Fase 11.10F consumiu estas fixtures como contrato de entrada para a
+especificação do writer futuro:
+
+```text
+PENNY_DIAGNOSTIC_WRITER_SPECIFIED
+FIXTURES_READY_FOR_WRITER_IMPLEMENTATION
+IMPLEMENTATION_NOT_ALLOWED_IN_11_10F
+RUNTIME_EXECUTION_NOT_ALLOWED_IN_11_10F
+```
+
+A especificação resultante está em
+`docs/80_penny_diagnostic_writer_spec.md` e define a próxima etapa provável:
+
+```text
+PHASE11_10G_IMPLEMENT_PENNY_DIAGNOSTIC_WRITER_OPT_IN
+```

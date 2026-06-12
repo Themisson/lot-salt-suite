@@ -386,6 +386,22 @@ produzir `NaN` ao normalizar por `norm_sigd`. O uso legado esperado continua
 acoplado a `APB1da`; comparações de deslocamento total legado contra
 perturbação moderna ficam bloqueadas sem alinhamento explícito.
 
+## Fase 11.10F — especificação do writer diagnóstico PennyShaped
+
+A Fase 11.10F especifica o writer diagnóstico PennyShaped futuro sem
+implementar C++ ou runtime:
+
+```text
+PENNY_DIAGNOSTIC_WRITER_SPECIFIED
+IMPLEMENTATION_NOT_ALLOWED_IN_11_10F
+RUNTIME_EXECUTION_NOT_ALLOWED_IN_11_10F
+```
+
+O writer futuro deve consumir uma entrada diagnóstica estruturada, emitir JSON e
+CSV compatíveis com as fixtures 11.10E, preservar grandezas internas em 1 rad e
+reportar equivalentes 2π apenas com `source`/caveat. A rota permanece
+diagnóstica, não ativa e não equivalente ao legado.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.
