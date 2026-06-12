@@ -6238,3 +6238,29 @@ abertura e estado APB/sal ainda não estão consumíveis para o
 **Gate:** `PHASE11_9D_UPDATE_BUZ29_PENNY_READINESS`.
 
 `PHASE11_10A` não foi executada nesta fase.
+
+---
+
+### [2026-06-12] Fase 11.9D — Atualização de readiness BUZ29 PennyShaped — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Readiness anterior:** `BUZ29_PENNY_CANDIDATE_PARTIAL`.
+
+**Evidência 11.9C:** `BUZ29_PENNY_EVIDENCE_PARTIAL`.
+
+**Readiness atualizado:** `BUZ29_PENNY_CANDIDATE_PARTIAL`.
+
+**Gate:** `BUZ29_PENNY_PARTIAL_DO_NOT_START_11_10A`.
+
+**can_start_11_10A:** `false`.
+
+**Entregáveis:**
+- `tools/update_phase11_9d_buz29_penny_readiness.py`
+- `tests/python/test_update_phase11_9d_buz29_penny_readiness.py`
+- `docs/71_buz29_penny_readiness_update.md`
+
+**Próxima fase recomendada:**
+`PHASE11_9E_COMPLETE_BUZ29_PRESSURE_AND_OPENING_EVIDENCE`.
+
+`PHASE11_10A` permanece bloqueada.

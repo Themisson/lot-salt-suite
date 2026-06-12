@@ -2015,6 +2015,35 @@
       "Phase 11.10A remains blocked until Phase 11.9D explicitly opens the gate."
     ]
   },
+  "phase11_9d_buz29_penny_readiness_update": {
+    "status": "BUZ29_PENNY_CANDIDATE_PARTIAL",
+    "phase": "11.9D",
+    "track": "PENNY_SHAPED",
+    "previous_readiness": "BUZ29_PENNY_CANDIDATE_PARTIAL",
+    "evidence_classification": "BUZ29_PENNY_EVIDENCE_PARTIAL",
+    "updated_readiness": "BUZ29_PENNY_CANDIDATE_PARTIAL",
+    "can_start_11_10A": false,
+    "gate": "BUZ29_PENNY_PARTIAL_DO_NOT_START_11_10A",
+    "tool": "tools/update_phase11_9d_buz29_penny_readiness.py",
+    "document": "docs/71_buz29_penny_readiness_update.md",
+    "recommended_next_phase": "PHASE11_9E_COMPLETE_BUZ29_PRESSURE_AND_OPENING_EVIDENCE",
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_yaml_created": false,
+    "blocking_gaps": [
+      "opening_time",
+      "penny_inputs",
+      "pressure_history",
+      "sigmaTheta_history",
+      "time_since_opening"
+    ],
+    "caveats": [
+      "The readiness update does not validate BUZ29.",
+      "Phase 11.10A remains blocked because pressure history and opening time are not consumable.",
+      "No BUZ29 candidate YAML is created by Phase 11.9D."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

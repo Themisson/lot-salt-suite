@@ -205,6 +205,19 @@ Foram encontrados indícios documentais e fonte legada para o caso
 para o `PennyShapedDiagnosticAdapter`. A 11.10A continua bloqueada até a
 atualização formal de readiness da 11.9D.
 
+## Fase 11.9D — atualização de readiness BUZ29 PennyShaped
+
+A Fase 11.9D mantém o gate da rota diagnóstica fechado:
+
+```text
+updated_readiness = BUZ29_PENNY_CANDIDATE_PARTIAL
+gate = BUZ29_PENNY_PARTIAL_DO_NOT_START_11_10A
+can_start_11_10A = false
+```
+
+A próxima etapa segura é completar evidência de pressão e abertura antes de
+qualquer YAML candidato BUZ29-PENNY.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

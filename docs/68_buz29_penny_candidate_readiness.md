@@ -66,6 +66,21 @@ O mapa de evidências registrou pressão como `PARTIAL`, `sigmaTheta` como
 `MISSING` e estado APB/sal como `PARTIAL`. Nenhum desses campos críticos ficou
 consumível para o adapter nesta fase.
 
+## Phase 11.9D readiness update
+
+A Fase 11.9D consumiu o mapa da 11.9C e manteve o gate fechado:
+
+```text
+updated_readiness = BUZ29_PENNY_CANDIDATE_PARTIAL
+can_start_11_10A = false
+gate = BUZ29_PENNY_PARTIAL_DO_NOT_START_11_10A
+recommended_next_phase = PHASE11_9E_COMPLETE_BUZ29_PRESSURE_AND_OPENING_EVIDENCE
+```
+
+O status não foi promovido para rota diagnóstica segura porque pressão,
+`sigmaTheta`, tempo de abertura, tempo desde abertura e inputs BUZ29 do adapter
+seguem não consumíveis.
+
 ## Caveats
 
 - Esta fase não cria YAML BUZ29.

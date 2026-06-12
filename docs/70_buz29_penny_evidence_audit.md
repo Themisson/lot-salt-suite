@@ -97,3 +97,16 @@ A evidência permite atualizar o readiness na 11.9D, mas não permite iniciar a
 
 A 11.9D deve consumir este mapa de evidência e manter o gate da 11.10A fechado,
 a menos que uma regra explícita de diagnóstico parcial seguro seja satisfeita.
+
+## Atualização 11.9D
+
+A Fase 11.9D consumiu este mapa e registrou:
+
+```text
+updated_readiness = BUZ29_PENNY_CANDIDATE_PARTIAL
+gate = BUZ29_PENNY_PARTIAL_DO_NOT_START_11_10A
+can_start_11_10A = false
+```
+
+Como `pressure_history`, `opening_time` e `penny_inputs` não estão consumíveis,
+a rota 11.10A permanece bloqueada.

@@ -567,3 +567,6 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   há fonte legada e indícios documentais, mas pressão, `sigmaTheta`, tempo de
   abertura, tempo desde abertura e estado APB/sal ainda não formam contrato
   consumível para iniciar a rota BUZ29-PENNY.
+- A Fase 11.9D atualiza formalmente o readiness com base na 11.9C e mantém
+  `can_start_11_10A = false`. A próxima evolução deve completar evidência de
+  pressão e abertura antes de qualquer YAML candidato BUZ29-PENNY.
