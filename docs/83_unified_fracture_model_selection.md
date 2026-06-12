@@ -302,3 +302,15 @@ com valores canônicos `PKN` e `PENNY_SHAPED`; aliases permanecem limitados ao
 helper/testes até decisão contrária. A integração parser/schema pode ser
 implementada na próxima fase, mas execução runtime não-PKN e BUZ29-PENNY
 continuam bloqueadas.
+
+## Atualização 11.10M — parser/schema integrados
+
+A Fase 11.10M integra `lot.fracture.fracture_model` ao schema e ao parser. A
+seleção agora é persistida em `CaseData`, mas continua sem dispatch runtime.
+Campo ausente seleciona `PKN` por default; `PENNY_SHAPED` explícito fica
+registrado como diagnóstico, não validado fisicamente e não equivalente ao
+legado.
+
+O próximo bloqueio técnico não é sintático: antes de executar qualquer dispatch
+real, é necessário auditar o estado inicial de `sigma_theta` pós-perfuração por
+meio do gate `SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH`.

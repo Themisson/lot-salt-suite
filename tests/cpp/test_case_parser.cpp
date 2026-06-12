@@ -108,6 +108,28 @@ std::string read_text_file(const std::filesystem::path& path) {
           std::istreambuf_iterator<char>()};
 }
 
+std::filesystem::path write_pkn_case_with_fracture_model(
+    const std::string& value, const std::string& suffix) {
+  auto yaml = read_text_file(kPknMinimalCasePath);
+  const std::string geometry_line = "    geometry: pkn\n";
+  const auto pos = yaml.find(geometry_line);
+  REQUIRE(pos != std::string::npos);
+  yaml.insert(pos + geometry_line.size(), "    fracture_model: " + value + "\n");
+
+  return write_temp_case("lss_fracture_model_" + suffix + ".yaml", yaml);
+}
+
+void require_parse_error_contains(const std::filesystem::path& path,
+                                  const std::string& expected_message) {
+  try {
+    (void)lss::io::parse_yaml(path);
+    FAIL("Expected parse error");
+  } catch (const std::exception& error) {
+    CHECK(std::string(error.what()).find(expected_message) !=
+          std::string::npos);
+  }
+}
+
 }  // namespace
 
 TEST_CASE("Minimal LOT validation case loads") {
@@ -242,6 +264,14 @@ TEST_CASE("Minimal LOT PKN contract loads and converts schedule to SI") {
   CHECK(data.lot.enabled);
   CHECK(data.lot.model == "pkn");
   CHECK(data.lot.fracture_geometry == "pkn");
+  CHECK(data.lot.fracture_model == "PKN");
+  CHECK(data.lot.fracture_model_selection_source == "DEFAULTED");
+  CHECK(data.lot.fracture_model_route == "lot-pkn");
+  CHECK_FALSE(data.lot.fracture_model_diagnostic_only);
+  CHECK_FALSE(data.lot.fracture_model_runtime_dispatch_enabled);
+  CHECK(data.lot.fracture_model_runtime_supported_now);
+  CHECK(data.lot.fracture_model_requires_fracture_initiation_gate);
+  CHECK(data.lot.fracture_model_sigma_theta_initial_state_audit_required);
   CHECK(data.lot.injection_rate_m3_s == Catch::Approx(0.0005));
   CHECK(data.lot.injection_total_time_s == Catch::Approx(600.0));
   CHECK(data.lot.injection_dt_s == Catch::Approx(30.0));
@@ -249,6 +279,64 @@ TEST_CASE("Minimal LOT PKN contract loads and converts schedule to SI") {
   CHECK(data.lot.fracture_fluid_viscosity_Pa_s == Catch::Approx(0.003));
   CHECK(data.lot.breakdown_pressure_Pa == Catch::Approx(45000000.0));
   CHECK(data.lot.detection_method == "derivative_drop");
+}
+
+TEST_CASE("CaseParser accepts explicit PKN fracture_model") {
+  const auto path = write_pkn_case_with_fracture_model("PKN", "explicit_pkn");
+  const auto data = lss::io::parse_yaml(path);
+
+  CHECK(data.lot.fracture_model == "PKN");
+  CHECK(data.lot.fracture_model_selection_source == "EXPLICIT");
+  CHECK(data.lot.fracture_model_route == "lot-pkn");
+  CHECK_FALSE(data.lot.fracture_model_diagnostic_only);
+  CHECK_FALSE(data.lot.fracture_model_runtime_dispatch_enabled);
+  CHECK(data.lot.fracture_model_runtime_supported_now);
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser accepts explicit PENNY_SHAPED fracture_model as diagnostic metadata") {
+  const auto path =
+      write_pkn_case_with_fracture_model("PENNY_SHAPED", "explicit_penny");
+  const auto data = lss::io::parse_yaml(path);
+
+  CHECK(data.lot.fracture_model == "PENNY_SHAPED");
+  CHECK(data.lot.fracture_model_selection_source == "EXPLICIT");
+  CHECK(data.lot.fracture_model_route == "unified_lot_fracture_runtime");
+  CHECK(data.lot.fracture_model_diagnostic_only);
+  CHECK_FALSE(data.lot.fracture_model_physically_validated);
+  CHECK_FALSE(data.lot.fracture_model_legacy_equivalent);
+  CHECK_FALSE(data.lot.fracture_model_runtime_supported_now);
+  CHECK_FALSE(data.lot.fracture_model_runtime_dispatch_enabled);
+  CHECK(data.lot.fracture_model_requires_fracture_initiation_gate);
+  CHECK(data.lot.fracture_model_sigma_theta_initial_state_audit_required);
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects explicit empty fracture_model") {
+  const auto path = write_pkn_case_with_fracture_model("\"\"", "empty");
+
+  require_parse_error_contains(path,
+                               "EXPLICIT_EMPTY_FRACTURE_MODEL_NOT_ALLOWED");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects unsupported KGD fracture_model") {
+  const auto path = write_pkn_case_with_fracture_model("KGD", "kgd");
+
+  require_parse_error_contains(path, "UNSUPPORTED_FRACTURE_MODEL");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects unsupported RADIAL fracture_model") {
+  const auto path = write_pkn_case_with_fracture_model("RADIAL", "radial");
+
+  require_parse_error_contains(path, "UNSUPPORTED_FRACTURE_MODEL");
+
+  std::filesystem::remove(path);
 }
 
 TEST_CASE("LOT PKN contract without breakdown pressure keeps fracture start disabled") {

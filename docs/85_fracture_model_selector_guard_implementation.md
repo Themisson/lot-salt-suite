@@ -190,3 +190,20 @@ A Fase 11.10L especifica essa integração futura sem implementá-la. A polític
 recomendada é `SCHEMA_STRICT_CANONICAL_ONLY`, com `PKN` e `PENNY_SHAPED` como
 valores canônicos, ausência do campo defaultando para PKN no parser, valor
 vazio explícito como erro e runtime BUZ29-PENNY ainda bloqueado.
+
+## Integração parser/schema 11.10M
+
+A Fase 11.10M conecta este helper ao `CaseParser` e ao schema YAML. A seleção
+passa a ser armazenada em `CaseData` como metadado:
+
+```text
+fracture_model
+fracture_model_selection_source
+fracture_model_runtime_dispatch_enabled = false
+fracture_model_sigma_theta_initial_state_audit_required = true
+```
+
+`PENNY_SHAPED` explícito é aceito como opt-in diagnóstico, com
+`physically_validated = false`, `legacy_equivalent = false` e
+`runtime_supported_now = false`. A integração não altera `PknRunner`,
+`PknModel`, CLI ou o comportamento de `lot-pkn`.

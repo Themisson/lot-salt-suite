@@ -227,6 +227,9 @@ properties:
           geometry:
             type: string
             enum: [circular, elliptical, penny_shaped, pkn]
+          fracture_model:
+            type: string
+            enum: [PKN, PENNY_SHAPED]
           fluid_viscosity_cP: {type: number}
           height:
             $ref: "#/$defs/length_quantity"

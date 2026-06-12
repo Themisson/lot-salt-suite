@@ -661,3 +661,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   política recomendada é `SCHEMA_STRICT_CANONICAL_ONLY`, com `PKN` e
   `PENNY_SHAPED` como valores canônicos, ausência do campo defaultando para
   PKN, valor vazio explícito como erro e execução BUZ29-PENNY ainda bloqueada.
+- A Fase 11.10M integra `lot.fracture.fracture_model` ao parser/schema com
+  default retrocompatível `PKN`. `PENNY_SHAPED` explícito é aceito somente
+  como metadado diagnóstico; `runtime_dispatch_enabled` permanece falso,
+  BUZ29-PENNY não é executado e o próximo gate obrigatório é
+  `SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH`.

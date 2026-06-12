@@ -190,3 +190,16 @@ lot_pkn_behavior_change_allowed = false
 ```text
 PHASE11_10M_INTEGRATE_FRACTURE_MODEL_IN_PARSER_SCHEMA
 ```
+
+## Implementação 11.10M
+
+A Fase 11.10M implementa esta especificação no parser/schema. O campo
+`lot.fracture.fracture_model` passa a ser aceito pelo schema com valores
+canônicos `PKN` e `PENNY_SHAPED`, e o parser usa `FractureModelSelector` para
+defaultar campo ausente para `PKN`, aceitar `PKN` explícito, aceitar
+`PENNY_SHAPED` como metadado diagnóstico e rejeitar vazio explícito/modelos não
+suportados.
+
+O runtime dispatch permanece desabilitado. Antes de qualquer dispatch físico,
+fica registrado o gate
+`SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH`.

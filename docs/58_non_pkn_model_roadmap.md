@@ -503,6 +503,19 @@ ausência do campo preserva PKN, valor vazio explícito é erro e modelos não
 suportados seguem bloqueados. A fase não altera parser, schema, runtime ou
 casos.
 
+## Fase 11.10M — integração parser/schema
+
+A Fase 11.10M integra `lot.fracture.fracture_model` no parser/schema com
+default retrocompatível `PKN`. `PENNY_SHAPED` explícito é aceito como seleção
+diagnóstica, com `runtime_dispatch_enabled = false`, `physically_validated =
+false` e `legacy_equivalent = false`. Modelos não suportados, como `KGD` e
+`RADIAL`, são rejeitados.
+
+Essa fase ainda não torna BUZ29-PENNY executável. O próximo gate é
+`SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH`, porque o critério de
+fratura não deve ser avaliado antes de auditar o estado geomecânico inicial
+pós-perfuração.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

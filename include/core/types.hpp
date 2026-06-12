@@ -158,6 +158,16 @@ struct LotConfig {
   double shoe_depth_m = 0.0;
   std::string model;
   std::string fracture_geometry;
+  std::string fracture_model = "PKN";
+  std::string fracture_model_selection_source = "DEFAULTED";
+  std::string fracture_model_route = "lot-pkn";
+  bool fracture_model_diagnostic_only = false;
+  bool fracture_model_physically_validated = false;
+  bool fracture_model_legacy_equivalent = false;
+  bool fracture_model_runtime_supported_now = true;
+  bool fracture_model_requires_fracture_initiation_gate = true;
+  bool fracture_model_runtime_dispatch_enabled = false;
+  bool fracture_model_sigma_theta_initial_state_audit_required = true;
   double fracture_fluid_viscosity_cP = 0.0;
   double fracture_fluid_viscosity_Pa_s = 0.0;
   double injection_rate_m3_s = 0.0;

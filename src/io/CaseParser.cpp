@@ -7,6 +7,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "lot/FractureModelSelector.hpp"
 #include "units/units.hpp"
 
 namespace {
@@ -57,6 +58,34 @@ lss::core::TimeConfig::Scheme parse_time_scheme(const std::string& scheme) {
     return lss::core::TimeConfig::Scheme::ImplicitAdaptive;
   }
   throw std::runtime_error("time.scheme invalido: " + scheme);
+}
+
+std::string fracture_model_source_text(
+    lss::lot::FractureModelSelectionSource source) {
+  switch (source) {
+    case lss::lot::FractureModelSelectionSource::Defaulted:
+      return "DEFAULTED";
+    case lss::lot::FractureModelSelectionSource::Explicit:
+      return "EXPLICIT";
+  }
+  throw std::runtime_error("FractureModelSelector: fonte de selecao invalida");
+}
+
+void apply_fracture_model_selection(
+    const lss::lot::FractureModelSelectionResult& selection,
+    lss::core::LotConfig& lot) {
+  lot.fracture_model = selection.canonical_name;
+  lot.fracture_model_selection_source =
+      fracture_model_source_text(selection.source);
+  lot.fracture_model_route = selection.route;
+  lot.fracture_model_diagnostic_only = selection.diagnostic_only;
+  lot.fracture_model_physically_validated = selection.physically_validated;
+  lot.fracture_model_legacy_equivalent = selection.legacy_equivalent;
+  lot.fracture_model_runtime_supported_now = selection.runtime_supported_now;
+  lot.fracture_model_requires_fracture_initiation_gate =
+      selection.requires_fracture_initiation_gate;
+  lot.fracture_model_runtime_dispatch_enabled = false;
+  lot.fracture_model_sigma_theta_initial_state_audit_required = true;
 }
 
 double parse_viscosity_Pa_s(const YAML::Node& node, const std::string& path) {
@@ -344,6 +373,16 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
   const YAML::Node fracture = require_node(lot["fracture"], "lot.fracture");
   data.lot.fracture_geometry =
       require_as<std::string>(fracture["geometry"], "lot.fracture.geometry");
+  lss::lot::FractureModelSelectionInput fracture_model_input;
+  fracture_model_input.has_fracture_model_field =
+      static_cast<bool>(fracture["fracture_model"]);
+  if (fracture_model_input.has_fracture_model_field) {
+    fracture_model_input.fracture_model_value =
+        require_as<std::string>(fracture["fracture_model"],
+                                "lot.fracture.fracture_model");
+  }
+  apply_fracture_model_selection(
+      lss::lot::select_fracture_model(fracture_model_input), data.lot);
   if (data.lot.model.empty()) {
     data.lot.model = data.lot.fracture_geometry;
   }

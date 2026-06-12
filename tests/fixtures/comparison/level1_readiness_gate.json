@@ -2727,6 +2727,53 @@
       "PENNY_SHAPED remains diagnostic, not physically validated and not legacy-equivalent."
     ]
   },
+  "phase11_10m_fracture_model_parser_schema_integration": {
+    "status": "PHASE11_10M_FRACTURE_MODEL_PARSER_SCHEMA_INTEGRATED",
+    "phase": "11.10M",
+    "integration_status": "FRACTURE_MODEL_PARSER_SCHEMA_INTEGRATED",
+    "field": "lot.fracture.fracture_model",
+    "schema_policy": "SCHEMA_STRICT_CANONICAL_ONLY",
+    "default_fracture_model": "PKN",
+    "missing_field_behavior": "DEFAULT_TO_PKN",
+    "explicit_empty_behavior": "ERROR_EXPLICIT_EMPTY_FRACTURE_MODEL_NOT_ALLOWED",
+    "unsupported_model_behavior": "ERROR_UNSUPPORTED_FRACTURE_MODEL",
+    "allowed_canonical_values": [
+      "PKN",
+      "PENNY_SHAPED"
+    ],
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "sigma_theta_initial_state_audit_required": true,
+    "lot_pkn_behavior_changed": false,
+    "tool": "tools/audit_phase11_10m_fracture_model_parser_schema_integration.py",
+    "document": "docs/87_fracture_model_parser_schema_integration.md",
+    "parser_schema_updates": {
+      "parser": "src/io/CaseParser.cpp",
+      "schema": "schemas/lot_case.schema.yaml",
+      "case_data": "include/core/types.hpp::LotConfig",
+      "tests": "tests/cpp/test_case_parser.cpp"
+    },
+    "future_gate": {
+      "cause": "FRACTURE_GATE_MAY_BE_EVALUATED_BEFORE_INITIAL_STRESS_STATE",
+      "gate": "SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH",
+      "secondary_cause": "POSSIBLE_PRESSURE_SIGMATHETA_REFERENCE_MISMATCH",
+      "secondary_gate": "ALIGN_PRESSURE_AND_SIGMATHETA_SEMANTICS_BEFORE_FRACTURE_MODEL_SELECTION"
+    },
+    "required_statuses": [
+      "PHASE11_10M_FRACTURE_MODEL_PARSER_SCHEMA_INTEGRATED",
+      "PKN_DEFAULT_WHEN_FRACTURE_MODEL_MISSING",
+      "PENNY_SHAPED_EXPLICIT_OPT_IN_ONLY",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "SIGMATHETA_INITIAL_STATE_AUDIT_REQUIRED_BEFORE_DISPATCH"
+    ],
+    "recommended_next_phase": "PHASE11_10N_AUDIT_FRACTURE_INITIATION_GATE_INITIAL_SIGMATHETA_STATE",
+    "caveats": [
+      "Parser/schema integration does not authorize runtime dispatch.",
+      "BUZ29-PENNY was not executed.",
+      "PENNY_SHAPED remains diagnostic, not physically validated and not legacy-equivalent.",
+      "lot-pkn physical behavior is unchanged."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

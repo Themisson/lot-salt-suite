@@ -120,3 +120,14 @@ RUNTIME_EXECUTION_NOT_ALLOWED_NEXT
 ```
 
 A fase não altera parser, schema ou runtime.
+
+## Integração 11.10M
+
+A Fase 11.10M implementa a integração parser/schema do guard. O schema oficial
+aceita `lot.fracture.fracture_model` com valores canônicos `PKN` e
+`PENNY_SHAPED`. O parser usa o helper para default retrocompatível `PKN`,
+rejeição de vazio explícito e bloqueio de modelos não suportados.
+
+Essa integração ainda não é autorização de execução: `runtime_dispatch_enabled`
+permanece falso e o próximo gate físico obrigatório é
+`SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH`.

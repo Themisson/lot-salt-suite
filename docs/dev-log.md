@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10F PennyShaped diagnostic writer specification
+Fase ativa  : 11.10M fracture_model parser/schema integration
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : 273/273 passaram apos Fase 11.10A em 2026-06-12
-Testes Py   : 511/511 esperados apos Fase 11.10F em 2026-06-12
+Testes C++  : 306/306 esperados apos Fase 11.10M em 2026-06-12
+Testes Py   : 598/598 esperados apos Fase 11.10M em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,40 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10M — integração parser/schema de `fracture_model` — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Arquivos principais:**
+
+```text
+include/core/types.hpp
+src/io/CaseParser.cpp
+schemas/lot_case.schema.yaml
+tests/cpp/test_case_parser.cpp
+tools/audit_phase11_10m_fracture_model_parser_schema_integration.py
+docs/87_fracture_model_parser_schema_integration.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10M_FRACTURE_MODEL_PARSER_SCHEMA_INTEGRATED
+PKN_DEFAULT_WHEN_FRACTURE_MODEL_MISSING
+PENNY_SHAPED_EXPLICIT_OPT_IN_ONLY
+RUNTIME_DISPATCH_NOT_ENABLED
+SIGMATHETA_INITIAL_STATE_AUDIT_REQUIRED_BEFORE_DISPATCH
+```
+
+**Interpretação:** `lot.fracture.fracture_model` agora é aceito pelo schema e
+interpretado pelo parser via `FractureModelSelector`. Campo ausente seleciona
+`PKN`; `PENNY_SHAPED` explícito é apenas metadado diagnóstico, não validado e
+sem dispatch runtime. BUZ29-PENNY continua bloqueado até auditoria do estado
+inicial de `sigma_theta`.
 
 ---
 
