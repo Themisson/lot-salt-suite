@@ -686,3 +686,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   compatibilidade pressão x sigma-theta, mas não é chamado pelo runtime. A
   próxima fase planejada deve especificar a integração futura do guard ao
   `fracture_initiation_gate` sem liberar BUZ29-PENNY.
+- A Fase 11.10Q especifica essa integração futura em nível arquitetural:
+  `FractureModelSelector -> SigmaThetaInitialStateGuard -> criterio pressao x
+  sigma_theta -> dispatch`. O dispatch permanece bloqueado. A próxima fase
+  deve especificar o critério pressão x sigma-theta e a convenção de sinal
+  associada antes de qualquer runtime físico.

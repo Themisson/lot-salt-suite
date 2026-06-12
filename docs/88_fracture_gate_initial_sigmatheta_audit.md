@@ -211,3 +211,21 @@ SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED
 DISPATCH_REMAINS_BLOCKED
 BUZ29_RUNTIME_EXECUTION_NOT_ALLOWED
 ```
+
+## Encaminhamento 11.10Q
+
+A Fase 11.10Q transforma o achado desta auditoria em especificacao de dispatch:
+o futuro `fracture_initiation_gate` deve chamar
+`SigmaThetaInitialStateGuard` antes de qualquer criterio fisico e antes de
+qualquer dispatch por `fracture_model`.
+
+O novo estado formal e:
+
+```text
+FRACTURE_GATE_BLOCKED_BY_SIGMATHETA_GUARD
+FRACTURE_GATE_READY_FOR_CRITERION_EVALUATION
+FRACTURE_MODEL_DISPATCH_NOT_ALLOWED
+```
+
+Como o criterio pressao x sigma-theta ainda nao esta especificado, o dispatch
+permanece bloqueado.

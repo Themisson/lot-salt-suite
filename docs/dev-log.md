@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10P sigma-theta initial-state guard implementation
+Fase ativa  : 11.10Q fracture gate dispatch with sigma-theta guard specification
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 321/321 esperados apos Fase 11.10P em 2026-06-12
-Testes Py   : 631/631 esperados apos Fase 11.10P em 2026-06-12
+Testes Py   : 646/646 esperados apos Fase 11.10Q em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,44 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10Q — especificacao do dispatch com sigma-theta guard — Codex
+
+**Status:** Concluido; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/spec_phase11_10q_fracture_gate_dispatch_with_sigmatheta_guard.py
+```
+
+**Documento criado:**
+
+```text
+docs/91_fracture_gate_dispatch_with_sigmatheta_guard_spec.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10Q_FRACTURE_GATE_DISPATCH_WITH_SIGMATHETA_GUARD_SPECIFIED
+FRACTURE_GATE_DISPATCH_WITH_SIGMATHETA_GUARD_SPECIFIED
+SIGMATHETA_GUARD_REQUIRED_BEFORE_DISPATCH
+FRACTURE_MODEL_SELECTOR_REQUIRED_BEFORE_DISPATCH
+PRESSURE_SIGMATHETA_CRITERION_SPEC_REQUIRED
+SIGN_CONVENTION_RESOLUTION_REQUIRED
+DISPATCH_REMAINS_BLOCKED
+```
+
+**Interpretação:** a fase especifica o fluxo futuro
+`FractureModelSelector -> SigmaThetaInitialStateGuard -> criterio pressao x
+sigma_theta -> dispatch`. Ela nao integra o guard ao runtime, nao altera C++,
+parser/schema ou `lot-pkn`, nao executa BUZ29-PENNY e mantem
+`dispatch_allowed_next = false`. A proxima fase recomendada e
+`PHASE11_10R_SPECIFY_PRESSURE_SIGMATHETA_FRACTURE_CRITERION`.
 
 ---
 

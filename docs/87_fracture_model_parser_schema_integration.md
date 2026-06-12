@@ -254,3 +254,20 @@ RUNTIME_DISPATCH_NOT_CHANGED
 LOT_PKN_BEHAVIOR_NOT_CHANGED
 SIGMATHETA_INITIAL_STATE_GUARD_IMPLEMENTED
 ```
+
+## Resultado da especificacao 11.10Q
+
+A Fase 11.10Q nao altera parser/schema. Ela apenas especifica como o futuro
+`fracture_initiation_gate` deve consultar `SigmaThetaInitialStateGuard` depois
+da selecao por `FractureModelSelector`.
+
+Status:
+
+```text
+FRACTURE_GATE_DISPATCH_WITH_SIGMATHETA_GUARD_SPECIFIED
+PARSER_SCHEMA_NOT_CHANGED
+RUNTIME_DISPATCH_NOT_CHANGED
+DISPATCH_REMAINS_BLOCKED
+```
+
+O criterio pressao x sigma-theta permanece como requisito da 11.10R.

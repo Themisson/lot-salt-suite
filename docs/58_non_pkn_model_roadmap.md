@@ -574,6 +574,28 @@ DISPATCH_REMAINS_BLOCKED
 A proxima fase deve especificar o uso do guard pelo
 `fracture_initiation_gate`, sem executar BUZ29-PENNY.
 
+## Fase 11.10Q — dispatch especificado com sigma-theta guard
+
+A Fase 11.10Q especifica o fluxo futuro:
+
+```text
+FractureModelSelector -> SigmaThetaInitialStateGuard -> criterio pressao x sigma_theta -> dispatch
+```
+
+O status registrado e:
+
+```text
+FRACTURE_GATE_DISPATCH_WITH_SIGMATHETA_GUARD_SPECIFIED
+SIGMATHETA_GUARD_REQUIRED_BEFORE_DISPATCH
+FRACTURE_MODEL_SELECTOR_REQUIRED_BEFORE_DISPATCH
+PRESSURE_SIGMATHETA_CRITERION_SPEC_REQUIRED
+SIGN_CONVENTION_RESOLUTION_REQUIRED
+DISPATCH_REMAINS_BLOCKED
+```
+
+A fase nao integra runtime e nao executa BUZ29-PENNY. A proxima fase
+recomendada e `PHASE11_10R_SPECIFY_PRESSURE_SIGMATHETA_FRACTURE_CRITERION`.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

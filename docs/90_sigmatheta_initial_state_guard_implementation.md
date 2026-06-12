@@ -156,3 +156,22 @@ Essa proxima fase deve especificar como o guard sera chamado pelo futuro
 `fracture_initiation_gate`, ainda sem liberar execucao BUZ29-PENNY ate existir
 estado inicial de tensao, semantica de pressao e dispatch explicitamente
 testados.
+
+## Atualizacao 11.10Q — uso futuro pelo fracture gate
+
+A Fase 11.10Q especifica que este helper deve ser chamado antes de qualquer
+criterio fisico:
+
+```text
+validate_sigma_theta_initial_state(...)
+```
+
+Se `gate_ready = false`, o futuro `fracture_initiation_gate` deve registrar:
+
+```text
+FRACTURE_GATE_BLOCKED_BY_SIGMATHETA_GUARD
+FRACTURE_MODEL_DISPATCH_NOT_ALLOWED
+```
+
+Se `gate_ready = true`, o gate pode apenas avancar para a avaliacao futura do
+criterio pressao x sigma-theta. A 11.10Q nao libera dispatch fisico.

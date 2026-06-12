@@ -348,3 +348,17 @@ execução. A próxima fase pode implementar o guard que verifica
 `sigma_theta_initialized`, `sigma_theta_initial_state_valid`,
 `sigma_theta_reference_frame` e `sigma_theta_sign_convention`; não pode ainda
 executar BUZ29-PENNY ou declarar equivalência física.
+
+## Especificação 11.10Q — selector, guard e dispatch
+
+A Fase 11.10Q especifica que a selecao unificada de modelo nao pode despachar
+sozinha. O fluxo futuro deve ser:
+
+```text
+FractureModelSelector -> SigmaThetaInitialStateGuard -> criterio pressao x sigma_theta -> dispatch
+```
+
+Assim, `FRACTURE_MODEL_SELECTOR_REQUIRED_BEFORE_DISPATCH` e
+`SIGMATHETA_GUARD_REQUIRED_BEFORE_DISPATCH` passam a ser gates formais. O
+dispatch segue bloqueado ate a especificacao do criterio pressao x
+`sigma_theta` na proxima fase.

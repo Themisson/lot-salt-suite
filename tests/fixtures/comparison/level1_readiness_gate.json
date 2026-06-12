@@ -2893,6 +2893,42 @@
       "No physical validation or legacy equivalence is claimed."
     ]
   },
+  "phase11_10q_fracture_gate_dispatch_with_sigmatheta_guard": {
+    "status": "PHASE11_10Q_FRACTURE_GATE_DISPATCH_WITH_SIGMATHETA_GUARD_SPECIFIED",
+    "phase": "11.10Q",
+    "dispatch_spec_status": "FRACTURE_GATE_DISPATCH_WITH_SIGMATHETA_GUARD_SPECIFIED",
+    "sigmatheta_guard_required": true,
+    "fracture_model_selector_required": true,
+    "dispatch_allowed_next": false,
+    "runtime_execution_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "requires_pressure_sigmatheta_criterion_spec": true,
+    "requires_sign_convention_resolution": true,
+    "gate_states": [
+      "FRACTURE_GATE_BLOCKED_BY_SIGMATHETA_GUARD",
+      "FRACTURE_GATE_READY_FOR_CRITERION_EVALUATION",
+      "FRACTURE_GATE_NOT_REACHED",
+      "FRACTURE_GATE_REACHED",
+      "FRACTURE_MODEL_DISPATCH_NOT_ALLOWED",
+      "FRACTURE_MODEL_DISPATCH_ALLOWED"
+    ],
+    "required_statuses": [
+      "PHASE11_10Q_FRACTURE_GATE_DISPATCH_WITH_SIGMATHETA_GUARD_SPECIFIED",
+      "FRACTURE_GATE_DISPATCH_WITH_SIGMATHETA_GUARD_SPECIFIED",
+      "SIGMATHETA_GUARD_REQUIRED_BEFORE_DISPATCH",
+      "FRACTURE_MODEL_SELECTOR_REQUIRED_BEFORE_DISPATCH",
+      "PRESSURE_SIGMATHETA_CRITERION_SPEC_REQUIRED",
+      "SIGN_CONVENTION_RESOLUTION_REQUIRED",
+      "DISPATCH_REMAINS_BLOCKED"
+    ],
+    "recommended_next_phase": "PHASE11_10R_SPECIFY_PRESSURE_SIGMATHETA_FRACTURE_CRITERION",
+    "caveats": [
+      "Phase 11.10Q is specification only.",
+      "No C++, parser, schema, CLI or runtime dispatch is changed.",
+      "PENNY_SHAPED remains diagnostic, not physically validated and not legacy-equivalent.",
+      "BUZ29-PENNY is not executed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

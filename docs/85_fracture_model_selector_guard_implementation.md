@@ -223,3 +223,20 @@ O helper `FractureModelSelector` permanece isolado da física. Mesmo com
 `fracture_model` integrado ao parser, o dispatch real continua bloqueado até
 que `sigma_theta_compression_positive_Pa` venha de um estado inicial
 pós-perfuração especificado, não de um default ou proxy silencioso.
+
+## Especificacao 11.10Q — interacao selector, guard e dispatch
+
+A Fase 11.10Q especifica que o `FractureModelSelector` deve atuar antes do
+`SigmaThetaInitialStateGuard`, mas nenhum dos dois libera dispatch fisico
+isoladamente. O gate futuro deve seguir:
+
+```text
+selected_fracture_model
+sigma_theta_guard_status
+fracture_initiation_gate_status
+fracture_dispatch_status
+```
+
+`PENNY_SHAPED` permanece `diagnostic_only = true`, portanto segue bloqueado
+para dispatch runtime fisico. A proxima fase deve especificar o criterio
+pressao x sigma-theta.

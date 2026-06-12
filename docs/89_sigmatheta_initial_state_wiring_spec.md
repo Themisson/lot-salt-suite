@@ -214,3 +214,20 @@ DISPATCH_REMAINS_BLOCKED
 
 A fase nao conecta o helper ao `fracture_initiation_gate`, nao altera parser ou
 schema, nao executa BUZ29-PENNY e nao libera dispatch fisico.
+
+## Atualizacao 11.10Q — dispatch especificado
+
+A Fase 11.10Q especifica como o guard devera ser chamado futuramente pelo
+`fracture_initiation_gate`:
+
+```text
+FractureModelSelector
+  -> SigmaThetaInitialStateGuard
+  -> criterio pressao x sigma_theta
+  -> dispatch do selected_fracture_model
+```
+
+O guard deve bloquear dispatch quando `sigma_theta_guard_status` nao for
+`SIGMATHETA_INITIAL_STATE_READY`. Mesmo quando o guard estiver pronto, a fase
+mantem `dispatch_allowed_next = false` porque o criterio pressao x
+`sigma_theta` e a convencao de sinal associada ainda precisam ser especificados.
