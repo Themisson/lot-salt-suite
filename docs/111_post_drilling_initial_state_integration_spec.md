@@ -139,3 +139,17 @@ FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE
 
 Esses estados continuam diagnosticos. `runtime_dispatch_enabled` permanece
 `false`, `PENNY_SHAPED` nao vira runtime fisico e BUZ29-PENNY nao e executado.
+
+## Decisao 11.11P
+
+A 11.11P classifica o contrato diagnostico como pronto para uso controlado:
+
+```text
+DIAGNOSTIC_SIGMATHETA_GATE_READY
+ready_for_diagnostic_use = true
+ready_for_physical_validation = false
+ready_for_physical_dispatch = false
+```
+
+O contrato `PostDrillingInitialState` ainda precisa de uma fonte real para
+qualquer uso fisico. A prontidao atual e somente diagnostica.

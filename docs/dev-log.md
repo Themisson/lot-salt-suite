@@ -7906,3 +7906,36 @@ estão resolvidos para gate real.
 
 **Próxima fase recomendada:**
 `PHASE11_11M_KEEP_LIMITED_GATE_DIAGNOSTIC_AND_PLAN_SIGMATHETA_SOURCE`.
+
+---
+
+### [2026-06-12] Fase 11.11P — Readiness do gate sigma-theta diagnóstico — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `DIAGNOSTIC_SIGMATHETA_GATE_READY`.
+
+**Decisão:**
+
+```text
+ready_for_diagnostic_use = true
+ready_for_physical_validation = false
+ready_for_physical_dispatch = false
+ready_for_real_source_integration_spec = true
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_change_allowed = false
+penny_shaped_runtime_enabled = false
+```
+
+**Interpretação:** o gate alimentado por `sigma_theta_diagnostic_input` está
+pronto para uso diagnóstico controlado. O estado `Reached` continua sendo
+elegibilidade diagnóstica, não execução física de fratura.
+
+**Entregáveis:**
+- `tools/decide_phase11_11p_diagnostic_sigmatheta_gate_readiness.py`
+- `tests/python/test_decide_phase11_11p_diagnostic_sigmatheta_gate_readiness.py`
+- `docs/116_diagnostic_sigmatheta_gate_readiness_decision.md`
+
+**Próxima fase recomendada:**
+`PHASE11_11Q_SPECIFY_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH`.

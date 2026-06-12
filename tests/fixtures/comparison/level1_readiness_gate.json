@@ -3708,6 +3708,41 @@
       "PENNY_SHAPED remains diagnostic-only."
     ]
   },
+  "phase11_11p_diagnostic_sigmatheta_gate_readiness": {
+    "status": "PHASE11_11P_DIAGNOSTIC_SIGMATHETA_GATE_READINESS_DECIDED",
+    "phase": "11.11P",
+    "readiness_status": "DIAGNOSTIC_SIGMATHETA_GATE_READY",
+    "ready_for_diagnostic_use": true,
+    "ready_for_physical_validation": false,
+    "ready_for_physical_dispatch": false,
+    "ready_for_real_source_integration_spec": true,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_change_allowed": false,
+    "penny_shaped_runtime_enabled": false,
+    "pkn_outputs_unchanged": true,
+    "diagnostic_output_isolated": true,
+    "required_statuses": [
+      "PHASE11_11P_DIAGNOSTIC_SIGMATHETA_GATE_READINESS_DECIDED",
+      "DIAGNOSTIC_SIGMATHETA_GATE_READY",
+      "READY_FOR_DIAGNOSTIC_USE",
+      "NOT_READY_FOR_PHYSICAL_VALIDATION",
+      "NOT_READY_FOR_PHYSICAL_DISPATCH",
+      "REAL_SIGMATHETA_SOURCE_INTEGRATION_SPEC_REQUIRED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PKN_BEHAVIOR_NOT_CHANGED",
+      "PENNY_SHAPED_RUNTIME_NOT_ENABLED"
+    ],
+    "recommended_next_phase": "PHASE11_11Q_SPECIFY_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH",
+    "caveats": [
+      "Readiness is diagnostic only.",
+      "Reached means diagnostic gate eligibility, not physical fracture execution.",
+      "Physical validation remains disabled.",
+      "Physical dispatch remains disabled.",
+      "BUZ29-PENNY is not executed.",
+      "A real sigma-theta source integration path still needs specification."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

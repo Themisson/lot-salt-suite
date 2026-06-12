@@ -943,3 +943,26 @@ PENNY_SHAPED_RUNTIME_NOT_ENABLED
 BUZ29_EXECUTION_BLOCKED
 RUNTIME_DISPATCH_NOT_ENABLED
 ```
+
+### Fase 11.11P — readiness do gate sigma-theta diagnostico
+
+A 11.11P decide que o gate alimentado por `sigma_theta_diagnostic_input` esta
+pronto apenas para uso diagnostico:
+
+```text
+DIAGNOSTIC_SIGMATHETA_GATE_READY
+READY_FOR_DIAGNOSTIC_USE
+NOT_READY_FOR_PHYSICAL_VALIDATION
+NOT_READY_FOR_PHYSICAL_DISPATCH
+```
+
+Para a trilha nao-PKN, isso preserva:
+
+```text
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_DISPATCH_NOT_ENABLED
+```
+
+`FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE` continua sendo elegibilidade
+diagnostica, nao execucao fisica.

@@ -134,3 +134,16 @@ runtime_dispatch_enabled = false
 
 O estado `Reached` permanece elegibilidade diagnostica do gate. Ele nao chama
 runtime fisico PKN/PENNY e nao altera outputs fisicos PKN.
+
+## Decisao 11.11P
+
+A 11.11P consolidou a fonte diagnostica como pronta para uso diagnostico do
+gate:
+
+```text
+DIAGNOSTIC_SIGMATHETA_GATE_READY
+READY_FOR_DIAGNOSTIC_USE
+```
+
+Essa decisao nao promove `sigma_theta_diagnostic_input` a fonte fisica, nao
+habilita dispatch e nao declara equivalencia com legado.

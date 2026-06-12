@@ -147,3 +147,22 @@ physically_validated = false
 legacy_equivalent = false
 runtime_dispatch_enabled = false
 ```
+
+## Decisao de readiness 11.11P
+
+A 11.11P confirmou que `EXPLICIT_DIAGNOSTIC_INPUT` e `SYNTHETIC_FIXTURE`
+podem alimentar o gate em uso diagnostico controlado:
+
+```text
+DIAGNOSTIC_SIGMATHETA_GATE_READY
+READY_FOR_DIAGNOSTIC_USE
+```
+
+Essa decisao nao altera a estrategia de fonte real. A fonte primaria futura
+continua sendo `ELASTIC_INITIAL_WELLBORE_STATE`, e a proxima etapa deve
+especificar o caminho de integracao dessa fonte real:
+
+```text
+REAL_SIGMATHETA_SOURCE_INTEGRATION_SPEC_REQUIRED
+PHASE11_11Q_SPECIFY_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH
+```

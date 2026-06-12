@@ -1103,3 +1103,25 @@ Proxima fase:
 ```text
 PHASE11_11O_VALIDATE_SIGMATHETA_DIAGNOSTIC_SOURCE_ON_CONTROLLED_CASES
 ```
+
+### Fase 11.11P — readiness do gate sigma-theta diagnostico
+
+Status:
+
+```text
+PHASE11_11P_DIAGNOSTIC_SIGMATHETA_GATE_READINESS_DECIDED
+DIAGNOSTIC_SIGMATHETA_GATE_READY
+READY_FOR_DIAGNOSTIC_USE
+NOT_READY_FOR_PHYSICAL_VALIDATION
+NOT_READY_FOR_PHYSICAL_DISPATCH
+```
+
+A fonte `sigma_theta_diagnostic_input` esta pronta para exercitar o
+`limited_gate` em casos controlados. Isso ainda nao e validacao fisica, nao e
+equivalencia com legado e nao habilita dispatch.
+
+Proxima fase recomendada:
+
+```text
+PHASE11_11Q_SPECIFY_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH
+```

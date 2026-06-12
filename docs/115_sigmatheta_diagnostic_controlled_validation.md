@@ -122,3 +122,17 @@ Nao ha validacao de BUZ29, nao ha equivalencia com legado e nao ha promocao de
 PHASE11_11P_DECIDE_DIAGNOSTIC_SIGMATHETA_GATE_READINESS
 ```
 
+## Resultado da decisao 11.11P
+
+A 11.11P confirmou que a validacao controlada da 11.11O e suficiente para uso
+diagnostico do gate:
+
+```text
+DIAGNOSTIC_SIGMATHETA_GATE_READY
+ready_for_diagnostic_use = true
+ready_for_physical_validation = false
+ready_for_physical_dispatch = false
+```
+
+O estado `Reached` continua significando elegibilidade diagnostica do gate, nao
+execucao fisica de fratura.
