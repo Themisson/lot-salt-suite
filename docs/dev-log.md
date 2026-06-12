@@ -6194,3 +6194,25 @@ parser, schema, CLI, `PknModel`, `PknRunner`, casos protegidos ou semântica
 `PknModel`, `PknRunner`, casos protegidos ou semântica `lot-pkn`.
 
 **Próxima fase:** `PHASE11_9B_BUZ29_PENNY_READINESS`.
+
+---
+
+### [2026-06-11] Fase 11.9B — Readiness BUZ29 PennyShaped
+
+**Status:** Concluído.
+
+**Classificação:** `BUZ29_PENNY_CANDIDATE_PARTIAL`.
+
+**Gate:** `BUZ29_PENNY_READINESS_PARTIAL_DO_NOT_START_11_10A`.
+
+**Entregáveis:**
+- `tools/check_phase11_9b_buz29_penny_readiness.py`
+- `tests/python/test_check_phase11_9b_buz29_penny_readiness.py`
+- `docs/68_buz29_penny_candidate_readiness.md`
+
+**Decisão:** BUZ29 ainda não está pronto para YAML diagnóstico
+`PennyShaped`. Faltam histórico de pressão, `sigmaTheta`, tempo desde abertura
+e estado APB/sal em contrato consumível.
+
+**Próxima fase recomendada:** `PHASE11_9C_COMPLETE_BUZ29_PENNY_EVIDENCE`.
+`PHASE11_10A` não foi executada.

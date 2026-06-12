@@ -68,3 +68,15 @@ A próxima fase deve avaliar se BUZ29 tem evidência suficiente para alimentar a
 rota `PennyShaped`; a preferência continua sendo bloquear ou classificar como
 parcial quando pressão, sigmaTheta, tempo e estado APB/sal não estiverem
 completos.
+
+## Resultado da Fase 11.9B
+
+A avaliação BUZ29 retornou:
+
+```text
+BUZ29_PENNY_CANDIDATE_PARTIAL
+BUZ29_PENNY_READINESS_PARTIAL_DO_NOT_START_11_10A
+```
+
+O caso sintético permanece útil como contrato isolado, mas não autoriza criação
+de YAML BUZ29 diagnóstico.

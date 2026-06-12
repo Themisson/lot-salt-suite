@@ -560,3 +560,6 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 - A Fase 11.9A cria um caso sintético mínimo `penny_shaped` em
   `cases/validation/non_pkn/`, verificado por Python. Ele é fixture/caso
   diagnóstico, não entrada oficial do runtime.
+- A Fase 11.9B classifica BUZ29 como `BUZ29_PENNY_CANDIDATE_PARTIAL` e bloqueia
+  11.10A até existir evidência consumível de pressão, `sigmaTheta`, tempo desde
+  abertura e estado APB/sal.

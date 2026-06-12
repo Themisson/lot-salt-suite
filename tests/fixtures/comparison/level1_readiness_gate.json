@@ -1956,6 +1956,31 @@
       "Not an official lot-sim runtime schema route."
     ]
   },
+  "phase11_9b_buz29_penny_readiness": {
+    "status": "BUZ29_PENNY_CANDIDATE_PARTIAL",
+    "phase": "11.9B",
+    "track": "PENNY_SHAPED",
+    "gate": "BUZ29_PENNY_READINESS_PARTIAL_DO_NOT_START_11_10A",
+    "can_start_11_10a": false,
+    "tool": "tools/check_phase11_9b_buz29_penny_readiness.py",
+    "document": "docs/68_buz29_penny_candidate_readiness.md",
+    "recommended_next_phase": "PHASE11_9C_COMPLETE_BUZ29_PENNY_EVIDENCE",
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_yaml_created": false,
+    "missing_evidence": [
+      "pressure_history",
+      "sigma_theta_history",
+      "elapsed_opening_time",
+      "apb_salt_state"
+    ],
+    "caveats": [
+      "BUZ29 active model is penny-shaped, not PKN.",
+      "The synthetic PennyShaped case does not validate BUZ29.",
+      "Phase 11.10A must not start until readiness becomes sufficient."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

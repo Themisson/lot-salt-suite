@@ -176,6 +176,19 @@ tool = tools/verify_phase11_9a_penny_synthetic_case.py
 O caso é verificado por Python e não é uma rota de schema/runtime oficial do
 `lot-sim`. Ele serve apenas para manter o contrato diagnóstico exercitável.
 
+## Fase 11.9B — readiness BUZ29 PennyShaped
+
+A Fase 11.9B classifica BUZ29 como candidato parcial:
+
+```text
+readiness = BUZ29_PENNY_CANDIDATE_PARTIAL
+gate = BUZ29_PENNY_READINESS_PARTIAL_DO_NOT_START_11_10A
+```
+
+Há núcleo, adapter e caso sintético, mas faltam histórico de pressão,
+`sigmaTheta`, tempo desde abertura e estado APB/sal de BUZ29 em forma
+consumível. Assim, a 11.10A permanece bloqueada.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.
