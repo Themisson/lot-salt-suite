@@ -148,6 +148,21 @@ recommended_next_phase = PHASE11_8D_PENNY_DIAGNOSTIC_ADAPTER_IMPLEMENTATION
 A especificação usa os campos reais do `PennyShapedInput`, mantém caveat
 explícito de não validação BUZ29 e não cria rota oficial de parser/schema/CLI.
 
+## Fase 11.8D — adapter diagnóstico C++ opt-in
+
+A Fase 11.8D implementa o adapter mínimo:
+
+```text
+status = PENNY_SHAPED_DIAGNOSTIC_ADAPTER_IMPLEMENTED
+header = include/lot/PennyShapedDiagnosticAdapter.hpp
+source = src/lot/PennyShapedDiagnosticAdapter.cpp
+test = tests/cpp/test_penny_shaped_diagnostic_adapter.cpp
+```
+
+O adapter apenas mapeia input diagnóstico em SI para `PennyShapedInput` e chama
+`evaluate_penny_shaped_model`. Ele não altera parser, schema, CLI, `PknModel`,
+`PknRunner` ou casos protegidos.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

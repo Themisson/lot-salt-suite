@@ -106,3 +106,15 @@ buz29_validation = false
 
 Ela prepara a Fase 11.8D para criar um adapter C++ opt-in em torno do núcleo
 isolado, ainda sem conexão com `PknModel`, `PknRunner`, CLI ou parser.
+
+## Resultado da Fase 11.8D
+
+O adapter diagnóstico C++ foi implementado em torno do núcleo isolado:
+
+```text
+PENNY_SHAPED_DIAGNOSTIC_ADAPTER_IMPLEMENTED
+```
+
+Ele preserva a chamada direta para `evaluate_penny_shaped_model(...)` e adiciona
+apenas metadados diagnósticos (`source`, `caveat`, `status`). O caminho
+`lot-pkn` segue inalterado.

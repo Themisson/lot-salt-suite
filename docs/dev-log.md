@@ -6155,3 +6155,23 @@ parser, schema, CLI, `PknModel`, `PknRunner`, casos protegidos ou runtime
 `lot-pkn`.
 
 **Próxima fase:** `PHASE11_8D_PENNY_DIAGNOSTIC_ADAPTER_IMPLEMENTATION`.
+
+---
+
+### [2026-06-11] Fase 11.8D — Adapter diagnóstico PennyShaped
+
+**Status:** Concluído.
+
+**Classificação:** `PENNY_SHAPED_DIAGNOSTIC_ADAPTER_IMPLEMENTED`.
+
+**Entregáveis:**
+- `include/lot/PennyShapedDiagnosticAdapter.hpp`
+- `src/lot/PennyShapedDiagnosticAdapter.cpp`
+- `tests/cpp/test_penny_shaped_diagnostic_adapter.cpp`
+- `docs/66_penny_diagnostic_adapter_implementation.md`
+
+**Escopo:** adapter C++ opt-in em torno de `PennyShapedModel`. Não altera
+parser, schema, CLI, `PknModel`, `PknRunner`, casos protegidos ou semântica
+`lot-pkn`.
+
+**Próxima fase:** `PHASE11_9A_PENNY_SYNTHETIC_MINIMAL_CASE`.

@@ -83,3 +83,21 @@ PHASE11_8D_PENNY_DIAGNOSTIC_ADAPTER_IMPLEMENTATION
 
 Essa fase pode criar o adapter C++ opt-in, com testes Catch2 dedicados, ainda
 sem parser, schema ou CLI.
+
+## Implementação 11.8D
+
+A Fase 11.8D implementou a especificação por meio de:
+
+```text
+include/lot/PennyShapedDiagnosticAdapter.hpp
+src/lot/PennyShapedDiagnosticAdapter.cpp
+tests/cpp/test_penny_shaped_diagnostic_adapter.cpp
+```
+
+O status implementado permanece diagnóstico:
+
+```text
+PENNY_SHAPED_DIAGNOSTIC_ADAPTER_IMPLEMENTED
+```
+
+Não houve promoção para parser/schema/CLI nem validação BUZ29.

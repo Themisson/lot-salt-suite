@@ -554,3 +554,6 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 - A Fase 11.8C especifica o contrato desse adapter diagnóstico opt-in usando
   os campos reais do `PennyShapedInput`. A especificação é fixture-only,
   sem schema runtime, sem CLI e sem validação BUZ29.
+- A Fase 11.8D implementa o adapter C++ diagnóstico opt-in
+  `PennyShapedDiagnosticAdapter`, preservando o núcleo isolado e mantendo
+  `lot-pkn`, parser, schema e casos protegidos sem alteração de comportamento.

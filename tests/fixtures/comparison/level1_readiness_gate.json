@@ -1913,6 +1913,28 @@
       "Phase 11.8C does not declare legacy equivalence."
     ]
   },
+  "phase11_8d_penny_diagnostic_adapter": {
+    "status": "PENNY_SHAPED_DIAGNOSTIC_ADAPTER_IMPLEMENTED",
+    "phase": "11.8D",
+    "selected_track": "PENNY_SHAPED",
+    "integration_path": "diagnostic_adapter",
+    "header": "include/lot/PennyShapedDiagnosticAdapter.hpp",
+    "source": "src/lot/PennyShapedDiagnosticAdapter.cpp",
+    "test": "tests/cpp/test_penny_shaped_diagnostic_adapter.cpp",
+    "document": "docs/66_penny_diagnostic_adapter_implementation.md",
+    "recommended_next_phase": "PHASE11_9A_PENNY_SYNTHETIC_MINIMAL_CASE",
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "buz29_validation": false,
+    "parser_schema_changed": false,
+    "lot_pkn_behavior_changed": false,
+    "caveats": [
+      "The adapter only wraps PennyShapedModel for opt-in diagnostics.",
+      "Phase 11.8D does not validate BUZ29.",
+      "Phase 11.8D does not add a lot-sim runtime mode."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

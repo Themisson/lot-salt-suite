@@ -139,6 +139,7 @@ phases:
   phase_11_8a_selected_non_pkn_minimal_model: completed
   phase_11_8b_penny_integration_gate: completed
   phase_11_8c_penny_adapter_spec: completed
+  phase_11_8d_penny_diagnostic_adapter: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -204,6 +205,7 @@ docs:
   stage11_8a_selected_non_pkn_minimal_model: implemented
   stage11_8b_penny_integration_gate: implemented
   stage11_8c_penny_adapter_spec: implemented
+  stage11_8d_penny_diagnostic_adapter: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -267,7 +269,7 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 268        # Catch2 lot-salt-suite — 268/268 previstos apos Fase 11.8A (2026-06-11)
+  cpp_tests: 273        # Catch2 lot-salt-suite — 273/273 previstos apos Fase 11.8D (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
   python_tests: 395     # pytest lot-salt-suite — 395/395 previstos apos Fase 11.8C (2026-06-11)
   regression_baselines: 4
