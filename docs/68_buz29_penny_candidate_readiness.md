@@ -81,6 +81,28 @@ O status não foi promovido para rota diagnóstica segura porque pressão,
 `sigmaTheta`, tempo de abertura, tempo desde abertura e inputs BUZ29 do adapter
 seguem não consumíveis.
 
+## Phase 11.9E pressure/opening evidence
+
+A Fase 11.9E refinou a busca nos outputs legados existentes e encontrou os
+dois campos mínimos que motivaram a fase:
+
+```text
+pressure_history_status = PRESSURE_HISTORY_FOUND_CONSUMABLE
+opening_time_status = OPENING_TIME_FOUND_CONSUMABLE
+classification = BUZ29_PRESSURE_AND_OPENING_EVIDENCE_COMPLETE
+can_reopen_11_10A_gate = true
+recommended_next_phase = PHASE11_9F_REEVALUATE_BUZ29_PENNY_READINESS_AFTER_PRESSURE_OPENING
+```
+
+O histórico de pressão vem de `Time` + blocos `dP` em
+`7-BUZ-29D-RJS10_PENNY-SHAPED.dat`, com conversão documentada no visualizador
+legado. O tempo de abertura vem do campo `Momento da quebra: 10.4`.
+
+Essa evidência não inicia a 11.10A automaticamente. Ela apenas remove a lacuna
+focal de pressão/abertura e exige uma fase 11.9F para reavaliar o readiness
+com os demais campos ainda não exportados diretamente (`sigmaTheta`, `pw`,
+`margin`, `opened`).
+
 ## Caveats
 
 - Esta fase não cria YAML BUZ29.

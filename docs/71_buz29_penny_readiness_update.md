@@ -72,3 +72,20 @@ PHASE11_9E_COMPLETE_BUZ29_PRESSURE_AND_OPENING_EVIDENCE
 
 Essa fase futura deve obter ou normalizar histórico de pressão, tempo de
 abertura e campos mínimos do adapter antes de qualquer YAML candidato BUZ29.
+
+## Resultado da 11.9E
+
+A fase recomendada foi executada e encontrou evidência consumível para pressão
+e abertura:
+
+```text
+pressure_history_status = PRESSURE_HISTORY_FOUND_CONSUMABLE
+opening_time_status = OPENING_TIME_FOUND_CONSUMABLE
+classification = BUZ29_PRESSURE_AND_OPENING_EVIDENCE_COMPLETE
+can_reopen_11_10A_gate = true
+recommended_next_phase = PHASE11_9F_REEVALUATE_BUZ29_PENNY_READINESS_AFTER_PRESSURE_OPENING
+```
+
+A 11.9D permanece correta como snapshot histórico do gate antes da descoberta
+focal da 11.9E. A próxima fase deve reavaliar formalmente o readiness; a 11.9E
+não inicia a 11.10A diretamente.

@@ -2044,6 +2044,43 @@
       "No BUZ29 candidate YAML is created by Phase 11.9D."
     ]
   },
+  "phase11_9e_buz29_pressure_opening_evidence": {
+    "status": "PHASE11_9E_BUZ29_PRESSURE_OPENING_EVIDENCE_AUDITED",
+    "phase": "11.9E",
+    "track": "PENNY_SHAPED",
+    "case": "BUZ29-VISCO-first-well",
+    "pressure_history_status": "PRESSURE_HISTORY_FOUND_CONSUMABLE",
+    "opening_time_status": "OPENING_TIME_FOUND_CONSUMABLE",
+    "pressure_history_consumable": true,
+    "opening_time_consumable": true,
+    "classification": "BUZ29_PRESSURE_AND_OPENING_EVIDENCE_COMPLETE",
+    "can_reopen_11_10A_gate": true,
+    "tool": "tools/audit_phase11_9e_buz29_pressure_opening_evidence.py",
+    "document": "docs/72_buz29_pressure_opening_evidence_audit.md",
+    "source_output": "legance/LOT_Tese/results/7-BUZ-29D-RJS10_PENNY-SHAPED.dat",
+    "legacy_time_points": 131,
+    "legacy_time_min": 0.0,
+    "legacy_time_max": 13.0,
+    "legacy_opening_time_min": 10.4,
+    "legacy_opening_time_s": 624.0,
+    "first_positive_dv_leakoff_time_min": 10.4,
+    "recommended_next_phase": "PHASE11_9F_REEVALUATE_BUZ29_PENNY_READINESS_AFTER_PRESSURE_OPENING",
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "modern_yaml_created": false,
+    "simulation_executed": false,
+    "remaining_gaps": [
+      "sigmaTheta BUZ29 is not exported directly",
+      "pw, margin and opened are not exported directly",
+      "PennyShaped adapter readiness must be re-evaluated in Phase 11.9F"
+    ],
+    "caveats": [
+      "Phase 11.9E does not execute BUZ29-PENNY.",
+      "Phase 11.9E does not create a BUZ29-PENNY candidate YAML.",
+      "Complete pressure/opening evidence only reopens the readiness review path; it does not start Phase 11.10A automatically."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

@@ -218,6 +218,25 @@ can_start_11_10A = false
 A próxima etapa segura é completar evidência de pressão e abertura antes de
 qualquer YAML candidato BUZ29-PENNY.
 
+## Fase 11.9E — evidência BUZ29 de pressão e abertura
+
+A Fase 11.9E completou a auditoria focal dos dois campos mínimos que bloqueavam
+o gate anterior:
+
+```text
+pressure_history_status = PRESSURE_HISTORY_FOUND_CONSUMABLE
+opening_time_status = OPENING_TIME_FOUND_CONSUMABLE
+classification = BUZ29_PRESSURE_AND_OPENING_EVIDENCE_COMPLETE
+can_reopen_11_10A_gate = true
+recommended_next_phase = PHASE11_9F_REEVALUATE_BUZ29_PENNY_READINESS_AFTER_PRESSURE_OPENING
+```
+
+A evidência vem do output legado existente
+`legance/LOT_Tese/results/7-BUZ-29D-RJS10_PENNY-SHAPED.dat`, que contém `Time`,
+blocos `dP`, `dV_leakoff` e `Momento da quebra: 10.4`. A fase não cria YAML
+BUZ29-PENNY, não executa BUZ29 e não valida fisicamente a rota; ela apenas
+habilita uma reavaliação formal de readiness na próxima fase.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

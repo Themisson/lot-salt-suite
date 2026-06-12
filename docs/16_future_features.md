@@ -570,3 +570,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 - A Fase 11.9D atualiza formalmente o readiness com base na 11.9C e mantém
   `can_start_11_10A = false`. A próxima evolução deve completar evidência de
   pressão e abertura antes de qualquer YAML candidato BUZ29-PENNY.
+- A Fase 11.9E encontra evidência consumível de pressão e abertura no output
+  legado `7-BUZ-29D-RJS10_PENNY-SHAPED.dat`: `Time` + blocos `dP` para
+  histórico de pressão e `Momento da quebra: 10.4` para abertura. O status é
+  `BUZ29_PRESSURE_AND_OPENING_EVIDENCE_COMPLETE`, com
+  `can_reopen_11_10A_gate = true`, mas isso apenas recomenda a 11.9F para
+  reavaliar readiness; não cria YAML BUZ29-PENNY nem inicia simulação.

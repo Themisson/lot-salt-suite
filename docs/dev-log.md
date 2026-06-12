@@ -57,6 +57,40 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-12] Fase 11.9E — evidência BUZ29 de pressão e abertura — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase11_9e_buz29_pressure_opening_evidence.py
+```
+
+**Documento criado:**
+
+```text
+docs/72_buz29_pressure_opening_evidence_audit.md
+```
+
+**Resultado:**
+
+```text
+pressure_history_status = PRESSURE_HISTORY_FOUND_CONSUMABLE
+opening_time_status = OPENING_TIME_FOUND_CONSUMABLE
+classification = BUZ29_PRESSURE_AND_OPENING_EVIDENCE_COMPLETE
+can_reopen_11_10A_gate = true
+recommended_next_phase = PHASE11_9F_REEVALUATE_BUZ29_PENNY_READINESS_AFTER_PRESSURE_OPENING
+```
+
+**Interpretação:** o output legado existente
+`legance/LOT_Tese/results/7-BUZ-29D-RJS10_PENNY-SHAPED.dat` contém série
+`Time`, blocos `dP` e `Momento da quebra: 10.4`. A fase não executa BUZ29,
+não cria YAML candidato e não valida fisicamente o caso; ela apenas reabre a
+possibilidade de uma reavaliação formal do readiness na 11.9F.
+
+---
+
 ### [2026-06-11] Fase 11.8B — gate de integração penny-shaped — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.

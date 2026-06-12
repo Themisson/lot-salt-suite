@@ -110,3 +110,24 @@ can_start_11_10A = false
 
 Como `pressure_history`, `opening_time` e `penny_inputs` não estão consumíveis,
 a rota 11.10A permanece bloqueada.
+
+## Atualização 11.9E
+
+A Fase 11.9E aprofundou especificamente a busca por pressão e abertura no
+output legado BUZ29 penny-shaped e encontrou evidência consumível para ambos:
+
+```text
+pressure_history_status = PRESSURE_HISTORY_FOUND_CONSUMABLE
+opening_time_status = OPENING_TIME_FOUND_CONSUMABLE
+classification = BUZ29_PRESSURE_AND_OPENING_EVIDENCE_COMPLETE
+can_reopen_11_10A_gate = true
+```
+
+A fonte principal é
+`legance/LOT_Tese/results/7-BUZ-29D-RJS10_PENNY-SHAPED.dat`, que contém a série
+`Time`, blocos `dP` e o marcador `Momento da quebra: 10.4`. O documento
+detalhado está em `docs/72_buz29_pressure_opening_evidence_audit.md`.
+
+Essa atualização não executa BUZ29-PENNY, não cria YAML candidato e não valida
+fisicamente o caso. Ela recomenda a 11.9F para reavaliar readiness antes de
+qualquer 11.10A.
