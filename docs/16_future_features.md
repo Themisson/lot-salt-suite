@@ -815,3 +815,20 @@ PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
 A fase seleciona uma integracao futura opt-in e diagnostica entre parse/validacao
 e `run_pkn_case(data)`. A integracao completa com dispatch fisico permanece
 bloqueada.
+
+## Fase 11.10Y — diagnostic pre-runner runtime gate
+
+Status registrado:
+
+```text
+PHASE11_10Y_DIAGNOSTIC_PRE_RUNNER_RUNTIME_GATE_IMPLEMENTED
+DIAGNOSTIC_PRE_RUNNER_OPT_IN_IMPLEMENTED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_EXECUTION_BLOCKED
+```
+
+A fase implementa um diagnostico pre-runner opt-in que grava
+`diagnostic_fracture_gate.json` sem alterar `result.json`, `timeseries.csv`,
+`PknModel` ou `PknRunner`. A execucao fisica de modelos nao-PKN e a rota
+BUZ29-PENNY continuam como trabalho futuro bloqueado.

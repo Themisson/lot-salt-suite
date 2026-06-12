@@ -110,6 +110,7 @@ set(LSS_CORE_SOURCES
   src/io/ResultWriter.cpp
   src/wellbore/AnnularVolume.cpp
   src/lot/BreakdownDetector.cpp
+  src/lot/FractureGateDiagnosticPreRunner.cpp
   src/lot/FractureGateRuntimeWiring.cpp
   src/lot/FractureModelSelector.cpp
   src/lot/InjectionSchedule.cpp
@@ -176,6 +177,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_annular_volume.cpp
     tests/cpp/test_case_parser.cpp
     tests/cpp/test_breakdown_detector.cpp
+    tests/cpp/test_fracture_gate_diagnostic_pre_runner.cpp
     tests/cpp/test_fracture_gate_runtime_wiring.cpp
     tests/cpp/test_fracture_model_selector.cpp
     tests/cpp/test_leakoff_model.cpp

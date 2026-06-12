@@ -727,3 +727,19 @@ RUNTIME_PHYSICAL_DISPATCH_NOT_ALLOWED
 
 Nenhum caso BUZ29-PENNY deve ser executado ate que uma fase posterior autorize
 explicitamente um runtime fisico ou diagnostico isolado com entradas completas.
+
+## Fase 11.10Y — gate pre-runner diagnostico
+
+A Fase 11.10Y implementa a primeira conexao runtime do fracture gate, mas
+somente como diagnostico opt-in antes do `run_pkn_case`.
+
+Para a trilha nao-PKN:
+
+```text
+PENNY_SHAPED = diagnostic_only
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+```
+
+`PENNY_SHAPED` pode aparecer no JSON diagnostico como modelo selecionado, mas
+isso nao chama o adapter penny-shaped e nao executa BUZ29-PENNY.

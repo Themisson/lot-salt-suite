@@ -3219,6 +3219,37 @@
       "Parser, schema, CLI and lot-pkn runtime remain unchanged."
     ]
   },
+  "phase11_10y_diagnostic_pre_runner_runtime_gate": {
+    "status": "PHASE11_10Y_DIAGNOSTIC_PRE_RUNNER_RUNTIME_GATE_IMPLEMENTED",
+    "phase": "11.10Y",
+    "integration_status": "DIAGNOSTIC_PRE_RUNNER_RUNTIME_GATE_IMPLEMENTED",
+    "diagnostic_opt_in_required": true,
+    "dispatch_runtime_enabled_allowed": false,
+    "runtime_physical_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "pkn_model_called_by_diagnostic": false,
+    "penny_adapter_called_by_diagnostic": false,
+    "diagnostic_output": "diagnostic_fracture_gate.json",
+    "diagnostic_output_isolated_from_physical_result": true,
+    "expected_missing_sigma_theta_status": "FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE",
+    "required_statuses": [
+      "PHASE11_10Y_DIAGNOSTIC_PRE_RUNNER_RUNTIME_GATE_IMPLEMENTED",
+      "DIAGNOSTIC_PRE_RUNNER_OPT_IN_IMPLEMENTED",
+      "RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED",
+      "PKN_BEHAVIOR_NOT_CHANGED",
+      "BUZ29_EXECUTION_BLOCKED"
+    ],
+    "recommended_next_phase": "PHASE11_10Z_ADD_DIAGNOSTIC_PRE_RUNNER_CASE_FIXTURES",
+    "caveats": [
+      "Phase 11.10Y implements only an opt-in diagnostic pre-runner gate.",
+      "The diagnostic output is isolated from result.json and timeseries.csv.",
+      "Physical dispatch remains disabled.",
+      "Missing sigma_theta initial state must produce diagnostic blocking, not fracture execution.",
+      "PknModel and PennyShapedDiagnosticAdapter are not called by the diagnostic.",
+      "BUZ29-PENNY is not executed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

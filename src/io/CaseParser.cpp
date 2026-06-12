@@ -30,6 +30,12 @@ std::string optional_string(const YAML::Node& node, const std::string& path,
   return value ? value.as<std::string>() : fallback;
 }
 
+bool optional_bool(const YAML::Node& node, const std::string& path,
+                   const bool fallback = false) {
+  const YAML::Node value = node[path];
+  return value ? value.as<bool>() : fallback;
+}
+
 lss::core::FluidData::Mode parse_fluid_mode(const std::string& mode) {
   if (mode == "constant") {
     return lss::core::FluidData::Mode::Constant;
@@ -267,6 +273,37 @@ void parse_sigma_theta_runtime_geometry(
                       "APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED");
 }
 
+void parse_fracture_gate_diagnostics(const YAML::Node& fracture,
+                                     lss::core::LotConfig& lot) {
+  const YAML::Node diagnostics = fracture["fracture_gate_diagnostics"];
+  if (!diagnostics) {
+    return;
+  }
+
+  auto& config = lot.fracture_gate_diagnostics;
+  config.enabled = require_as<bool>(
+      diagnostics["enabled"],
+      "lot.fracture.fracture_gate_diagnostics.enabled");
+  config.mode = optional_string(diagnostics, "mode", "pre_runner");
+  config.dispatch_runtime_enabled =
+      optional_bool(diagnostics, "dispatch_runtime_enabled", false);
+
+  if (!config.enabled) {
+    return;
+  }
+
+  if (config.mode != "pre_runner" && config.mode != "diagnostic_only") {
+    throw std::runtime_error(
+        "Validacao falhou: fracture_gate_diagnostics.mode exige pre_runner "
+        "ou diagnostic_only");
+  }
+  if (config.dispatch_runtime_enabled) {
+    throw std::runtime_error(
+        "Validacao falhou: fracture_gate_diagnostics.dispatch_runtime_enabled "
+        "deve ser false nesta fase");
+  }
+}
+
 }  // namespace
 
 namespace lss::io {
@@ -383,6 +420,7 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
   }
   apply_fracture_model_selection(
       lss::lot::select_fracture_model(fracture_model_input), data.lot);
+  parse_fracture_gate_diagnostics(fracture, data.lot);
   if (data.lot.model.empty()) {
     data.lot.model = data.lot.fracture_geometry;
   }

@@ -193,3 +193,21 @@ Essa decisao permite planejar uma fase futura que chame
 `FractureGateRuntimeWiring` apos parse/validacao e antes de `run_pkn_case`, mas
 somente se uma feature flag diagnostica estiver habilitada. A decisao nao
 libera dispatch fisico, nao altera `lot-pkn` e nao executa BUZ29-PENNY.
+
+## Fase 11.10Y — gate diagnostico pre-runner
+
+A Fase 11.10Y conecta o helper ao runtime apenas como diagnostico opt-in
+pre-runner. A chamada ocorre antes de `run_pkn_case(data)` e grava
+`diagnostic_fracture_gate.json` quando habilitada.
+
+Status:
+
+```text
+DIAGNOSTIC_PRE_RUNNER_OPT_IN_IMPLEMENTED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_EXECUTION_BLOCKED
+```
+
+O resultado esperado para casos sem estado inicial sigma_theta e bloqueio
+diagnostico. Isso nao e falha do PKN nem autorizacao para dispatch fisico.

@@ -230,6 +230,18 @@ properties:
           fracture_model:
             type: string
             enum: [PKN, PENNY_SHAPED]
+          fracture_gate_diagnostics:
+            type: object
+            required: [enabled]
+            additionalProperties: false
+            properties:
+              enabled:
+                type: boolean
+              mode:
+                type: string
+                enum: [pre_runner, diagnostic_only]
+              dispatch_runtime_enabled:
+                type: boolean
           fluid_viscosity_cP: {type: number}
           height:
             $ref: "#/$defs/length_quantity"

@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">157/164</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">347</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">745</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">158/165</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">359</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">756</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8411,6 +8411,18 @@ PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
 <p>A fase seleciona uma integracao futura opt-in e diagnostica entre parse/validacao
 e <code>run_pkn_case(data)</code>. A integracao completa com dispatch fisico permanece
 bloqueada.</p>
+<h2 id="fase-1110y-diagnostic-pre-runner-runtime-gate">Fase 11.10Y — diagnostic pre-runner runtime gate</h2>
+<p>Status registrado:</p>
+<pre><code class="language-text">PHASE11_10Y_DIAGNOSTIC_PRE_RUNNER_RUNTIME_GATE_IMPLEMENTED
+DIAGNOSTIC_PRE_RUNNER_OPT_IN_IMPLEMENTED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_EXECUTION_BLOCKED
+</code></pre>
+<p>A fase implementa um diagnostico pre-runner opt-in que grava
+<code>diagnostic_fracture_gate.json</code> sem alterar <code>result.json</code>, <code>timeseries.csv</code>,
+<code>PknModel</code> ou <code>PknRunner</code>. A execucao fisica de modelos nao-PKN e a rota
+BUZ29-PENNY continuam como trabalho futuro bloqueado.</p>
 </div>
 </section>
 

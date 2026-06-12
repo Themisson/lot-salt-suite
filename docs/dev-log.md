@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10X runtime integration gate for FractureGateRuntimeWiring
+Fase ativa  : 11.10Y diagnostic pre-runner runtime gate
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : 347/347 esperados apos Fase 11.10X em 2026-06-12
-Testes Py   : 745/745 esperados apos Fase 11.10X em 2026-06-12
+Testes C++  : 359/359 esperados apos Fase 11.10Y em 2026-06-12
+Testes Py   : 756/756 esperados apos Fase 11.10Y em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -56,6 +56,42 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ## Entradas de sessão
 
 ---
+
+### [2026-06-12] Fase 11.10Y — diagnostic pre-runner runtime gate — Codex
+
+**Status:** Implementado; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Objetivo:** conectar `FractureGateRuntimeWiring` ao fluxo `lot-sim run` apenas
+como diagnostico opt-in pre-runner, sem dispatch fisico e sem alterar o
+comportamento padrao do PKN.
+
+**Arquivos principais criados:**
+
+```text
+include/lot/FractureGateDiagnosticPreRunner.hpp
+src/lot/FractureGateDiagnosticPreRunner.cpp
+tests/cpp/test_fracture_gate_diagnostic_pre_runner.cpp
+tools/audit_phase11_10y_diagnostic_pre_runner_runtime_gate.py
+tests/python/test_audit_phase11_10y_diagnostic_pre_runner_runtime_gate.py
+docs/99_diagnostic_pre_runner_runtime_gate.md
+```
+
+**Resultado esperado do gate:**
+
+```text
+PHASE11_10Y_DIAGNOSTIC_PRE_RUNNER_RUNTIME_GATE_IMPLEMENTED
+DIAGNOSTIC_PRE_RUNNER_OPT_IN_IMPLEMENTED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_EXECUTION_BLOCKED
+```
+
+**Interpretacao:** o diagnostico grava `diagnostic_fracture_gate.json` quando
+`lot.fracture.fracture_gate_diagnostics.enabled` e `true`. Com sigma_theta
+inicial ausente, o bloqueio diagnostico esperado e
+`FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE`. Isso nao habilita fratura
+fisica e nao executa BUZ29-PENNY.
 
 ### [2026-06-12] Fase 11.10X — gate de integracao runtime do FractureGateRuntimeWiring — Codex
 

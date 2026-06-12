@@ -248,3 +248,17 @@ RUNTIME_WIRING_NOT_IMPLEMENTED
 BUZ29_EXECUTION_BLOCKED
 PENNY_SHAPED_DIAGNOSTIC_ONLY
 ```
+
+## Atualizacao 11.10Y — consumo diagnostico do contrato
+
+A Fase 11.10Y passa a consumir o contrato de wiring em um ponto pre-runner
+diagnostico e opt-in. O contrato continua sem dispatch fisico:
+
+```text
+PHASE11_10Y_DIAGNOSTIC_PRE_RUNNER_RUNTIME_GATE_IMPLEMENTED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+Quando o caso nao fornece estado inicial sigma_theta, o gate retorna bloqueio
+diagnostico e o fluxo PKN segue separado.

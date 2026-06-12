@@ -7,6 +7,7 @@
 #include "core/types.hpp"
 #include "io/CaseParser.hpp"
 #include "io/ResultWriter.hpp"
+#include "lot/FractureGateDiagnosticPreRunner.hpp"
 #include "lot/PknRunner.hpp"
 
 namespace {
@@ -79,13 +80,23 @@ int run_case(int argc, char* argv[]) {
   }
 
   const auto data = lss::io::parse_yaml(case_arg);
+  const auto diagnostic =
+      lss::lot::evaluate_fracture_gate_diagnostic_pre_runner(data);
+  if (diagnostic.fracture_gate_diagnostics_enabled) {
+    lss::lot::write_fracture_gate_diagnostic_pre_runner_json(output_arg,
+                                                             diagnostic);
+  }
   const auto run = lss::lot::run_pkn_case(data);
   lss::io::write_pkn_result(output_arg, data.name, run.result);
 
   std::cout << "OK: " << data.name << '\n';
   std::cout << "Mode: lot-pkn\n";
   std::cout << "Output: " << std::filesystem::path(output_arg).string() << '\n';
-  std::cout << "Files: result.json, timeseries.csv\n";
+  std::cout << "Files: result.json, timeseries.csv";
+  if (diagnostic.fracture_gate_diagnostics_enabled) {
+    std::cout << ", diagnostic_fracture_gate.json";
+  }
+  std::cout << '\n';
   return EXIT_SUCCESS;
 }
 

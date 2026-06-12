@@ -187,3 +187,23 @@ PHASE11_10Y_IMPLEMENT_DIAGNOSTIC_PRE_RUNNER_RUNTIME_GATE
 
 Essa proxima fase deve implementar, se autorizada, somente a integracao
 diagnostica opt-in pre-runner, com outputs isolados e regressoes PKN passando.
+
+## Atualizacao 11.10Y — gate pre-runner implementado
+
+A Fase 11.10Y implementa a opcao selecionada pela 11.10X:
+
+```text
+DIAGNOSTIC_PRE_RUNNER_OPT_IN_IMPLEMENTED
+```
+
+O diagnostico roda somente quando `lot.fracture.fracture_gate_diagnostics`
+declara `enabled: true`. O arquivo produzido e isolado:
+
+```text
+diagnostic_fracture_gate.json
+```
+
+A fase nao habilita dispatch fisico, nao chama `PknModel`, nao chama
+`PennyShapedDiagnosticAdapter` e nao executa BUZ29-PENNY. Com sigma_theta
+inicial ausente, o bloqueio esperado e
+`FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE`.
