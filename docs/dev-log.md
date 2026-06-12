@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11F limited_gate fixtures
+Fase ativa  : 11.11G limited_gate controlled validation
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : atualizar apos Fase 11.11F
-Testes Py   : atualizar apos Fase 11.11F
+Testes C++  : atualizar apos Fase 11.11G
+Testes Py   : atualizar apos Fase 11.11G
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -56,6 +56,41 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ## Entradas de sessão
 
 ---
+
+### [2026-06-12] Fase 11.11G — limited_gate controlled validation — Codex
+
+**Status:** Implementado; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/validate_phase11_11g_limited_gate_controlled_cases.py
+```
+
+**Documento criado:**
+
+```text
+docs/107_limited_gate_controlled_validation.md
+```
+
+**Status registrado:**
+
+```text
+PHASE11_11G_LIMITED_GATE_CONTROLLED_CASES_VALIDATED
+LIMITED_GATE_CONTROLLED_CASES_VALID
+PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE
+DIAGNOSTIC_OUTPUT_ISOLATED
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE11_11H_DECIDE_LIMITED_GATE_READINESS_FOR_RUNTIME_USE
+```
 
 ### [2026-06-12] Fase 11.11F — limited_gate fixtures — Codex
 

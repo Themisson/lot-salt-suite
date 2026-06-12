@@ -96,3 +96,19 @@ LIMITED_GATE_FIXTURES_VALID
 ```text
 PHASE11_11G_VALIDATE_LIMITED_GATE_ON_CONTROLLED_CASES
 ```
+
+## Atualização 11.11G — validação controlada
+
+A Fase 11.11G valida os fixtures da 11.11F como casos controlados do contrato
+`limited_gate`. O resultado esperado e:
+
+```text
+LIMITED_GATE_CONTROLLED_CASES_VALID
+PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE
+DIAGNOSTIC_OUTPUT_ISOLATED
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+```
+
+A validacao permanece diagnostica e nao habilita dispatch fisico.

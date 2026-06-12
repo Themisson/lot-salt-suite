@@ -110,3 +110,20 @@ RUNTIME_DISPATCH_NOT_ENABLED
 BUZ29_EXECUTION_BLOCKED
 PENNY_SHAPED_RUNTIME_NOT_ENABLED
 ```
+
+## Atualização 11.11G — validação controlada do limited_gate
+
+A Fase 11.11G valida os fixtures `limited_gate` como casos controlados. Ela
+confirma que o modo e opt-in, que o default permanece disabled, que
+`dispatch_runtime_enabled=true` continua rejeitado e que os outputs fisicos PKN
+permanecem inalterados na comparacao disabled/enabled.
+
+Status:
+
+```text
+PHASE11_11G_LIMITED_GATE_CONTROLLED_CASES_VALIDATED
+LIMITED_GATE_CONTROLLED_CASES_VALID
+PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE
+DIAGNOSTIC_OUTPUT_ISOLATED
+RUNTIME_DISPATCH_NOT_ENABLED
+```

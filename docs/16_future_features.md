@@ -933,3 +933,22 @@ PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
 A fase adiciona fixtures pequenas para o modo `limited_gate` e um validador
 Python dedicado. A proxima etapa deve validar esses fixtures em casos
 controlados, sem liberar dispatch fisico.
+
+## Fase 11.11G — validação controlada limited_gate
+
+Status registrado:
+
+```text
+PHASE11_11G_LIMITED_GATE_CONTROLLED_CASES_VALIDATED
+LIMITED_GATE_CONTROLLED_CASES_VALID
+PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE
+DIAGNOSTIC_OUTPUT_ISOLATED
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+```
+
+A fase confirma que `limited_gate` e reproduzivel em fixtures controladas e
+que a comparacao PKN disabled/enabled continua preservando `result.json` e
+`timeseries.csv`. A proxima decisao deve avaliar readiness sem liberar dispatch
+fisico automaticamente.

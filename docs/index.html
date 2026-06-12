@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">165/172</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">166/173</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">373</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">827</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">845</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8492,6 +8492,20 @@ PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
 <p>A fase adiciona fixtures pequenas para o modo <code>limited_gate</code> e um validador
 Python dedicado. A proxima etapa deve validar esses fixtures em casos
 controlados, sem liberar dispatch fisico.</p>
+<h2 id="fase-1111g-validacao-controlada-limited_gate">Fase 11.11G — validação controlada limited_gate</h2>
+<p>Status registrado:</p>
+<pre><code class="language-text">PHASE11_11G_LIMITED_GATE_CONTROLLED_CASES_VALIDATED
+LIMITED_GATE_CONTROLLED_CASES_VALID
+PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE
+DIAGNOSTIC_OUTPUT_ISOLATED
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+</code></pre>
+<p>A fase confirma que <code>limited_gate</code> e reproduzivel em fixtures controladas e
+que a comparacao PKN disabled/enabled continua preservando <code>result.json</code> e
+<code>timeseries.csv</code>. A proxima decisao deve avaliar readiness sem liberar dispatch
+fisico automaticamente.</p>
 </div>
 </section>
 

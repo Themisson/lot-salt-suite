@@ -179,6 +179,7 @@ phases:
   phase_11_11d_limited_fracture_gate_runtime_integration_spec: completed
   phase_11_11e_limited_fracture_gate_runtime_integration: completed
   phase_11_11f_limited_gate_fixtures: completed
+  phase_11_11g_limited_gate_controlled_validation: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -284,6 +285,7 @@ docs:
   stage11_11d_limited_fracture_gate_runtime_integration_spec: implemented
   stage11_11e_limited_fracture_gate_runtime_integration: implemented
   stage11_11f_limited_gate_fixtures: implemented
+  stage11_11g_limited_gate_controlled_validation: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -347,14 +349,14 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 373        # Catch2 lot-salt-suite — atualizar apos execucao da Fase 11.11F (2026-06-12)
+  cpp_tests: 373        # Catch2 lot-salt-suite — atualizar apos execucao da Fase 11.11G (2026-06-12)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 827     # pytest lot-salt-suite — atualizar apos execucao da Fase 11.11F (2026-06-12)
+  python_tests: 845     # pytest lot-salt-suite — atualizar apos execucao da Fase 11.11G (2026-06-12)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-12"
-updated_by: "codex (Fase 11.11F limited_gate fixtures)"
+updated_by: "codex (Fase 11.11G limited_gate controlled validation)"
 project_version: "0.1.0"

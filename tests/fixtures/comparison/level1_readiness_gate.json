@@ -3451,6 +3451,41 @@
       "The PKN behavior remains unchanged."
     ]
   },
+  "phase11_11g_limited_gate_controlled_validation": {
+    "status": "PHASE11_11G_LIMITED_GATE_CONTROLLED_CASES_VALIDATED",
+    "phase": "11.11G",
+    "validation_status": "LIMITED_GATE_CONTROLLED_CASES_VALID",
+    "limited_gate_opt_in_valid": true,
+    "default_disabled_valid": true,
+    "pkn_limited_gate_valid": true,
+    "penny_diagnostic_only_valid": true,
+    "dispatch_true_rejected": true,
+    "missing_sigmatheta_blocks": true,
+    "invalid_model_blocked": true,
+    "physical_outputs_identical": true,
+    "diagnostic_output_isolated": true,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "required_statuses": [
+      "PHASE11_11G_LIMITED_GATE_CONTROLLED_CASES_VALIDATED",
+      "LIMITED_GATE_CONTROLLED_CASES_VALID",
+      "PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE",
+      "DIAGNOSTIC_OUTPUT_ISOLATED",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PENNY_SHAPED_RUNTIME_NOT_ENABLED"
+    ],
+    "recommended_next_phase": "PHASE11_11H_DECIDE_LIMITED_GATE_READINESS_FOR_RUNTIME_USE",
+    "caveats": [
+      "Phase 11.11G validates limited_gate controlled fixtures only.",
+      "The validation does not execute BUZ29-PENNY.",
+      "Physical dispatch remains disabled.",
+      "PENNY_SHAPED remains diagnostic-only.",
+      "The PKN behavior remains unchanged."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

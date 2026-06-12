@@ -817,3 +817,17 @@ RUNTIME_DISPATCH_NOT_ENABLED
 
 Essas fixtures nao executam BUZ29-PENNY e existem apenas para validar bloqueios,
 metadata e regressao do gate limitado.
+
+## Fase 11.11G — validacao controlada limited_gate
+
+A Fase 11.11G confirma que `limited_gate` permanece opt-in e diagnostico. Para
+a trilha nao-PKN:
+
+```text
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_DISPATCH_NOT_ENABLED
+```
+
+`PENNY_SHAPED` pode continuar aparecendo como selecao diagnostica, mas nao e
+runtime fisico e nao executa BUZ29-PENNY.
