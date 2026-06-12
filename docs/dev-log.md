@@ -57,6 +57,43 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-12] Fase 11.10L — especificação parser/schema de `fracture_model` — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/spec_phase11_10l_parser_schema_fracture_model_integration.py
+```
+
+**Documento criado:**
+
+```text
+docs/86_fracture_model_parser_schema_integration_spec.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10L_FRACTURE_MODEL_PARSER_SCHEMA_INTEGRATION_SPECIFIED
+FRACTURE_MODEL_FIELD_LOT_FRACTURE_FRACTURE_MODEL
+PKN_DEFAULT_PARSER_BEHAVIOR_REQUIRED
+EXPLICIT_EMPTY_FRACTURE_MODEL_BLOCKED
+UNSUPPORTED_FRACTURE_MODELS_BLOCKED
+PARSER_SCHEMA_INTEGRATION_ALLOWED_NEXT
+RUNTIME_EXECUTION_NOT_ALLOWED_NEXT
+BUZ29_EXECUTION_NOT_ALLOWED_NEXT
+```
+
+**Interpretação:** a próxima fase pode integrar parser/schema com política
+`SCHEMA_STRICT_CANONICAL_ONLY`, preservando PKN como default quando
+`fracture_model` estiver ausente. Runtime não-PKN e BUZ29-PENNY continuam
+bloqueados.
+
+---
+
 ### [2026-06-12] Fase 11.10K — implementação do guard `fracture_model` — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase se todos os

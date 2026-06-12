@@ -494,6 +494,15 @@ ao parser, schema, CLI ou runtime. `PENNY_SHAPED` permanece diagnóstico,
 `PKN` permanece default quando o campo estiver ausente, e BUZ29-PENNY não é
 executado.
 
+## Fase 11.10L — especificação parser/schema
+
+A Fase 11.10L especifica a integração futura de
+`lot.fracture.fracture_model` ao parser/schema. A política recomendada é
+`SCHEMA_STRICT_CANONICAL_ONLY`: YAML oficial aceita `PKN` e `PENNY_SHAPED`,
+ausência do campo preserva PKN, valor vazio explícito é erro e modelos não
+suportados seguem bloqueados. A fase não altera parser, schema, runtime ou
+casos.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

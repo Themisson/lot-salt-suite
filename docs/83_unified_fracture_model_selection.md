@@ -293,3 +293,12 @@ A Fase 11.10K adiciona `FractureModelSelector` em `include/lot/` e `src/lot/`.
 Ele normaliza `PKN` e `PENNY_SHAPED`, rejeita vazio explícito e bloqueia
 modelos não suportados, mas não é integrado ao parser, schema, CLI ou runtime.
 `lot-sim run --mode lot-pkn` permanece sem alteração.
+
+## Especificação 11.10L — parser/schema futuros
+
+A Fase 11.10L especifica a integração futura de
+`lot.fracture.fracture_model` no parser/schema. O schema recomendado é estrito,
+com valores canônicos `PKN` e `PENNY_SHAPED`; aliases permanecem limitados ao
+helper/testes até decisão contrária. A integração parser/schema pode ser
+implementada na próxima fase, mas execução runtime não-PKN e BUZ29-PENNY
+continuam bloqueadas.

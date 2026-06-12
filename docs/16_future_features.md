@@ -657,3 +657,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   normaliza `PKN`/`PENNY_SHAPED`, rejeita valor vazio explícito e bloqueia
   modelos não suportados, mas ainda não é integrado ao parser, schema, CLI ou
   runtime.
+- A Fase 11.10L especifica a integração futura do guard ao parser/schema. A
+  política recomendada é `SCHEMA_STRICT_CANONICAL_ONLY`, com `PKN` e
+  `PENNY_SHAPED` como valores canônicos, ausência do campo defaultando para
+  PKN, valor vazio explícito como erro e execução BUZ29-PENNY ainda bloqueada.

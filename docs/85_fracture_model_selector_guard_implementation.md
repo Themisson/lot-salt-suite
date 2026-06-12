@@ -183,3 +183,10 @@ PHASE11_10L_SPECIFY_PARSER_SCHEMA_INTEGRATION_FOR_FRACTURE_MODEL
 
 A próxima fase deve decidir como integrar o guard ao parser/schema sem alterar
 o comportamento dos casos PKN existentes.
+
+## Especificação 11.10L
+
+A Fase 11.10L especifica essa integração futura sem implementá-la. A política
+recomendada é `SCHEMA_STRICT_CANONICAL_ONLY`, com `PKN` e `PENNY_SHAPED` como
+valores canônicos, ausência do campo defaultando para PKN no parser, valor
+vazio explícito como erro e runtime BUZ29-PENNY ainda bloqueado.

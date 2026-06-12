@@ -2681,6 +2681,52 @@
       "PENNY_SHAPED remains diagnostic, not physically validated and not legacy-equivalent."
     ]
   },
+  "phase11_10l_fracture_model_parser_schema_integration": {
+    "status": "PHASE11_10L_FRACTURE_MODEL_PARSER_SCHEMA_INTEGRATION_SPECIFIED",
+    "phase": "11.10L",
+    "integration_spec_status": "FRACTURE_MODEL_PARSER_SCHEMA_INTEGRATION_SPECIFIED",
+    "field": "lot.fracture.fracture_model",
+    "default_fracture_model": "PKN",
+    "missing_field_behavior": "DEFAULT_TO_PKN",
+    "explicit_empty_behavior": "ERROR_EXPLICIT_EMPTY_FRACTURE_MODEL_NOT_ALLOWED",
+    "unsupported_model_behavior": "ERROR_UNSUPPORTED_FRACTURE_MODEL",
+    "schema_policy": "SCHEMA_STRICT_CANONICAL_ONLY",
+    "allowed_canonical_values": [
+      "PKN",
+      "PENNY_SHAPED"
+    ],
+    "parser_integration_allowed_next": true,
+    "schema_integration_allowed_next": true,
+    "runtime_execution_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "lot_pkn_behavior_change_allowed": false,
+    "tool": "tools/spec_phase11_10l_parser_schema_fracture_model_integration.py",
+    "document": "docs/86_fracture_model_parser_schema_integration_spec.md",
+    "current_parser_audit": {
+      "yaml_reader": "src/io/CaseParser.cpp::parse_yaml",
+      "schema": "schemas/lot_case.schema.yaml",
+      "case_data": "include/core/types.hpp::LotConfig",
+      "current_fracture_field": "lot.fracture.geometry",
+      "future_fracture_model_field": "lot.fracture.fracture_model"
+    },
+    "required_statuses": [
+      "PHASE11_10L_FRACTURE_MODEL_PARSER_SCHEMA_INTEGRATION_SPECIFIED",
+      "FRACTURE_MODEL_FIELD_LOT_FRACTURE_FRACTURE_MODEL",
+      "PKN_DEFAULT_PARSER_BEHAVIOR_REQUIRED",
+      "EXPLICIT_EMPTY_FRACTURE_MODEL_BLOCKED",
+      "UNSUPPORTED_FRACTURE_MODELS_BLOCKED",
+      "PARSER_SCHEMA_INTEGRATION_ALLOWED_NEXT",
+      "RUNTIME_EXECUTION_NOT_ALLOWED_NEXT",
+      "BUZ29_EXECUTION_NOT_ALLOWED_NEXT"
+    ],
+    "recommended_next_phase": "PHASE11_10M_INTEGRATE_FRACTURE_MODEL_IN_PARSER_SCHEMA",
+    "caveats": [
+      "Phase 11.10L is specification only.",
+      "No parser, schema, C++, CLI or runtime files are changed.",
+      "Parser/schema integration does not authorize BUZ29-PENNY execution.",
+      "PENNY_SHAPED remains diagnostic, not physically validated and not legacy-equivalent."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

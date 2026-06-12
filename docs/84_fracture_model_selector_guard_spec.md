@@ -106,3 +106,17 @@ src/lot/FractureModelSelector.cpp
 
 O helper ainda não é integrado ao parser, schema, CLI ou runtime oficial.
 Sua função é congelar a semântica de seleção antes da fase de integração.
+
+## Especificação parser/schema 11.10L
+
+A Fase 11.10L define como essa integração deve ocorrer futuramente:
+
+```text
+lot.fracture.fracture_model
+SCHEMA_STRICT_CANONICAL_ONLY
+PKN_DEFAULT_PARSER_BEHAVIOR_REQUIRED
+PARSER_SCHEMA_INTEGRATION_ALLOWED_NEXT
+RUNTIME_EXECUTION_NOT_ALLOWED_NEXT
+```
+
+A fase não altera parser, schema ou runtime.

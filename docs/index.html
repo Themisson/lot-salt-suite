@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">144/151</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">145/152</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">301</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">573</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">589</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8289,7 +8289,11 @@ unidades reais usadas no <code>LOT_APB_v5</code> antes de aceitar nomes ou dimen
   <code>FractureModelSelector</code>, com testes Catch2 e auditoria Python. O helper
   normaliza <code>PKN</code>/<code>PENNY_SHAPED</code>, rejeita valor vazio explícito e bloqueia
   modelos não suportados, mas ainda não é integrado ao parser, schema, CLI ou
-  runtime.</p>
+  runtime.
+- A Fase 11.10L especifica a integração futura do guard ao parser/schema. A
+  política recomendada é <code>SCHEMA_STRICT_CANONICAL_ONLY</code>, com <code>PKN</code> e
+  <code>PENNY_SHAPED</code> como valores canônicos, ausência do campo defaultando para
+  PKN, valor vazio explícito como erro e execução BUZ29-PENNY ainda bloqueada.</p>
 </div>
 </section>
 
