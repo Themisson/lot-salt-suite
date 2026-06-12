@@ -94,3 +94,15 @@ PHASE11_10K_IMPLEMENT_FRACTURE_MODEL_SELECTOR_GUARD
 A próxima fase pode implementar o guard de forma mínima e testável, desde que
 preserve o default PKN, rejeite valores vazios explícitos, bloqueie modelos não
 suportados e mantenha `PENNY_SHAPED` como opt-in diagnóstico.
+
+## Implementação 11.10K
+
+A Fase 11.10K implementa essa especificação como helper C++ isolado:
+
+```text
+include/lot/FractureModelSelector.hpp
+src/lot/FractureModelSelector.cpp
+```
+
+O helper ainda não é integrado ao parser, schema, CLI ou runtime oficial.
+Sua função é congelar a semântica de seleção antes da fase de integração.

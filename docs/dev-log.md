@@ -57,6 +57,51 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-12] Fase 11.10K — implementação do guard `fracture_model` — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Arquivos C++ criados:**
+
+```text
+include/lot/FractureModelSelector.hpp
+src/lot/FractureModelSelector.cpp
+tests/cpp/test_fracture_model_selector.cpp
+```
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase11_10k_fracture_model_selector_guard.py
+```
+
+**Documento criado:**
+
+```text
+docs/85_fracture_model_selector_guard_implementation.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10K_FRACTURE_MODEL_SELECTOR_GUARD_IMPLEMENTED
+FRACTURE_MODEL_SELECTOR_GUARD_IMPLEMENTED
+PKN_DEFAULT_WHEN_FRACTURE_MODEL_MISSING
+PENNY_SHAPED_EXPLICIT_OPT_IN_ONLY
+EXPLICIT_EMPTY_FRACTURE_MODEL_BLOCKED
+UNSUPPORTED_FRACTURE_MODELS_BLOCKED
+PARSER_SCHEMA_RUNTIME_NOT_INTEGRATED
+```
+
+**Interpretação:** o guard agora existe como helper C++ isolado e testado.
+Ausência de `fracture_model` defaulta para PKN; valor vazio explícito é erro;
+`PENNY_SHAPED` continua opt-in diagnóstico, não validado e não equivalente ao
+legado. A fase não integra parser, schema, CLI ou runtime e não executa
+BUZ29-PENNY.
+
+---
+
 ### [2026-06-12] Fase 11.10J — guard do seletor `fracture_model` — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase se todos os

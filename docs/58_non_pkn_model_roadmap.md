@@ -486,6 +486,14 @@ continua apenas opt-in diagnóstico e depende de `fracture_initiation_gate` e da
 convenção explícita de sinal de `sigma_theta`. A fase não implementa runtime,
 parser, schema ou execução BUZ29-PENNY.
 
+## Fase 11.10K — helper C++ isolado do guard
+
+A Fase 11.10K implementa `FractureModelSelector` como helper C++ testável e
+isolado. Ele define a semântica futura de seleção sem conectar essa semântica
+ao parser, schema, CLI ou runtime. `PENNY_SHAPED` permanece diagnóstico,
+`PKN` permanece default quando o campo estiver ausente, e BUZ29-PENNY não é
+executado.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

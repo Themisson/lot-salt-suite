@@ -652,3 +652,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   diagnóstico, modelos não suportados são bloqueados e a execução permanece
   condicionada a `fracture_initiation_gate` e à convenção explícita de sinal de
   `sigma_theta`. A fase não altera C++, parser, schema, CLI ou `lot-pkn`.
+- A Fase 11.10K implementa o guard como helper C++ isolado
+  `FractureModelSelector`, com testes Catch2 e auditoria Python. O helper
+  normaliza `PKN`/`PENNY_SHAPED`, rejeita valor vazio explícito e bloqueia
+  modelos não suportados, mas ainda não é integrado ao parser, schema, CLI ou
+  runtime.

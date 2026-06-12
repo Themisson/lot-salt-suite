@@ -286,3 +286,10 @@ SIGMATHETA_SIGN_CONVENTION_REQUIRED
 
 O ponto principal é separar ausência de campo e valor vazio explícito. Ausência
 preserva PKN; valor vazio explícito deve falhar antes de qualquer dispatch.
+
+## Implementação 11.10K — helper isolado
+
+A Fase 11.10K adiciona `FractureModelSelector` em `include/lot/` e `src/lot/`.
+Ele normaliza `PKN` e `PENNY_SHAPED`, rejeita vazio explícito e bloqueia
+modelos não suportados, mas não é integrado ao parser, schema, CLI ou runtime.
+`lot-sim run --mode lot-pkn` permanece sem alteração.

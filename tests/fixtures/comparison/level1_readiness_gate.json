@@ -2617,6 +2617,70 @@
       "Selection does not imply execution; fracture_initiation and sigmaTheta sign gates remain required."
     ]
   },
+  "phase11_10k_fracture_model_selector_guard": {
+    "status": "PHASE11_10K_FRACTURE_MODEL_SELECTOR_GUARD_IMPLEMENTED",
+    "phase": "11.10K",
+    "implementation_status": "FRACTURE_MODEL_SELECTOR_GUARD_IMPLEMENTED",
+    "selection_field": "lot.fracture.fracture_model",
+    "default_fracture_model": "PKN",
+    "missing_field_behavior": "DEFAULT_TO_PKN",
+    "explicit_empty_behavior": "ERROR_EXPLICIT_EMPTY_FRACTURE_MODEL_NOT_ALLOWED",
+    "supported_models": [
+      "PKN",
+      "PENNY_SHAPED"
+    ],
+    "explicit_opt_in_models": [
+      "PENNY_SHAPED"
+    ],
+    "blocked_models": [
+      "KGD",
+      "KGD_CIRCULAR",
+      "KGD_ELLIPTICAL",
+      "RADIAL",
+      "ELLIPTICAL",
+      "UNKNOWN"
+    ],
+    "parser_integrated": false,
+    "schema_integrated": false,
+    "runtime_integrated": false,
+    "buz29_executed": false,
+    "lot_pkn_behavior_changed": false,
+    "pkn_status": {
+      "diagnostic_only": false,
+      "runtime_supported_now": true,
+      "source_when_missing": "Defaulted"
+    },
+    "penny_shaped_status": {
+      "diagnostic_only": true,
+      "physically_validated": false,
+      "legacy_equivalent": false,
+      "runtime_supported_now": false,
+      "source": "Explicit"
+    },
+    "tool": "tools/audit_phase11_10k_fracture_model_selector_guard.py",
+    "document": "docs/85_fracture_model_selector_guard_implementation.md",
+    "source_files": [
+      "include/lot/FractureModelSelector.hpp",
+      "src/lot/FractureModelSelector.cpp",
+      "tests/cpp/test_fracture_model_selector.cpp"
+    ],
+    "required_statuses": [
+      "PHASE11_10K_FRACTURE_MODEL_SELECTOR_GUARD_IMPLEMENTED",
+      "FRACTURE_MODEL_SELECTOR_GUARD_IMPLEMENTED",
+      "PKN_DEFAULT_WHEN_FRACTURE_MODEL_MISSING",
+      "PENNY_SHAPED_EXPLICIT_OPT_IN_ONLY",
+      "EXPLICIT_EMPTY_FRACTURE_MODEL_BLOCKED",
+      "UNSUPPORTED_FRACTURE_MODELS_BLOCKED",
+      "PARSER_SCHEMA_RUNTIME_NOT_INTEGRATED"
+    ],
+    "recommended_next_phase": "PHASE11_10L_SPECIFY_PARSER_SCHEMA_INTEGRATION_FOR_FRACTURE_MODEL",
+    "caveats": [
+      "The guard is implemented as an isolated C++ helper.",
+      "The guard is not integrated into parser, schema, CLI or official runtime.",
+      "BUZ29-PENNY is not executed.",
+      "PENNY_SHAPED remains diagnostic, not physically validated and not legacy-equivalent."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
