@@ -2774,6 +2774,43 @@
       "lot-pkn physical behavior is unchanged."
     ]
   },
+  "phase11_10n_fracture_gate_initial_sigmatheta": {
+    "status": "PHASE11_10N_FRACTURE_GATE_INITIAL_SIGMATHETA_AUDITED",
+    "phase": "11.10N",
+    "sigmatheta_initial_state": "SIGMATHETA_INITIAL_STATE_MISSING",
+    "fracture_gate_status": "FRACTURE_GATE_REQUIRES_INITIAL_STATE_WIRING",
+    "pressure_semantics": "PRESSURE_SIGMATHETA_SEMANTICS_PARTIAL_REQUIRES_ALIGNMENT",
+    "sign_convention": "SIGN_CONVENTION_REQUIRES_REVIEW",
+    "t0_lot_vs_drilling_distinction": true,
+    "dispatch_allowed_next": false,
+    "runtime_execution_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "tool": "tools/audit_phase11_10n_fracture_gate_initial_sigmatheta.py",
+    "document": "docs/88_fracture_gate_initial_sigmatheta_audit.md",
+    "required_statuses": [
+      "PHASE11_10N_FRACTURE_GATE_INITIAL_SIGMATHETA_AUDITED",
+      "SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH",
+      "T0_LOT_DISTINCT_FROM_T0_DRILLING",
+      "PRESSURE_SIGMATHETA_SEMANTICS_REQUIRED",
+      "SIGMATHETA_SIGN_CONVENTION_REQUIRED",
+      "DISPATCH_REMAINS_BLOCKED_UNTIL_GATE_SAFE"
+    ],
+    "blocking_gaps": [
+      "No verified sigma_theta_initial_after_drilling is wired into PknModel.",
+      "Current sigma_theta_static and sigma_theta_time_series inputs are diagnostic YAML/provider values.",
+      "SaltWallStressDiagnostics exists as an opt-in diagnostic route, not as default fracture gate runtime.",
+      "The LOT t=0 state is not proven to include post-drilling elastic/geomechanical redistribution.",
+      "Pressure source and sigma_theta reference are only partially aligned for future dispatch.",
+      "Compression-positive sign convention is documented, but future model dispatch still needs an explicit gate contract."
+    ],
+    "recommended_next_phase": "PHASE11_10O_SPECIFY_SIGMATHETA_INITIAL_STATE_WIRING",
+    "caveats": [
+      "Phase 11.10N is an audit only.",
+      "No parser, schema, C++ runtime or protected cases are changed.",
+      "fracture_model remains metadata/selection until the initial sigma-theta state is specified.",
+      "BUZ29-PENNY is not executed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

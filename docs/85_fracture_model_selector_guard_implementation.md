@@ -207,3 +207,19 @@ fracture_model_sigma_theta_initial_state_audit_required = true
 `physically_validated = false`, `legacy_equivalent = false` e
 `runtime_supported_now = false`. A integração não altera `PknRunner`,
 `PknModel`, CLI ou o comportamento de `lot-pkn`.
+
+## Auditoria 11.10N — dispatch ainda bloqueado
+
+A auditoria posterior ao parser/schema confirma:
+
+```text
+SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH
+T0_LOT_DISTINCT_FROM_T0_DRILLING
+PRESSURE_SIGMATHETA_SEMANTICS_REQUIRED
+SIGMATHETA_SIGN_CONVENTION_REQUIRED
+```
+
+O helper `FractureModelSelector` permanece isolado da física. Mesmo com
+`fracture_model` integrado ao parser, o dispatch real continua bloqueado até
+que `sigma_theta_compression_positive_Pa` venha de um estado inicial
+pós-perfuração especificado, não de um default ou proxy silencioso.

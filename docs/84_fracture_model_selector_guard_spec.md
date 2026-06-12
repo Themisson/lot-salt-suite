@@ -131,3 +131,17 @@ rejeição de vazio explícito e bloqueio de modelos não suportados.
 Essa integração ainda não é autorização de execução: `runtime_dispatch_enabled`
 permanece falso e o próximo gate físico obrigatório é
 `SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH`.
+
+## Auditoria 11.10N
+
+A Fase 11.10N audita esse gate e registra:
+
+```text
+sigmatheta_initial_state = SIGMATHETA_INITIAL_STATE_MISSING
+fracture_gate_status = FRACTURE_GATE_REQUIRES_INITIAL_STATE_WIRING
+```
+
+O guard do seletor permanece correto como camada de seleção, mas não deve ser
+interpretado como autorização de execução. O futuro dispatch precisa receber um
+`sigma_theta_initial_after_drilling` explícito e alinhado com a semântica da
+pressão de poço/parede usada no critério.

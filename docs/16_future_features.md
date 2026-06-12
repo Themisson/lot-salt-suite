@@ -666,3 +666,10 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   como metadado diagnóstico; `runtime_dispatch_enabled` permanece falso,
   BUZ29-PENNY não é executado e o próximo gate obrigatório é
   `SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH`.
+- A Fase 11.10N audita esse gate e mantém o dispatch bloqueado. A classificação
+  é `SIGMATHETA_INITIAL_STATE_MISSING` e
+  `FRACTURE_GATE_REQUIRES_INITIAL_STATE_WIRING`: o runtime consegue consumir
+  sigma-theta diagnóstico, mas ainda não prova um
+  `sigma_theta_initial_after_drilling` calculado antes do gate. A próxima fase
+  deve especificar esse wiring inicial antes de qualquer execução BUZ29-PENNY
+  ou dispatch físico por `fracture_model`.

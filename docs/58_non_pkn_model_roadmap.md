@@ -516,6 +516,25 @@ Essa fase ainda não torna BUZ29-PENNY executável. O próximo gate é
 fratura não deve ser avaliado antes de auditar o estado geomecânico inicial
 pós-perfuração.
 
+## Fase 11.10N — estado inicial de sigma-theta
+
+A Fase 11.10N audita o gate físico que ficou pendente após a integração
+parser/schema:
+
+```text
+sigmatheta_initial_state = SIGMATHETA_INITIAL_STATE_MISSING
+fracture_gate_status = FRACTURE_GATE_REQUIRES_INITIAL_STATE_WIRING
+dispatch_allowed_next = false
+buz29_execution_allowed_next = false
+```
+
+O resultado confirma que a seleção de `PENNY_SHAPED` no parser/schema ainda
+não pode virar execução. As rotas atuais consomem `sigma_theta_static`,
+`sigma_theta_time_series` ou diagnóstico sal/coupling, mas não comprovam um
+`sigma_theta_initial_after_drilling` calculado e alinhado com a pressão do
+gate. A próxima fase recomendada é
+`PHASE11_10O_SPECIFY_SIGMATHETA_INITIAL_STATE_WIRING`.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

@@ -314,3 +314,19 @@ legado.
 O próximo bloqueio técnico não é sintático: antes de executar qualquer dispatch
 real, é necessário auditar o estado inicial de `sigma_theta` pós-perfuração por
 meio do gate `SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH`.
+
+## Atualização 11.10N — gate de estado inicial
+
+A Fase 11.10N confirma que o gate permanece fechado:
+
+```text
+SIGMATHETA_INITIAL_STATE_MISSING
+FRACTURE_GATE_REQUIRES_INITIAL_STATE_WIRING
+PRESSURE_SIGMATHETA_SEMANTICS_PARTIAL_REQUIRES_ALIGNMENT
+DISPATCH_REMAINS_BLOCKED_UNTIL_GATE_SAFE
+```
+
+Assim, `fracture_model` continua sendo uma seleção/metadata no parser/schema.
+Nenhum dispatch físico de `PKN` ou `PENNY_SHAPED` deve ser ligado enquanto o
+estado inicial `sigma_theta` pós-perfuração não estiver especificado e
+semanticamente alinhado com a pressão usada no gate.

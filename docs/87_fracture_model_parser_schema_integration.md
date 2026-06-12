@@ -198,3 +198,22 @@ PHASE11_10N_AUDIT_FRACTURE_INITIATION_GATE_INITIAL_SIGMATHETA_STATE
 
 Essa fase deve ocorrer antes de qualquer dispatch físico por
 `fracture_model`.
+
+## Resultado da auditoria 11.10N
+
+A Fase 11.10N executa a auditoria do gate acima e mantém o dispatch bloqueado:
+
+```text
+sigmatheta_initial_state = SIGMATHETA_INITIAL_STATE_MISSING
+fracture_gate_status = FRACTURE_GATE_REQUIRES_INITIAL_STATE_WIRING
+pressure_semantics = PRESSURE_SIGMATHETA_SEMANTICS_PARTIAL_REQUIRES_ALIGNMENT
+sign_convention = SIGN_CONVENTION_REQUIRES_REVIEW
+dispatch_allowed_next = false
+runtime_execution_allowed_next = false
+buz29_execution_allowed_next = false
+```
+
+O motivo é que o runtime `lot-pkn` já consegue consumir sigma-theta por rota
+diagnóstica, mas ainda não comprova um estado inicial tangencial
+pós-perfuração antes do gate. A próxima fase segura é
+`PHASE11_10O_SPECIFY_SIGMATHETA_INITIAL_STATE_WIRING`.

@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10M fracture_model parser/schema integration
+Fase ativa  : 11.10N fracture gate initial sigma-theta audit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 306/306 esperados apos Fase 11.10M em 2026-06-12
-Testes Py   : 598/598 esperados apos Fase 11.10M em 2026-06-12
+Testes Py   : 607/607 esperados apos Fase 11.10N em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,43 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10N — auditoria do estado inicial sigma-theta — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase11_10n_fracture_gate_initial_sigmatheta.py
+```
+
+**Documento criado:**
+
+```text
+docs/88_fracture_gate_initial_sigmatheta_audit.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10N_FRACTURE_GATE_INITIAL_SIGMATHETA_AUDITED
+SIGMATHETA_INITIAL_STATE_MISSING
+FRACTURE_GATE_REQUIRES_INITIAL_STATE_WIRING
+PRESSURE_SIGMATHETA_SEMANTICS_PARTIAL_REQUIRES_ALIGNMENT
+SIGN_CONVENTION_REQUIRES_REVIEW
+DISPATCH_REMAINS_BLOCKED_UNTIL_GATE_SAFE
+```
+
+**Interpretação:** o runtime já possui rotas diagnósticas que consomem
+`sigma_theta_static`, `sigma_theta_time_series` ou provider, mas ainda não
+existe prova de um `sigma_theta_initial_after_drilling` calculado e alinhado
+antes do gate de fratura. `fracture_model` permanece metadata/seleção; dispatch
+físico e BUZ29-PENNY continuam bloqueados. Próxima fase recomendada:
+`PHASE11_10O_SPECIFY_SIGMATHETA_INITIAL_STATE_WIRING`.
 
 ---
 

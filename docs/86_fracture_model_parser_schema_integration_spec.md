@@ -203,3 +203,18 @@ suportados.
 O runtime dispatch permanece desabilitado. Antes de qualquer dispatch físico,
 fica registrado o gate
 `SIGMATHETA_INITIAL_STATE_REQUIRED_BEFORE_MODEL_DISPATCH`.
+
+## Auditoria 11.10N — especificação do próximo bloqueio
+
+A Fase 11.10N executa a auditoria física desse bloqueio e conclui que a próxima
+etapa ainda não é dispatch. A classificação é:
+
+```text
+SIGMATHETA_INITIAL_STATE_MISSING
+FRACTURE_GATE_REQUIRES_INITIAL_STATE_WIRING
+DISPATCH_REMAINS_BLOCKED_UNTIL_GATE_SAFE
+```
+
+Portanto, a integração parser/schema especificada aqui permanece uma camada de
+entrada e metadata. Ela não autoriza `PENNY_SHAPED` runtime nem altera a rota
+`lot-pkn`.
