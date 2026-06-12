@@ -591,3 +591,10 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `NOT_ACTIVE_SIMULATION_CASE`. A próxima exigência é
   `AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED`; a rota ainda não
   executa BUZ29, não altera `lot-pkn` e não cria runner não-PKN.
+- A Fase 11.10B inspeciona os campos do candidato contra a API real do
+  `PennyShapedDiagnosticAdapter` e classifica
+  `BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL`. Pressão e abertura são consumíveis
+  como evidência, mas as entradas elásticas, de viscosidade, vazão e
+  `sigma_theta_compression_positive_Pa` ainda não estão adapter-ready. A
+  próxima fase permanece `PHASE11_10C_AUDIT_PENNY_SHAPED_MODEL_MATH_AXISYMMETRIC_1RAD`
+  antes de qualquer execução diagnóstica.

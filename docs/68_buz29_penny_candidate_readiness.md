@@ -144,6 +144,32 @@ O candidato não é schema runtime oficial e não deve ser executado como valida
 física BUZ29. Ele apenas registra a evidência consumível de pressão/abertura e
 os caveats necessários para uma futura inspeção dos inputs do adapter.
 
+## Phase 11.10B adapter-ready input inspection
+
+A Fase 11.10B executou essa inspeção de inputs:
+
+```text
+classification = BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL
+adapter_ready = false
+partial_adapter_ready = true
+```
+
+Campos ausentes para o adapter:
+
+- `young_modulus_Pa`;
+- `poisson_ratio`;
+- `viscosity_Pa_min`;
+- `flow_rate_m3_min`;
+- `sigma_theta_compression_positive_Pa`.
+
+Campos que exigem revisão semântica:
+
+- `elapsed_since_opening_min`;
+- `wellbore_pressure_Pa`.
+
+A próxima fase recomendada é auditoria matemática do modelo em 1 rad, não
+execução BUZ29.
+
 ## Caveats
 
 - Esta fase não cria YAML BUZ29.

@@ -114,3 +114,34 @@ PHASE11_10B_INSPECT_BUZ29_PENNY_ADAPTER_READY_INPUTS
 Essa próxima fase deve auditar se os inputs reais necessários ao
 `PennyShapedDiagnosticAdapter` podem ser montados sem inventar parâmetros e sem
 promover o candidato a rota runtime oficial.
+
+## Resultado da 11.10B
+
+A inspeção dos inputs adapter-ready classificou o candidato como parcial:
+
+```text
+classification = BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL
+adapter_ready = false
+partial_adapter_ready = true
+```
+
+A API real do `PennyShapedDiagnosticAdapter` exige:
+
+```text
+young_modulus_Pa
+poisson_ratio
+viscosity_Pa_min
+flow_rate_m3_min
+elapsed_since_opening_min
+wellbore_pressure_Pa
+sigma_theta_compression_positive_Pa
+volume_multiplier
+```
+
+O candidato 11.10A possui pressão/abertura consumíveis, mas ainda não possui
+todos os campos acima como entradas diretas e semanticamente prontas. A próxima
+fase recomendada é:
+
+```text
+PHASE11_10C_AUDIT_PENNY_SHAPED_MODEL_MATH_AXISYMMETRIC_1RAD
+```

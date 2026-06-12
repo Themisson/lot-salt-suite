@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10A BUZ29-PENNY diagnostic route
+Fase ativa  : 11.10B BUZ29-PENNY adapter-ready input inspection
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 273/273 passaram apos Fase 11.10A em 2026-06-12
-Testes Py   : 439/439 passaram apos Fase 11.10A em 2026-06-12
+Testes Py   : 449/449 passaram apos Fase 11.10B em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,42 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10B — entradas adapter-ready BUZ29-PENNY — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/inspect_phase11_10b_buz29_penny_adapter_ready_inputs.py
+```
+
+**Documento criado:**
+
+```text
+docs/75_buz29_penny_adapter_ready_inputs.md
+```
+
+**Resultado:**
+
+```text
+classification = BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL
+adapter_ready = false
+partial_adapter_ready = true
+physically_validated = false
+legacy_equivalent = false
+active_simulation_case = false
+recommended_next_phase = PHASE11_10C_AUDIT_PENNY_SHAPED_MODEL_MATH_AXISYMMETRIC_1RAD
+```
+
+**Interpretação:** pressão e abertura BUZ29 são evidências consumíveis, mas o
+candidato ainda não possui todos os campos exigidos pelo
+`PennyShapedDiagnosticAdapter` como entradas diretas e semanticamente prontas.
+A próxima etapa segura é auditoria matemática da formulação axissimétrica de 1
+rad, não execução BUZ29.
 
 ---
 

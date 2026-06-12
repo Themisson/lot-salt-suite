@@ -290,6 +290,28 @@ A 11.10A não altera `lot-pkn`, não cria rota runtime oficial, não executa BUZ
 como simulação física e não remove as lacunas de `sigmaTheta`, `pw`, `margin`
 ou `opened`.
 
+## Fase 11.10B — inspeção adapter-ready BUZ29-PENNY
+
+A Fase 11.10B inspecionou o candidato criado na 11.10A contra a API real do
+`PennyShapedDiagnosticAdapter`:
+
+```text
+classification = BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL
+adapter_ready = false
+partial_adapter_ready = true
+recommended_next_phase = PHASE11_10C_AUDIT_PENNY_SHAPED_MODEL_MATH_AXISYMMETRIC_1RAD
+```
+
+A inspeção confirmou que pressão e abertura são evidências consumíveis, mas
+`young_modulus_Pa`, `poisson_ratio`, `viscosity_Pa_min`, `flow_rate_m3_min` e
+`sigma_theta_compression_positive_Pa` ainda não estão presentes como entradas
+diretas do adapter. `elapsed_since_opening_min` e `wellbore_pressure_Pa`
+existem apenas como mapeamentos parciais que exigem revisão semântica.
+
+Mesmo com esse status parcial, a próxima fase não deve executar BUZ29; ela deve
+auditar matematicamente o `PennyShapedModel` na formulação axissimétrica de 1
+rad.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

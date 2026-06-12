@@ -2160,6 +2160,57 @@
       "Phase 11.10A starts diagnostic preparation only; it does not execute BUZ29-PENNY as a physical simulation."
     ]
   },
+  "phase11_10b_buz29_penny_adapter_ready_inputs": {
+    "status": "PHASE11_10B_BUZ29_PENNY_ADAPTER_READY_INPUTS_INSPECTED",
+    "phase": "11.10B",
+    "track": "PENNY_SHAPED",
+    "case": "cases/validation/non_pkn/buz29_penny_candidate.yaml",
+    "classification": "BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL",
+    "adapter_ready": false,
+    "partial_adapter_ready": true,
+    "physically_validated": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalent": false,
+    "legacy_equivalence": false,
+    "active_simulation_case": false,
+    "simulation_executed": false,
+    "tool": "tools/inspect_phase11_10b_buz29_penny_adapter_ready_inputs.py",
+    "document": "docs/75_buz29_penny_adapter_ready_inputs.md",
+    "required_adapter_fields": [
+      "young_modulus_Pa",
+      "poisson_ratio",
+      "viscosity_Pa_min",
+      "flow_rate_m3_min",
+      "elapsed_since_opening_min",
+      "wellbore_pressure_Pa",
+      "sigma_theta_compression_positive_Pa",
+      "volume_multiplier"
+    ],
+    "missing_fields": [
+      "young_modulus_Pa",
+      "poisson_ratio",
+      "viscosity_Pa_min",
+      "flow_rate_m3_min",
+      "sigma_theta_compression_positive_Pa"
+    ],
+    "semantic_review_fields": [
+      "elapsed_since_opening_min",
+      "wellbore_pressure_Pa"
+    ],
+    "axisymmetric_interpretation": "PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED",
+    "future_output_requirement": "AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED",
+    "recommended_next_phase": "PHASE11_10C_AUDIT_PENNY_SHAPED_MODEL_MATH_AXISYMMETRIC_1RAD",
+    "caveats": [
+      "NOT_PHYSICALLY_VALIDATED",
+      "NOT_LEGACY_EQUIVALENT",
+      "NOT_ACTIVE_SIMULATION_CASE",
+      "MATH_AUDIT_REQUIRED_BEFORE_DIAGNOSTIC_EXECUTION",
+      "PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED",
+      "AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED",
+      "Phase 11.10B inspects inputs only; it does not execute BUZ29-PENNY."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

@@ -210,3 +210,17 @@ NOT_ACTIVE_SIMULATION_CASE
 
 A 11.10A não executa BUZ29 e não cria uma rota oficial do `lot-sim`; ela apenas
 formaliza o contrato de entrada para uma inspeção futura dos campos do adapter.
+
+## Resultado da 11.10B
+
+A inspeção adapter-ready foi executada na fase seguinte:
+
+```text
+classification = BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL
+adapter_ready = false
+partial_adapter_ready = true
+recommended_next_phase = PHASE11_10C_AUDIT_PENNY_SHAPED_MODEL_MATH_AXISYMMETRIC_1RAD
+```
+
+Esse resultado preserva o gate diagnóstico: BUZ29-PENNY ainda não é simulação
+física, não é equivalência com o legado e não é caso runtime ativo.
