@@ -174,6 +174,21 @@ candidato BUZ29 adapter-ready. Os campos ausentes continuam ausentes, e o
 próximo gate deve definir o contrato de saída 1 rad/2π antes de qualquer
 execução diagnóstica BUZ29.
 
+## Resultado da 11.10D
+
+O contrato de saída 1 rad/2π foi especificado:
+
+```text
+contract_status = AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_SPECIFIED
+volume_multiplier_semantics = VOLUME_MULTIPLIER_EMPIRICAL
+implementation_allowed = false
+recommended_next_phase = PHASE11_10E_DEFINE_PENNY_DIAGNOSTIC_OUTPUT_FIXTURES
+```
+
+A execução BUZ29-PENNY segue bloqueada. A próxima etapa segura é criar fixtures
+de saída diagnóstica que preservem o valor de origem em 1 rad e reportem
+equivalentes 2π apenas com `source`/caveat.
+
 ## Riscos remanescentes
 
 - A pressão legada ainda precisa ser transformada em amostra `wellbore_pressure_Pa`.

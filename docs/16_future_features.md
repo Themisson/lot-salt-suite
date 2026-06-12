@@ -604,3 +604,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `PENNY_MATH_AXISYMMETRIC_1RAD_PROXY`. A auditoria passa sem correção C++,
   mas exige `PHASE11_10D_DEFINE_AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT` antes
   de tratar `fracture_volume_proxy_m3` como volume físico total.
+- A Fase 11.10D especifica esse contrato de saída:
+  `AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_SPECIFIED`. Saídas futuras devem
+  preservar `*_1rad_m3`, reportar equivalentes `*_equivalent_2pi_m3` apenas com
+  campo `source`/caveat, e manter `volume_multiplier` como
+  `VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI`. A próxima etapa é criar fixtures de
+  saída diagnóstica, ainda sem writer/runtime C++.

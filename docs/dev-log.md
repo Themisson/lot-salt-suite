@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10C PennyShaped math axisymmetric 1rad audit
+Fase ativa  : 11.10D axisymmetric 1rad to 2pi output contract
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 273/273 passaram apos Fase 11.10A em 2026-06-12
-Testes Py   : 461/461 esperados apos Fase 11.10C em 2026-06-12
+Testes Py   : 473/473 esperados apos Fase 11.10D em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,40 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10D — contrato de saída 1 rad ↔ 2π — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/spec_phase11_10d_axisymmetric_output_contract.py
+```
+
+**Documento criado:**
+
+```text
+docs/77_axisymmetric_1rad_2pi_output_contract.md
+```
+
+**Resultado:**
+
+```text
+contract_status = AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_SPECIFIED
+axisymmetric_angle_rad = 1.0
+volume_conversion_factor_1rad_to_2pi = 6.283185307179586
+volume_multiplier_semantics = VOLUME_MULTIPLIER_EMPIRICAL
+implementation_allowed = false
+recommended_next_phase = PHASE11_10E_DEFINE_PENNY_DIAGNOSTIC_OUTPUT_FIXTURES
+```
+
+**Interpretação:** a fase define contrato de saída, não runtime. O
+`volume_multiplier` permanece empírico e não é fator geométrico `2π`. Toda
+saída volumétrica física futura deve preservar o valor de origem em 1 rad e
+reportar separadamente equivalente 2π com `source`/caveat.
 
 ---
 

@@ -333,6 +333,24 @@ interpretação axissimétrica de 1 rad. O multiplicador `10.0` continua
 legado-inspirado e empírico; ele não deve ser promovido a conversão formal
 `2π` sem contrato de saída específico.
 
+## Fase 11.10D — contrato de saída 1 rad ↔ 2π
+
+A Fase 11.10D especificou o contrato de saída sem implementar runtime:
+
+```text
+contract_status = AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_SPECIFIED
+axisymmetric_angle_rad = 1.0
+volume_conversion_factor_1rad_to_2pi = 6.283185307179586
+volume_multiplier_semantics = VOLUME_MULTIPLIER_EMPIRICAL
+implementation_allowed = false
+recommended_next_phase = PHASE11_10E_DEFINE_PENNY_DIAGNOSTIC_OUTPUT_FIXTURES
+```
+
+A rota passa a exigir campos separados para `fracture_volume_proxy_1rad_m3`,
+`fracture_volume_equivalent_2pi_m3` e `fracture_volume_equivalent_2pi_source`.
+O `volume_multiplier` permanece empírico e não substitui o fator geométrico
+`2π`.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

@@ -99,3 +99,18 @@ Essa classificação preserva o adapter atual: não há correção C++ obrigató
 O próximo passo técnico é definir contrato de saída para separar grandezas
 internas em 1 rad e volumes equivalentes 2π antes de qualquer uso físico forte
 do `fracture_volume_proxy_m3`.
+
+## Resultado da Fase 11.10D
+
+A 11.10D definiu esse contrato como especificação documental:
+
+```text
+AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_SPECIFIED
+VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI
+IMPLEMENTATION_NOT_ALLOWED_IN_11_10D
+```
+
+O adapter C++ permanece inalterado. Uma futura fase poderá criar fixtures de
+saída diagnóstica com `fracture_volume_proxy_1rad_m3`,
+`fracture_volume_equivalent_2pi_m3` e `fracture_volume_equivalent_2pi_source`
+antes de qualquer writer/runtime.

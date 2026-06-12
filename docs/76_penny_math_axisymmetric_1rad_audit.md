@@ -194,3 +194,19 @@ diagnóstica BUZ29.
 ```text
 PHASE11_10D_DEFINE_AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT
 ```
+
+## Resultado da Fase 11.10D
+
+A fase seguinte especificou o contrato de saída:
+
+```text
+contract_status = AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_SPECIFIED
+axisymmetric_angle_rad = 1.0
+volume_conversion_factor_1rad_to_2pi = 6.283185307179586
+volume_multiplier_semantics = VOLUME_MULTIPLIER_EMPIRICAL
+implementation_allowed = false
+recommended_next_phase = PHASE11_10E_DEFINE_PENNY_DIAGNOSTIC_OUTPUT_FIXTURES
+```
+
+O contrato mantém `volume_multiplier` como empírico e exige campos separados
+para grandezas internas em 1 rad e equivalentes 2π com source/caveat.

@@ -246,7 +246,7 @@
 </div>
 <div class="nav-group">
   <div class="label">Formulações</div>
-  <a href="#lot" data-title="02 — formulação do leak-off test (lot)"><span>02 — Formulação do Leak-Off Test (LOT)</span><span class="nav-dot pill-muted"></span></a><a href="#apb" data-title="03 — formulação do annular pressure buildup (apb)"><span>03 — Formulação do Annular Pressure Buildup (APB)</span><span class="nav-dot pill-muted"></span></a><a href="#salt" data-title="04 — modelos de fluência de sal"><span>04 — Modelos de Fluência de Sal</span><span class="nav-dot pill-muted"></span></a><a href="#coupling" data-title="13 — acoplamento lot–apb–sal"><span>13 — Acoplamento LOT–APB–Sal</span><span class="nav-dot pill-warn"></span></a><a href="#issues" data-title="08 — problemas conhecidos e riscos"><span>08 — Problemas Conhecidos e Riscos</span><span class="nav-dot pill-muted"></span></a>
+  <a href="#lot" data-title="02 — formulação do leak-off test (lot)"><span>02 — Formulação do Leak-Off Test (LOT)</span><span class="nav-dot pill-muted"></span></a><a href="#apb" data-title="03 — formulação do annular pressure buildup (apb)"><span>03 — Formulação do Annular Pressure Buildup (APB)</span><span class="nav-dot pill-muted"></span></a><a href="#salt" data-title="04 — modelos de fluência de sal"><span>04 — Modelos de Fluência de Sal</span><span class="nav-dot pill-muted"></span></a><a href="#coupling" data-title="13 — acoplamento lot–apb–sal"><span>13 — Acoplamento LOT–APB–Sal</span><span class="nav-dot pill-warn"></span></a><a href="#future_features" data-title="16 — planejamento de funcionalidades futuras"><span>16 — Planejamento de funcionalidades futuras</span><span class="nav-dot pill-info"></span></a><a href="#issues" data-title="08 — problemas conhecidos e riscos"><span>08 — Problemas Conhecidos e Riscos</span><span class="nav-dot pill-muted"></span></a>
 </div>
 <div class="nav-group">
   <div class="label">Entrada, CLI e validação</div>
@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">135/142</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">136/143</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">273</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">461</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">473</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -7666,6 +7666,583 @@ BASE_CASE=BUZ67D_MODERN_REFINED
 NEXT_GATE=ADDITIONAL_WELLS_OR_SENSITIVITY_MATRIX
 PROTECTED_SCOPE_UNCHANGED=true
 </code></pre>
+</div>
+</section>
+
+<section id="future_features">
+<div class="section-meta"><span>Documento</span><span class="pill pill-info">Planejado</span></div>
+<h3>16 — Planejamento de funcionalidades futuras</h3>
+<div class="doc-body">
+<p><strong>Status:</strong> Planejamento técnico<br />
+<strong>Escopo:</strong> funcionalidades futuras que ainda não devem entrar no runtime<br />
+<strong>Restrição:</strong> este documento não autoriza validação física nem alteração de
+formulações sem fase própria.</p>
+<hr />
+<h2 id="fase-1017c-acomodacao-shut-in-e-fluido-zamora">Fase 10.17C — acomodação, shut-in e fluido Zamora</h2>
+<p><strong>Status:</strong> <code>PLANNED_NO_RUNTIME_CHANGE</code>.</p>
+<p>A Fase 10.17C registra o plano para três evoluções que ficaram fora do modo
+opcional <code>volumetric_balance</code> da Fase 10.17B:</p>
+<ol>
+<li>agenda operacional com acomodação antes da injeção;</li>
+<li>fase de shut-in/no-injection após a injeção;</li>
+<li>modelo de fluido Zamora ou equivalente moderno.</li>
+</ol>
+<p>Nenhum desses itens foi implementado nesta fase.</p>
+<h3 id="acomodacao-operacional">Acomodação operacional</h3>
+<p>O legado <code>LOT_Tese</code> separa <code>tac</code> e <code>t_no_injection</code>:</p>
+<pre><code class="language-text">tac            -&gt; acomodação térmica/mecânica antes do carregamento operacional
+t_no_injection -&gt; extensão temporal após o fim da injeção LOT
+</code></pre>
+<p>No moderno atual, <code>lot.injection.schedule.accommodation_time</code> já reduz o tempo
+ativo usado pelo <code>PknModel</code>, mas ainda não existe uma estrutura explícita de
+fases operacionais. A evolução recomendada é criar uma agenda declarativa:</p>
+<pre><code class="language-yaml">lot:
+  operation_schedule:
+    phases:
+      - type: accommodation
+        duration: {value: 9.5, unit: min}
+      - type: injection
+        duration: {value: 12.5, unit: min}
+        rate: {value: 0.5, unit: bbl_min}
+      - type: shutin
+        duration: {value: 9.5, unit: min}
+</code></pre>
+<p>Essa agenda deve ser parseada para SI no <code>CaseParser</code>, mas não deve ser
+conectada automaticamente ao acoplamento sal/APB antes de testes dedicados.</p>
+<h3 id="shut-in-no-injection">Shut-in / no-injection</h3>
+<p><strong>Status:</strong> implementado de forma opt-in para LOT/PKN na Fase 10.18B.</p>
+<p>O legado mantém <code>Vq = flowRate(tend)</code> após o fim da injeção quando <code>t &gt; tend</code>,
+prolongando a simulação com o volume injetado final. Isso não é equivalente a
+continuar bombeando: é uma fase de volume imposto constante.</p>
+<p>A Fase 10.18A não implementa shut-in. Ela apenas confirma, por diagnóstico
+visual, que o modo moderno <code>volumetric_balance</code> se aproxima mais da escala de
+<code>pw_Pa</code> legado do que <code>pkn_direct</code> no caso controlado BUZ67D. A diferença
+temporal remanescente permanece esperada porque o legado auditado inclui uma
+cauda sem injeção até <code>1320 s</code>, enquanto o run moderno controlado cobre
+<code>0..750 s</code>.</p>
+<p>Contrato futuro recomendado:</p>
+<pre><code class="language-text">injection phase:
+  dV_injected/dt = Q
+
+shutin phase:
+  dV_injected/dt = 0
+  V_injected = V_injected_at_end_of_injection
+</code></pre>
+<p>Para o modo <code>volumetric_balance</code>, a fase shut-in altera pressão somente por
+termos explicitamente disponíveis no modelo moderno. Na implementação 10.18B,
+<code>Q=0</code> implica volume injetado constante; sem leakoff/fratura/fechamento ativo,
+a pressão permanece constante. Com leakoff ativo, o incremento efetivo pode ser
+negativo e a pressão pode declinar. APB, sal, casing elástico e Zamora ainda
+não foram conectados a esse ciclo.</p>
+<h3 id="fluido-zamora">Fluido Zamora</h3>
+<p>O ramo <code>legance/LOT_APB_v5</code> contém uma implementação extensa de correlações
+Zamora em:</p>
+<pre><code class="language-text">legance/LOT_APB_v5/include/apb_code/Fluids.h
+legance/LOT_APB_v5/src/apb_code/Fluids.cpp
+</code></pre>
+<p>Funções e estruturas relevantes observadas em modo read-only:</p>
+<pre><code class="language-text">Zamora
+Zamora_Coefficients
+setZamora(...)
+setZamoraCoefficients(...)
+setZamoraPVTinit(...)
+setHidrostaticPVTinit(...)
+setZamoraKt(...)
+setZamoraAlpha(...)
+attZamoraPVT(...)
+attZamoraKt(...)
+attZamoraAlpha(...)
+getZamoraRho(...)
+getZamoraPressure(...)
+getZamoraKt(...)
+getZamoraAlpha(...)
+getZamoraRhoAtDepth(...)
+getZamoraPressureAtDepth(...)
+getZamoraKtAtDepth(...)
+getZamoraAlphaAtDepth(...)
+</code></pre>
+<p>O uso em <code>APB1da.cpp</code> atualiza densidade, compressibilidade e expansão térmica
+por profundidade/temperatura/pressão durante a solução APB. Essa lógica não
+deve ser copiada diretamente para <code>src/</code>; a política do projeto exige criar um
+contrato moderno próprio.</p>
+<h3 id="api-futura-recomendada">API futura recomendada</h3>
+<p>Criar futuramente um módulo <code>fluids/</code> C++ com uma interface pequena:</p>
+<pre><code class="language-cpp">struct FluidStateInput {
+  double pressure_Pa = 0.0;
+  double temperature_K = 0.0;
+  double depth_m = 0.0;
+};
+
+struct FluidState {
+  double density_kg_m3 = 0.0;
+  double compressibility_per_Pa = 0.0;
+  double thermal_expansion_per_K = 0.0;
+  double viscosity_Pa_s = 0.0;
+};
+
+class FluidModel {
+ public:
+  virtual ~FluidModel() = default;
+  virtual FluidState evaluate(const FluidStateInput&amp; input) const = 0;
+};
+</code></pre>
+<p>Uma implementação futura <code>ZamoraFluidModel</code> deve:</p>
+<ul>
+<li>receber coeficientes declarados em YAML;</li>
+<li>converter todas as unidades no parser;</li>
+<li>expor densidade, compressibilidade e expansão térmica em SI;</li>
+<li>ter testes C++ com casos analíticos/fixture pequenos;</li>
+<li>não depender de headers <code>legance/</code> ou de código legado;</li>
+<li>não virar default sem fase de validação.</li>
+</ul>
+<h3 id="yaml-futuro-recomendado">YAML futuro recomendado</h3>
+<p>Exemplo conceitual:</p>
+<pre><code class="language-yaml">fluids:
+  - id: lot_fluid
+    mode: zamora
+    viscosity_cP: 3.0
+    zamora:
+      reference_pressure: {value: 1.0, unit: atm}
+      reference_temperature: {value: 60.0, unit: degF}
+      coefficients:
+        a1: 0.0
+        b1: 0.0
+        c1: 0.0
+        a2: 0.0
+        b2: 0.0
+        c2: 0.0
+</code></pre>
+<p>Esse formato é apenas proposta. A fase de implementação deve auditar as
+unidades reais usadas no <code>LOT_APB_v5</code> antes de aceitar nomes ou dimensões.</p>
+<h3 id="ordem-recomendada">Ordem recomendada</h3>
+<ol>
+<li>Manter o diagnóstico 10.18C como rota de sink volumétrico por threshold
+   simplificado, sem declará-lo equivalente ao critério legado.</li>
+<li>Criar uma fase de arquitetura opt-in para fornecer
+   <code>SigmaThetaInfluenceLayer</code> ao balanço volumétrico sem fazer <code>lot/</code> depender
+   diretamente de <code>salt/</code> ou <code>coupling/</code>.</li>
+<li>Só depois reavaliar o critério legado
+   <code>|pi + dP| &gt; |sigma_tangencial(altura_de_influencia)|</code> como rota runtime
+   experimental. O gate atual da Fase 10.18D é
+   <code>SIGMA_THETA_AVAILABLE_DIAGNOSTIC_ONLY</code>.</li>
+<li>Auditar a semântica de <code>dP</code> legado após abertura/leakoff.</li>
+<li>Criar <code>FluidModel</code> abstrato e <code>ConstantFluidModel</code> compatível com o estado atual.</li>
+<li>Auditar especificamente as unidades Zamora no <code>LOT_APB_v5</code>.</li>
+<li>Implementar <code>ZamoraFluidModel</code> experimental, opt-in e sem alterar defaults.</li>
+</ol>
+<h3 id="riscos">Riscos</h3>
+<ul>
+<li><code>tac</code> legado pode representar acomodação termo-mecânica, não apenas atraso de
+  injeção.</li>
+<li><code>t_no_injection</code> representa volume final constante, não vazão residual.</li>
+<li>Zamora no legado mistura pressão, temperatura, profundidade e unidades
+  históricas; copiar fórmula sem normalização pode criar erro dimensional.</li>
+<li>Conectar shut-in ao balanço sem sal/APB pode produzir falsa sensação de
+  validação.</li>
+<li>A pressão inicial absoluta ainda precisa de contrato próprio antes de comparar
+  <code>pw</code> legado com <code>wellbore_pressure_Pa</code> moderno.</li>
+<li>O critério legado por tensão tangencial não está reproduzido no <code>PknModel</code>;
+  usar <code>fracture.breakdown.pressure</code> como proxy pode antecipar ou atrasar
+  artificialmente o desconto de volume de fratura.</li>
+<li><code>sigma_theta_compression_positive_Pa</code> existe no diagnóstico moderno, mas
+  ainda não é fonte runtime para <code>lot-sim run --mode lot-pkn</code>.</li>
+<li>A Fase 10.18E confirmou que calibrar <code>fracture.breakdown.pressure</code> com o
+  <code>dP</code> legado em <code>Momento da quebra = 8.5 min</code> ainda abre a rota moderna cedo
+  demais (<code>30 s</code> contra <code>510 s</code>). Portanto, fases futuras não devem insistir
+  apenas em ajuste escalar do threshold; o caminho recomendado é uma rota
+  opt-in que forneça <code>SigmaThetaInfluenceLayer</code>/altura de influência ao balanço
+  volumétrico, mantendo <code>lot-sim run --mode lot-pkn</code> desacoplado por default.</li>
+<li>A Fase 10.19A criou o contrato opt-in <code>sigma_theta_static</code>, mas o proxy
+  escalar ainda abriu cedo demais. A próxima evolução deve trocar o valor
+  estático por um provider runtime explícito, por uma rota como:</li>
+</ul>
+<pre><code class="language-text">CaseData -&gt; SaltCreepTimeBridge -&gt; SaltWallStressDiagnostics
+         -&gt; SigmaThetaInfluenceLayer -&gt; volumetric_balance
+</code></pre>
+<p>Essa rota futura deve continuar opt-in, sem tornar sal/sigma-theta default
+  para <code>lot-sim run --mode lot-pkn</code>.
+- A Fase 10.19B auditou a hipótese de erro de vazão e classificou a convenção
+  como <code>FLOWRATE_CONVENTION_MATCHES_LEGACY</code>. O salto moderno de primeiro passo
+  é compatível com compressão pura do fluido, enquanto o legado inclui o termo
+  geométrico <code>dV</code> no balanço. Antes de avançar para sigma-theta runtime como
+  validação física, deve existir uma fase opt-in para <code>annular_compliance</code> ou
+  <code>wellbore_compliance</code>, sem fator empírico.
+- A Fase 10.19C implementou uma compliance geométrica constante e opt-in no
+  <code>volumetric_balance</code>. O resultado foi classificado como
+  <code>COMPLIANCE_EFFECTIVE</code> para o caso BUZ67D controlado porque reproduziu a
+  escala do primeiro <code>dP</code> e aproximou a faixa maxima de pressao. Ainda assim,
+  o valor foi inferido de um unico passo legado e permanece
+  <code>GEOMETRIC_COMPLIANCE_DIAGNOSTIC_ONLY</code>. Fases futuras devem substituir esse
+  equivalente constante por um modelo mecanico explícito de deformabilidade do
+  anular/revestimento/formacao, mantendo o default sem compliance.
+- A Fase 10.20A formulou o candidato <code>elastic_annular_simple</code>. O gate ficou
+  <code>MECHANICAL_COMPLIANCE_FORMULATION_PARTIAL</code>, porque a estimativa elastica
+  simples e testavel, mas produz apenas cerca de <code>0.93%</code> da compliance
+  diagnostica inferida na 10.19C. A proxima implementacao pode prosseguir como
+  rota experimental/opt-in, com expectativa de diagnosticar se o modelo e
+  subcompliant em BUZ67D antes de adicionar calibracoes ou modelos mais ricos.
+- A Fase 10.20B implementou <code>elastic_annular_simple</code>. O proximo passo deve ser
+  diagnosticar BUZ67D contra legado/sem compliance/<code>constant_geometric</code>, sem
+  calibrar silenciosamente o modelo. Se o resultado for subcompliant, a
+  evolucao correta e formular um modelo mecanico mais completo ou uma
+  calibracao opt-in explicita, nao esconder um fator empirico no solver.
+- A Fase 10.20C confirmou <code>ELASTIC_COMPLIANCE_UNDERCOMPLIANT</code> para BUZ67D. O
+  primeiro <code>dP</code> elastico simples foi <code>43.64 MPa</code>, contra <code>1.845 MPa</code> no legado
+  e no proxy <code>constant_geometric</code>. O modelo deve permanecer experimental; fase
+  futura deve tratar casing/formacao/sal de modo mais completo ou criar
+  calibracao opt-in declarada.
+- A Fase 10.21A extraiu uma compliance aparente reduzida do trace auditado e
+  classificou a serie como <code>APPARENT_COMPLIANCE_PRESSURE_DEPENDENT</code>. A media
+  pre-abertura ficou acima do proxy constante da 10.19C, enquanto o primeiro
+  passo coincide com ele. Uma fase futura deve avaliar <code>tabulated_pressure</code>,
+  <code>pressure_dependent</code> ou <code>elastic_scaled</code> opt-in, idealmente depois de exportar
+  <code>dV_geom</code>, <code>dMl</code>, <code>dV_leakoff</code> e <code>k</code> diretamente do legado.
+- O adendo termico da 10.21B bloqueia a implementacao imediata de
+  <code>pressure_tabulated_geometric</code> a partir da serie bruta. Embora
+  <code>k_legacy = C_fluid_modern = 6.4e-10 1/Pa</code>, o termo <code>alpha*dT</code> e dominante
+  no layer 16 pre-abertura (<code>mean_thermal_fraction ~= 0.867</code>,
+  <code>max_abs_thermal_fraction ~= 1.526</code>). A proxima evolucao deve produzir uma
+  serie corrigida por termo termico ou reinstrumentar temporariamente o legado
+  para exportar <code>dT</code>, <code>alpha</code>, <code>k</code>, <code>dV_geom</code>, <code>dMl</code> e <code>dV_leakoff</code> no mesmo
+  trace.
+- A Fase 10.21C produziu essa primeira serie corrigida por perfil termico, mas
+  nao liberou <code>pressure_tabulated_geometric</code>. A correcao principal
+  <code>dP_mech = dP - alpha*dT/k</code> ficou
+  <code>THERMAL_CORRECTED_COMPLIANCE_SIGN_AMBIGUOUS</code>, com quatro pontos
+  pre-abertura de pressao mecanica negativa e um incremento mecanico nao
+  positivo. O gate futuro permanece:
+  <code>PRESSURE_TABULATED_STILL_BLOCKED_MISSING_BALANCE_TERMS</code> e
+  <code>PRESSURE_TABULATED_STILL_BLOCKED_SIGN_CONVENTION_AMBIGUOUS</code>. Uma evolucao
+  futura deve instrumentar ou extrair <code>dV_geom</code>, <code>dMl</code>, <code>dV_leakoff</code>, <code>k</code>,
+  <code>dT</code> e <code>opened</code> no mesmo trace antes de qualquer tabela de compliance.
+- A Fase 10.22A confirmou diretamente a algebra ativa do balanco PKN legado:
+  <code>dP = alpha*dT/k + (Vq - dV + dMl/(rho_f2*FC))/(Vi*k)</code>. A reconstrução
+  termo-a-termo bateu com <code>dP</code> com residual maximo <code>1.86e-9 Pa</code>, mas a rota
+  <code>pressure_tabulated_geometric</code> ainda deve permanecer bloqueada. O trace
+  continua parcial: <code>opened</code>, <code>sigmaTheta</code>, <code>margin</code> e o estado antes/depois da
+  abertura nao foram exportados no mesmo registro. A proxima evolucao deve ser
+  uma fase de analise/instrumentacao adicional ou uma tentativa diagnostica
+  claramente opt-in usando a compliance termo-a-termo, nunca default runtime.
+- A Fase 10.22B tentou essa extracao diagnostica de compliance geometrica
+  direta. A serie acumulada pre-abertura teve media <code>4.44e-10 1/Pa</code>, apenas
+  <code>2.39%</code> do proxy <code>constant_geometric</code> da 10.19C, e CV <code>0.95</code>. A serie
+  incremental teve media negativa (<code>-3.85e-8 1/Pa</code>) e CV <code>3.28</code>. Ambas foram
+  classificadas como <code>TERMWISE_GEOM_COMPLIANCE_NOISY</code>, com dependencia de fase.
+  Assim, <code>pressure_tabulated_geometric</code> segue bloqueado ate existir trace
+  complementar com <code>opened/sigmaTheta/margin</code> no mesmo registro.
+- A Fase 10.22C produziu esse trace complementar de forma temporaria e
+  read-only sobre <code>LOT_Tese</code>, confirmando <code>opened</code> em <code>510 s</code>, primeiro sink
+  positivo em <code>540 s</code> e <code>sink_delay_s = 30 s</code>. A classificacao
+  <code>PHASE_DEPENDENCE_EXPLAINED_BY_SINK</code> melhora a evidencia para uma fase de
+  formulacao, mas ainda nao libera runtime: uma evolucao futura deve decidir se
+  a informacao vira apenas diagnostico, uma tabela opt-in controlada ou um
+  modelo mecanico de acomodacao/sink mais explicito.
+- A Fase 10.23B combinou <code>constant_geometric</code>, <code>sigma_theta_static</code> fixo da
+  10.22C e <code>sink_timing: next_step</code>. O resultado
+  <code>COMBINED_DIAGNOSTIC_PRESSURE_OK_OPENING_SHIFTED</code> mostra que o pico de
+  pressao e o atraso de sink estao adequados para diagnostico, mas a abertura
+  moderna ainda ocorre tarde (<code>660 s</code> contra <code>510 s</code>). A proxima evolucao deve
+  ser uma fase de decisao: priorizar sigma-theta runtime, compliance dependente
+  de fase ou manter <code>constant_geometric</code> apenas como diagnostico suficiente para
+  comparar outros pocos. <code>pressure_tabulated_geometric</code> continua bloqueado.
+- A Fase 10.23C tomou essa decisao: <code>NEXT_MODEL_SIGMA_THETA_RUNTIME</code>. O motivo e
+  que a combinacao 10.23B ja preserva escala de pressao e <code>sink_delay_s = 30 s</code>,
+  mas ainda desloca o instante de abertura. Assim, a proxima evolucao deve focar
+  em uma rota opt-in para sigma-theta runtime ou criterio de abertura mais fiel.
+  <code>pressure_tabulated_geometric</code> permanece bloqueado e <code>constant_geometric</code>
+  continua apenas diagnostico.
+- A Fase 10.24A implementou o primeiro contrato arquitetural dessa rota:
+  <code>SigmaThetaProvider</code> em <code>lot/</code>. Ele permite que o <code>PknModel</code> consulte
+  <code>sigma_theta_compression_positive_Pa</code> de uma fonte runtime opt-in, sem incluir
+  <code>saltcreep</code>, <code>SaltCreepTimeBridge</code> ou <code>SaltWallStressDiagnostics</code>.
+- A Fase 10.24B implementou o provider diagnostico <code>sigma_theta_time_series</code>
+  por YAML, com interpolacao linear e clamp. Essa rota ainda e fixture minima
+  de wiring e nao substitui uma fonte fisica real. As fases futuras devem
+  avaliar se <code>SaltWallStressDiagnostics</code> pode ser a fonte runtime fisicamente
+  controlada. O default de <code>lot-sim run --mode lot-pkn</code> permanece inalterado.
+- A Fase 10.24C diagnosticou o caso BUZ67D combinado e classificou a rota como
+  <code>SIGMA_THETA_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED</code>. A pressao maxima, a
+  pressao na abertura, o shut-in final e o atraso de sink ficaram bons em escala
+  diagnostica, mas a abertura moderna ainda ocorreu em <code>660 s</code> contra <code>510 s</code>
+  no legado. A proxima fase deve melhorar/auditar a fonte temporal de
+  sigma-theta antes de promover <code>SaltWallStressDiagnostics</code> como provider
+  runtime.
+- A Fase 10.25A extraiu uma serie refinada de <code>sigmaTheta</code> diretamente do
+  ponto do criterio legado <code>pw &gt; sigmaTheta</code>. A serie refinada tem <code>44</code> pontos,
+  cobre <code>30..1320 s</code>, confirma abertura em <code>510 s</code> e sink em <code>540 s</code>, e mostra
+  que a fixture 10.24B era esparsa: em <code>660 s</code>, o refinado tem
+  <code>65445500 Pa</code>, contra <code>66666600 Pa</code> no YAML anterior. O gate
+  <code>SIGMA_THETA_REFINED_PROVIDER_UPDATE_ALLOWED</code> permite criar um novo caso
+  diagnostico opt-in com essa serie. Ainda assim, isso nao valida fratura fisica
+  nem promove <code>SaltWallStressDiagnostics</code> runtime; apenas melhora a fonte
+  temporal diagnostica antes da decisao seguinte.
+- A Fase 10.25B criou o caso opt-in
+  <code>cases/validation/buz67d_pkn_legacy_sigma_theta_refined_timeseries.yaml</code>
+  com os 44 pontos refinados. O diagnostico permaneceu
+  <code>SIGMA_THETA_REFINED_TIMESERIES_PRESSURE_OK_OPENING_SHIFTED</code>: pressao maxima,
+  pressao na abertura, pressao final e sink delay continuam bons, mas a abertura
+  moderna segue em <code>660 s</code> contra <code>510 s</code> no legado. A proxima decisao deve
+  priorizar auditoria de <code>pressure_source</code>/timing ou mapeamento temporal antes
+  de promover uma fonte runtime real de <code>SaltWallStressDiagnostics</code>.
+- A Fase 10.25C comparou 10.24C contra 10.25B e decidiu
+  <code>NEXT_MODEL_PRESSURE_SOURCE_TIMING_REVIEW</code>. Como a serie refinada nao alterou
+  o erro de abertura (<code>+150 s</code>), a proxima implementacao/auditoria deve focar a
+  amostragem e uso de <code>wellbore_pressure_before_step_Pa</code>,
+  <code>wellbore_pressure_trial_Pa</code> e <code>wellbore_pressure_after_step_Pa</code> no criterio
+  moderno antes de conectar fonte runtime real de tensao de sal.
+- A Fase 10.26A auditou os campos exportados e, no adendo geometrico, bloqueou
+  uma correcao prematura de <code>pressure_source</code>/timing. A evidencia bruta ainda
+  mostra <code>MISSING_PRESSURE_TRACE_FIELDS</code> e melhor candidato abrindo em <code>600 s</code>
+  (<code>+90 s</code>), mas o gate final e
+  <code>LEGACY_EQUIVALENCE_REQUIRES_MESH_MATCHING</code>: o <code>APBSalt1D</code> legado usa
+  <code>outer_radius_m = 8 m</code>, <code>nelem = 15</code>, <code>ratio = 10</code>, <code>integration_order = 3</code>
+  e amostra <code>mdl-&gt;getElem(0)-&gt;getSigmaTheta()</code>, enquanto a rota moderna
+  diagnostica/bridge usa defaults de dominio e refinamento diferentes. A proxima
+  fase deve primeiro reproduzir uma configuracao APBSalt1D equivalente no
+  moderno; so depois disso a auditoria de <code>before/trial/after</code> e timing deve ser
+  retomada.
+- A Fase 10.26B criou essa rota como contrato opt-in inicial:
+  <code>sigma_theta_runtime_geometry</code> declara <code>outer_radius_m = 8 m</code>,
+  <code>radial_elements = 15</code>, <code>ratio = 10</code>, <code>integration_order = 3</code> e
+  <code>sampling = legacy_elem0_sig_2_0</code>. Nesta fase, porem, o status permanece
+  <code>APBSALT1D_CONFIG_DECLARED_NOT_CONSUMED</code>: a configuracao e validada e
+  rastreavel, mas ainda nao alimenta um provider runtime real. Uma fase futura
+  deve consumir essa geometria em <code>SaltWallStressDiagnostics</code>/bridge opt-in ou
+  documentar formalmente que a malha moderna refinada nao busca equivalencia
+  com o legado.
+- A Fase 10.26C decidiu formalmente
+  <code>APBSALT1D_METADATA_ONLY_CONFIRMED</code> e
+  <code>NEXT_PHASE_IMPLEMENT_SAMPLING_BRIDGE</code>. O moderno ja tem malha radial L3,
+  <code>outer_radius_m</code>, <code>radial_elements</code> e diagnostico de tensao de parede, mas
+  ainda falta consumir <code>ratio = 10</code>, expor a amostragem
+  <code>legacy_elem0_sig_2_0</code> e ligar essa amostra a um <code>SigmaThetaProvider</code> opt-in.
+  <code>pressure_source</code>/timing segue bloqueado ate que a geometria seja consumida
+  ou rejeitada explicitamente.
+- A Fase 10.26D tentou o primeiro gate de sampling bridge e confirmou
+  <code>APBSALT1D_SAMPLING_BRIDGE_METADATA_ONLY</code>. A rota atual
+  <code>sigma_theta_time_series</code> nao possui amostras espaciais, raio de amostra,
+  elemento ou ponto de Gauss; portanto <code>legacy_elem0_sig_2_0</code> nao pode ser
+  consumido sem uma fonte espacial real. A proxima fase deve implementar um
+  provider/sampler opt-in baseado em amostras de parede, ou documentar
+  formalmente que a equivalencia APBSalt1D nao sera perseguida. Ajustes de
+  <code>pressure_source</code>/timing continuam bloqueados ate essa decisao.
+- A Fase 10.27A registrou a decisao estrategica entre <code>legacy-equivalence mode</code>
+  e <code>modern-refined mode</code>. Abertura em <code>510 s</code> so deve ser exigida quando o
+  objetivo for regressao estrita contra o <code>LOT_Tese</code> e a geometria APBSalt1D
+  for consumida de forma real. Em <code>modern-refined mode</code>, abertura em <code>660 s</code>
+  pode ser uma divergencia aceitavel de malha/dominio/amostragem, nao erro
+  automatico. O gate novo e
+  <code>LEGACY_EQUIVALENCE_VS_MODERN_REFINED_DECISION_RECORDED</code>.
+- A Fase 10.27B consolidou o BUZ-67D como pacote <code>modern-refined</code>: pressao e
+  sink delay sustentam o diagnostico, enquanto abertura em <code>660 s</code> permanece
+  diferenca documentada e nao regressao estrita. A proxima evolucao deve
+  validar/sensibilizar o modo moderno em mais casos ou preparar graficos de
+  publicacao antes de qualquer tentativa de solver APBSalt1D equivalente.
+- A Fase 10.27C registrou o roadmap pos-10.27 em
+  <code>docs/32_post_10_27_roadmap.md</code>. A proxima fase recomendada e <code>10.28A</code>,
+  consolidando <code>modern-refined mode</code> em casos adicionais, seguida por
+  sensibilidade de malha/dominio/sampling (<code>10.28B</code>) e graficos de publicacao
+  (<code>10.28C</code>). A rota <code>legacy-equivalence</code> com solver APBSalt1D fica opcional e
+  condicionada a necessidade explicita de regressao estrita.
+- A Fase 10.28A criou o pacote de planejamento
+  <code>docs/33_phase10_28a_modern_refined_validation_package.md</code>. O gate novo e
+  <code>ADDITIONAL_WELLS_OR_SENSITIVITY_MATRIX</code>: usar casos/poços adicionais apenas
+  com dados completos; caso contrario, executar matriz de sensibilidade
+  BUZ-67D sem transformar divergencias temporais ou numericas em erro
+  automatico.
+- A Fase 10.28B aplicou esse gate. BUZ-29D foi encontrado no legado, mas nao
+  como caso PKN moderno pronto: fontes principais usam modelos alternativos ou
+  precisam de auditoria adicional, e saidas PKN nao bastam para criar YAML sem
+  inventar parametros. A rota escolhida para 10.28C e
+  <code>ADDITIONAL_WELL_BLOCKED_SENSITIVITY_SELECTED</code>, com matriz BUZ-67D
+  <code>modern-refined</code> S0-S3.
+- A Fase 10.28C executou a matriz S0-S3. O resultado
+  <code>PHASE10_28C_SENSITIVITY_MATRIX_RUN_OK</code> mostra sensibilidade relevante a
+  <code>constant_geometric</code>: <code>0.75x</code> aproximou a abertura de <code>510 s</code>, <code>1.25x</code> nao
+  abriu na janela e <code>same_step</code> removeu o atraso de sink. Esse achado deve
+  orientar novas sensibilidades ou auditoria de compliance, mas nao autoriza
+  calibracao automatica nem mistura com <code>legacy-equivalence</code>.
+- A Fase 10.29A refinou essa sensibilidade em <code>0.60x..1.00x</code>. O melhor fator
+  por abertura e score combinado foi <code>0.75x</code>; o melhor fator por pressao maxima
+  isolada foi <code>0.60x</code>. A conclusao tecnica e que a abertura modern-refined e
+  fortemente controlada por <code>constant_geometric</code>, ainda como diagnostico.
+- A Fase 10.29B criou <code>tools/run_lot_pkn_sensitivity_matrix.py</code> como
+  infraestrutura generica para matrizes LOT/PKN. A ferramenta valida/roda casos
+  declarados em YAML e sumariza <code>timeseries.csv</code>, mas permanece pos-processo de
+  diagnostico em <code>tools/</code>: nao muda runtime C++, nao cria modelo fisico novo e
+  nao transforma sensibilidade em calibracao automatica.
+- A Fase 10.29C auditou BUZ-29D e manteve
+  <code>BUZ29D_MODERN_YAML_NOT_READY</code>. Existem fontes e saidas BUZ-29D, inclusive
+  saidas PKN, mas os fontes ativos auditados sao <code>penny-shaped</code>, <code>circular</code> ou
+  ambiguos. Uma fase futura deve auditar a proveniencia das saidas PKN ou
+  planejar suporte KGD/penny-shaped antes de criar YAML moderno.
+- A Fase 10.30A criou uma matriz YAML versionada para a sensibilidade BUZ-67D
+  <code>modern-refined</code>: <code>buz67d_modern_refined_cgeom_matrix.yaml</code>. Essa matriz
+  deve ser a entrada preferencial para reproducao local da sensibilidade por
+  <code>tools/run_lot_pkn_sensitivity_matrix.py</code>. Ela nao altera solver nem promove
+  fator de compliance a calibracao automatica.
+- A Fase 10.30B executou essa matriz versionada e adicionou verificacao de
+  <code>summary.csv</code>/<code>metadata.json</code> por
+  <code>tools/verify_phase10_30b_sensitivity_run.py</code>. A classificacao
+  <code>VERSIONED_SENSITIVITY_RUN_OK</code> confirma reprodutibilidade operacional da
+  matriz, nao calibracao fisica.
+- A Fase 10.30C criou <code>tools/report_lot_pkn_sensitivity_matrix.py</code> para gerar
+  relatorios JSON/Markdown reproduziveis a partir de <code>summary.csv</code> e
+  <code>metadata.json</code>. O ranking de fatores e diagnostico e nao deve ser usado como
+  calibracao automatica.
+- A Fase 10.31A criou <code>tools/run_buz67d_modern_refined_package.py</code> e
+  <code>docs/42_buz67d_modern_refined_reproducible_package.md</code>, consolidando o fluxo
+  end-to-end BUZ-67D <code>modern-refined</code> para outro computador/agente. O pacote
+  continua diagnostico e grava artefatos apenas em <code>results/</code>.
+- A Fase 10.31B fecha formalmente a Etapa 10 com
+  <code>PHASE10_CLOSED_READY_FOR_STAGE11</code> e recomenda a Etapa 11 como
+  <code>STAGE11_PARAMETRIC_INFRASTRUCTURE</code>. O foco futuro deve ser infraestrutura
+  paramétrica, índices de estudos e relatórios multi-estudo, sem promover
+  sensibilidade diagnóstica a calibração física.
+- A Fase 11.1A registra o plano técnico da Etapa 11 em
+  <code>docs/44_stage11_parametric_infrastructure_plan.md</code>. A primeira implementação
+  recomendada é <code>STAGE11_1B_MULTI_STUDY_MATRIX_INDEX</code>, mantendo solver e casos
+  protegidos inalterados.
+- A Fase 11.1B adiciona <code>cases/validation/sensitivity/studies_index.yaml</code> e
+  <code>tools/list_lot_pkn_sensitivity_studies.py</code>, registrando
+  <code>buz67d_cgeom_sensitivity</code> como primeiro estudo ativo. O runner permanece
+  inalterado e continua recebendo matrizes por caminho explícito.
+- A Fase 11.2A especifica o contrato <code>schema_version: 2</code> para matrizes
+  paramétricas <code>base_case + overrides</code>, com validador dedicado em
+  <code>tools/validate_lot_pkn_parametric_matrix.py</code>. A geração materializada e a
+  integração com o runner ficam planejadas para 11.2B/11.2C; casos derivados
+  devem permanecer em <code>results/</code> até promoção manual.
+- A Fase 11.2B adiciona <code>tools/materialize_lot_pkn_parametric_matrix.py</code> para
+  gerar YAMLs derivados de matrizes v2 em <code>results/</code> ou diretório temporário.
+  O materializador é utilitário de validação/diagnóstico, não pré-processador
+  obrigatório do runtime, e não promove casos automaticamente para
+  <code>cases/validation/</code>.
+- A Fase 11.2C integra matrizes v2 ao runner genérico. O runner materializa
+  cenários em <code>&lt;output-dir&gt;/materialized_cases/</code>, registra
+  <code>materialized_case_path</code> em summary/metadata e preserva compatibilidade com
+  matrizes v1. A variante <code>buz67d_cgeom_sensitivity_v2</code> fica registrada no
+  índice de estudos.
+- A Fase 11.3A executa a matriz v2 BUZ-67D e confirma
+  <code>V2_REPRODUCES_V1_DIAGNOSTICS</code> para os cenários selecionados. Os YAMLs
+  materializados continuam artefatos locais em <code>results/</code>, não casos
+  versionados.
+- A Fase 11.3B adiciona execução por <code>study_id</code> com
+  <code>tools/run_lot_pkn_sensitivity_study.py</code>. O estudo
+  <code>buz67d_cgeom_sensitivity_v2</code> passa a ser executável a partir do índice sem
+  informar manualmente o caminho da matriz. O wrapper delega ao runner genérico
+  e mantém <code>results/</code> fora do Git.
+- A Fase 11.3C adiciona <code>tools/run_lot_pkn_study.py</code> como comando canônico de
+  estudo. Ele resolve <code>study_id</code>, chama a execução por estudo, gera relatório
+  quando há outputs reais e escreve <code>study_manifest.json</code>/<code>run_commands.txt</code> em
+  <code>results/</code>.
+- A Fase 11.4A define <code>study_manifest.json</code> <code>schema_version: 1</code> e adiciona
+  provenance operacional completa aos estudos LOT/PKN: Git, ambiente Python,
+  plataforma, executável <code>lot-sim</code>, matriz, <code>base_case</code>, outputs, cenários e
+  comandos de reprodução.
+- A Fase 11.4B adiciona verificação formal de diretórios de resultado por
+  <code>tools/verify_lot_pkn_study_results.py</code>, cobrindo manifesto v1, outputs,
+  resumo, metadados, relatórios opcionais e cenários.
+- A Fase 11.5A amplia a sensibilidade BUZ-67D <code>modern-refined</code> de <code>C_geom</code> com
+  matriz v2 e execução por <code>study_id</code>, mantendo a interpretação como
+  diagnóstico e não calibração física.
+- A Fase 11.5B adiciona a matriz cruzada BUZ-67D <code>C_geom x sink_timing</code> por
+  <code>study_id</code>. Ela separa efeitos de compliance e temporização do sink, confirma
+  o atraso operacional de 30 s para <code>next_step</code> nos pares com abertura e mantém
+  a classificação como diagnóstico, não calibração física.
+- A Fase 11.5C consolida os estudos BUZ-67D 11.5A/11.5B em um relatório
+  interpretativo. O bloco fecha com <code>C_geom=0.75x</code> como melhor ranking
+  diagnóstico combinado, <code>C_geom=0.55x</code> como melhor ranking por pressão máxima
+  e transição recomendada para auditoria BUZ29-VISCO-first-well.
+- A Fase 11.6A auditou <code>BUZ29-VISCO-first-well.cpp</code> e confirmou que o caso
+  existe, mas não está pronto para YAML moderno LOT/PKN: o modelo ativo é
+  <code>penny-shaped</code> e a linha PKN está comentada. A próxima evolução deve ser um
+  roadmap não-PKN, cobrindo penny-shaped/KGD/Zamora como escopo futuro separado
+  da infraestrutura BUZ-67D modern-refined.
+- A Fase 11.6B registra esse roadmap não-PKN: priorizar auditoria de formulação
+  <code>penny-shaped</code>, manter KGD/circular/elliptical como rota opcional, bloquear
+  Zamora/compositional fluid até gate próprio e auditar proveniência dos outputs
+  PKN antes de usá-los como referência.
+- A Fase 11.5D adiciona máximos de fratura, leakoff, comprimento, abertura e
+  pressão líquida aos summaries de estudos LOT/PKN. A mudança é Python-only e
+  usa colunas já exportadas pelo runtime moderno; não altera formulação física.
+- A Fase 11.7A decide a primeira trilha não-PKN pós-BUZ29:
+  <code>PENNY_SHAPED</code>. A decisão é documental e técnica; não implementa modelo novo,
+  não cria YAML BUZ29 e não declara validação física. A próxima etapa segura é
+  auditar matematicamente a formulação penny-shaped antes de qualquer solver.
+- A Fase 11.7B audita a matemática penny-shaped legada e extrai relações
+  mínimas para <code>w0</code>, <code>R</code>, <code>pressureFactor</code> e volume proxy. O status permite
+  especificação YAML/IO e eventual núcleo C++ isolado, mas continua bloqueando
+  validação BUZ29 e equivalência com o legado completo.
+- A Fase 11.7C especifica o YAML/IO mínimo do modelo <code>penny_shaped</code> em uma
+  fixture versionada, com validador Python e status
+  <code>SPEC_FIXTURE_ONLY_NOT_RUNTIME_SCHEMA</code>. Isso prepara a 11.8A sem alterar
+  parser, schema oficial, runtime ou casos protegidos.
+- A Fase 11.8A adiciona o núcleo C++ isolado <code>lot::PennyShapedModel</code>, com
+  testes Catch2 para as fórmulas auditadas. O código não é conectado ao CLI,
+  parser, <code>PknRunner</code>, <code>PknModel</code> ou BUZ29; permanece base diagnóstica para
+  decisão futura de integração.
+- A Fase 11.8B seleciona <code>PENNY_ADAPTER_OPT_IN_SELECTED</code> como caminho seguro de
+  integração. O próximo passo é especificar um adapter diagnóstico opt-in, sem
+  promover <code>penny_shaped</code> a rota oficial do <code>lot-sim</code>.
+- A Fase 11.8C especifica o contrato desse adapter diagnóstico opt-in usando
+  os campos reais do <code>PennyShapedInput</code>. A especificação é fixture-only,
+  sem schema runtime, sem CLI e sem validação BUZ29.
+- A Fase 11.8D implementa o adapter C++ diagnóstico opt-in
+  <code>PennyShapedDiagnosticAdapter</code>, preservando o núcleo isolado e mantendo
+  <code>lot-pkn</code>, parser, schema e casos protegidos sem alteração de comportamento.
+- A Fase 11.9A cria um caso sintético mínimo <code>penny_shaped</code> em
+  <code>cases/validation/non_pkn/</code>, verificado por Python. Ele é fixture/caso
+  diagnóstico, não entrada oficial do runtime.
+- A Fase 11.9B classifica BUZ29 como <code>BUZ29_PENNY_CANDIDATE_PARTIAL</code> e bloqueia
+  11.10A até existir evidência consumível de pressão, <code>sigmaTheta</code>, tempo desde
+  abertura e estado APB/sal.
+- A Fase 11.9C audita essas evidências e mantém a classificação como parcial:
+  há fonte legada e indícios documentais, mas pressão, <code>sigmaTheta</code>, tempo de
+  abertura, tempo desde abertura e estado APB/sal ainda não formam contrato
+  consumível para iniciar a rota BUZ29-PENNY.
+- A Fase 11.9D atualiza formalmente o readiness com base na 11.9C e mantém
+  <code>can_start_11_10A = false</code>. A próxima evolução deve completar evidência de
+  pressão e abertura antes de qualquer YAML candidato BUZ29-PENNY.
+- A Fase 11.9E encontra evidência consumível de pressão e abertura no output
+  legado <code>7-BUZ-29D-RJS10_PENNY-SHAPED.dat</code>: <code>Time</code> + blocos <code>dP</code> para
+  histórico de pressão e <code>Momento da quebra: 10.4</code> para abertura. O status é
+  <code>BUZ29_PRESSURE_AND_OPENING_EVIDENCE_COMPLETE</code>, com
+  <code>can_reopen_11_10A_gate = true</code>, mas isso apenas recomenda a 11.9F para
+  reavaliar readiness; não cria YAML BUZ29-PENNY nem inicia simulação.
+- A Fase 11.9F reavalia esse readiness e registra
+  <code>BUZ29_PENNY_CANDIDATE_PARTIAL_BUT_DIAGNOSTIC_SAFE</code>, com gate
+  <code>BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A</code>. Isso autoriza apenas a
+  preparação diagnóstica 11.10A, sem validação física, sem equivalência com o
+  legado e sem YAML criado pela 11.9F. O caveat
+  <code>PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED</code> fica obrigatório:
+  <code>fracture_volume_proxy_m3</code> não deve ser tratado automaticamente como volume
+  circular completo em 2π sem auditoria matemática específica.
+- A Fase 11.10A cria <code>cases/validation/non_pkn/buz29_penny_candidate.yaml</code> e
+  <code>cases/validation/non_pkn/studies_index.yaml</code> como artefatos diagnósticos
+  inativos. O status é <code>BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED</code>, com
+  <code>NOT_PHYSICALLY_VALIDATED</code>, <code>NOT_LEGACY_EQUIVALENT</code> e
+  <code>NOT_ACTIVE_SIMULATION_CASE</code>. A próxima exigência é
+  <code>AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED</code>; a rota ainda não
+  executa BUZ29, não altera <code>lot-pkn</code> e não cria runner não-PKN.
+- A Fase 11.10B inspeciona os campos do candidato contra a API real do
+  <code>PennyShapedDiagnosticAdapter</code> e classifica
+  <code>BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL</code>. Pressão e abertura são consumíveis
+  como evidência, mas as entradas elásticas, de viscosidade, vazão e
+  <code>sigma_theta_compression_positive_Pa</code> ainda não estão adapter-ready. A
+  próxima fase permanece <code>PHASE11_10C_AUDIT_PENNY_SHAPED_MODEL_MATH_AXISYMMETRIC_1RAD</code>
+  antes de qualquer execução diagnóstica.
+- A Fase 11.10C audita a matemática do <code>PennyShapedModel</code> na interpretação
+  axissimétrica de 1 rad e classifica a rota como
+  <code>PENNY_MATH_HYDRAULIC_DIAGNOSTIC_SCALING</code> /
+  <code>PENNY_MATH_AXISYMMETRIC_1RAD_PROXY</code>. A auditoria passa sem correção C++,
+  mas exige <code>PHASE11_10D_DEFINE_AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT</code> antes
+  de tratar <code>fracture_volume_proxy_m3</code> como volume físico total.
+- A Fase 11.10D especifica esse contrato de saída:
+  <code>AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_SPECIFIED</code>. Saídas futuras devem
+  preservar <code>*_1rad_m3</code>, reportar equivalentes <code>*_equivalent_2pi_m3</code> apenas com
+  campo <code>source</code>/caveat, e manter <code>volume_multiplier</code> como
+  <code>VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI</code>. A próxima etapa é criar fixtures de
+  saída diagnóstica, ainda sem writer/runtime C++.</p>
 </div>
 </section>
 

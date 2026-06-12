@@ -149,6 +149,7 @@ phases:
   phase_11_10a_buz29_penny_diagnostic_route: completed
   phase_11_10b_buz29_penny_adapter_ready_inputs: completed
   phase_11_10c_penny_math_axisymmetric_1rad_audit: completed
+  phase_11_10d_axisymmetric_1rad_2pi_output_contract: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -224,6 +225,7 @@ docs:
   stage11_10a_buz29_penny_diagnostic_route: implemented
   stage11_10b_buz29_penny_adapter_ready_inputs: implemented
   stage11_10c_penny_math_axisymmetric_1rad_audit: implemented
+  stage11_10d_axisymmetric_1rad_2pi_output_contract: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -289,12 +291,12 @@ validation:
 test_counts:
   cpp_tests: 273        # Catch2 lot-salt-suite — 273/273 previstos apos Fase 11.8D (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 461     # pytest lot-salt-suite — 461/461 previstos apos Fase 11.10C (2026-06-12)
+  python_tests: 473     # pytest lot-salt-suite — 473/473 previstos apos Fase 11.10D (2026-06-12)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-12"
-updated_by: "codex (Fase 11.10C PennyShaped math axisymmetric 1rad audit)"
+updated_by: "codex (Fase 11.10D axisymmetric 1rad to 2pi output contract)"
 project_version: "0.1.0"

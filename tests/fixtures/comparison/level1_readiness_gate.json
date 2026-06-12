@@ -2243,6 +2243,57 @@
       "volume_multiplier = 10.0 is legacy-inspired and empirical; it is not a formal 2pi conversion."
     ]
   },
+  "phase11_10d_axisymmetric_1rad_2pi_output_contract": {
+    "status": "PHASE11_10D_AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_SPECIFIED",
+    "phase": "11.10D",
+    "track": "PENNY_SHAPED",
+    "contract_status": "AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_SPECIFIED",
+    "axisymmetric_angle_rad": 1.0,
+    "axisymmetric_basis": "axisymmetric_1rad",
+    "volume_conversion_factor_1rad_to_2pi": 6.283185307179586,
+    "volume_multiplier_semantics": "VOLUME_MULTIPLIER_EMPIRICAL",
+    "volume_multiplier_interpretation": "VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI",
+    "future_output_requirement": "AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED",
+    "implementation_allowed": false,
+    "physical_validation": false,
+    "legacy_equivalence": false,
+    "diagnostic_only": true,
+    "tool": "tools/spec_phase11_10d_axisymmetric_output_contract.py",
+    "document": "docs/77_axisymmetric_1rad_2pi_output_contract.md",
+    "required_fields": [
+      "axisymmetric_angle_rad",
+      "axisymmetric_basis",
+      "volume_multiplier",
+      "volume_multiplier_semantics",
+      "fracture_volume_proxy_1rad_m3",
+      "fracture_volume_equivalent_2pi_m3",
+      "fracture_volume_equivalent_2pi_source",
+      "solid_volume_1rad_m3",
+      "solid_volume_equivalent_2pi_m3",
+      "volume_conversion_factor_1rad_to_2pi",
+      "volume_interpretation",
+      "physically_validated",
+      "legacy_equivalent",
+      "diagnostic_only"
+    ],
+    "conversion_rules": [
+      "If *_1rad_m3 is geometrically integrable, *_equivalent_2pi_m3 = *_1rad_m3 * 2pi.",
+      "Proxy fields do not get automatic 2pi equivalents without source/caveat.",
+      "volume_multiplier is not 2pi.",
+      "2pi equivalent outputs require source.",
+      "2pi equivalent outputs must preserve the 1rad source value."
+    ],
+    "required_caveats": [
+      "PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED",
+      "AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED",
+      "VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI",
+      "IMPLEMENTATION_NOT_ALLOWED_IN_11_10D",
+      "NOT_PHYSICALLY_VALIDATED",
+      "NOT_LEGACY_EQUIVALENT",
+      "DIAGNOSTIC_ONLY"
+    ],
+    "recommended_next_phase": "PHASE11_10E_DEFINE_PENNY_DIAGNOSTIC_OUTPUT_FIXTURES"
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
