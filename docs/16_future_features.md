@@ -60,6 +60,22 @@ implementation_allowed_next = false
 O contrato esta pronto para orientar implementacao futura, mas a implementacao
 continua bloqueada enquanto a fonte runtime de sigma-theta nao existir.
 
+## Fase 11.11L — decisao real sigma-theta do limited_gate
+
+**Status:** `LIMITED_GATE_REMAINS_DIAGNOSTIC_BLOCKED_BY_REAL_SOURCE`.
+
+A decisao formal da 11.11L e:
+
+```text
+implementation_allowed_next = false
+runtime_dispatch_allowed_next = false
+buz29_execution_allowed_next = false
+pkn_behavior_change_allowed = false
+```
+
+Assim, a proxima fase deve manter o gate como diagnostico e planejar a fonte
+runtime real de sigma-theta, sem C++.
+
 ---
 
 ## Fase 10.17C — acomodação, shut-in e fluido Zamora

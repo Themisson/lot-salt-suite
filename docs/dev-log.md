@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11K post-drilling initial state integration spec
+Fase ativa  : 11.11L limited_gate real sigma-theta readiness decision
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 373/373 em 2026-06-12
-Testes Py   : 889/889 em 2026-06-12
+Testes Py   : 898/898 em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -7762,3 +7762,32 @@ sigma-theta inicial/current.
 
 **Próxima fase recomendada:**
 `PHASE11_11L_DECIDE_LIMITED_GATE_REAL_SIGMATHETA_READINESS`.
+
+---
+
+### [2026-06-12] Fase 11.11L — Decisão limited_gate real sigma-theta — Codex
+
+**Status:** Concluído; commit/push planejado ao final da fase.
+
+**Classificação:** `LIMITED_GATE_REMAINS_DIAGNOSTIC_BLOCKED_BY_REAL_SOURCE`.
+
+**Decisão:**
+
+```text
+implementation_allowed_next = false
+runtime_dispatch_allowed_next = false
+buz29_execution_allowed_next = false
+pkn_behavior_change_allowed = false
+```
+
+**Motivo:** faltam fontes runtime reais de `sigma_theta_initial` e
+`sigma_theta_current`; a semântica de pressão, sinal e referencial ainda não
+estão resolvidos para gate real.
+
+**Entregáveis:**
+- `tools/decide_phase11_11l_limited_gate_real_sigmatheta_readiness.py`
+- `tests/python/test_decide_phase11_11l_limited_gate_real_sigmatheta_readiness.py`
+- `docs/112_limited_gate_real_sigmatheta_readiness_decision.md`
+
+**Próxima fase recomendada:**
+`PHASE11_11M_KEEP_LIMITED_GATE_DIAGNOSTIC_AND_PLAN_SIGMATHETA_SOURCE`.

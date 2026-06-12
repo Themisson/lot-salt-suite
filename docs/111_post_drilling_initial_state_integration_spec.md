@@ -92,3 +92,18 @@ PHASE11_11L_DECIDE_LIMITED_GATE_REAL_SIGMATHETA_READINESS
 A 11.11L deve decidir formalmente se o gate continua diagnostico ou se ha
 evidencia suficiente para wiring real. Com o estado atual, a expectativa tecnica
 e manter o gate diagnostico por falta de fonte sigma-theta real.
+
+## Decisao 11.11L
+
+A Fase 11.11L confirmou:
+
+```text
+LIMITED_GATE_REMAINS_DIAGNOSTIC_BLOCKED_BY_REAL_SOURCE
+implementation_allowed_next = false
+runtime_dispatch_allowed_next = false
+buz29_execution_allowed_next = false
+pkn_behavior_change_allowed = false
+```
+
+Portanto, a fase 11.11M deve registrar plano de fonte sigma-theta, sem
+implementacao C++.

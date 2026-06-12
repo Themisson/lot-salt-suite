@@ -803,6 +803,19 @@ buz29_execution_allowed_next = false
 Assim, modelos nao-PKN seguem limitados a diagnostico e nao ha execucao BUZ29
 ou dispatch fisico.
 
+## Fase 11.11L — decisao de manter diagnostico bloqueado
+
+A Fase 11.11L mantem:
+
+```text
+LIMITED_GATE_REMAINS_DIAGNOSTIC_BLOCKED_BY_REAL_SOURCE
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+```
+
+O caminho 11.11M deve ser documental/planejamento, nao implementacao runtime
+fisica.
+
 O status permanece documental/diagnostico; nenhum runner nao-PKN e executado.
 
 ## Fase 11.11A — validacao controlada do pre-runner

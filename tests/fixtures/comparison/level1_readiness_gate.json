@@ -3595,6 +3595,29 @@
       "Physical dispatch remains disabled."
     ]
   },
+  "phase11_11l_limited_gate_real_sigmatheta_readiness": {
+    "status": "LIMITED_GATE_REMAINS_DIAGNOSTIC_BLOCKED_BY_REAL_SOURCE",
+    "phase": "11.11L",
+    "readiness_status": "LIMITED_GATE_REMAINS_DIAGNOSTIC_BLOCKED_BY_REAL_SOURCE",
+    "implementation_allowed_next": false,
+    "runtime_dispatch_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "pkn_behavior_change_allowed": false,
+    "required_statuses": [
+      "LIMITED_GATE_REMAINS_DIAGNOSTIC_BLOCKED_BY_REAL_SOURCE",
+      "MISSING_RUNTIME_SIGMATHETA_INITIAL_SOURCE",
+      "MISSING_RUNTIME_SIGMATHETA_CURRENT_SOURCE",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED"
+    ],
+    "recommended_next_phase": "PHASE11_11M_KEEP_LIMITED_GATE_DIAGNOSTIC_AND_PLAN_SIGMATHETA_SOURCE",
+    "caveats": [
+      "Real sigma-theta wiring is not allowed yet.",
+      "The limited gate remains diagnostic.",
+      "Physical dispatch remains disabled.",
+      "BUZ29-PENNY remains blocked."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
