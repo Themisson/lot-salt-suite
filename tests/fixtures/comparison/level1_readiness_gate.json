@@ -1981,6 +1981,40 @@
       "Phase 11.10A must not start until readiness becomes sufficient."
     ]
   },
+  "phase11_9c_buz29_penny_evidence": {
+    "status": "BUZ29_PENNY_EVIDENCE_PARTIAL",
+    "phase": "11.9C",
+    "track": "PENNY_SHAPED",
+    "classification": "BUZ29_PENNY_EVIDENCE_PARTIAL",
+    "can_update_readiness": true,
+    "can_start_11_10a": false,
+    "tool": "tools/audit_phase11_9c_buz29_penny_evidence.py",
+    "document": "docs/70_buz29_penny_evidence_audit.md",
+    "recommended_next_phase": "PHASE11_9D_UPDATE_BUZ29_PENNY_READINESS",
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalence": false,
+    "simulation_executed": false,
+    "blocking_gaps": [
+      "opening_time",
+      "penny_inputs",
+      "pressure_history",
+      "sigmaTheta_history",
+      "time_since_opening"
+    ],
+    "evidence_status": {
+      "pressure_history": "PARTIAL",
+      "sigmaTheta_history": "MISSING",
+      "opening_time": "MISSING",
+      "time_since_opening": "MISSING",
+      "apb_salt_state": "PARTIAL"
+    },
+    "caveats": [
+      "Phase 11.9C does not start the BUZ29-PENNY route and does not run simulation.",
+      "Partial legacy evidence is not equivalent to consumable adapter inputs.",
+      "Phase 11.10A remains blocked until Phase 11.9D explicitly opens the gate."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

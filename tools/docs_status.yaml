@@ -142,6 +142,7 @@ phases:
   phase_11_8d_penny_diagnostic_adapter: completed
   phase_11_9a_penny_synthetic_case: completed
   phase_11_9b_buz29_penny_readiness: completed
+  phase_11_9c_buz29_penny_evidence: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -210,6 +211,7 @@ docs:
   stage11_8d_penny_diagnostic_adapter: implemented
   stage11_9a_penny_synthetic_case: implemented
   stage11_9b_buz29_penny_readiness: implemented
+  stage11_9c_buz29_penny_evidence: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -275,12 +277,12 @@ validation:
 test_counts:
   cpp_tests: 273        # Catch2 lot-salt-suite — 273/273 previstos apos Fase 11.8D (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 404     # pytest lot-salt-suite — 404/404 previstos apos Fase 11.9B (2026-06-11)
+  python_tests: 409     # pytest lot-salt-suite — 409/409 previstos apos Fase 11.9C (2026-06-12)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
-last_updated: "2026-06-11"
-updated_by: "codex (Fase 11.7B selected non-PKN model math audit)"
+last_updated: "2026-06-12"
+updated_by: "codex (Fase 11.9C BUZ29 PennyShaped evidence audit)"
 project_version: "0.1.0"

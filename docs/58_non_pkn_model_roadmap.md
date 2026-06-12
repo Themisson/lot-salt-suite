@@ -189,6 +189,22 @@ Há núcleo, adapter e caso sintético, mas faltam histórico de pressão,
 `sigmaTheta`, tempo desde abertura e estado APB/sal de BUZ29 em forma
 consumível. Assim, a 11.10A permanece bloqueada.
 
+## Fase 11.9C — evidência BUZ29 PennyShaped
+
+A Fase 11.9C audita evidências adicionais para a rota BUZ29-PENNY:
+
+```text
+classification = BUZ29_PENNY_EVIDENCE_PARTIAL
+can_update_readiness = true
+can_start_11_10a = false
+recommended_next_phase = PHASE11_9D_UPDATE_BUZ29_PENNY_READINESS
+```
+
+Foram encontrados indícios documentais e fonte legada para o caso
+`BUZ29-VISCO-first-well`, mas os campos críticos ainda não estão consumíveis
+para o `PennyShapedDiagnosticAdapter`. A 11.10A continua bloqueada até a
+atualização formal de readiness da 11.9D.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

@@ -50,6 +50,22 @@ PHASE11_9C_COMPLETE_BUZ29_PENNY_EVIDENCE
 Essa próxima fase deve completar a evidência BUZ29 antes de qualquer tentativa
 de `PHASE11_10A_BUZ29_PENNY_DIAGNOSTIC_ROUTE`.
 
+## Phase 11.9C evidence audit
+
+A Fase 11.9C executou uma auditoria de evidências sem iniciar simulação BUZ29:
+
+```text
+classification = BUZ29_PENNY_EVIDENCE_PARTIAL
+can_update_readiness = true
+can_start_11_10a = false
+recommended_next_phase = PHASE11_9D_UPDATE_BUZ29_PENNY_READINESS
+```
+
+O mapa de evidências registrou pressão como `PARTIAL`, `sigmaTheta` como
+`MISSING`, tempo de abertura como `MISSING`, tempo desde abertura como
+`MISSING` e estado APB/sal como `PARTIAL`. Nenhum desses campos críticos ficou
+consumível para o adapter nesta fase.
+
 ## Caveats
 
 - Esta fase não cria YAML BUZ29.

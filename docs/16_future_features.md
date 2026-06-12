@@ -563,3 +563,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 - A Fase 11.9B classifica BUZ29 como `BUZ29_PENNY_CANDIDATE_PARTIAL` e bloqueia
   11.10A até existir evidência consumível de pressão, `sigmaTheta`, tempo desde
   abertura e estado APB/sal.
+- A Fase 11.9C audita essas evidências e mantém a classificação como parcial:
+  há fonte legada e indícios documentais, mas pressão, `sigmaTheta`, tempo de
+  abertura, tempo desde abertura e estado APB/sal ainda não formam contrato
+  consumível para iniciar a rota BUZ29-PENNY.
