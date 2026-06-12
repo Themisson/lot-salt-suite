@@ -156,6 +156,7 @@ phases:
   phase_11_10g_penny_diagnostic_writer: completed
   phase_11_10h_non_pkn_diagnostic_runner_gate: completed
   phase_11_10i_unified_fracture_model_selection: completed
+  phase_11_10j_fracture_model_selector_guard: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -238,6 +239,7 @@ docs:
   stage11_10g_penny_diagnostic_writer: implemented
   stage11_10h_non_pkn_diagnostic_runner_gate: implemented
   stage11_10i_unified_fracture_model_selection: implemented
+  stage11_10j_fracture_model_selector_guard: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -303,12 +305,12 @@ validation:
 test_counts:
   cpp_tests: 281        # Catch2 lot-salt-suite — 281/281 passaram apos Fase 11.10G (2026-06-12)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 543     # pytest lot-salt-suite — 543/543 passaram apos Fase 11.10I (2026-06-12)
+  python_tests: 559     # pytest lot-salt-suite — 559/559 esperados apos Fase 11.10J (2026-06-12)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-12"
-updated_by: "codex (Fase 11.10I unified fracture model selection)"
+updated_by: "codex (Fase 11.10J fracture model selector guard)"
 project_version: "0.1.0"

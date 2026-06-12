@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">142/149</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">143/150</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">281</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">543</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">559</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8279,7 +8279,12 @@ unidades reais usadas no <code>LOT_APB_v5</code> antes de aceitar nomes ou dimen
   ausente e <code>PENNY_SHAPED</code> apenas como opt-in explícito, diagnóstico e não
   fisicamente validado. <code>KGD</code>, <code>RADIAL</code>, <code>ELLIPTICAL</code> e variantes permanecem
   bloqueados. A fase não implementa runner, parser/schema ou execução
-  BUZ29-PENNY.</p>
+  BUZ29-PENNY.
+- A Fase 11.10J especifica o guard desse seletor: ausência do campo preserva
+  PKN, valor vazio explícito é erro, <code>PENNY_SHAPED</code> continua opt-in
+  diagnóstico, modelos não suportados são bloqueados e a execução permanece
+  condicionada a <code>fracture_initiation_gate</code> e à convenção explícita de sinal de
+  <code>sigma_theta</code>. A fase não altera C++, parser, schema, CLI ou <code>lot-pkn</code>.</p>
 </div>
 </section>
 

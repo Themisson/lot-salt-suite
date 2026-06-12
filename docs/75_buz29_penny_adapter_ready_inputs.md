@@ -222,3 +222,10 @@ A 11.10I redefiniu a próxima arquitetura como seleção unificada por
 torna o candidato BUZ29 adapter-ready: `PENNY_SHAPED` segue opt-in explícito,
 diagnóstico, não equivalente ao legado e bloqueado para execução runtime até
 novo gate.
+## Atualização 11.10J — gate antes dos inputs adapter-ready
+
+Mesmo com inputs adapter-ready, `PENNY_SHAPED` só pode entrar por seleção
+explícita em `lot.fracture.fracture_model`. A ausência do campo preserva PKN; a
+string vazia deve ser erro; e a execução ainda depende do
+`fracture_initiation_gate` e de convenção explícita para
+`sigma_theta_compression_positive_Pa`.

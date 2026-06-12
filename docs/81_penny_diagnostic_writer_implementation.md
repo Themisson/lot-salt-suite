@@ -250,3 +250,8 @@ arquitetural: em vez de criar uma rota oficial não-PKN paralela, a evolução
 futura deve usar uma seleção unificada de modelo por
 `lot.fracture.fracture_model`. `PKN` permanece o default; `PENNY_SHAPED` só
 pode ser selecionado por opt-in explícito e continua diagnóstico.
+## Atualização 11.10J — implementação preservada fora do default
+
+A implementação do writer diagnóstico não altera o default PKN. A Fase 11.10J
+formaliza que ausência de `lot.fracture.fracture_model` deve selecionar PKN e
+que `PENNY_SHAPED` só pode ser ativado por opt-in explícito em fase futura.

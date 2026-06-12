@@ -268,3 +268,21 @@ para isso sem alterar comportamento PKN, a fase seguinte poderá evoluir para:
 ```text
 PHASE11_10J_IMPLEMENT_FRACTURE_MODEL_SELECTOR_GUARD
 ```
+
+## Atualização 11.10J — guard do seletor
+
+A Fase 11.10J detalha o guard futuro para `lot.fracture.fracture_model` sem
+implementar parser, schema ou runtime. A especificação formaliza:
+
+```text
+FRACTURE_MODEL_SELECTOR_GUARD_SPECIFIED
+PKN_DEFAULT_WHEN_ABSENT
+EXPLICIT_EMPTY_FRACTURE_MODEL_REJECTED
+PENNY_SHAPED_EXPLICIT_OPT_IN_ONLY
+UNSUPPORTED_FRACTURE_MODELS_BLOCKED
+FRACTURE_INITIATION_GATE_REQUIRED
+SIGMATHETA_SIGN_CONVENTION_REQUIRED
+```
+
+O ponto principal é separar ausência de campo e valor vazio explícito. Ausência
+preserva PKN; valor vazio explícito deve falhar antes de qualquer dispatch.

@@ -206,3 +206,9 @@ de modelo. Quando ausente, o default deve continuar PKN. `PENNY_SHAPED`
 continua opt-in explícito, diagnóstico, não fisicamente validado e não
 equivalente ao legado. A 11.10I não implementa runner, parser, schema ou
 execução BUZ29-PENNY.
+## Atualização 11.10J — runner paralelo não é o caminho principal
+
+A Fase 11.10J consolida a evolução recomendada como um selector guard dentro de
+uma rota LOT/fracture unificada. O antigo conceito de runner não-PKN paralelo
+permanece subordinado ao guard `lot.fracture.fracture_model`, com PKN default,
+`PENNY_SHAPED` opt-in e modelos não suportados bloqueados.

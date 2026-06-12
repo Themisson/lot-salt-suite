@@ -383,3 +383,9 @@ se vier a ser consumido por runtime, dentro de uma rota LOT/fracture unificada
 selecionada por `lot.fracture.fracture_model`. O default futuro deve ser `PKN`
 quando o campo estiver ausente, e `PENNY_SHAPED` deve permanecer opt-in
 explícito, diagnóstico e não fisicamente validado.
+## Atualização 11.10J — writer não implica seleção runtime
+
+O writer diagnóstico PennyShaped permanece opt-in e isolado. A Fase 11.10J
+especifica que a seleção futura por `lot.fracture.fracture_model` não deve
+executar o writer automaticamente; `PENNY_SHAPED` continua diagnóstico e
+depende de seleção explícita, gate de início de fratura e convenção de sinal.

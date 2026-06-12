@@ -647,3 +647,8 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   fisicamente validado. `KGD`, `RADIAL`, `ELLIPTICAL` e variantes permanecem
   bloqueados. A fase não implementa runner, parser/schema ou execução
   BUZ29-PENNY.
+- A Fase 11.10J especifica o guard desse seletor: ausência do campo preserva
+  PKN, valor vazio explícito é erro, `PENNY_SHAPED` continua opt-in
+  diagnóstico, modelos não suportados são bloqueados e a execução permanece
+  condicionada a `fracture_initiation_gate` e à convenção explícita de sinal de
+  `sigma_theta`. A fase não altera C++, parser, schema, CLI ou `lot-pkn`.

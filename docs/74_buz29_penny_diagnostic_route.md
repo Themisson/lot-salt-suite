@@ -178,3 +178,9 @@ lot.fracture.fracture_model
 com `PKN` como default quando o campo estiver ausente e `PENNY_SHAPED` apenas
 como opt-in explícito, diagnóstico e não fisicamente validado. BUZ29-PENNY
 continua não executado e fora de validação física.
+## Atualização 11.10J — seleção guardada por `fracture_model`
+
+A rota BUZ29-PENNY permanece diagnóstica e inativa. A Fase 11.10J especifica
+que uma futura seleção por `lot.fracture.fracture_model` deve aceitar
+`PENNY_SHAPED` somente por opt-in explícito, rejeitar valor vazio explícito e
+bloquear modelos não suportados antes de qualquer execução.

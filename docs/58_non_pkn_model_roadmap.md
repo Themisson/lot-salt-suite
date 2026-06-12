@@ -468,6 +468,24 @@ opt-in explícito. `KGD`, `RADIAL`, `ELLIPTICAL` e variantes seguem bloqueados.
 Esta fase não altera parser, schema, C++, CLI, `PknModel`, `PknRunner` ou
 `lot-pkn`.
 
+## Fase 11.10J — guard do seletor `fracture_model`
+
+A Fase 11.10J especifica o guard futuro para a seleção unificada por
+`lot.fracture.fracture_model`:
+
+```text
+FRACTURE_MODEL_SELECTOR_GUARD_SPECIFIED
+PKN_DEFAULT_WHEN_ABSENT
+EXPLICIT_EMPTY_FRACTURE_MODEL_REJECTED
+PENNY_SHAPED_EXPLICIT_OPT_IN_ONLY
+UNSUPPORTED_FRACTURE_MODELS_BLOCKED
+```
+
+Ausência do campo preserva PKN. Valor vazio explícito é erro. `PENNY_SHAPED`
+continua apenas opt-in diagnóstico e depende de `fracture_initiation_gate` e da
+convenção explícita de sinal de `sigma_theta`. A fase não implementa runtime,
+parser, schema ou execução BUZ29-PENNY.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

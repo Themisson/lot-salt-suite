@@ -57,6 +57,44 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-12] Fase 11.10J — guard do seletor `fracture_model` — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/spec_phase11_10j_fracture_model_selector_guard.py
+```
+
+**Documento criado:**
+
+```text
+docs/84_fracture_model_selector_guard_spec.md
+```
+
+**Resultado:**
+
+```text
+FRACTURE_MODEL_SELECTOR_GUARD_SPECIFIED
+PKN_DEFAULT_WHEN_ABSENT
+EXPLICIT_EMPTY_FRACTURE_MODEL_REJECTED
+PENNY_SHAPED_EXPLICIT_OPT_IN_ONLY
+UNSUPPORTED_FRACTURE_MODELS_BLOCKED
+FRACTURE_INITIATION_GATE_REQUIRED
+SIGMATHETA_SIGN_CONVENTION_REQUIRED
+NO_RUNTIME_CHANGE_IN_11_10J
+```
+
+**Interpretação:** a ausência de `lot.fracture.fracture_model` preserva o
+default PKN, enquanto valor vazio explícito deve ser erro. `PENNY_SHAPED`
+continua opt-in diagnóstico, não validado fisicamente e sem equivalência legada.
+A seleção não implica execução: ainda exige `fracture_initiation_gate` e
+convenção explícita de sinal para `sigma_theta`.
+
+---
+
 ### [2026-06-12] Fase 11.10I — seleção unificada `fracture_model` — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase se todos os
