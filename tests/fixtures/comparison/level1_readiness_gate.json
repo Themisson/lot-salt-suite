@@ -3189,6 +3189,36 @@
       "Parser, schema, CLI and lot-pkn runtime remain unchanged."
     ]
   },
+  "phase11_10x_runtime_integration_gate": {
+    "status": "PHASE11_10X_RUNTIME_INTEGRATION_GATE_SPECIFIED",
+    "phase": "11.10X",
+    "integration_gate_status": "RUNTIME_INTEGRATION_GATE_SPECIFIED",
+    "selected_integration_option": "DIAGNOSTIC_PRE_RUNNER_OPT_IN",
+    "implementation_allowed_next": true,
+    "runtime_physical_dispatch_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "pkn_behavior_change_allowed": false,
+    "requires_feature_flag": true,
+    "requires_diagnostic_output_isolation": true,
+    "safe_integration_point": "after parse/validate and before run_pkn_case",
+    "required_statuses": [
+      "PHASE11_10X_RUNTIME_INTEGRATION_GATE_SPECIFIED",
+      "RUNTIME_INTEGRATION_GATE_SPECIFIED",
+      "DIAGNOSTIC_PRE_RUNNER_OPT_IN_SELECTED",
+      "RUNTIME_PHYSICAL_DISPATCH_NOT_ALLOWED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PKN_BEHAVIOR_CHANGE_NOT_ALLOWED"
+    ],
+    "recommended_next_phase": "PHASE11_10Y_IMPLEMENT_DIAGNOSTIC_PRE_RUNNER_RUNTIME_GATE",
+    "caveats": [
+      "Phase 11.10X is a gate/specification phase only.",
+      "FractureGateRuntimeWiring is not integrated into runtime in this phase.",
+      "Future integration must be opt-in and diagnostic.",
+      "Physical dispatch remains disabled.",
+      "BUZ29-PENNY is not executed.",
+      "Parser, schema, CLI and lot-pkn runtime remain unchanged."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

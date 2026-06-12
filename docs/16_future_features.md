@@ -798,3 +798,20 @@ BUZ29_EXECUTION_BLOCKED
 O helper C++ isolado esta disponivel para testes de gate/dispatch, mas ainda
 nao e conectado ao runtime real. A proxima fase deve especificar o gate de
 integracao antes de qualquer mudanca em `lot-pkn` ou execucao BUZ29-PENNY.
+
+## Fase 11.10X — gate de integracao runtime
+
+Status registrado:
+
+```text
+PHASE11_10X_RUNTIME_INTEGRATION_GATE_SPECIFIED
+RUNTIME_INTEGRATION_GATE_SPECIFIED
+DIAGNOSTIC_PRE_RUNNER_OPT_IN_SELECTED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ALLOWED
+BUZ29_EXECUTION_BLOCKED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+```
+
+A fase seleciona uma integracao futura opt-in e diagnostica entre parse/validacao
+e `run_pkn_case(data)`. A integracao completa com dispatch fisico permanece
+bloqueada.

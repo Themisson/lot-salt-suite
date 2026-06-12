@@ -180,3 +180,16 @@ PHASE11_10X_SPECIFY_RUNTIME_INTEGRATION_GATE
 
 Essa fase deve decidir se, quando e onde esse wiring pode ser conectado ao
 runtime real.
+
+## Fase 11.10X — gate de integracao runtime
+
+A Fase 11.10X seleciona a integracao futura:
+
+```text
+DIAGNOSTIC_PRE_RUNNER_OPT_IN
+```
+
+Essa decisao permite planejar uma fase futura que chame
+`FractureGateRuntimeWiring` apos parse/validacao e antes de `run_pkn_case`, mas
+somente se uma feature flag diagnostica estiver habilitada. A decisao nao
+libera dispatch fisico, nao altera `lot-pkn` e nao executa BUZ29-PENNY.

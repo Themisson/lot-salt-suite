@@ -712,3 +712,18 @@ FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE
 Esse status nao executa BUZ29-PENNY, nao chama o adapter penny-shaped e nao
 declara validacao fisica. A proxima decisao continua sendo um gate explicito
 de integracao runtime.
+
+## Fase 11.10X — gate de integracao runtime
+
+A Fase 11.10X seleciona a rota futura `DIAGNOSTIC_PRE_RUNNER_OPT_IN`.
+
+Para a trilha nao-PKN, isso preserva:
+
+```text
+PENNY_SHAPED = diagnostic_only
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ALLOWED
+```
+
+Nenhum caso BUZ29-PENNY deve ser executado ate que uma fase posterior autorize
+explicitamente um runtime fisico ou diagnostico isolado com entradas completas.

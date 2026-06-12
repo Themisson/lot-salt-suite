@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10W FractureGateRuntimeWiring implementation
+Fase ativa  : 11.10X runtime integration gate for FractureGateRuntimeWiring
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : 347/347 esperados apos Fase 11.10W em 2026-06-12
-Testes Py   : 733/733 esperados apos Fase 11.10W em 2026-06-12
+Testes C++  : 347/347 esperados apos Fase 11.10X em 2026-06-12
+Testes Py   : 745/745 esperados apos Fase 11.10X em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,45 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10X — gate de integracao runtime do FractureGateRuntimeWiring — Codex
+
+**Status:** Concluido; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_phase11_10x_runtime_integration_gate.py
+```
+
+**Documento criado:**
+
+```text
+docs/98_runtime_integration_gate_for_fracture_wiring.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10X_RUNTIME_INTEGRATION_GATE_SPECIFIED
+RUNTIME_INTEGRATION_GATE_SPECIFIED
+DIAGNOSTIC_PRE_RUNNER_OPT_IN_SELECTED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ALLOWED
+BUZ29_EXECUTION_BLOCKED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+```
+
+**Interpretacao:** a fase audita o runtime atual
+`apps/lot-sim.cpp -> run_pkn_case(data) -> PknModel{}.simulate(...)` e
+seleciona a proxima integracao segura como diagnostica, pre-runner e opt-in.
+A integracao futura deve ocorrer depois do parse/validacao e antes de
+`run_pkn_case(data)`, com feature flag explicita e saida diagnostica isolada.
+Dispatch fisico, BUZ29-PENNY e qualquer alteracao de comportamento PKN
+permanecem bloqueados. A proxima fase recomendada e
+`PHASE11_10Y_IMPLEMENT_DIAGNOSTIC_PRE_RUNNER_RUNTIME_GATE`.
 
 ---
 

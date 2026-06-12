@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">156/163</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">157/164</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">347</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">733</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">745</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8399,6 +8399,18 @@ BUZ29_EXECUTION_BLOCKED
 <p>O helper C++ isolado esta disponivel para testes de gate/dispatch, mas ainda
 nao e conectado ao runtime real. A proxima fase deve especificar o gate de
 integracao antes de qualquer mudanca em <code>lot-pkn</code> ou execucao BUZ29-PENNY.</p>
+<h2 id="fase-1110x-gate-de-integracao-runtime">Fase 11.10X — gate de integracao runtime</h2>
+<p>Status registrado:</p>
+<pre><code class="language-text">PHASE11_10X_RUNTIME_INTEGRATION_GATE_SPECIFIED
+RUNTIME_INTEGRATION_GATE_SPECIFIED
+DIAGNOSTIC_PRE_RUNNER_OPT_IN_SELECTED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ALLOWED
+BUZ29_EXECUTION_BLOCKED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+</code></pre>
+<p>A fase seleciona uma integracao futura opt-in e diagnostica entre parse/validacao
+e <code>run_pkn_case(data)</code>. A integracao completa com dispatch fisico permanece
+bloqueada.</p>
 </div>
 </section>
 

@@ -212,3 +212,15 @@ BUZ29_EXECUTION_BLOCKED
 ```
 
 A implementacao retorna elegibilidade de dispatch, nao execucao fisica.
+
+## Fase 11.10X — gate de integracao futura
+
+A Fase 11.10X avalia onde o helper implementado na 11.10W pode ser conectado
+sem mudar comportamento fisico. A opcao selecionada e:
+
+```text
+DIAGNOSTIC_PRE_RUNNER_OPT_IN
+```
+
+A integracao futura continua condicionada a feature flag explicita, saida
+diagnostica isolada e `dispatch_runtime_enabled = false`.

@@ -159,3 +159,9 @@ PKN_MODEL_NOT_CALLED
 PENNY_ADAPTER_NOT_CALLED
 BUZ29_EXECUTION_BLOCKED
 ```
+
+## Fase 11.10X — uso futuro das fixtures no gate de integracao
+
+A Fase 11.10X mantem as fixtures da 11.10U como cobertura obrigatoria para
+qualquer integracao futura. A opcao selecionada, `DIAGNOSTIC_PRE_RUNNER_OPT_IN`,
+nao altera os cenarios: eles continuam contrato de status, nao execucao fisica.

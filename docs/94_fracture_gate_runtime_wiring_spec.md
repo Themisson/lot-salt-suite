@@ -102,6 +102,25 @@ Ele nao chama `PknModel`, `PknRunner`, `PennyShapedDiagnosticAdapter` ou
 `PennyShapedDiagnosticWriter`. Assim, a especificacao de runtime continua
 separada da execucao fisica.
 
+## Fase 11.10X — ponto de integracao selecionado
+
+A Fase 11.10X seleciona o ponto futuro mais seguro:
+
+```text
+apos parse/validacao
+antes de run_pkn_case(data)
+somente com feature flag diagnostica
+```
+
+Status:
+
+```text
+RUNTIME_INTEGRATION_GATE_SPECIFIED
+DIAGNOSTIC_PRE_RUNNER_OPT_IN_SELECTED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ALLOWED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+```
+
 ## Estados do fracture gate
 
 Estados minimos especificados:
