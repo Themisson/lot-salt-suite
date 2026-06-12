@@ -1,0 +1,28 @@
+# Phase 11.11F fixture.
+# PKN limited_gate diagnostic opt-in; physical dispatch remains disabled.
+fixture:
+  id: limited_gate_enabled_pkn
+  phase: "11.11F"
+  scenario: pkn_limited_gate
+  expected:
+    diagnostics_enabled: true
+    diagnostic_output_expected: true
+    selected_model: PKN
+    gate_status: FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE
+    dispatch_status: FRACTURE_DISPATCH_NOT_ALLOWED
+    pkn_result_preserved: true
+    runtime_dispatch_enabled: false
+    runtime_physical_dispatch_enabled: false
+    buz29_execution_allowed: false
+    penny_shaped_runtime_enabled: false
+
+case:
+  id: limited_gate_enabled_pkn
+
+lot:
+  fracture:
+    fracture_model: PKN
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: limited_gate
+      dispatch_runtime_enabled: false

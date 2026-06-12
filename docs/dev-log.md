@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11E limited fracture gate runtime integration implementation
+Fase ativa  : 11.11F limited_gate fixtures
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : atualizar apos Fase 11.11E
-Testes Py   : atualizar apos Fase 11.11E
+Testes C++  : atualizar apos Fase 11.11F
+Testes Py   : atualizar apos Fase 11.11F
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -56,6 +56,46 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ## Entradas de sessão
 
 ---
+
+### [2026-06-12] Fase 11.11F — limited_gate fixtures — Codex
+
+**Status:** Implementado; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Fixtures criadas:**
+
+```text
+tests/fixtures/comparison/phase11_11f/
+```
+
+**Ferramenta criada:**
+
+```text
+tools/validate_phase11_11f_limited_gate_fixtures.py
+```
+
+**Documento criado:**
+
+```text
+docs/106_limited_gate_fixtures.md
+```
+
+**Status registrado:**
+
+```text
+PHASE11_11F_LIMITED_GATE_FIXTURES_DEFINED
+LIMITED_GATE_FIXTURES_VALID
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE11_11G_VALIDATE_LIMITED_GATE_ON_CONTROLLED_CASES
+```
 
 ### [2026-06-12] Fase 11.11E — limited fracture gate runtime integration — Codex
 

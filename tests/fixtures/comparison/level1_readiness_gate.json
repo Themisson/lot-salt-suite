@@ -3417,6 +3417,40 @@
       "BUZ29-PENNY is not executed."
     ]
   },
+  "phase11_11f_limited_gate_fixtures": {
+    "status": "PHASE11_11F_LIMITED_GATE_FIXTURES_DEFINED",
+    "phase": "11.11F",
+    "fixture_status": "LIMITED_GATE_FIXTURES_VALID",
+    "fixture_count": 6,
+    "limited_gate_mode_supported": true,
+    "default_disabled_covered": true,
+    "pkn_limited_gate_covered": true,
+    "penny_limited_gate_covered": true,
+    "dispatch_true_invalid_covered": true,
+    "missing_sigmatheta_blocks_covered": true,
+    "invalid_model_blocked_covered": true,
+    "runtime_dispatch_enabled": false,
+    "runtime_physical_dispatch_allowed": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_change_allowed": false,
+    "penny_shaped_runtime_enabled": false,
+    "required_statuses": [
+      "PHASE11_11F_LIMITED_GATE_FIXTURES_DEFINED",
+      "LIMITED_GATE_FIXTURES_VALID",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PENNY_SHAPED_RUNTIME_NOT_ENABLED",
+      "PKN_BEHAVIOR_CHANGE_NOT_ALLOWED"
+    ],
+    "recommended_next_phase": "PHASE11_11G_VALIDATE_LIMITED_GATE_ON_CONTROLLED_CASES",
+    "caveats": [
+      "Phase 11.11F fixtures are diagnostic contracts, not production cases.",
+      "The fixtures do not execute BUZ29-PENNY.",
+      "Physical dispatch remains disabled.",
+      "PENNY_SHAPED remains diagnostic-only.",
+      "The PKN behavior remains unchanged."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

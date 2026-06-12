@@ -153,3 +153,24 @@ converte `PknEligible` ou `PennyDiagnosticEligible` em execucao fisica.
 LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED
 RUNTIME_DISPATCH_NOT_ENABLED
 ```
+
+## Atualizacao 11.11F — fixtures limited_gate
+
+A 11.11F cria fixtures versionadas em:
+
+```text
+tests/fixtures/comparison/phase11_11f/
+```
+
+Os cenarios cobrem default disabled, PKN `limited_gate`, `PENNY_SHAPED`
+`limited_gate`, `dispatch_runtime_enabled=true` invalido, bloqueio por
+sigma_theta ausente e modelo nao suportado. A validacao das fixtures confirma:
+
+```text
+LIMITED_GATE_FIXTURES_VALID
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+```
+
+As fixtures sao contrato diagnostico e nao validacao fisica.

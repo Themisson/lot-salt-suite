@@ -91,3 +91,22 @@ PENNY_SHAPED_RUNTIME_NOT_ENABLED
 PHASE11_11F_ADD_LIMITED_GATE_CASE_FIXTURES
 ```
 
+## Atualização 11.11F — fixtures do modo limited_gate
+
+A Fase 11.11F adiciona fixtures pequenas e versionadas para o modo
+`limited_gate`. Elas cobrem default disabled, PKN limitado, `PENNY_SHAPED`
+diagnostic-only, `dispatch_runtime_enabled=true` invalido, sigma_theta ausente
+e modelo nao suportado.
+
+Essas fixtures validam contrato e regressao. Elas nao habilitam dispatch fisico,
+nao executam BUZ29-PENNY e nao transformam `PENNY_SHAPED` em runtime fisico.
+
+Status esperado:
+
+```text
+PHASE11_11F_LIMITED_GATE_FIXTURES_DEFINED
+LIMITED_GATE_FIXTURES_VALID
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+```

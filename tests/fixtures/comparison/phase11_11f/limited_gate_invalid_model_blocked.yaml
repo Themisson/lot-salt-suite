@@ -1,0 +1,28 @@
+# Phase 11.11F fixture.
+# Unsupported model must be blocked before any runtime dispatch.
+fixture:
+  id: limited_gate_invalid_model_blocked
+  phase: "11.11F"
+  scenario: invalid_model_blocked
+  expected:
+    diagnostics_enabled: true
+    diagnostic_output_expected: false
+    selected_model: KGD
+    invalid: true
+    rejection_reason: UNSUPPORTED_FRACTURE_MODEL_BLOCKED
+    dispatch_status: FRACTURE_DISPATCH_NOT_ALLOWED
+    runtime_dispatch_enabled: false
+    runtime_physical_dispatch_enabled: false
+    buz29_execution_allowed: false
+    penny_shaped_runtime_enabled: false
+
+case:
+  id: limited_gate_invalid_model_blocked
+
+lot:
+  fracture:
+    fracture_model: KGD
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: limited_gate
+      dispatch_runtime_enabled: false

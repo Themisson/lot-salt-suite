@@ -916,3 +916,20 @@ controladas para `limited_gate` e continuar bloqueando BUZ29-PENNY.
 ```text
 PHASE11_11F_ADD_LIMITED_GATE_CASE_FIXTURES
 ```
+
+## Fase 11.11F — fixtures limited_gate
+
+Status registrado:
+
+```text
+PHASE11_11F_LIMITED_GATE_FIXTURES_DEFINED
+LIMITED_GATE_FIXTURES_VALID
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+```
+
+A fase adiciona fixtures pequenas para o modo `limited_gate` e um validador
+Python dedicado. A proxima etapa deve validar esses fixtures em casos
+controlados, sem liberar dispatch fisico.

@@ -1,0 +1,27 @@
+# Phase 11.11F fixture.
+# dispatch_runtime_enabled=true must be rejected for limited_gate.
+fixture:
+  id: limited_gate_dispatch_true_invalid
+  phase: "11.11F"
+  scenario: dispatch_true_invalid
+  expected:
+    diagnostics_enabled: true
+    diagnostic_output_expected: false
+    selected_model: PKN
+    invalid: true
+    rejection_reason: DISPATCH_RUNTIME_ENABLED_TRUE_REJECTED
+    runtime_dispatch_enabled: false
+    runtime_physical_dispatch_enabled: false
+    buz29_execution_allowed: false
+    penny_shaped_runtime_enabled: false
+
+case:
+  id: limited_gate_dispatch_true_invalid
+
+lot:
+  fracture:
+    fracture_model: PKN
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: limited_gate
+      dispatch_runtime_enabled: true

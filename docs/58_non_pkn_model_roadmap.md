@@ -802,3 +802,18 @@ PHASE11_11E_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_IMPLEMENTED
 RUNTIME_DISPATCH_NOT_ENABLED
 PENNY_SHAPED_RUNTIME_NOT_ENABLED
 ```
+
+## Fase 11.11F — fixtures limited_gate
+
+A Fase 11.11F registra fixtures de contrato para `limited_gate`, incluindo o
+cenario `limited_gate_enabled_penny`. Para a trilha nao-PKN, o contrato continua:
+
+```text
+PENNY_SHAPED = diagnostic_only
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_DISPATCH_NOT_ENABLED
+```
+
+Essas fixtures nao executam BUZ29-PENNY e existem apenas para validar bloqueios,
+metadata e regressao do gate limitado.

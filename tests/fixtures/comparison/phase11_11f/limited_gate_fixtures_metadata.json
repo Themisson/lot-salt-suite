@@ -1,0 +1,18 @@
+{
+  "phase": "11.11F",
+  "fixture_type": "limited_gate_runtime_integration_contract",
+  "limited_gate_mode_supported": true,
+  "runtime_dispatch_enabled": false,
+  "runtime_physical_dispatch_allowed": false,
+  "buz29_execution_allowed": false,
+  "pkn_behavior_change_allowed": false,
+  "penny_shaped_runtime_enabled": false,
+  "required_caveats": [
+    "PKN_DEFAULT_RETROCOMPATIBLE",
+    "LIMITED_GATE_DIAGNOSTIC_ONLY",
+    "DISPATCH_RUNTIME_ENABLED_TRUE_REJECTED",
+    "PENNY_SHAPED_DIAGNOSTIC_ONLY",
+    "BUZ29_EXECUTION_BLOCKED",
+    "DIAGNOSTIC_OUTPUT_ISOLATED"
+  ]
+}

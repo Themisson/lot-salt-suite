@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">164/171</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">165/172</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">373</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">809</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">827</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8480,6 +8480,18 @@ habilita dispatch fisico. O proximo incremento deve adicionar fixtures
 controladas para <code>limited_gate</code> e continuar bloqueando BUZ29-PENNY.</p>
 <pre><code class="language-text">PHASE11_11F_ADD_LIMITED_GATE_CASE_FIXTURES
 </code></pre>
+<h2 id="fase-1111f-fixtures-limited_gate">Fase 11.11F — fixtures limited_gate</h2>
+<p>Status registrado:</p>
+<pre><code class="language-text">PHASE11_11F_LIMITED_GATE_FIXTURES_DEFINED
+LIMITED_GATE_FIXTURES_VALID
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+</code></pre>
+<p>A fase adiciona fixtures pequenas para o modo <code>limited_gate</code> e um validador
+Python dedicado. A proxima etapa deve validar esses fixtures em casos
+controlados, sem liberar dispatch fisico.</p>
 </div>
 </section>
 
