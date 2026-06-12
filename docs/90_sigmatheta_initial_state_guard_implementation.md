@@ -97,6 +97,22 @@ SIGMATHETA_INITIAL_STATE_READY
 Esse status significa apenas que o estado informado ao helper e internamente
 coerente. Ele nao libera dispatch fisico.
 
+## Fase 11.10V — uso futuro no runtime wiring
+
+A Fase 11.10V especifica que o futuro `FractureGateRuntimeWiring` deve chamar
+`SigmaThetaInitialStateGuard` antes de avaliar o criterio pressao x
+sigma-theta.
+
+Se esse guard falhar, o wiring futuro deve retornar:
+
+```text
+FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE
+FRACTURE_DISPATCH_NOT_ALLOWED
+```
+
+A 11.10V nao conecta este guard ao runtime. Ela apenas autoriza a proxima fase
+a implementar um helper isolado de wiring.
+
 ## Compatibilidade pressao x sigma-theta
 
 | Pressao | Referencial de sigma-theta | Status |

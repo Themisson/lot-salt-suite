@@ -763,3 +763,21 @@ PENNY_SHAPED_DIAGNOSTIC_ONLY
 A fase adiciona fixtures e validador Python para o contrato do futuro
 `fracture_initiation_gate`. Nenhum runtime wiring, dispatch ou BUZ29-PENNY e
 executado.
+
+## Fase 11.10V — plano de implementacao do runtime wiring
+
+Status registrado:
+
+```text
+PHASE11_10V_RUNTIME_WIRING_IMPLEMENTATION_PLAN_SPECIFIED
+RUNTIME_WIRING_IMPLEMENTATION_PLAN_SPECIFIED
+RUNTIME_WIRING_IMPLEMENTATION_ALLOWED_NEXT
+RUNTIME_EXECUTION_STILL_BLOCKED
+BUZ29_EXECUTION_STILL_BLOCKED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+```
+
+A 11.10V autoriza apenas a proxima implementacao isolada do helper
+`FractureGateRuntimeWiring`. Ela nao libera execucao runtime, nao altera
+`lot-pkn`, nao chama `PknModel` ou `PennyShapedDiagnosticAdapter` e nao executa
+BUZ29-PENNY.

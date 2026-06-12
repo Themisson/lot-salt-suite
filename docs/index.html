@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">154/161</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">155/162</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">335</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">712</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">723</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8374,6 +8374,19 @@ PENNY_SHAPED_DIAGNOSTIC_ONLY
 <p>A fase adiciona fixtures e validador Python para o contrato do futuro
 <code>fracture_initiation_gate</code>. Nenhum runtime wiring, dispatch ou BUZ29-PENNY e
 executado.</p>
+<h2 id="fase-1110v-plano-de-implementacao-do-runtime-wiring">Fase 11.10V — plano de implementacao do runtime wiring</h2>
+<p>Status registrado:</p>
+<pre><code class="language-text">PHASE11_10V_RUNTIME_WIRING_IMPLEMENTATION_PLAN_SPECIFIED
+RUNTIME_WIRING_IMPLEMENTATION_PLAN_SPECIFIED
+RUNTIME_WIRING_IMPLEMENTATION_ALLOWED_NEXT
+RUNTIME_EXECUTION_STILL_BLOCKED
+BUZ29_EXECUTION_STILL_BLOCKED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+</code></pre>
+<p>A 11.10V autoriza apenas a proxima implementacao isolada do helper
+<code>FractureGateRuntimeWiring</code>. Ela nao libera execucao runtime, nao altera
+<code>lot-pkn</code>, nao chama <code>PknModel</code> ou <code>PennyShapedDiagnosticAdapter</code> e nao executa
+BUZ29-PENNY.</p>
 </div>
 </section>
 

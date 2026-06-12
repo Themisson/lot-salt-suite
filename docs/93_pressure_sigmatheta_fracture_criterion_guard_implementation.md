@@ -258,3 +258,25 @@ FRACTURE_DISPATCH_NOT_ALLOWED
 ```
 
 Isso protege o contrato antes de qualquer wiring runtime real.
+
+## Atualizacao 11.10V — criterio no plano de implementacao
+
+A 11.10V especifica que o futuro `FractureGateRuntimeWiring` deve chamar
+`PressureSigmaThetaFractureCriterionGuard` somente depois do
+`SigmaThetaInitialStateGuard`.
+
+Se o criterio bloquear, o helper futuro deve retornar:
+
+```text
+FRACTURE_GATE_BLOCKED_PRESSURE_SIGMATHETA_CRITERION
+FRACTURE_DISPATCH_NOT_ALLOWED
+```
+
+Se o criterio estiver pronto mas sem fratura, o helper futuro deve retornar:
+
+```text
+FRACTURE_GATE_READY_NOT_REACHED
+FRACTURE_DISPATCH_NOT_EXECUTED
+```
+
+A 11.10V nao altera runtime, parser/schema ou comportamento `lot-pkn`.

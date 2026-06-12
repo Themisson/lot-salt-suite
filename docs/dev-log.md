@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10U fracture gate runtime wiring fixtures
+Fase ativa  : 11.10V fracture gate runtime wiring implementation plan
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : 335/335 esperados apos Fase 11.10U em 2026-06-12
-Testes Py   : 712/712 esperados apos Fase 11.10U em 2026-06-12
+Testes C++  : 335/335 esperados apos Fase 11.10V em 2026-06-12
+Testes Py   : 723/723 esperados apos Fase 11.10V em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,44 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10V — plano de implementacao do runtime wiring do fracture gate — Codex
+
+**Status:** Concluido; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/plan_phase11_10v_runtime_wiring_implementation.py
+```
+
+**Documento criado:**
+
+```text
+docs/96_fracture_gate_runtime_wiring_implementation_plan.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10V_RUNTIME_WIRING_IMPLEMENTATION_PLAN_SPECIFIED
+RUNTIME_WIRING_IMPLEMENTATION_PLAN_SPECIFIED
+RUNTIME_WIRING_IMPLEMENTATION_ALLOWED_NEXT
+RUNTIME_EXECUTION_STILL_BLOCKED
+BUZ29_EXECUTION_STILL_BLOCKED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+```
+
+**Interpretacao:** a fase especifica a proxima implementacao isolada de
+`FractureGateRuntimeWiring`, mapeando as sete fixtures da 11.10U para testes
+Catch2 futuros. A implementacao futura deve compor `FractureModelSelector`,
+`SigmaThetaInitialStateGuard` e `PressureSigmaThetaFractureCriterionGuard`,
+mas a 11.10V nao altera C++, runtime, parser/schema, CLI, `lot-pkn` ou casos.
+BUZ29-PENNY permanece bloqueado. A proxima fase recomendada e
+`PHASE11_10W_IMPLEMENT_FRACTURE_GATE_RUNTIME_WIRING`.
 
 ---
 

@@ -125,3 +125,23 @@ RUNTIME_WIRING_NOT_IMPLEMENTED
 BUZ29_EXECUTION_BLOCKED
 PENNY_SHAPED_DIAGNOSTIC_ONLY
 ```
+
+## Fase 11.10V — plano de implementacao
+
+A Fase 11.10V consome estas fixtures como contrato de teste para a futura
+implementacao isolada de `FractureGateRuntimeWiring`.
+
+Cada um dos sete cenarios acima deve virar um teste Catch2 futuro. A 11.10V
+mantem:
+
+```text
+RUNTIME_EXECUTION_STILL_BLOCKED
+BUZ29_EXECUTION_STILL_BLOCKED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+```
+
+O plano de implementacao esta registrado em:
+
+```text
+docs/96_fracture_gate_runtime_wiring_implementation_plan.md
+```

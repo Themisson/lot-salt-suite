@@ -3116,6 +3116,48 @@
       "No physical validation or legacy equivalence is claimed."
     ]
   },
+  "phase11_10v_runtime_wiring_implementation_plan": {
+    "status": "PHASE11_10V_RUNTIME_WIRING_IMPLEMENTATION_PLAN_SPECIFIED",
+    "phase": "11.10V",
+    "plan_status": "RUNTIME_WIRING_IMPLEMENTATION_PLAN_SPECIFIED",
+    "implementation_allowed_next": true,
+    "runtime_execution_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "pkn_behavior_change_allowed": false,
+    "runtime_wiring_implemented": false,
+    "runtime_dispatch_executed": false,
+    "proposed_files": [
+      "include/lot/FractureGateRuntimeWiring.hpp",
+      "src/lot/FractureGateRuntimeWiring.cpp",
+      "tests/cpp/test_fracture_gate_runtime_wiring.cpp"
+    ],
+    "required_test_scenarios": [
+      "missing_model_defaults_pkn_not_reached",
+      "explicit_pkn_initiated_dispatch_eligible",
+      "explicit_penny_initiated_diagnostic_eligible",
+      "sigmatheta_guard_blocks_dispatch",
+      "pressure_sigmatheta_criterion_blocks_dispatch",
+      "unsupported_kgd_model_blocked",
+      "explicit_empty_model_blocked"
+    ],
+    "required_statuses": [
+      "PHASE11_10V_RUNTIME_WIRING_IMPLEMENTATION_PLAN_SPECIFIED",
+      "RUNTIME_WIRING_IMPLEMENTATION_PLAN_SPECIFIED",
+      "RUNTIME_WIRING_IMPLEMENTATION_ALLOWED_NEXT",
+      "RUNTIME_EXECUTION_STILL_BLOCKED",
+      "BUZ29_EXECUTION_STILL_BLOCKED",
+      "PKN_BEHAVIOR_CHANGE_NOT_ALLOWED"
+    ],
+    "recommended_next_phase": "PHASE11_10W_IMPLEMENT_FRACTURE_GATE_RUNTIME_WIRING",
+    "caveats": [
+      "Phase 11.10V is a planning phase only.",
+      "No C++, parser, schema, CLI or runtime dispatch is changed.",
+      "The next implementation may create an isolated FractureGateRuntimeWiring helper.",
+      "PENNY_SHAPED remains diagnostic-only.",
+      "BUZ29-PENNY is not executed.",
+      "No physical validation or legacy equivalence is claimed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

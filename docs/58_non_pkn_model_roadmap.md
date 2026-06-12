@@ -682,3 +682,20 @@ PENNY_SHAPED_DIAGNOSTIC_ONLY
 ```
 
 Essas fixtures sao contrato de teste; nao executam runtime nem validam BUZ29.
+
+## Fase 11.10V — plano de implementacao do wiring
+
+A Fase 11.10V registra o plano para uma proxima implementacao C++ isolada do
+`FractureGateRuntimeWiring`, usando as fixtures da 11.10U como contrato.
+
+```text
+PHASE11_10V_RUNTIME_WIRING_IMPLEMENTATION_PLAN_SPECIFIED
+RUNTIME_WIRING_IMPLEMENTATION_ALLOWED_NEXT
+RUNTIME_EXECUTION_STILL_BLOCKED
+BUZ29_EXECUTION_STILL_BLOCKED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+```
+
+A trilha nao-PKN continua segura: `PENNY_SHAPED` pode ser marcado futuramente
+como `PennyDiagnosticEligible`, mas isso nao significa execucao fisica nem
+validacao BUZ29-PENNY.

@@ -168,6 +168,7 @@ phases:
   phase_11_10s_pressure_sigmatheta_fracture_criterion_guard: completed
   phase_11_10t_fracture_gate_runtime_wiring: completed
   phase_11_10u_fracture_gate_runtime_wiring_fixtures: completed
+  phase_11_10v_runtime_wiring_implementation_plan: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -262,6 +263,7 @@ docs:
   stage11_10s_pressure_sigmatheta_fracture_criterion_guard: implemented
   stage11_10t_fracture_gate_runtime_wiring: implemented
   stage11_10u_fracture_gate_runtime_wiring_fixtures: implemented
+  stage11_10v_runtime_wiring_implementation_plan: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -325,14 +327,14 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 335        # Catch2 lot-salt-suite — 335/335 esperados apos Fase 11.10U (2026-06-12)
+  cpp_tests: 335        # Catch2 lot-salt-suite — 335/335 esperados apos Fase 11.10V (2026-06-12)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 712     # pytest lot-salt-suite — 712/712 esperados apos Fase 11.10U (2026-06-12)
+  python_tests: 723     # pytest lot-salt-suite — 723/723 esperados apos Fase 11.10V (2026-06-12)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-12"
-updated_by: "codex (Fase 11.10U fracture gate runtime wiring fixtures)"
+updated_by: "codex (Fase 11.10V fracture gate runtime wiring implementation plan)"
 project_version: "0.1.0"

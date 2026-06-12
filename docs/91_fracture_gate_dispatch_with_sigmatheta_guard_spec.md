@@ -274,3 +274,20 @@ FRACTURE_DISPATCH_NOT_ALLOWED
 ```
 
 Esses estados continuam contrato sintetico. Nenhum dispatch e executado.
+
+## Atualizacao 11.10V — plano de implementacao do wiring
+
+A 11.10V transforma esta especificacao em plano de implementacao futura para
+um helper isolado `FractureGateRuntimeWiring`.
+
+O helper futuro deve produzir apenas status de gate e dispatch. Nenhuma chamada
+a `PknModel`, `PennyShapedDiagnosticAdapter` ou BUZ29-PENNY e autorizada pela
+11.10V.
+
+Status preservado:
+
+```text
+RUNTIME_EXECUTION_STILL_BLOCKED
+BUZ29_EXECUTION_STILL_BLOCKED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+```

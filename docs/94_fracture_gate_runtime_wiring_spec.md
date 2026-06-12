@@ -53,6 +53,35 @@ CaseData/parser defaults
 O dispatch so pode ocorrer se todos os guards anteriores estiverem prontos e se
 a fase futura autorizar explicitamente a rota.
 
+## Fase 11.10V — plano de implementacao futura
+
+A Fase 11.10V nao implementa esse wiring, mas especifica a proxima
+implementacao isolada:
+
+```text
+include/lot/FractureGateRuntimeWiring.hpp
+src/lot/FractureGateRuntimeWiring.cpp
+tests/cpp/test_fracture_gate_runtime_wiring.cpp
+```
+
+O plano mantem o encadeamento:
+
+```text
+FractureModelSelector
+-> SigmaThetaInitialStateGuard
+-> PressureSigmaThetaFractureCriterionGuard
+-> dispatch status
+```
+
+e registra:
+
+```text
+RUNTIME_WIRING_IMPLEMENTATION_ALLOWED_NEXT
+RUNTIME_EXECUTION_STILL_BLOCKED
+BUZ29_EXECUTION_STILL_BLOCKED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+```
+
 ## Estados do fracture gate
 
 Estados minimos especificados:
