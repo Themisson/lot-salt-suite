@@ -225,3 +225,19 @@ fracture_margin_Pa = wellbore_pressure_Pa - fracture_threshold_pressure_Pa
 só é aceitável se `fracture_threshold_pressure_Pa` for derivada com semântica
 explícita. O dispatch físico segue bloqueado até a 11.10S implementar e testar
 um guard específico para esse critério.
+
+## Atualização 11.10S — guard do critério disponível
+
+A 11.10S implementa `PressureSigmaThetaFractureCriterionGuard` como helper C++
+isolado. O guard ja calcula margem por tensao tangencial ou por threshold
+pressure explicito, mas ainda nao e chamado pelo runtime. Assim, a sequencia
+futura continua especificada como:
+
+```text
+FractureModelSelector
+-> SigmaThetaInitialStateGuard
+-> PressureSigmaThetaFractureCriterionGuard
+-> dispatch futuro
+```
+
+O dispatch fisico permanece bloqueado ate uma fase de wiring runtime com guards.

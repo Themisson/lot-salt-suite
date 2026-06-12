@@ -624,3 +624,19 @@ sigma_theta_current_compression_positive_Pa <= -tensile_strength_Pa
 `pressure > sigma_theta_compression_positive_Pa` não deve ser usado como
 critério físico final sem transformação de sinal, pressão crítica e referencial
 explícito. `PENNY_SHAPED` continua opt-in diagnóstico e sem execução BUZ29.
+
+## Fase 11.10S — guard do criterio pressao x sigma-theta
+
+A Fase 11.10S implementa `PressureSigmaThetaFractureCriterionGuard` como helper
+C++ isolado. O status registrado e:
+
+```text
+PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD_IMPLEMENTED
+SIGMATHETA_COMPRESSION_POSITIVE_CRITERION_IMPLEMENTED
+RUNTIME_DISPATCH_NOT_CHANGED
+LOT_PKN_BEHAVIOR_NOT_CHANGED
+```
+
+O helper nao executa BUZ29-PENNY, nao altera `PknModel`, nao altera
+parser/schema e nao libera dispatch. A proxima fase recomendada e especificar
+o wiring runtime com guards, ainda sem executar fisicamente modelos nao PKN.

@@ -2966,6 +2966,43 @@
       "BUZ29-PENNY is not executed."
     ]
   },
+  "phase11_10s_pressure_sigmatheta_fracture_criterion_guard": {
+    "status": "PHASE11_10S_PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD_IMPLEMENTED",
+    "phase": "11.10S",
+    "implementation_status": "PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD_IMPLEMENTED",
+    "sigma_theta_sign_convention": "COMPRESSION_POSITIVE",
+    "preferred_criterion": "sigma_theta_current_compression_positive_Pa <= -tensile_strength_Pa",
+    "preferred_tensile_condition": "tensile_condition_Pa = -sigma_theta_current_compression_positive_Pa",
+    "threshold_form_available": true,
+    "alternative_threshold_form": "fracture_margin_Pa = wellbore_pressure_Pa - fracture_threshold_pressure_Pa",
+    "forbidden_shortcut": "pressure_greater_than_sigma_theta_without_sign_reference_transform",
+    "dispatch_allowed_next": false,
+    "runtime_execution_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "parser_schema_changed": false,
+    "runtime_dispatch_changed": false,
+    "lot_pkn_behavior_changed": false,
+    "source_files": [
+      "include/lot/PressureSigmaThetaFractureCriterionGuard.hpp",
+      "src/lot/PressureSigmaThetaFractureCriterionGuard.cpp",
+      "tests/cpp/test_pressure_sigma_theta_fracture_criterion_guard.cpp"
+    ],
+    "required_statuses": [
+      "PHASE11_10S_PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD_IMPLEMENTED",
+      "PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD_IMPLEMENTED",
+      "SIGMATHETA_COMPRESSION_POSITIVE_CRITERION_IMPLEMENTED",
+      "PRESSURE_GREATER_THAN_SIGMATHETA_SHORTCUT_FORBIDDEN",
+      "RUNTIME_DISPATCH_NOT_CHANGED",
+      "LOT_PKN_BEHAVIOR_NOT_CHANGED"
+    ],
+    "recommended_next_phase": "PHASE11_10T_SPECIFY_FRACTURE_GATE_RUNTIME_WIRING_WITH_GUARDS",
+    "caveats": [
+      "The guard is implemented as an isolated C++ helper.",
+      "The guard is not integrated into parser, schema, CLI or runtime dispatch.",
+      "BUZ29-PENNY is not executed.",
+      "No physical validation or legacy equivalence is claimed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

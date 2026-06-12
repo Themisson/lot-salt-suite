@@ -252,3 +252,11 @@ sigma_theta_current_compression_positive_Pa =
 
 Essa combinação só pode ocorrer se todos os termos estiverem no mesmo
 referencial total/efetivo e com convenção compression-positive.
+
+## Atualizacao 11.10S — criterio algébrico implementado como helper
+
+A 11.10S implementa `PressureSigmaThetaFractureCriterionGuard` como helper C++
+isolado. Ele consome `sigma_theta_current_compression_positive_Pa`,
+`tensile_strength_Pa`, semantica de pressao, referencial e convencao de sinal,
+mas ainda nao recebe dados do parser ou do runtime. O wiring especificado neste
+documento permanece pendente para fase futura.

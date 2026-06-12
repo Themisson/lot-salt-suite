@@ -248,3 +248,12 @@ sigma_theta_current_compression_positive_Pa <= -tensile_strength_Pa
 
 O gate continua bloqueando dispatch se pressão, sinal ou referencial forem
 desconhecidos.
+
+## Atualizacao 11.10S — guard de criterio implementado
+
+A Fase 11.10S implementa a avaliacao isolada do criterio pressao x
+sigma-theta. O novo helper ainda depende do estado inicial validado por
+`SigmaThetaInitialStateGuard`, mas calcula `tensile_condition_Pa`,
+`fracture_margin_Pa` e `fracture_initiated` de forma testada. A auditoria
+permanece bloqueante para runtime porque o helper ainda nao esta conectado ao
+`fracture_initiation_gate`.

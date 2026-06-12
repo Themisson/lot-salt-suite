@@ -190,3 +190,11 @@ FRACTURE_CRITERION_BLOCKED_PRESSURE_SEMANTICS_UNKNOWN
 FRACTURE_CRITERION_BLOCKED_SIGN_CONVENTION_UNKNOWN
 FRACTURE_CRITERION_BLOCKED_REFERENCE_FRAME_MISMATCH
 ```
+
+## Atualizacao 11.10S — guard do criterio pressao x sigma-theta
+
+A Fase 11.10S adiciona o helper isolado
+`PressureSigmaThetaFractureCriterionGuard`, que deve ser chamado apenas depois
+de `SigmaThetaInitialStateGuard` retornar estado pronto. Essa fase nao conecta
+os dois helpers ao runtime; ela apenas deixa o criterio algébrico testado e
+disponivel para especificacao de wiring futura.

@@ -703,3 +703,29 @@ Esse guard deve implementar apenas a validação algébrica especificada na
 11.10R, preservando `lot-pkn`, parser/schema e dispatch runtime bloqueados até
 que os testes provem semântica de pressão, sinal compression-positive e
 referencial compatível.
+
+## Fase 11.10S — PressureSigmaThetaFractureCriterionGuard
+
+A Fase 11.10S implementa o helper C++ isolado
+`PressureSigmaThetaFractureCriterionGuard` e registra:
+
+```text
+PHASE11_10S_PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD_IMPLEMENTED
+PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD_IMPLEMENTED
+SIGMATHETA_COMPRESSION_POSITIVE_CRITERION_IMPLEMENTED
+PRESSURE_GREATER_THAN_SIGMATHETA_SHORTCUT_FORBIDDEN
+RUNTIME_DISPATCH_NOT_CHANGED
+LOT_PKN_BEHAVIOR_NOT_CHANGED
+```
+
+O helper calcula a forma preferencial:
+
+```text
+tensile_condition_Pa = -sigma_theta_current_compression_positive_Pa
+fracture_margin_Pa = tensile_condition_Pa - tensile_strength_Pa
+```
+
+A forma alternativa por `fracture_threshold_pressure_Pa` tambem existe, mas
+apenas como opcao explicita. Parser, schema, runtime dispatch, BUZ29-PENNY e
+comportamento `lot-pkn` permanecem inalterados. A proxima fase recomendada e
+`PHASE11_10T_SPECIFY_FRACTURE_GATE_RUNTIME_WIRING_WITH_GUARDS`.

@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10R pressure x sigma-theta fracture criterion specification
+Fase ativa  : 11.10S pressure x sigma-theta fracture criterion guard
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : 321/321 esperados apos Fase 11.10P em 2026-06-12
-Testes Py   : 667/667 esperados apos Fase 11.10R em 2026-06-12
+Testes C++  : 335/335 esperados apos Fase 11.10S em 2026-06-12
+Testes Py   : 680/680 esperados apos Fase 11.10S em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,52 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10S — guard do criterio pressao x sigma-theta — Codex
+
+**Status:** Concluido; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Arquivos C++ criados:**
+
+```text
+include/lot/PressureSigmaThetaFractureCriterionGuard.hpp
+src/lot/PressureSigmaThetaFractureCriterionGuard.cpp
+tests/cpp/test_pressure_sigma_theta_fracture_criterion_guard.cpp
+```
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase11_10s_pressure_sigmatheta_fracture_criterion_guard.py
+```
+
+**Documento criado:**
+
+```text
+docs/93_pressure_sigmatheta_fracture_criterion_guard_implementation.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10S_PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD_IMPLEMENTED
+PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD_IMPLEMENTED
+SIGMATHETA_COMPRESSION_POSITIVE_CRITERION_IMPLEMENTED
+PRESSURE_GREATER_THAN_SIGMATHETA_SHORTCUT_FORBIDDEN
+RUNTIME_DISPATCH_NOT_CHANGED
+LOT_PKN_BEHAVIOR_NOT_CHANGED
+```
+
+**Interpretacao:** a fase implementa apenas o helper C++ isolado que avalia
+`sigma_theta_current_compression_positive_Pa <= -tensile_strength_Pa` por meio
+de `tensile_condition_Pa` e `fracture_margin_Pa`, com forma alternativa por
+`fracture_threshold_pressure_Pa` somente quando explicitamente selecionada. A
+fase nao integra runtime, nao altera parser/schema, `PknModel`, `PknRunner`,
+CLI ou `lot-pkn`, e nao executa BUZ29-PENNY. A proxima fase recomendada e
+`PHASE11_10T_SPECIFY_FRACTURE_GATE_RUNTIME_WIRING_WITH_GUARDS`.
 
 ---
 

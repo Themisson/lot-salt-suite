@@ -187,3 +187,25 @@ SIGMATHETA_COMPRESSION_POSITIVE_SIGN_CONVENTION_RESOLVED
 PRESSURE_GREATER_THAN_SIGMATHETA_SHORTCUT_FORBIDDEN
 DISPATCH_REMAINS_BLOCKED_UNTIL_CRITERION_GUARD_IMPLEMENTED
 ```
+
+## Atualização 11.10S — guard implementado
+
+A Fase 11.10S implementa o helper C++ isolado
+`PressureSigmaThetaFractureCriterionGuard`. A forma preferencial implementada e:
+
+```text
+tensile_condition_Pa = -sigma_theta_current_compression_positive_Pa
+fracture_margin_Pa = tensile_condition_Pa - tensile_strength_Pa
+fracture_initiated = fracture_margin_Pa >= 0
+```
+
+A forma alternativa por threshold pressure tambem foi implementada, mas apenas
+quando selecionada explicitamente:
+
+```text
+fracture_margin_Pa = wellbore_pressure_Pa - fracture_threshold_pressure_Pa
+```
+
+A implementacao nao altera parser, schema, `PknModel`, `PknRunner`, runtime
+dispatch, BUZ29-PENNY ou comportamento `lot-pkn`. O proximo passo recomendado e
+`PHASE11_10T_SPECIFY_FRACTURE_GATE_RUNTIME_WIRING_WITH_GUARDS`.
