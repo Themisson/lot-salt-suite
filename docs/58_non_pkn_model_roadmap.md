@@ -163,6 +163,19 @@ O adapter apenas mapeia input diagnóstico em SI para `PennyShapedInput` e chama
 `evaluate_penny_shaped_model`. Ele não altera parser, schema, CLI, `PknModel`,
 `PknRunner` ou casos protegidos.
 
+## Fase 11.9A — caso sintético mínimo
+
+A Fase 11.9A adiciona um caso sintético versionado:
+
+```text
+status = PENNY_SYNTHETIC_CASE_CREATED
+case = cases/validation/non_pkn/penny_shaped_synthetic_minimal.yaml
+tool = tools/verify_phase11_9a_penny_synthetic_case.py
+```
+
+O caso é verificado por Python e não é uma rota de schema/runtime oficial do
+`lot-sim`. Ele serve apenas para manter o contrato diagnóstico exercitável.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

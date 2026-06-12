@@ -71,3 +71,14 @@ PHASE11_9A_PENNY_SYNTHETIC_MINIMAL_CASE
 
 A próxima fase pode criar um caso sintético mínimo e verificador diagnóstico,
 sem promover a rota para parser/schema oficial.
+
+## Resultado da Fase 11.9A
+
+A fase seguinte criou o caso sintético mínimo:
+
+```text
+cases/validation/non_pkn/penny_shaped_synthetic_minimal.yaml
+```
+
+O caso é verificado por `tools/verify_phase11_9a_penny_synthetic_case.py` e
+permanece fora do parser/schema oficial.

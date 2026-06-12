@@ -140,6 +140,7 @@ phases:
   phase_11_8b_penny_integration_gate: completed
   phase_11_8c_penny_adapter_spec: completed
   phase_11_8d_penny_diagnostic_adapter: completed
+  phase_11_9a_penny_synthetic_case: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -206,6 +207,7 @@ docs:
   stage11_8b_penny_integration_gate: implemented
   stage11_8c_penny_adapter_spec: implemented
   stage11_8d_penny_diagnostic_adapter: implemented
+  stage11_9a_penny_synthetic_case: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -271,7 +273,7 @@ validation:
 test_counts:
   cpp_tests: 273        # Catch2 lot-salt-suite — 273/273 previstos apos Fase 11.8D (2026-06-11)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 395     # pytest lot-salt-suite — 395/395 previstos apos Fase 11.8C (2026-06-11)
+  python_tests: 400     # pytest lot-salt-suite — 400/400 previstos apos Fase 11.9A (2026-06-11)
   regression_baselines: 4
 
 # ============================================================

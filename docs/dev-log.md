@@ -6175,3 +6175,22 @@ parser, schema, CLI, `PknModel`, `PknRunner`, casos protegidos ou semântica
 `lot-pkn`.
 
 **Próxima fase:** `PHASE11_9A_PENNY_SYNTHETIC_MINIMAL_CASE`.
+
+---
+
+### [2026-06-11] Fase 11.9A — Caso sintético mínimo PennyShaped
+
+**Status:** Concluído.
+
+**Classificação:** `PENNY_SYNTHETIC_CASE_CREATED`.
+
+**Entregáveis:**
+- `cases/validation/non_pkn/penny_shaped_synthetic_minimal.yaml`
+- `tools/verify_phase11_9a_penny_synthetic_case.py`
+- `tests/python/test_verify_phase11_9a_penny_synthetic_case.py`
+- `docs/67_penny_synthetic_minimal_case.md`
+
+**Escopo:** caso/verificador diagnóstico. Não altera parser, schema, CLI,
+`PknModel`, `PknRunner`, casos protegidos ou semântica `lot-pkn`.
+
+**Próxima fase:** `PHASE11_9B_BUZ29_PENNY_READINESS`.

@@ -1,0 +1,41 @@
+# Phase 11.9A synthetic diagnostic case.
+# Synthetic diagnostic case only. Not BUZ29 validation. Not legacy equivalence.
+# This file is not an official lot-sim runtime schema route.
+
+case:
+  id: penny_shaped_synthetic_minimal
+  description: Synthetic minimum PennyShaped diagnostic case.
+
+model:
+  type: penny_shaped_diagnostic
+  adapter: PennyShapedDiagnosticAdapter
+
+elasticity:
+  young_modulus_Pa: 5710000.0
+  poisson_ratio: 0.36
+
+fluid:
+  viscosity_Pa_min: 180.0
+
+injection:
+  flow_rate_m3_min: 0.05
+
+initiation:
+  elapsed_since_opening_min: 1.25
+  wellbore_pressure_Pa: 67000000.0
+  sigma_theta_compression_positive_Pa: 66000000.0
+
+legacy_options:
+  volume_multiplier: 10.0
+
+diagnostics:
+  source: synthetic
+  status: PENNY_SYNTHETIC_CASE_CREATED
+  caveat: Synthetic diagnostic case only. Not BUZ29 validation. Not legacy equivalence.
+
+expected_outputs:
+  - plane_strain_modulus_Pa
+  - opening_m
+  - radius_m
+  - pressure_factor
+  - fracture_volume_proxy_m3

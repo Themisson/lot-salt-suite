@@ -557,3 +557,6 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
 - A Fase 11.8D implementa o adapter C++ diagnóstico opt-in
   `PennyShapedDiagnosticAdapter`, preservando o núcleo isolado e mantendo
   `lot-pkn`, parser, schema e casos protegidos sem alteração de comportamento.
+- A Fase 11.9A cria um caso sintético mínimo `penny_shaped` em
+  `cases/validation/non_pkn/`, verificado por Python. Ele é fixture/caso
+  diagnóstico, não entrada oficial do runtime.
