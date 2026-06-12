@@ -369,6 +369,23 @@ Foram definidos fixtures JSON, CSV e metadata em
 `fracture_volume_proxy_1rad_m3` do equivalente `2π` e mantém
 `volume_multiplier` como `VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI`.
 
+## Fase 11.10F-aux — restrição standalone do SESTSAL legado
+
+A Fase 11.10F-aux registra uma restrição da trilha sal/APB que não deve travar
+a evolução PennyShaped, mas precisa ficar documentada:
+
+```text
+cause = LEGACY_SESTSAL_REQUIRES_APB1DA_COUPLING
+gate = DO_NOT_USE_SESTSAL_STANDALONE_AS_VALIDATION_REFERENCE
+secondary_cause = ELASTIC_DISPLACEMENT_REFERENCE_MISMATCH
+secondary_gate = ALIGN_TOTAL_VS_PERTURBATION_DISPLACEMENT_BEFORE_COMPARISON
+```
+
+Chamadas standalone de `sestsal` que atinjam estado hidrostático puro podem
+produzir `NaN` ao normalizar por `norm_sigd`. O uso legado esperado continua
+acoplado a `APB1da`; comparações de deslocamento total legado contra
+perturbação moderna ficam bloqueadas sem alinhamento explícito.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

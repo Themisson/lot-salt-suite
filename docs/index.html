@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">137/144</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">138/145</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">273</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">488</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">494</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8246,7 +8246,13 @@ unidades reais usadas no <code>LOT_APB_v5</code> antes de aceitar nomes ou dimen
 - A Fase 11.10E materializa o contrato da 11.10D em fixtures JSON/CSV/metadata
   pequenos e versionados, com validador Python. O status é
   <code>PENNY_DIAGNOSTIC_OUTPUT_FIXTURES_VALID</code>; ainda não há writer C++,
-  execução BUZ29-PENNY, validação física ou equivalência legada.</p>
+  execução BUZ29-PENNY, validação física ou equivalência legada.
+- A Fase 11.10F-aux registra uma restrição lateral da trilha sal/APB:
+  <code>legacy/sestsal</code> não deve ser usado como motor standalone de validação. A
+  função de fluência normaliza por <code>norm_sigd</code>, o estado hidrostático puro pode
+  gerar <code>NaN</code>, e a referência legada deve permanecer acoplada ao <code>APB1da</code>.
+  Comparações de deslocamento total legado versus deslocamento perturbacional
+  moderno ficam bloqueadas até alinhamento de referencial.</p>
 </div>
 </section>
 

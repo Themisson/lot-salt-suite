@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10E PennyShaped diagnostic output fixtures
+Fase ativa  : 11.10F-aux legacy SESTSAL standalone constraint
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 273/273 passaram apos Fase 11.10A em 2026-06-12
-Testes Py   : 488/488 esperados apos Fase 11.10E em 2026-06-12
+Testes Py   : 494/494 esperados apos Fase 11.10F-aux em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,42 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10F-aux — restrição standalone do SESTSAL legado — Codex
+
+**Status:** Concluído; commit executado ao final da fase se todos os gates
+passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/audit_legacy_sestsal_standalone_constraint.py
+```
+
+**Documento criado:**
+
+```text
+docs/79_legacy_sestsal_standalone_constraint.md
+```
+
+**Resultado:**
+
+```text
+cause = LEGACY_SESTSAL_REQUIRES_APB1DA_COUPLING
+gate = DO_NOT_USE_SESTSAL_STANDALONE_AS_VALIDATION_REFERENCE
+secondary_cause = ELASTIC_DISPLACEMENT_REFERENCE_MISMATCH
+secondary_gate = ALIGN_TOTAL_VS_PERTURBATION_DISPLACEMENT_BEFORE_COMPARISON
+standalone_validation_supported = false
+```
+
+**Interpretação:** a auditoria registra que `Material::creepFunction(...)`
+normaliza por `norm_sigd` sem guarda explícita para estado hidrostático puro.
+Logo, testes que chamem SESTSAL legado isoladamente devem ser classificados
+como unsupported; a referência válida do legado permanece o uso acoplado via
+`APB1da`. Comparações de deslocamento total legado contra deslocamento
+perturbacional moderno continuam bloqueadas sem alinhamento de referencial.
 
 ---
 

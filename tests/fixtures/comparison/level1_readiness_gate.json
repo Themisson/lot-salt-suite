@@ -2332,6 +2332,29 @@
       "DIAGNOSTIC_ONLY"
     ]
   },
+  "phase11_10f_aux_legacy_sestsal_standalone_constraint": {
+    "status": "LEGACY_SESTSAL_STANDALONE_CONSTRAINT_RECORDED",
+    "phase": "11.10F-aux",
+    "track": "SALT_APB_LEGACY",
+    "cause": "LEGACY_SESTSAL_REQUIRES_APB1DA_COUPLING",
+    "gate": "DO_NOT_USE_SESTSAL_STANDALONE_AS_VALIDATION_REFERENCE",
+    "secondary_cause": "ELASTIC_DISPLACEMENT_REFERENCE_MISMATCH",
+    "secondary_gate": "ALIGN_TOTAL_VS_PERTURBATION_DISPLACEMENT_BEFORE_COMPARISON",
+    "standalone_validation_supported": false,
+    "standalone_tests_status": "UNSUPPORTED",
+    "nan_risk": "NORM_SIGD_ZERO_CAN_GENERATE_NAN_IN_HYDROSTATIC_STANDALONE_CALL",
+    "legacy_files_modified": false,
+    "runtime_changed": false,
+    "tool": "tools/audit_legacy_sestsal_standalone_constraint.py",
+    "document": "docs/79_legacy_sestsal_standalone_constraint.md",
+    "recommended_mainline_next_phase": "PHASE11_10F_SPECIFY_PENNY_DIAGNOSTIC_WRITER_IMPLEMENTATION",
+    "caveats": [
+      "SESTSAL standalone calls are unsupported as validation reference.",
+      "The legacy reference context is APB1da-coupled execution.",
+      "Total legacy displacement and modern perturbation displacement require reference alignment before comparison.",
+      "No legacy, legance or external/saltcreep code is modified by this audit."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

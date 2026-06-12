@@ -614,3 +614,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   pequenos e versionados, com validador Python. O status é
   `PENNY_DIAGNOSTIC_OUTPUT_FIXTURES_VALID`; ainda não há writer C++,
   execução BUZ29-PENNY, validação física ou equivalência legada.
+- A Fase 11.10F-aux registra uma restrição lateral da trilha sal/APB:
+  `legacy/sestsal` não deve ser usado como motor standalone de validação. A
+  função de fluência normaliza por `norm_sigd`, o estado hidrostático puro pode
+  gerar `NaN`, e a referência legada deve permanecer acoplada ao `APB1da`.
+  Comparações de deslocamento total legado versus deslocamento perturbacional
+  moderno ficam bloqueadas até alinhamento de referencial.
