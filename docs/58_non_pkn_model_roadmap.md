@@ -756,6 +756,23 @@ legacy_equivalent = false
 BUZ29_EXECUTION_BLOCKED
 ```
 
+## Fase 11.11I — fonte real de sigma-theta inicial
+
+A Fase 11.11I especifica que a fonte primaria futura para
+`sigma_theta_initial_compression_positive_Pa` deve ser
+`ELASTIC_INITIAL_WELLBORE_STATE`, representando o estado pos-perfuracao e
+pre-LOT. `LEGACY_DIAGNOSTIC_TRACE` permanece fonte apenas diagnostica, nao
+fonte de validacao fisica automatica.
+
+Status registrados:
+
+```text
+PHASE11_11I_REAL_SIGMATHETA_INITIAL_SOURCE_STRATEGY_SPECIFIED
+PRIMARY_SIGMATHETA_SOURCE_ELASTIC_INITIAL_WELLBORE_STATE
+LOT_TIME_ZERO_NOT_DRILLING_TIME_ZERO
+LEGACY_TRACE_NOT_PHYSICAL_VALIDATION_SOURCE
+```
+
 O status permanece documental/diagnostico; nenhum runner nao-PKN e executado.
 
 ## Fase 11.11A — validacao controlada do pre-runner

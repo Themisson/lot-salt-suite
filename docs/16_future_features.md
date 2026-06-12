@@ -7,6 +7,26 @@ formulações sem fase própria.
 
 ---
 
+## Fase 11.11I — fonte real de sigma-theta inicial
+
+**Status:** `REAL_SIGMATHETA_INITIAL_SOURCE_STRATEGY_SPECIFIED`.
+
+A fonte primaria futura para
+`sigma_theta_initial_compression_positive_Pa` deve ser
+`ELASTIC_INITIAL_WELLBORE_STATE`, isto e, o estado pos-perfuracao e pre-LOT na
+parede do poco. O trace legado continua permitido apenas como diagnostico:
+
+```text
+LOT_TIME_ZERO_NOT_DRILLING_TIME_ZERO
+LEGACY_TRACE_NOT_PHYSICAL_VALIDATION_SOURCE
+implementation_allowed_next = false
+```
+
+A proxima etapa e auditar se o runtime real ja possui sigma-theta inicial,
+sigma-theta current e pressao com semantica suficiente.
+
+---
+
 ## Fase 10.17C — acomodação, shut-in e fluido Zamora
 
 **Status:** `PLANNED_NO_RUNTIME_CHANGE`.

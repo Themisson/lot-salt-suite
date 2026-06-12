@@ -207,3 +207,17 @@ A fase nao habilita dispatch fisico, nao chama `PknModel`, nao chama
 `PennyShapedDiagnosticAdapter` e nao executa BUZ29-PENNY. Com sigma_theta
 inicial ausente, o bloqueio esperado e
 `FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE`.
+
+## Atualizacao 11.11I — estrategia de fonte sigma-theta
+
+A 11.11I especifica que a fonte primaria futura para alimentar o guard no
+runtime deve ser:
+
+```text
+ELASTIC_INITIAL_WELLBORE_STATE
+```
+
+Esse estado deve representar a condicao pos-perfuracao e pre-LOT. Portanto,
+`t = 0` do LOT nao deve ser interpretado como `t = 0` da perfuracao. A
+integracao runtime real continua bloqueada ate a 11.11J auditar
+disponibilidade de sigma-theta e pressao com semantica suficiente.

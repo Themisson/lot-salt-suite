@@ -67,3 +67,10 @@ REAL_SIGMATHETA_WIRING
 ```text
 PHASE11_11I_SPECIFY_REAL_SIGMATHETA_INITIAL_SOURCE_STRATEGY
 ```
+
+## Encadeamento 11.11I
+
+A Fase 11.11I registra que a fonte primaria futura para
+`sigma_theta_initial_compression_positive_Pa` deve representar o estado
+pos-perfuracao e pre-LOT. O `limited_gate` permanece diagnostico ate que essa
+fonte exista no runtime com semantica, sinal e referencial resolvidos.

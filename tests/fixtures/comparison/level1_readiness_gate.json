@@ -3514,6 +3514,33 @@
       "A real sigma-theta initial source is still future work."
     ]
   },
+  "phase11_11i_real_sigmatheta_initial_source_strategy": {
+    "status": "PHASE11_11I_REAL_SIGMATHETA_INITIAL_SOURCE_STRATEGY_SPECIFIED",
+    "phase": "11.11I",
+    "strategy_status": "REAL_SIGMATHETA_INITIAL_SOURCE_STRATEGY_SPECIFIED",
+    "primary_source": "ELASTIC_INITIAL_WELLBORE_STATE",
+    "fallback_sources": [
+      "EXPLICIT_DIAGNOSTIC_INPUT",
+      "SYNTHETIC_FIXTURE"
+    ],
+    "requires_post_drilling_state": true,
+    "lot_time_zero_is_not_drilling_time_zero": true,
+    "legacy_trace_validation_allowed": false,
+    "implementation_allowed_next": false,
+    "required_statuses": [
+      "PHASE11_11I_REAL_SIGMATHETA_INITIAL_SOURCE_STRATEGY_SPECIFIED",
+      "PRIMARY_SIGMATHETA_SOURCE_ELASTIC_INITIAL_WELLBORE_STATE",
+      "LOT_TIME_ZERO_NOT_DRILLING_TIME_ZERO",
+      "LEGACY_TRACE_NOT_PHYSICAL_VALIDATION_SOURCE"
+    ],
+    "recommended_next_phase": "PHASE11_11J_AUDIT_RUNTIME_SIGMATHETA_AND_PRESSURE_AVAILABILITY",
+    "caveats": [
+      "Phase 11.11I specifies strategy only.",
+      "The primary source must represent post-drilling pre-LOT state.",
+      "Legacy diagnostic trace is not a physical validation source.",
+      "Runtime wiring remains blocked until availability is audited."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

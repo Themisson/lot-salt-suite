@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11H limited_gate runtime readiness decision
+Fase ativa  : 11.11I real sigma-theta initial source strategy
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : atualizar apos Fase 11.11H
-Testes Py   : atualizar apos Fase 11.11H
+Testes C++  : 373/373 em 2026-06-12
+Testes Py   : 867/867 em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -7671,3 +7671,29 @@ abertura e estado APB/sal ainda não estão consumíveis para o
 `PHASE11_9E_COMPLETE_BUZ29_PRESSURE_AND_OPENING_EVIDENCE`.
 
 `PHASE11_10A` permanece bloqueada.
+
+---
+
+### [2026-06-12] Fase 11.11I — Estratégia de fonte real de sigma-theta inicial — Codex
+
+**Status:** Concluído; commit/push planejado ao final da fase.
+
+**Classificação:** `REAL_SIGMATHETA_INITIAL_SOURCE_STRATEGY_SPECIFIED`.
+
+**Fonte primária:** `ELASTIC_INITIAL_WELLBORE_STATE`.
+
+**Fallbacks:** `EXPLICIT_DIAGNOSTIC_INPUT`, `SYNTHETIC_FIXTURE`.
+
+**Premissa física registrada:** `t = 0` do LOT não é `t = 0` da perfuração.
+O estado inicial deve representar a condição pós-perfuração e pré-LOT.
+
+**Decisão:** `LEGACY_DIAGNOSTIC_TRACE` permanece fonte diagnóstica, não fonte
+de validação física automática.
+
+**Entregáveis:**
+- `tools/spec_phase11_11i_real_sigmatheta_initial_source_strategy.py`
+- `tests/python/test_spec_phase11_11i_real_sigmatheta_initial_source_strategy.py`
+- `docs/109_real_sigmatheta_initial_source_strategy.md`
+
+**Próxima fase recomendada:**
+`PHASE11_11J_AUDIT_RUNTIME_SIGMATHETA_AND_PRESSURE_AVAILABILITY`.

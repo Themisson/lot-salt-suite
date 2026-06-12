@@ -240,3 +240,18 @@ FRACTURE_DISPATCH_NOT_ALLOWED
 ```
 
 Esse cenario valida o contrato de bloqueio, nao uma chamada runtime real.
+
+## Atualizacao 11.11I — estrategia da fonte inicial real
+
+A Fase 11.11I reafirma que o `SigmaThetaInitialStateGuard` deve receber, em
+fase futura, um estado inicial pos-perfuracao e pre-LOT:
+
+```text
+primary_source = ELASTIC_INITIAL_WELLBORE_STATE
+state_time = POST_DRILLING_BEFORE_LOT
+sign_convention = COMPRESSION_POSITIVE
+reference_frame = WELLBORE_WALL_TOTAL_STRESS
+```
+
+O trace legado pode continuar sendo usado como evidencia diagnostica, mas nao
+como fonte automatica de validacao fisica.
