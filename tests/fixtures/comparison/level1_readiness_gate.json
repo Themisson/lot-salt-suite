@@ -3003,6 +3003,84 @@
       "No physical validation or legacy equivalence is claimed."
     ]
   },
+  "phase11_10t_fracture_gate_runtime_wiring": {
+    "status": "PHASE11_10T_FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED",
+    "phase": "11.10T",
+    "runtime_wiring_spec_status": "FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED",
+    "required_components": [
+      "FractureModelSelector",
+      "SigmaThetaInitialStateGuard",
+      "PressureSigmaThetaFractureCriterionGuard",
+      "PknModel",
+      "PennyShapedDiagnosticAdapter",
+      "PennyShapedDiagnosticWriter"
+    ],
+    "runtime_wiring_allowed_next": false,
+    "runtime_execution_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "pkn_behavior_change_allowed": false,
+    "penny_shaped_diagnostic_only": true,
+    "pkn_status": "DEFAULT_RETROCOMPATIBLE_NO_BEHAVIOR_CHANGE",
+    "penny_shaped_status": "DIAGNOSTIC_ONLY_NOT_PHYSICALLY_VALIDATED_NOT_LEGACY_EQUIVALENT",
+    "gate_states": [
+      "FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE",
+      "FRACTURE_GATE_BLOCKED_PRESSURE_SIGMATHETA_CRITERION",
+      "FRACTURE_GATE_READY_NOT_REACHED",
+      "FRACTURE_GATE_REACHED",
+      "FRACTURE_DISPATCH_NOT_ALLOWED",
+      "FRACTURE_DISPATCH_NOT_EXECUTED",
+      "FRACTURE_DISPATCH_PKN_ELIGIBLE",
+      "FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE"
+    ],
+    "required_fields": [
+      "selected_fracture_model",
+      "fracture_model_selection_source",
+      "wellbore_pressure_Pa",
+      "pressure_semantics",
+      "sigma_theta_initial_compression_positive_Pa",
+      "sigma_theta_current_compression_positive_Pa",
+      "sigma_theta_source",
+      "sigma_theta_state_time",
+      "sigma_theta_reference_frame",
+      "sigma_theta_sign_convention",
+      "tensile_strength_Pa",
+      "sigma_theta_guard_status",
+      "pressure_sigmatheta_criterion_status",
+      "fracture_initiation_gate_status",
+      "fracture_dispatch_status",
+      "fracture_initiated",
+      "fracture_margin_Pa",
+      "blocking_reasons"
+    ],
+    "blocking_rules": [
+      "FractureModelSelector must resolve selected model before dispatch.",
+      "SigmaThetaInitialStateGuard must pass before pressure x sigma-theta criterion.",
+      "PressureSigmaThetaFractureCriterionGuard must pass before dispatch.",
+      "Unknown pressure semantics blocks the criterion.",
+      "Unknown sigma_theta reference frame blocks the criterion.",
+      "Unknown or non compression-positive sign convention blocks the criterion.",
+      "PENNY_SHAPED remains diagnostic_only.",
+      "BUZ29-PENNY remains blocked.",
+      "PKN default must preserve existing behavior.",
+      "Runtime wiring remains blocked until future integration tests prove no PKN regression."
+    ],
+    "required_statuses": [
+      "PHASE11_10T_FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED",
+      "FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED",
+      "FRACTURE_MODEL_SELECTOR_REQUIRED",
+      "SIGMATHETA_INITIAL_STATE_GUARD_REQUIRED",
+      "PRESSURE_SIGMATHETA_CRITERION_GUARD_REQUIRED",
+      "RUNTIME_WIRING_NOT_IMPLEMENTED",
+      "DISPATCH_REMAINS_BLOCKED"
+    ],
+    "recommended_next_phase": "PHASE11_10U_SPECIFY_RUNTIME_WIRING_TEST_FIXTURES",
+    "caveats": [
+      "Phase 11.10T is specification only.",
+      "No C++, parser, schema, CLI or runtime dispatch is changed.",
+      "PENNY_SHAPED remains diagnostic-only.",
+      "BUZ29-PENNY is not executed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

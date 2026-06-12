@@ -729,3 +729,21 @@ A forma alternativa por `fracture_threshold_pressure_Pa` tambem existe, mas
 apenas como opcao explicita. Parser, schema, runtime dispatch, BUZ29-PENNY e
 comportamento `lot-pkn` permanecem inalterados. A proxima fase recomendada e
 `PHASE11_10T_SPECIFY_FRACTURE_GATE_RUNTIME_WIRING_WITH_GUARDS`.
+
+## Fase 11.10T — especificar wiring runtime do fracture gate
+
+Status registrado:
+
+```text
+PHASE11_10T_FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED
+FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED
+FRACTURE_MODEL_SELECTOR_REQUIRED
+SIGMATHETA_INITIAL_STATE_GUARD_REQUIRED
+PRESSURE_SIGMATHETA_CRITERION_GUARD_REQUIRED
+RUNTIME_WIRING_NOT_IMPLEMENTED
+DISPATCH_REMAINS_BLOCKED
+```
+
+A especificacao define a ordem futura dos guards, mas nao altera runtime. PKN
+permanece default retrocompativel; `PENNY_SHAPED` e BUZ29-PENNY permanecem
+bloqueados ate haver fixtures e testes de wiring explicitos.

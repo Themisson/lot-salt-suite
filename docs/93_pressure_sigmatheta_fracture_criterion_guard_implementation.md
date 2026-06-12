@@ -231,3 +231,17 @@ PRESSURE_GREATER_THAN_SIGMATHETA_SHORTCUT_FORBIDDEN
 RUNTIME_DISPATCH_NOT_CHANGED
 LOT_PKN_BEHAVIOR_NOT_CHANGED
 ```
+
+## Atualizacao 11.10T — criterio dentro do gate futuro
+
+A 11.10T especifica que `PressureSigmaThetaFractureCriterionGuard` so pode ser
+chamado depois de `SigmaThetaInitialStateGuard` retornar estado pronto. Se o
+criterio bloquear ou nao iniciar fratura, o dispatch permanece fechado:
+
+```text
+FRACTURE_GATE_BLOCKED_PRESSURE_SIGMATHETA_CRITERION
+FRACTURE_GATE_READY_NOT_REACHED
+FRACTURE_DISPATCH_NOT_ALLOWED
+```
+
+Nenhuma chamada runtime ao helper foi adicionada nesta fase.

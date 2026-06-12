@@ -376,3 +376,17 @@ preferred_criterion =
 A forma alternativa por pressão crítica só é aceitável se
 `fracture_threshold_pressure_Pa` for derivada de `sigma_theta`, resistência à
 tração e referencial conhecido. O dispatch de modelo permanece bloqueado.
+
+## Atualização 11.10T — selector dentro do wiring futuro
+
+A 11.10T preserva o `FractureModelSelector` como primeiro passo da sequencia
+futura do `fracture_initiation_gate`, mas nao conecta o selector ao runtime.
+A selecao de `PKN` continua retrocompativel; `PENNY_SHAPED` continua apenas
+diagnostico e bloqueado para BUZ29-PENNY.
+
+```text
+FRACTURE_MODEL_SELECTOR_REQUIRED
+FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED
+RUNTIME_WIRING_NOT_IMPLEMENTED
+DISPATCH_REMAINS_BLOCKED
+```

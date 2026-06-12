@@ -198,3 +198,16 @@ A Fase 11.10S adiciona o helper isolado
 de `SigmaThetaInitialStateGuard` retornar estado pronto. Essa fase nao conecta
 os dois helpers ao runtime; ela apenas deixa o criterio algébrico testado e
 disponivel para especificacao de wiring futura.
+
+## Atualizacao 11.10T — posicao do guard inicial no wiring
+
+A 11.10T fixa `SigmaThetaInitialStateGuard` como segundo passo obrigatorio do
+futuro `fracture_initiation_gate`, depois de `FractureModelSelector` e antes do
+criterio pressao x sigma-theta. Se esse guard falhar, o gate deve registrar:
+
+```text
+FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE
+FRACTURE_DISPATCH_NOT_ALLOWED
+```
+
+Nenhum runtime wiring foi implementado nesta fase.

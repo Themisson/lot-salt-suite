@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10S pressure x sigma-theta fracture criterion guard
+Fase ativa  : 11.10T fracture gate runtime wiring specification
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : 335/335 esperados apos Fase 11.10S em 2026-06-12
-Testes Py   : 680/680 esperados apos Fase 11.10S em 2026-06-12
+Testes C++  : 335/335 esperados apos Fase 11.10T em 2026-06-12
+Testes Py   : 695/695 esperados apos Fase 11.10T em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,45 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10T — especificacao do wiring runtime do fracture gate — Codex
+
+**Status:** Concluido; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/spec_phase11_10t_fracture_gate_runtime_wiring.py
+```
+
+**Documento criado:**
+
+```text
+docs/94_fracture_gate_runtime_wiring_spec.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10T_FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED
+FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED
+FRACTURE_MODEL_SELECTOR_REQUIRED
+SIGMATHETA_INITIAL_STATE_GUARD_REQUIRED
+PRESSURE_SIGMATHETA_CRITERION_GUARD_REQUIRED
+RUNTIME_WIRING_NOT_IMPLEMENTED
+DISPATCH_REMAINS_BLOCKED
+```
+
+**Interpretacao:** a fase especifica a sequencia futura
+`FractureModelSelector -> SigmaThetaInitialStateGuard ->
+PressureSigmaThetaFractureCriterionGuard -> dispatch`, mas nao implementa
+runtime wiring. PKN permanece default retrocompativel. `PENNY_SHAPED` continua
+diagnostico, nao fisicamente validado e nao equivalente ao legado. BUZ29-PENNY
+permanece bloqueado. A proxima fase recomendada e
+`PHASE11_10U_SPECIFY_RUNTIME_WIRING_TEST_FIXTURES`.
 
 ---
 

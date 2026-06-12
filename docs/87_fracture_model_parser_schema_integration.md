@@ -271,3 +271,15 @@ DISPATCH_REMAINS_BLOCKED
 ```
 
 O criterio pressao x sigma-theta permanece como requisito da 11.10R.
+
+## Atualizacao 11.10T — parser/schema continuam fora do wiring
+
+A 11.10T especifica o wiring runtime futuro sem alterar parser ou schema. O
+campo `lot.fracture.fracture_model` continua com default retrocompativel `PKN`
+e `PENNY_SHAPED` continua aceito apenas como rota diagnostica bloqueada.
+
+```text
+FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED
+PARSER_SCHEMA_NOT_CHANGED
+RUNTIME_WIRING_NOT_IMPLEMENTED
+```

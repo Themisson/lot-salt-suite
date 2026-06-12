@@ -640,3 +640,28 @@ LOT_PKN_BEHAVIOR_NOT_CHANGED
 O helper nao executa BUZ29-PENNY, nao altera `PknModel`, nao altera
 parser/schema e nao libera dispatch. A proxima fase recomendada e especificar
 o wiring runtime com guards, ainda sem executar fisicamente modelos nao PKN.
+
+## Fase 11.10T — especificacao do wiring runtime do fracture gate
+
+A Fase 11.10T especifica a sequencia futura do `fracture_initiation_gate`:
+
+```text
+FractureModelSelector
+-> SigmaThetaInitialStateGuard
+-> PressureSigmaThetaFractureCriterionGuard
+-> fracture_initiation_gate_status
+-> fracture_dispatch_status
+```
+
+O status registrado e:
+
+```text
+FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED
+RUNTIME_WIRING_NOT_IMPLEMENTED
+DISPATCH_REMAINS_BLOCKED
+```
+
+Essa especificacao nao altera C++, runtime, parser, schema, CLI ou casos. PKN
+permanece o default retrocompativel e `PENNY_SHAPED` permanece diagnostico,
+nao fisicamente validado e nao equivalente ao legado. A proxima fase deve
+especificar fixtures/testes de wiring antes de qualquer conexao runtime real.

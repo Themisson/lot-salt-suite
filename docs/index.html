@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">152/159</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">153/160</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">335</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">680</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">695</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8350,6 +8350,19 @@ fracture_margin_Pa = tensile_condition_Pa - tensile_strength_Pa
 apenas como opcao explicita. Parser, schema, runtime dispatch, BUZ29-PENNY e
 comportamento <code>lot-pkn</code> permanecem inalterados. A proxima fase recomendada e
 <code>PHASE11_10T_SPECIFY_FRACTURE_GATE_RUNTIME_WIRING_WITH_GUARDS</code>.</p>
+<h2 id="fase-1110t-especificar-wiring-runtime-do-fracture-gate">Fase 11.10T — especificar wiring runtime do fracture gate</h2>
+<p>Status registrado:</p>
+<pre><code class="language-text">PHASE11_10T_FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED
+FRACTURE_GATE_RUNTIME_WIRING_SPECIFIED
+FRACTURE_MODEL_SELECTOR_REQUIRED
+SIGMATHETA_INITIAL_STATE_GUARD_REQUIRED
+PRESSURE_SIGMATHETA_CRITERION_GUARD_REQUIRED
+RUNTIME_WIRING_NOT_IMPLEMENTED
+DISPATCH_REMAINS_BLOCKED
+</code></pre>
+<p>A especificacao define a ordem futura dos guards, mas nao altera runtime. PKN
+permanece default retrocompativel; <code>PENNY_SHAPED</code> e BUZ29-PENNY permanecem
+bloqueados ate haver fixtures e testes de wiring explicitos.</p>
 </div>
 </section>
 

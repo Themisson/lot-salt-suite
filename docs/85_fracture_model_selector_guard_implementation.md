@@ -240,3 +240,16 @@ fracture_dispatch_status
 `PENNY_SHAPED` permanece `diagnostic_only = true`, portanto segue bloqueado
 para dispatch runtime fisico. A proxima fase deve especificar o criterio
 pressao x sigma-theta.
+
+## Atualizacao 11.10T — selector como pre-condicao do gate
+
+A Fase 11.10T especifica que o futuro runtime deve chamar
+`FractureModelSelector` antes de `SigmaThetaInitialStateGuard` e
+`PressureSigmaThetaFractureCriterionGuard`. O selector continua sendo uma
+pre-condicao de metadados; ele nao autoriza sozinho nenhum dispatch.
+
+```text
+FRACTURE_MODEL_SELECTOR_REQUIRED
+RUNTIME_WIRING_NOT_IMPLEMENTED
+DISPATCH_REMAINS_BLOCKED
+```

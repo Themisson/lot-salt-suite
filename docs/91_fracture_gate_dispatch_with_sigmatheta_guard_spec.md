@@ -241,3 +241,23 @@ FractureModelSelector
 ```
 
 O dispatch fisico permanece bloqueado ate uma fase de wiring runtime com guards.
+
+## Atualizacao 11.10T — wiring runtime especificado, nao implementado
+
+A 11.10T transforma a sequencia acima em especificacao de runtime futura, com
+estados minimos de gate e campos obrigatorios. A sequencia continua:
+
+```text
+FractureModelSelector
+-> SigmaThetaInitialStateGuard
+-> PressureSigmaThetaFractureCriterionGuard
+-> fracture_dispatch_status
+```
+
+O status permanece:
+
+```text
+RUNTIME_WIRING_NOT_IMPLEMENTED
+DISPATCH_REMAINS_BLOCKED
+BUZ29_EXECUTION_ALLOWED_NEXT = false
+```
