@@ -138,3 +138,9 @@ dispatch fisico.
 A 11.11C registra `RUNTIME_WIRING_READY_FOR_LIMITED_GATE_SPEC`. A decisao
 autoriza apenas a especificacao de uma integracao limitada futura; o dispatch
 fisico permanece desabilitado e BUZ29-PENNY segue bloqueado.
+
+## Atualizacao 11.11D — especificacao da integracao limitada
+
+A 11.11D define os gates da proxima implementacao: default disabled preservado,
+outputs PKN fisicos preservados, JSON diagnostico isolado e rejeicao continua de
+`dispatch_runtime_enabled=true`. Nenhuma execucao fisica nao-PKN e permitida.

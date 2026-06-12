@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11C runtime wiring readiness decision
+Fase ativa  : 11.11D limited fracture gate runtime integration spec
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 359/359 esperados apos Fase 11.10Y em 2026-06-12
-Testes Py   : 794/794 esperados apos Fase 11.11C em 2026-06-12
+Testes Py   : 801/801 esperados apos Fase 11.11D em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -56,6 +56,38 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ## Entradas de sessão
 
 ---
+
+### [2026-06-12] Fase 11.11D — limited fracture gate runtime integration spec — Codex
+
+**Status:** Implementado; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/spec_phase11_11d_limited_fracture_gate_runtime_integration.py
+```
+
+**Documento criado:**
+
+```text
+docs/104_limited_fracture_gate_runtime_integration_spec.md
+```
+
+**Status registrado:**
+
+```text
+LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_SPECIFIED
+IMPLEMENTATION_ALLOWED_NEXT_WITH_DISPATCH_DISABLED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+BUZ29_EXECUTION_BLOCKED
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE11_11E_IMPLEMENT_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION
+```
 
 ### [2026-06-12] Fase 11.11C — runtime wiring readiness decision — Codex
 

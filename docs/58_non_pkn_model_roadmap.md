@@ -783,3 +783,9 @@ penny-shaped e chamado como runtime fisico.
 A decisao `RUNTIME_WIRING_READY_FOR_LIMITED_GATE_SPEC` nao altera a trilha
 nao-PKN. A proxima fase pode especificar integracao limitada, mas
 `PENNY_SHAPED` segue diagnostico e BUZ29-PENNY segue bloqueado.
+
+## Fase 11.11D — especificacao sem runtime nao-PKN
+
+A especificacao limitada nao desbloqueia PennyShaped runtime. A proxima
+implementacao deve manter `PENNY_SHAPED = diagnostic_only`, nao chamar o adapter
+penny-shaped como modelo fisico e nao executar BUZ29-PENNY.

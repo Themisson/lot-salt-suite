@@ -893,3 +893,18 @@ PENNY_SHAPED_DIAGNOSTIC_ONLY
 A fase decide que a proxima etapa pode especificar uma integracao limitada do
 fracture gate no runtime, mas ainda sem mudar comportamento PKN default e sem
 habilitar dispatch fisico.
+
+## Fase 11.11D — especificacao da integracao limitada
+
+Status registrado:
+
+```text
+LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_SPECIFIED
+IMPLEMENTATION_ALLOWED_NEXT_WITH_DISPATCH_DISABLED
+PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
+BUZ29_EXECUTION_BLOCKED
+```
+
+A especificacao permite uma implementacao futura apenas diagnostica. A proxima
+fase deve provar novamente que `result.json` e `timeseries.csv` permanecem
+preservados e que `diagnostic_fracture_gate.json` e isolado.

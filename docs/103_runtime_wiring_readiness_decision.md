@@ -70,3 +70,17 @@ PENNY_SHAPED_DIAGNOSTIC_ONLY
 ```text
 PHASE11_11D_SPECIFY_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION
 ```
+
+## Atualizacao 11.11D
+
+A Fase 11.11D especifica a integracao limitada e conserva:
+
+```text
+runtime_dispatch_allowed_next = false
+runtime_physical_dispatch_allowed_next = false
+buz29_execution_allowed_next = false
+pkn_behavior_change_allowed = false
+```
+
+A proxima fase pode implementar somente o caminho diagnostico limitado, com
+`diagnostic_fracture_gate.json` isolado e sem dispatch fisico.

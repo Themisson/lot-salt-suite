@@ -3361,6 +3361,33 @@
       "PENNY_SHAPED remains diagnostic-only."
     ]
   },
+  "phase11_11d_limited_fracture_gate_runtime_integration_spec": {
+    "status": "PHASE11_11D_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_SPECIFIED",
+    "phase": "11.11D",
+    "integration_spec_status": "LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_SPECIFIED",
+    "implementation_allowed_next": true,
+    "runtime_dispatch_allowed_next": false,
+    "runtime_physical_dispatch_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "pkn_behavior_change_allowed": false,
+    "penny_runtime_allowed": false,
+    "penny_diagnostic_only": true,
+    "required_integration_point": "after parse_validate_before_run_pkn_case",
+    "required_statuses": [
+      "PHASE11_11D_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_SPECIFIED",
+      "LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION_SPECIFIED",
+      "IMPLEMENTATION_ALLOWED_NEXT_WITH_DISPATCH_DISABLED",
+      "PKN_BEHAVIOR_CHANGE_NOT_ALLOWED",
+      "BUZ29_EXECUTION_BLOCKED"
+    ],
+    "recommended_next_phase": "PHASE11_11E_IMPLEMENT_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION",
+    "caveats": [
+      "Phase 11.11D is specification only.",
+      "The next phase may implement limited diagnostic integration only.",
+      "Physical dispatch remains forbidden.",
+      "BUZ29-PENNY remains blocked."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
