@@ -584,3 +584,10 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED` fica obrigatório:
   `fracture_volume_proxy_m3` não deve ser tratado automaticamente como volume
   circular completo em 2π sem auditoria matemática específica.
+- A Fase 11.10A cria `cases/validation/non_pkn/buz29_penny_candidate.yaml` e
+  `cases/validation/non_pkn/studies_index.yaml` como artefatos diagnósticos
+  inativos. O status é `BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED`, com
+  `NOT_PHYSICALLY_VALIDATED`, `NOT_LEGACY_EQUIVALENT` e
+  `NOT_ACTIVE_SIMULATION_CASE`. A próxima exigência é
+  `AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED`; a rota ainda não
+  executa BUZ29, não altera `lot-pkn` e não cria runner não-PKN.

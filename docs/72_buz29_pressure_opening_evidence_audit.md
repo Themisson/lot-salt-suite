@@ -182,6 +182,28 @@ caveat `PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED`: o proxy de
 volume do modelo PennyShaped não deve ser interpretado como volume circular
 completo em 2π sem auditoria matemática específica.
 
+## Resultado da 11.10A
+
+A Fase 11.10A usou esta evidência para criar uma rota diagnóstica parcial:
+
+```text
+case = cases/validation/non_pkn/buz29_penny_candidate.yaml
+classification = BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED
+```
+
+Esse candidato mantém `pressure_history_status =
+PRESSURE_HISTORY_FOUND_CONSUMABLE` e `opening_time_status =
+OPENING_TIME_FOUND_CONSUMABLE`, mas continua marcado como:
+
+```text
+NOT_PHYSICALLY_VALIDATED
+NOT_LEGACY_EQUIVALENT
+NOT_ACTIVE_SIMULATION_CASE
+```
+
+Assim, a evidência de pressão e abertura permanece consumível para preparação
+diagnóstica, não para validação física.
+
 ## Caveats
 
 - Esta fase não executa simulação BUZ29.

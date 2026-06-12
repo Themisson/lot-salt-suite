@@ -1,0 +1,13 @@
+# Phase 11.10A non-PKN diagnostic index.
+# This index is discovery metadata only. It is not a lot-sim runtime input.
+
+studies:
+  - id: buz29_penny_candidate_diagnostic
+    title: "BUZ29-VISCO-first-well PennyShaped diagnostic candidate"
+    case: "cases/validation/non_pkn/buz29_penny_candidate.yaml"
+    route: non_pkn
+    model: penny_shaped
+    status: partial_candidate
+    active: false
+    caveat: "Diagnostic candidate only. Not physically validated. Not legacy equivalent."
+    gate: BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A

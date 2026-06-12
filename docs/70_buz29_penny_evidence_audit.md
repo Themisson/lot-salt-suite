@@ -147,3 +147,19 @@ A decisão é estritamente diagnóstica. `sigmaTheta`, `pw`, `margin` e `opened`
 continuam não exportados diretamente no `.dat`, e o caveat
 `PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED` impede interpretar o
 proxy de volume como volume circular completo em 2π sem auditoria matemática.
+
+## Atualização 11.10A
+
+A Fase 11.10A iniciou a rota diagnóstica BUZ29-PENNY como candidato inativo:
+
+```text
+classification = BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED
+case = cases/validation/non_pkn/buz29_penny_candidate.yaml
+NOT_PHYSICALLY_VALIDATED
+NOT_LEGACY_EQUIVALENT
+NOT_ACTIVE_SIMULATION_CASE
+```
+
+A evidência da 11.9E continua sendo usada apenas como insumo documental. A
+11.10A não transforma `dP`, `Momento da quebra`, `dV_leakoff` ou `V_outflow`
+em validação física do modelo PennyShaped moderno.

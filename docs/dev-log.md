@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.5D summary fracture/leakoff maxima
+Fase ativa  : 11.10A BUZ29-PENNY diagnostic route
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
-Último push : 2026-06-11
-Testes C++  : 263/263 passaram apos Fase 10.30A em 2026-06-11
-Testes Py   : 373/373 previstos apos Fase 11.5D em 2026-06-11
+Último push : 2026-06-12
+Testes C++  : 273/273 passaram apos Fase 11.10A em 2026-06-12
+Testes Py   : 439/439 passaram apos Fase 11.10A em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,47 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10A — rota diagnóstica BUZ29-PENNY — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Artefatos criados:**
+
+```text
+cases/validation/non_pkn/buz29_penny_candidate.yaml
+cases/validation/non_pkn/studies_index.yaml
+tools/inspect_phase11_10a_buz29_penny_candidate.py
+tests/python/test_inspect_phase11_10a_buz29_penny_candidate.py
+docs/74_buz29_penny_diagnostic_route.md
+```
+
+**Resultado:**
+
+```text
+classification = BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED
+route_started = true
+physically_validated = false
+legacy_equivalent = false
+active_simulation_case = false
+```
+
+**Caveats obrigatórios:**
+
+```text
+PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED
+AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED
+NOT_PHYSICALLY_VALIDATED
+NOT_LEGACY_EQUIVALENT
+NOT_ACTIVE_SIMULATION_CASE
+```
+
+**Interpretação:** a 11.10A formaliza um candidato diagnóstico inativo. Ela não
+executa BUZ29, não cria rota runtime oficial, não altera `lot-pkn`, não valida
+fisicamente o caso e não declara equivalência com o legado. A próxima etapa
+segura é `PHASE11_10B_INSPECT_BUZ29_PENNY_ADAPTER_READY_INPUTS`.
 
 ---
 

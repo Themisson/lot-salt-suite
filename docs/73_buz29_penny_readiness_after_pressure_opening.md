@@ -187,3 +187,26 @@ PHASE11_10A_START_BUZ29_PENNY_DIAGNOSTIC_ROUTE
 
 Essa próxima fase deve criar apenas uma rota diagnóstica controlada, mantendo
 os caveats acima e sem promover BUZ29 a validação física.
+
+## Resultado da 11.10A
+
+A Fase 11.10A iniciou a preparação diagnóstica autorizada por este gate:
+
+```text
+classification = BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED
+case = cases/validation/non_pkn/buz29_penny_candidate.yaml
+index = cases/validation/non_pkn/studies_index.yaml
+```
+
+O candidato mantém explicitamente:
+
+```text
+PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED
+AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED
+NOT_PHYSICALLY_VALIDATED
+NOT_LEGACY_EQUIVALENT
+NOT_ACTIVE_SIMULATION_CASE
+```
+
+A 11.10A não executa BUZ29 e não cria uma rota oficial do `lot-sim`; ela apenas
+formaliza o contrato de entrada para uma inspeção futura dos campos do adapter.

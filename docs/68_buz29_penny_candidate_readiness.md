@@ -127,6 +127,23 @@ PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED
 O proxy de volume do `PennyShapedModel` não deve ser tratado automaticamente
 como volume circular completo em 2π.
 
+## Phase 11.10A diagnostic route start
+
+A Fase 11.10A consumiu o gate seguro da 11.9F e criou o candidato diagnóstico:
+
+```text
+case = cases/validation/non_pkn/buz29_penny_candidate.yaml
+index = cases/validation/non_pkn/studies_index.yaml
+classification = BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED
+physically_validated = false
+legacy_equivalent = false
+active_simulation_case = false
+```
+
+O candidato não é schema runtime oficial e não deve ser executado como validação
+física BUZ29. Ele apenas registra a evidência consumível de pressão/abertura e
+os caveats necessários para uma futura inspeção dos inputs do adapter.
+
 ## Caveats
 
 - Esta fase não cria YAML BUZ29.

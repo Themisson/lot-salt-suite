@@ -261,6 +261,35 @@ O `fracture_volume_proxy_m3` do núcleo/adapter PennyShaped deve ser interpretad
 no contexto axissimétrico de 1 rad e não como volume circular completo em 2π sem
 auditoria matemática específica.
 
+## Fase 11.10A — rota diagnóstica BUZ29-PENNY
+
+A Fase 11.10A iniciou a rota diagnóstica controlada para BUZ29-PENNY:
+
+```text
+classification = BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED
+case = cases/validation/non_pkn/buz29_penny_candidate.yaml
+index = cases/validation/non_pkn/studies_index.yaml
+physically_validated = false
+legacy_equivalent = false
+active_simulation_case = false
+```
+
+Esse candidato é somente um contrato diagnóstico. Ele preserva o gate da 11.9F,
+referencia a evidência consumível de pressão/abertura da 11.9E e registra os
+caveats:
+
+```text
+PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED
+AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED
+NOT_PHYSICALLY_VALIDATED
+NOT_LEGACY_EQUIVALENT
+NOT_ACTIVE_SIMULATION_CASE
+```
+
+A 11.10A não altera `lot-pkn`, não cria rota runtime oficial, não executa BUZ29
+como simulação física e não remove as lacunas de `sigmaTheta`, `pw`, `margin`
+ou `opened`.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

@@ -1,0 +1,63 @@
+# Phase 11.10A BUZ29-PENNY diagnostic candidate.
+# Diagnostic candidate only. Not physically validated. Not legacy equivalent.
+# Not an official lot-sim runtime schema route.
+
+case:
+  id: buz29_penny_candidate
+  title: "BUZ29-VISCO-first-well PennyShaped diagnostic candidate"
+  status: diagnostic_candidate
+  active: false
+  caveat: "Diagnostic candidate only. Not physically validated. Not legacy equivalent. Not an active simulation case."
+
+source:
+  legacy_trace: "legance/LOT_Tese/results/7-BUZ-29D-RJS10_PENNY-SHAPED.dat"
+  pressure_conversion_reference: "legance/LOT_Tese/PressureDataVisualizer29D-RAA.py"
+  evidence_phase: "11.9E"
+  readiness_phase: "11.9F"
+
+track:
+  model: PENNY_SHAPED
+  route: non_pkn
+  readiness: BUZ29_PENNY_CANDIDATE_PARTIAL_BUT_DIAGNOSTIC_SAFE
+  gate: BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A
+
+diagnostic_evidence:
+  pressure_history_status: PRESSURE_HISTORY_FOUND_CONSUMABLE
+  opening_time_status: OPENING_TIME_FOUND_CONSUMABLE
+  time_points: 131
+  time_min_min: 0.0
+  time_max_min: 13.0
+  opening_time_min: 10.4
+  available_blocks:
+    - dP
+    - dV_leakoff
+    - V_outflow
+
+axisymmetric_interpretation:
+  angle_rad: 1.0
+  caveat: PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED
+  future_output_requirement: AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED
+  notes: "Internal quantities remain interpreted in a 1 rad axisymmetric basis until future output separates 1 rad and 2pi-equivalent totals."
+
+adapter_status:
+  adapter_ready: partial
+  missing_or_deferred:
+    - "full physical validation"
+    - "mathematical audit of PennyShapedModel volume interpretation"
+    - "runtime non-PKN runner"
+    - "explicit 1rad/2pi volume output conversion"
+    - "direct sigmaTheta/pw/margin/opened legacy exports"
+
+diagnostics:
+  status: PHASE11_10A_BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED
+  physically_validated: false
+  legacy_equivalent: false
+  active_simulation_case: false
+
+expected_future_outputs:
+  axisymmetric_angle_rad: 1.0
+  fracture_volume_proxy_1rad_m3: deferred
+  fracture_volume_equivalent_2pi_m3: deferred
+  solid_volume_1rad_m3: deferred
+  solid_volume_equivalent_2pi_m3: deferred
+  volume_interpretation: "axisymmetric_1rad_with_2pi_equivalent_output"

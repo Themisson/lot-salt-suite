@@ -2115,6 +2115,51 @@
       "fracture_volume_proxy_m3 must not be interpreted as full 2pi circular fracture volume without a dedicated math audit."
     ]
   },
+  "phase11_10a_buz29_penny_diagnostic_route": {
+    "status": "PHASE11_10A_BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED",
+    "phase": "11.10A",
+    "track": "PENNY_SHAPED",
+    "case": "cases/validation/non_pkn/buz29_penny_candidate.yaml",
+    "index": "cases/validation/non_pkn/studies_index.yaml",
+    "classification": "BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED",
+    "route_started": true,
+    "physically_validated": false,
+    "physical_validation": false,
+    "numeric_equivalence": false,
+    "legacy_equivalent": false,
+    "legacy_equivalence": false,
+    "active_simulation_case": false,
+    "lot_sim_runtime_case": false,
+    "simulation_executed": false,
+    "gate": "BUZ29_PENNY_PARTIAL_DIAGNOSTIC_SAFE_START_11_10A",
+    "tool": "tools/inspect_phase11_10a_buz29_penny_candidate.py",
+    "document": "docs/74_buz29_penny_diagnostic_route.md",
+    "axisymmetric_interpretation": "PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED",
+    "future_output_requirement": "AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED",
+    "recommended_next_phase": "PHASE11_10B_INSPECT_BUZ29_PENNY_ADAPTER_READY_INPUTS",
+    "available_fields": {
+      "pressure_history_status": "PRESSURE_HISTORY_FOUND_CONSUMABLE",
+      "opening_time_status": "OPENING_TIME_FOUND_CONSUMABLE",
+      "time_points": 131,
+      "time_min_min": 0.0,
+      "time_max_min": 13.0,
+      "opening_time_min": 10.4,
+      "available_blocks": [
+        "dP",
+        "dV_leakoff",
+        "V_outflow"
+      ]
+    },
+    "caveats": [
+      "NOT_PHYSICALLY_VALIDATED",
+      "NOT_LEGACY_EQUIVALENT",
+      "NOT_ACTIVE_SIMULATION_CASE",
+      "PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED",
+      "AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED",
+      "sigmaTheta, pw, margin and opened are not directly exported by the legacy output.",
+      "Phase 11.10A starts diagnostic preparation only; it does not execute BUZ29-PENNY as a physical simulation."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

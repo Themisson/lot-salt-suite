@@ -105,3 +105,19 @@ Esse resultado substitui o gate operacional da 11.9D para fases futuras, mas
 não muda o significado histórico da 11.9D. A 11.10A continua autorizada apenas
 como preparação diagnóstica, sem validação física e sem YAML criado pela
 11.9F.
+
+## Resultado da 11.10A
+
+A 11.10A criou um candidato diagnóstico BUZ29-PENNY, mantendo o escopo
+limitado definido pela 11.9F:
+
+```text
+case = cases/validation/non_pkn/buz29_penny_candidate.yaml
+classification = BUZ29_PENNY_DIAGNOSTIC_ROUTE_PARTIAL_STARTED
+physically_validated = false
+legacy_equivalent = false
+active_simulation_case = false
+```
+
+O arquivo é um contrato de preparação. Ele não é rota runtime oficial, não
+valida BUZ29 e não altera casos LOT/PKN protegidos.
