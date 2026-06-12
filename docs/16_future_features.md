@@ -952,3 +952,18 @@ A fase confirma que `limited_gate` e reproduzivel em fixtures controladas e
 que a comparacao PKN disabled/enabled continua preservando `result.json` e
 `timeseries.csv`. A proxima decisao deve avaliar readiness sem liberar dispatch
 fisico automaticamente.
+
+## Fase 11.11H — readiness runtime diagnóstico
+
+Status registrado:
+
+```text
+PHASE11_11H_LIMITED_GATE_RUNTIME_READINESS_DECIDED
+LIMITED_GATE_READY_FOR_DIAGNOSTIC_RUNTIME_USE
+LIMITED_GATE_NOT_READY_FOR_PHYSICAL_DISPATCH
+BUZ29_EXECUTION_BLOCKED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+A próxima frente técnica deve especificar a fonte real de sigma_theta inicial
+pós-perfuração antes de qualquer tentativa de gate fisicamente alimentado.

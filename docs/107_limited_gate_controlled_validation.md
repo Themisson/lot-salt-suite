@@ -121,3 +121,17 @@ fisico.
 ```text
 PHASE11_11H_DECIDE_LIMITED_GATE_READINESS_FOR_RUNTIME_USE
 ```
+
+## Atualização 11.11H — readiness runtime diagnóstico
+
+A Fase 11.11H consolida a validação controlada e registra:
+
+```text
+LIMITED_GATE_READY_FOR_DIAGNOSTIC_RUNTIME_USE
+LIMITED_GATE_NOT_READY_FOR_PHYSICAL_DISPATCH
+BUZ29_EXECUTION_BLOCKED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+O `limited_gate` fica aceito como uso runtime diagnóstico seguro, sem liberar
+dispatch físico.

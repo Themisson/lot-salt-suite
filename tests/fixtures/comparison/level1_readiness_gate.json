@@ -3486,6 +3486,34 @@
       "The PKN behavior remains unchanged."
     ]
   },
+  "phase11_11h_limited_gate_runtime_readiness": {
+    "status": "PHASE11_11H_LIMITED_GATE_RUNTIME_READINESS_DECIDED",
+    "phase": "11.11H",
+    "readiness_status": "LIMITED_GATE_READY_FOR_DIAGNOSTIC_RUNTIME_USE",
+    "ready_for_diagnostic_runtime_use": true,
+    "ready_for_physical_dispatch": false,
+    "pkn_outputs_unchanged": true,
+    "diagnostic_output_isolated": true,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "required_statuses": [
+      "PHASE11_11H_LIMITED_GATE_RUNTIME_READINESS_DECIDED",
+      "LIMITED_GATE_READY_FOR_DIAGNOSTIC_RUNTIME_USE",
+      "LIMITED_GATE_NOT_READY_FOR_PHYSICAL_DISPATCH",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PKN_BEHAVIOR_NOT_CHANGED"
+    ],
+    "recommended_next_phase": "PHASE11_11I_SPECIFY_REAL_SIGMATHETA_INITIAL_SOURCE_STRATEGY",
+    "caveats": [
+      "Phase 11.11H decides diagnostic runtime readiness only.",
+      "Physical dispatch remains disabled.",
+      "PENNY_SHAPED remains diagnostic-only.",
+      "BUZ29-PENNY is not executed.",
+      "A real sigma-theta initial source is still future work."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

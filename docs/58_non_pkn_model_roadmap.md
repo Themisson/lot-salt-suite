@@ -831,3 +831,15 @@ RUNTIME_DISPATCH_NOT_ENABLED
 
 `PENNY_SHAPED` pode continuar aparecendo como selecao diagnostica, mas nao e
 runtime fisico e nao executa BUZ29-PENNY.
+
+## Fase 11.11H — readiness diagnostico sem runtime nao-PKN
+
+A Fase 11.11H classifica `limited_gate` como pronto para uso runtime
+diagnostico, mas explicitamente nao pronto para dispatch fisico:
+
+```text
+LIMITED_GATE_READY_FOR_DIAGNOSTIC_RUNTIME_USE
+LIMITED_GATE_NOT_READY_FOR_PHYSICAL_DISPATCH
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+```

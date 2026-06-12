@@ -112,3 +112,10 @@ PENNY_SHAPED_RUNTIME_NOT_ENABLED
 ```
 
 A validacao permanece diagnostica e nao habilita dispatch fisico.
+
+## Atualização 11.11H — readiness do limited_gate
+
+A decisão da 11.11H confirma que os fixtures e casos controlados são suficientes
+para manter `limited_gate` como runtime diagnóstico opt-in. A decisão não
+transforma `limited_gate` em dispatch físico e não altera o bloqueio de
+BUZ29-PENNY.

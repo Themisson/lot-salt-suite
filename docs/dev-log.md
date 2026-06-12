@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11G limited_gate controlled validation
+Fase ativa  : 11.11H limited_gate runtime readiness decision
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : atualizar apos Fase 11.11G
-Testes Py   : atualizar apos Fase 11.11G
+Testes C++  : atualizar apos Fase 11.11H
+Testes Py   : atualizar apos Fase 11.11H
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -56,6 +56,39 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ## Entradas de sessão
 
 ---
+
+### [2026-06-12] Fase 11.11H — limited_gate runtime readiness — Codex
+
+**Status:** Implementado; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_phase11_11h_limited_gate_runtime_readiness.py
+```
+
+**Documento criado:**
+
+```text
+docs/108_limited_gate_runtime_readiness_decision.md
+```
+
+**Status registrado:**
+
+```text
+PHASE11_11H_LIMITED_GATE_RUNTIME_READINESS_DECIDED
+LIMITED_GATE_READY_FOR_DIAGNOSTIC_RUNTIME_USE
+LIMITED_GATE_NOT_READY_FOR_PHYSICAL_DISPATCH
+BUZ29_EXECUTION_BLOCKED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE11_11I_SPECIFY_REAL_SIGMATHETA_INITIAL_SOURCE_STRATEGY
+```
 
 ### [2026-06-12] Fase 11.11G — limited_gate controlled validation — Codex
 

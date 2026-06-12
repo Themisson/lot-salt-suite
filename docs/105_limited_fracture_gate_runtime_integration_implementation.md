@@ -127,3 +127,16 @@ PKN_OUTPUTS_UNCHANGED_WITH_LIMITED_GATE
 DIAGNOSTIC_OUTPUT_ISOLATED
 RUNTIME_DISPATCH_NOT_ENABLED
 ```
+
+## Atualização 11.11H — decisão de readiness
+
+A 11.11H decide que `limited_gate` está pronto para uso runtime diagnóstico:
+
+```text
+LIMITED_GATE_READY_FOR_DIAGNOSTIC_RUNTIME_USE
+LIMITED_GATE_NOT_READY_FOR_PHYSICAL_DISPATCH
+```
+
+A próxima etapa passa a ser especificar a fonte real de
+`sigma_theta_initial_compression_positive_Pa`; isso ainda não autoriza dispatch
+físico.
