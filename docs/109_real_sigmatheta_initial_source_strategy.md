@@ -115,6 +115,21 @@ runtime_real_wiring_allowed_next = false
 
 Assim, a estrategia permanece especificada, mas ainda nao implementavel como
 wiring fisico real.
+
+## Validacao controlada 11.11O
+
+A 11.11O validou o fallback `EXPLICIT_DIAGNOSTIC_INPUT` em fixtures
+controladas. A validacao confirma apenas que o contrato pode alimentar o
+`limited_gate` diagnosticamente:
+
+```text
+SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALID
+LIMITED_GATE_CAN_BE_FED_DIAGNOSTICALLY
+RUNTIME_DISPATCH_NOT_ENABLED
+```
+
+Essa validacao nao promove `EXPLICIT_DIAGNOSTIC_INPUT` a fonte fisica primaria
+e nao substitui `ELASTIC_INITIAL_WELLBORE_STATE`.
 ## Fonte diagnóstica explícita adicionada na 11.11N
 
 A 11.11N nao substitui a fonte fisica futura `ELASTIC_INITIAL_WELLBORE_STATE`.

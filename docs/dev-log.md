@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11N diagnostic sigma-theta source
+Fase ativa  : 11.11O sigma-theta diagnostic controlled validation
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 387/387 em 2026-06-12
-Testes Py   : 920/920 em 2026-06-12
+Testes Py   : 936/936 em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,49 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.11O — sigma-theta diagnostic controlled validation — Codex
+
+**Status:** Implementado; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Fixtures criadas:**
+
+```text
+tests/fixtures/comparison/phase11_11o/
+```
+
+**Ferramenta criada:**
+
+```text
+tools/validate_phase11_11o_sigmatheta_diagnostic_controlled_cases.py
+```
+
+**Documento criado:**
+
+```text
+docs/115_sigmatheta_diagnostic_controlled_validation.md
+```
+
+**Status registrado:**
+
+```text
+PHASE11_11O_SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALIDATED
+SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALID
+LIMITED_GATE_CAN_BE_FED_DIAGNOSTICALLY
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE11_11P_DECIDE_DIAGNOSTIC_SIGMATHETA_GATE_READINESS
+```
 
 ---
 

@@ -3674,6 +3674,40 @@
       "Physical dispatch remains disabled."
     ]
   },
+  "phase11_11o_sigmatheta_diagnostic_controlled_validation": {
+    "status": "PHASE11_11O_SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALIDATED",
+    "phase": "11.11O",
+    "validation_status": "SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALID",
+    "ready_not_reached_case_valid": true,
+    "pkn_reached_case_valid": true,
+    "penny_reached_diagnostic_case_valid": true,
+    "missing_sigmatheta_blocks": true,
+    "physically_validated_true_rejected": true,
+    "legacy_equivalent_true_rejected": true,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "diagnostic_output_isolated": true,
+    "physical_outputs_identical": true,
+    "limited_gate_can_be_fed_diagnostically": true,
+    "required_statuses": [
+      "PHASE11_11O_SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALIDATED",
+      "SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALID",
+      "LIMITED_GATE_CAN_BE_FED_DIAGNOSTICALLY",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PENNY_SHAPED_RUNTIME_NOT_ENABLED",
+      "PKN_BEHAVIOR_NOT_CHANGED"
+    ],
+    "recommended_next_phase": "PHASE11_11P_DECIDE_DIAGNOSTIC_SIGMATHETA_GATE_READINESS",
+    "caveats": [
+      "Controlled fixtures validate diagnostic gate behavior only.",
+      "Reached means diagnostic eligibility, not physical fracture execution.",
+      "BUZ29-PENNY is not executed.",
+      "PENNY_SHAPED remains diagnostic-only."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

@@ -124,3 +124,18 @@ legacy_equivalent = false
 
 Essa entrada alimenta o guard em modo diagnostico, preservando dispatch fisico
 desabilitado.
+
+## Validacao controlada 11.11O
+
+A 11.11O confirmou, por fixtures, que o contrato pos-perfuracao pode ser
+alimentado diagnosticamente e produzir:
+
+```text
+FRACTURE_GATE_READY_NOT_REACHED
+FRACTURE_GATE_REACHED
+FRACTURE_DISPATCH_PKN_ELIGIBLE
+FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE
+```
+
+Esses estados continuam diagnosticos. `runtime_dispatch_enabled` permanece
+`false`, `PENNY_SHAPED` nao vira runtime fisico e BUZ29-PENNY nao e executado.

@@ -1,0 +1,30 @@
+# Phase 11.11O controlled fixture.
+# Missing sigma_theta_diagnostic_input must block the limited gate.
+fixture:
+  id: controlled_missing_sigmatheta_blocks
+  phase: "11.11O"
+  scenario: missing_sigmatheta_blocks
+  expected:
+    diagnostics_enabled: true
+    diagnostic_output_expected: true
+    selected_model: PKN
+    gate_status: FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE
+    fracture_initiated: false
+    dispatch_status: FRACTURE_DISPATCH_NOT_ALLOWED
+    runtime_dispatch_enabled: false
+    runtime_physical_dispatch_enabled: false
+    buz29_execution_allowed: false
+    pkn_behavior_changed: false
+    penny_shaped_runtime_enabled: false
+
+case:
+  id: controlled_missing_sigmatheta_blocks
+
+lot:
+  fracture:
+    fracture_model: PKN
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: limited_gate
+      dispatch_runtime_enabled: false
+

@@ -25,6 +25,26 @@ implementation_allowed_next = false
 A proxima etapa e auditar se o runtime real ja possui sigma-theta inicial,
 sigma-theta current e pressao com semantica suficiente.
 
+## Fase 11.11O — validacao controlada da fonte diagnostica
+
+**Status:** `SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALID`.
+
+A fonte `sigma_theta_diagnostic_input` foi validada em fixtures controladas
+para `ReadyNotReached`, `Reached` com PKN e `Reached` com `PENNY_SHAPED`
+diagnostico. O resultado permanece limitado:
+
+```text
+LIMITED_GATE_CAN_BE_FED_DIAGNOSTICALLY
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+Essa validacao nao resolve a fonte fisica futura de sigma-theta. A proxima
+decisao deve avaliar readiness do gate diagnostico, nao habilitar dispatch
+fisico.
+
 ## Fase 11.11J — disponibilidade runtime de sigma-theta e pressao
 
 **Status:** `RUNTIME_SIGMATHETA_PRESSURE_AVAILABILITY_AUDITED`.

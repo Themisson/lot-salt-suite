@@ -116,3 +116,21 @@ LEGACY_EQUIVALENCE
 ```text
 PHASE11_11O_VALIDATE_SIGMATHETA_DIAGNOSTIC_SOURCE_ON_CONTROLLED_CASES
 ```
+
+## Resultado da validacao 11.11O
+
+A 11.11O adicionou fixtures controladas e validou:
+
+```text
+SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALID
+ready_not_reached_case_valid = true
+pkn_reached_case_valid = true
+penny_reached_diagnostic_case_valid = true
+missing_sigmatheta_blocks = true
+physically_validated_true_rejected = true
+legacy_equivalent_true_rejected = true
+runtime_dispatch_enabled = false
+```
+
+O estado `Reached` permanece elegibilidade diagnostica do gate. Ele nao chama
+runtime fisico PKN/PENNY e nao altera outputs fisicos PKN.

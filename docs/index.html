@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">173/180</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">174/181</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">387</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">920</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">936</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -7690,6 +7690,20 @@ implementation_allowed_next = false
 </code></pre>
 <p>A proxima etapa e auditar se o runtime real ja possui sigma-theta inicial,
 sigma-theta current e pressao com semantica suficiente.</p>
+<h2 id="fase-1111o-validacao-controlada-da-fonte-diagnostica">Fase 11.11O — validacao controlada da fonte diagnostica</h2>
+<p><strong>Status:</strong> <code>SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALID</code>.</p>
+<p>A fonte <code>sigma_theta_diagnostic_input</code> foi validada em fixtures controladas
+para <code>ReadyNotReached</code>, <code>Reached</code> com PKN e <code>Reached</code> com <code>PENNY_SHAPED</code>
+diagnostico. O resultado permanece limitado:</p>
+<pre><code class="language-text">LIMITED_GATE_CAN_BE_FED_DIAGNOSTICALLY
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+</code></pre>
+<p>Essa validacao nao resolve a fonte fisica futura de sigma-theta. A proxima
+decisao deve avaliar readiness do gate diagnostico, nao habilitar dispatch
+fisico.</p>
 <h2 id="fase-1111j-disponibilidade-runtime-de-sigma-theta-e-pressao">Fase 11.11J — disponibilidade runtime de sigma-theta e pressao</h2>
 <p><strong>Status:</strong> <code>RUNTIME_SIGMATHETA_PRESSURE_AVAILABILITY_AUDITED</code>.</p>
 <p>Resultado da auditoria:</p>

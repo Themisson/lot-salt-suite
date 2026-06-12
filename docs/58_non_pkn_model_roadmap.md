@@ -5,6 +5,20 @@
 A Fase 11.6B consolida a decisão técnica após a auditoria
 `BUZ29-VISCO-first-well` da Fase 11.6A.
 
+## Atualizacao 11.11O — sigma-theta diagnostico controlado
+
+A 11.11O validou `sigma_theta_diagnostic_input` em casos controlados do
+`limited_gate`, incluindo `PENNY_SHAPED` apenas como elegibilidade diagnostica.
+Isso nao altera a decisao de roadmap nao-PKN: `PENNY_SHAPED` continua sem
+runtime fisico, BUZ29-PENNY continua bloqueado e qualquer estado `Reached`
+representa somente gate diagnostico.
+
+```text
+SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALID
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+```
+
 Status:
 
 ```text

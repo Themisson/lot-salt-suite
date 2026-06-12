@@ -1,0 +1,42 @@
+# Phase 11.11O controlled fixture.
+# PENNY_SHAPED limited_gate reached remains diagnostic-only.
+fixture:
+  id: controlled_penny_reached_diagnostic
+  phase: "11.11O"
+  scenario: penny_reached_diagnostic
+  expected:
+    diagnostics_enabled: true
+    diagnostic_output_expected: true
+    selected_model: PENNY_SHAPED
+    gate_status: FRACTURE_GATE_REACHED
+    fracture_initiated: true
+    dispatch_status: FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE
+    physically_validated: false
+    legacy_equivalent: false
+    runtime_dispatch_enabled: false
+    runtime_physical_dispatch_enabled: false
+    buz29_execution_allowed: false
+    pkn_behavior_changed: false
+    penny_shaped_runtime_enabled: false
+
+case:
+  id: controlled_penny_reached_diagnostic
+
+lot:
+  fracture:
+    fracture_model: PENNY_SHAPED
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: limited_gate
+      dispatch_runtime_enabled: false
+    sigma_theta_diagnostic_input:
+      enabled: true
+      source: EXPLICIT_DIAGNOSTIC_INPUT
+      sigma_theta_initial_compression_positive_Pa: 5000000.0
+      sigma_theta_current_compression_positive_Pa: -2000000.0
+      sign_convention: COMPRESSION_POSITIVE
+      reference_frame: WELLBORE_WALL_TOTAL_STRESS
+      state_time: POST_DRILLING_BEFORE_LOT
+      physically_validated: false
+      legacy_equivalent: false
+
