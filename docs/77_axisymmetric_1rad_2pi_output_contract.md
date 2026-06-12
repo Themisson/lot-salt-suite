@@ -229,3 +229,28 @@ PHASE11_10E_DEFINE_PENNY_DIAGNOSTIC_OUTPUT_FIXTURES
 
 Essa próxima fase deve criar fixtures de saída diagnóstica PennyShaped com o
 contrato aqui definido, ainda sem writer/runtime C++.
+
+## Resultado da Fase 11.10E
+
+A Fase 11.10E criou fixtures pequenos e versionados que materializam este
+contrato:
+
+```text
+tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_expected.json
+tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_expected.csv
+tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_metadata.json
+```
+
+O status registrado é:
+
+```text
+PENNY_DIAGNOSTIC_OUTPUT_FIXTURES_VALID
+FIXTURE_ONLY_NO_RUNTIME_WRITER
+IMPLEMENTATION_NOT_ALLOWED_IN_11_10E
+AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_MATERIALIZED_AS_FIXTURE
+```
+
+Esses fixtures preservam o campo interno `fracture_volume_proxy_1rad_m3`,
+reportam um equivalente `2π` separado com `source` e mantêm `volume_multiplier`
+como empírico, não como conversão geométrica. A fase não implementa writer e
+não valida BUZ29-PENNY.

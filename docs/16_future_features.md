@@ -610,3 +610,7 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   campo `source`/caveat, e manter `volume_multiplier` como
   `VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI`. A próxima etapa é criar fixtures de
   saída diagnóstica, ainda sem writer/runtime C++.
+- A Fase 11.10E materializa o contrato da 11.10D em fixtures JSON/CSV/metadata
+  pequenos e versionados, com validador Python. O status é
+  `PENNY_DIAGNOSTIC_OUTPUT_FIXTURES_VALID`; ainda não há writer C++,
+  execução BUZ29-PENNY, validação física ou equivalência legada.

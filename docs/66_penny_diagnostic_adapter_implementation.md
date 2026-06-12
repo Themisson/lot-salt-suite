@@ -114,3 +114,19 @@ O adapter C++ permanece inalterado. Uma futura fase poderá criar fixtures de
 saída diagnóstica com `fracture_volume_proxy_1rad_m3`,
 `fracture_volume_equivalent_2pi_m3` e `fracture_volume_equivalent_2pi_source`
 antes de qualquer writer/runtime.
+
+## Resultado da Fase 11.10E
+
+A 11.10E criou fixtures de saída diagnóstica para esse contrato, ainda sem
+alterar o adapter:
+
+```text
+PENNY_DIAGNOSTIC_OUTPUT_FIXTURES_VALID
+FIXTURE_ONLY_NO_RUNTIME_WRITER
+IMPLEMENTATION_NOT_ALLOWED_IN_11_10E
+```
+
+Os fixtures vivem em `tests/fixtures/comparison/phase11_10e/` e são validados
+por `tools/validate_phase11_10e_penny_output_fixtures.py`. Eles não representam
+execução BUZ29-PENNY nem writer C++ real; apenas fixam o contrato esperado para
+uma futura implementação opt-in.

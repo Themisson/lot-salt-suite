@@ -210,3 +210,16 @@ recommended_next_phase = PHASE11_10E_DEFINE_PENNY_DIAGNOSTIC_OUTPUT_FIXTURES
 
 O contrato mantém `volume_multiplier` como empírico e exige campos separados
 para grandezas internas em 1 rad e equivalentes 2π com source/caveat.
+
+## Resultado da Fase 11.10E
+
+A 11.10E materializou o contrato em fixtures JSON/CSV/metadata:
+
+```text
+PHASE11_10E_PENNY_DIAGNOSTIC_OUTPUT_FIXTURES_DEFINED
+PENNY_DIAGNOSTIC_OUTPUT_FIXTURES_VALID
+AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_MATERIALIZED_AS_FIXTURE
+```
+
+O resultado ainda é fixture-only. Não há writer runtime, não há execução
+BUZ29-PENNY e `volume_multiplier` continua separado do fator geométrico `2π`.

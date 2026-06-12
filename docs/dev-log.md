@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10D axisymmetric 1rad to 2pi output contract
+Fase ativa  : 11.10E PennyShaped diagnostic output fixtures
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 273/273 passaram apos Fase 11.10A em 2026-06-12
-Testes Py   : 473/473 esperados apos Fase 11.10D em 2026-06-12
+Testes Py   : 488/488 esperados apos Fase 11.10E em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,49 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10E — fixtures de saída diagnóstica PennyShaped — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase se todos os gates
+passarem.
+
+**Fixtures criados:**
+
+```text
+tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_expected.json
+tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_expected.csv
+tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_metadata.json
+```
+
+**Ferramenta criada:**
+
+```text
+tools/validate_phase11_10e_penny_output_fixtures.py
+```
+
+**Documento criado:**
+
+```text
+docs/78_penny_diagnostic_output_fixtures.md
+```
+
+**Resultado:**
+
+```text
+fixture_status = PENNY_DIAGNOSTIC_OUTPUT_FIXTURES_VALID
+implementation_status = FIXTURE_ONLY_NO_RUNTIME_WRITER
+implementation_allowed = false
+volume_multiplier_interpretation = VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI
+contract_materialized = AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT_MATERIALIZED_AS_FIXTURE
+recommended_next_phase = PHASE11_10F_SPECIFY_PENNY_DIAGNOSTIC_WRITER_IMPLEMENTATION
+```
+
+**Interpretação:** a fase materializa o contrato 1 rad ↔ 2π em fixtures
+versionados e verificáveis, mas não implementa writer, não altera runtime, não
+executa BUZ29-PENNY, não declara validação física e não transforma o fixture em
+caso ativo.
 
 ---
 

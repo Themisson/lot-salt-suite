@@ -351,6 +351,24 @@ A rota passa a exigir campos separados para `fracture_volume_proxy_1rad_m3`,
 O `volume_multiplier` permanece empírico e não substitui o fator geométrico
 `2π`.
 
+## Fase 11.10E — fixtures de saída diagnóstica PennyShaped
+
+A Fase 11.10E materializa o contrato da 11.10D como fixtures versionados, sem
+writer/runtime:
+
+```text
+PHASE11_10E_PENNY_DIAGNOSTIC_OUTPUT_FIXTURES_DEFINED
+PENNY_DIAGNOSTIC_OUTPUT_FIXTURES_VALID
+FIXTURE_ONLY_NO_RUNTIME_WRITER
+IMPLEMENTATION_NOT_ALLOWED_IN_11_10E
+```
+
+Foram definidos fixtures JSON, CSV e metadata em
+`tests/fixtures/comparison/phase11_10e/`, além do validador
+`tools/validate_phase11_10e_penny_output_fixtures.py`. O contrato separa
+`fracture_volume_proxy_1rad_m3` do equivalente `2π` e mantém
+`volume_multiplier` como `VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI`.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.
