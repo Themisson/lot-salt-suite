@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">169/176</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">170/177</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">373</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">878</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">889</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -7701,6 +7701,18 @@ runtime_real_wiring_allowed_next = false
 <p>O gate limitado ainda nao pode ser alimentado fisicamente porque faltam fonte
 runtime de sigma-theta inicial/current, convencao de sinal runtime resolvida e
 referencial total na parede do poco.</p>
+<h2 id="fase-1111k-contrato-de-estado-inicial-pos-perfuracao">Fase 11.11K — contrato de estado inicial pos-perfuracao</h2>
+<p><strong>Status:</strong> <code>POST_DRILLING_INITIAL_STATE_INTEGRATION_SPECIFIED_BUT_SOURCE_MISSING</code>.</p>
+<p>Contrato especificado:</p>
+<pre><code class="language-text">PostDrillingInitialState
+state_time = POST_DRILLING_BEFORE_LOT
+sign_convention = COMPRESSION_POSITIVE
+reference_frame = WELLBORE_WALL_TOTAL_STRESS
+source_status = MISSING_RUNTIME_SIGMATHETA_SOURCE
+implementation_allowed_next = false
+</code></pre>
+<p>O contrato esta pronto para orientar implementacao futura, mas a implementacao
+continua bloqueada enquanto a fonte runtime de sigma-theta nao existir.</p>
 <hr />
 <h2 id="fase-1017c-acomodacao-shut-in-e-fluido-zamora">Fase 10.17C — acomodação, shut-in e fluido Zamora</h2>
 <p><strong>Status:</strong> <code>PLANNED_NO_RUNTIME_CHANGE</code>.</p>

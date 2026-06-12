@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11J runtime sigma-theta pressure availability audit
+Fase ativa  : 11.11K post-drilling initial state integration spec
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 373/373 em 2026-06-12
-Testes Py   : 878/878 em 2026-06-12
+Testes Py   : 889/889 em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -7728,3 +7728,37 @@ com semântica suficiente para wiring físico do `limited_gate`.
 
 **Próxima fase recomendada:**
 `PHASE11_11K_SPECIFY_POST_DRILLING_INITIAL_STATE_INTEGRATION`.
+
+---
+
+### [2026-06-12] Fase 11.11K — Especificação de estado inicial pós-perfuração — Codex
+
+**Status:** Concluído; commit/push planejado ao final da fase.
+
+**Classificação:** `POST_DRILLING_INITIAL_STATE_INTEGRATION_SPECIFIED_BUT_SOURCE_MISSING`.
+
+**Contrato:** `PostDrillingInitialState`.
+
+**Campos semânticos principais:**
+
+```text
+state_time = POST_DRILLING_BEFORE_LOT
+sign_convention = COMPRESSION_POSITIVE
+reference_frame = WELLBORE_WALL_TOTAL_STRESS
+pressure_reference = WELLBORE_PRESSURE
+source_status = MISSING_RUNTIME_SIGMATHETA_SOURCE
+implementation_allowed_next = false
+runtime_dispatch_allowed_next = false
+buz29_execution_allowed_next = false
+```
+
+**Decisão:** o contrato está especificado, mas ainda sem fonte runtime real de
+sigma-theta inicial/current.
+
+**Entregáveis:**
+- `tools/spec_phase11_11k_post_drilling_initial_state_integration.py`
+- `tests/python/test_spec_phase11_11k_post_drilling_initial_state_integration.py`
+- `docs/111_post_drilling_initial_state_integration_spec.md`
+
+**Próxima fase recomendada:**
+`PHASE11_11L_DECIDE_LIMITED_GATE_REAL_SIGMATHETA_READINESS`.

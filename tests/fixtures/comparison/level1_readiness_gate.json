@@ -3566,6 +3566,35 @@
       "No C++ wiring is implemented in this phase."
     ]
   },
+  "phase11_11k_post_drilling_initial_state_integration": {
+    "status": "POST_DRILLING_INITIAL_STATE_INTEGRATION_SPECIFIED_BUT_SOURCE_MISSING",
+    "phase": "11.11K",
+    "integration_status": "POST_DRILLING_INITIAL_STATE_INTEGRATION_SPECIFIED_BUT_SOURCE_MISSING",
+    "contract": "PostDrillingInitialState",
+    "requires_post_drilling_state": true,
+    "state_time": "POST_DRILLING_BEFORE_LOT",
+    "sign_convention": "COMPRESSION_POSITIVE",
+    "reference_frame": "WELLBORE_WALL_TOTAL_STRESS",
+    "pressure_reference": "WELLBORE_PRESSURE",
+    "source_status": "MISSING_RUNTIME_SIGMATHETA_SOURCE",
+    "implementation_allowed_next": false,
+    "runtime_dispatch_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "pkn_behavior_change_allowed": false,
+    "required_statuses": [
+      "POST_DRILLING_INITIAL_STATE_INTEGRATION_SPECIFIED_BUT_SOURCE_MISSING",
+      "MISSING_RUNTIME_SIGMATHETA_SOURCE",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED"
+    ],
+    "recommended_next_phase": "PHASE11_11L_DECIDE_LIMITED_GATE_REAL_SIGMATHETA_READINESS",
+    "caveats": [
+      "The post-drilling initial state contract is specified only.",
+      "Runtime sigma-theta source is still missing.",
+      "Implementation is not allowed next.",
+      "Physical dispatch remains disabled."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

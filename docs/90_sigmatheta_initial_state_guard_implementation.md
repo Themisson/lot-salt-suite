@@ -255,3 +255,19 @@ reference_frame = WELLBORE_WALL_TOTAL_STRESS
 
 O trace legado pode continuar sendo usado como evidencia diagnostica, mas nao
 como fonte automatica de validacao fisica.
+
+## Atualizacao 11.11K — contrato PostDrillingInitialState
+
+A Fase 11.11K especifica o contrato que deve alimentar o guard em uma futura
+integracao real:
+
+```text
+PostDrillingInitialState
+state_time = POST_DRILLING_BEFORE_LOT
+sign_convention = COMPRESSION_POSITIVE
+reference_frame = WELLBORE_WALL_TOTAL_STRESS
+pressure_reference = WELLBORE_PRESSURE
+```
+
+Como a fonte runtime real ainda esta ausente, a integracao permanece bloqueada
+e o guard continua exercitado em rota diagnostica.

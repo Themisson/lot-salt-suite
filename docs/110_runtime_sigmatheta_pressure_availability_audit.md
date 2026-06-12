@@ -120,3 +120,18 @@ PHASE11_11K_SPECIFY_POST_DRILLING_INITIAL_STATE_INTEGRATION
 A proxima fase deve especificar o contrato de estado inicial pos-perfuracao,
 mantendo `implementation_allowed_next=false` enquanto a fonte runtime real nao
 existir.
+
+## Resultado da especificacao 11.11K
+
+A Fase 11.11K especificou o contrato `PostDrillingInitialState` com:
+
+```text
+state_time = POST_DRILLING_BEFORE_LOT
+sign_convention = COMPRESSION_POSITIVE
+reference_frame = WELLBORE_WALL_TOTAL_STRESS
+source_status = MISSING_RUNTIME_SIGMATHETA_SOURCE
+implementation_allowed_next = false
+```
+
+Portanto, a auditoria 11.11J continua bloqueando wiring real ate existir uma
+fonte runtime de sigma-theta inicial/current.

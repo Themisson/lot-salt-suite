@@ -789,6 +789,20 @@ runtime_real_wiring_allowed_next = false
 
 `PENNY_SHAPED` permanece diagnostic-only e BUZ29-PENNY continua bloqueado.
 
+## Fase 11.11K — contrato pos-perfuracao
+
+A Fase 11.11K especifica o contrato `PostDrillingInitialState`, mas registra:
+
+```text
+POST_DRILLING_INITIAL_STATE_INTEGRATION_SPECIFIED_BUT_SOURCE_MISSING
+implementation_allowed_next = false
+runtime_dispatch_allowed_next = false
+buz29_execution_allowed_next = false
+```
+
+Assim, modelos nao-PKN seguem limitados a diagnostico e nao ha execucao BUZ29
+ou dispatch fisico.
+
 O status permanece documental/diagnostico; nenhum runner nao-PKN e executado.
 
 ## Fase 11.11A — validacao controlada do pre-runner

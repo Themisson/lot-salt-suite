@@ -42,6 +42,24 @@ O gate limitado ainda nao pode ser alimentado fisicamente porque faltam fonte
 runtime de sigma-theta inicial/current, convencao de sinal runtime resolvida e
 referencial total na parede do poco.
 
+## Fase 11.11K — contrato de estado inicial pos-perfuracao
+
+**Status:** `POST_DRILLING_INITIAL_STATE_INTEGRATION_SPECIFIED_BUT_SOURCE_MISSING`.
+
+Contrato especificado:
+
+```text
+PostDrillingInitialState
+state_time = POST_DRILLING_BEFORE_LOT
+sign_convention = COMPRESSION_POSITIVE
+reference_frame = WELLBORE_WALL_TOTAL_STRESS
+source_status = MISSING_RUNTIME_SIGMATHETA_SOURCE
+implementation_allowed_next = false
+```
+
+O contrato esta pronto para orientar implementacao futura, mas a implementacao
+continua bloqueada enquanto a fonte runtime de sigma-theta nao existir.
+
 ---
 
 ## Fase 10.17C — acomodação, shut-in e fluido Zamora
