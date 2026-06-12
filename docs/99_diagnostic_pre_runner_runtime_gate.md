@@ -132,3 +132,9 @@ A 11.11B confirma que habilitar `fracture_gate_diagnostics` em copia temporaria
 dos casos LOT-PKN protegidos nao altera `result.json` nem `timeseries.csv`. O
 diagnostico continua isolado em `diagnostic_fracture_gate.json`, sem liberar
 dispatch fisico.
+
+## Atualizacao 11.11C — readiness conservadora
+
+A 11.11C registra `RUNTIME_WIRING_READY_FOR_LIMITED_GATE_SPEC`. A decisao
+autoriza apenas a especificacao de uma integracao limitada futura; o dispatch
+fisico permanece desabilitado e BUZ29-PENNY segue bloqueado.

@@ -3333,6 +3333,34 @@
       "It does not execute BUZ29-PENNY."
     ]
   },
+  "phase11_11c_runtime_wiring_readiness_decision": {
+    "status": "PHASE11_11C_RUNTIME_WIRING_READINESS_DECIDED",
+    "phase": "11.11C",
+    "readiness_status": "RUNTIME_WIRING_READY_FOR_LIMITED_GATE_SPEC",
+    "pkn_regression_safe": true,
+    "diagnostic_output_isolated": true,
+    "controlled_cases_valid": true,
+    "guards_available": true,
+    "runtime_dispatch_allowed": false,
+    "runtime_physical_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_change_allowed": false,
+    "penny_runtime_allowed": false,
+    "required_statuses": [
+      "PHASE11_11C_RUNTIME_WIRING_READINESS_DECIDED",
+      "RUNTIME_WIRING_READY_FOR_LIMITED_GATE_SPEC",
+      "PKN_REGRESSION_SAFE_FOR_DIAGNOSTIC_PRE_RUNNER",
+      "RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED"
+    ],
+    "recommended_next_phase": "PHASE11_11D_SPECIFY_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION",
+    "caveats": [
+      "Readiness is limited to specifying the next gate.",
+      "No physical dispatch is enabled.",
+      "BUZ29-PENNY is not executed.",
+      "PENNY_SHAPED remains diagnostic-only."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

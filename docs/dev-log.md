@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11B PKN diagnostic pre-runner regression comparison
+Fase ativa  : 11.11C runtime wiring readiness decision
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 359/359 esperados apos Fase 11.10Y em 2026-06-12
-Testes Py   : 787/787 esperados apos Fase 11.11B em 2026-06-12
+Testes Py   : 794/794 esperados apos Fase 11.11C em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -56,6 +56,43 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ## Entradas de sessão
 
 ---
+
+### [2026-06-12] Fase 11.11C — runtime wiring readiness decision — Codex
+
+**Status:** Implementado; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_phase11_11c_runtime_wiring_readiness.py
+```
+
+**Documento criado:**
+
+```text
+docs/103_runtime_wiring_readiness_decision.md
+```
+
+**Decisao:**
+
+```text
+RUNTIME_WIRING_READY_FOR_LIMITED_GATE_SPEC
+```
+
+**Restricoes preservadas:**
+
+```text
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_DIAGNOSTIC_ONLY
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE11_11D_SPECIFY_LIMITED_FRACTURE_GATE_RUNTIME_INTEGRATION
+```
 
 ### [2026-06-12] Fase 11.11B — PKN diagnostic disabled/enabled comparison — Codex
 

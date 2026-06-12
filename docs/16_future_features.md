@@ -878,3 +878,18 @@ A fase compara `result.json` e `timeseries.csv` com diagnostico disabled/enabled
 e confirma que o diagnostico pre-runner nao muda os outputs fisicos PKN. A
 integracao segue limitada a diagnostico opt-in; dispatch fisico continua
 bloqueado.
+
+## Fase 11.11C — readiness da integracao runtime limitada
+
+Status registrado:
+
+```text
+RUNTIME_WIRING_READY_FOR_LIMITED_GATE_SPEC
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_DIAGNOSTIC_ONLY
+```
+
+A fase decide que a proxima etapa pode especificar uma integracao limitada do
+fracture gate no runtime, mas ainda sem mudar comportamento PKN default e sem
+habilitar dispatch fisico.

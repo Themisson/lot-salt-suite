@@ -777,3 +777,9 @@ A Fase 11.11B reforca que o diagnostico pre-runner nao altera o comportamento
 PKN fisico. Para a trilha nao-PKN, o resultado e conservador: `PENNY_SHAPED`
 continua `diagnostic_only`, BUZ29-PENNY permanece bloqueado e nenhum adapter
 penny-shaped e chamado como runtime fisico.
+
+## Fase 11.11C — readiness sem desbloqueio nao-PKN
+
+A decisao `RUNTIME_WIRING_READY_FOR_LIMITED_GATE_SPEC` nao altera a trilha
+nao-PKN. A proxima fase pode especificar integracao limitada, mas
+`PENNY_SHAPED` segue diagnostico e BUZ29-PENNY segue bloqueado.

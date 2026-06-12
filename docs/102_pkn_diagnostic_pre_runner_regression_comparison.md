@@ -98,3 +98,14 @@ evitar execucao de simulacoes dentro do pytest.
 ```text
 PHASE11_11C_DECIDE_RUNTIME_WIRING_INTEGRATION_READINESS
 ```
+
+## Atualizacao 11.11C
+
+A Fase 11.11C usa esta comparacao como evidencia para classificar:
+
+```text
+RUNTIME_WIRING_READY_FOR_LIMITED_GATE_SPEC
+```
+
+Essa classificacao autoriza apenas a especificacao da integracao limitada na
+11.11D. Ela nao habilita dispatch fisico e nao executa BUZ29-PENNY.
