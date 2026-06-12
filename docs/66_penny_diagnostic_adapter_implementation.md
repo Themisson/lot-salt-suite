@@ -145,3 +145,16 @@ RUNTIME_EXECUTION_NOT_ALLOWED_IN_11_10F
 O writer futuro deve ser opt-in, emitir JSON/CSV compatíveis com as fixtures
 11.10E e preservar `volume_multiplier` como empírico, separado da conversão
 geométrica `1rad -> 2pi`.
+
+## Resultado da Fase 11.10G
+
+A 11.10G implementou `PennyShapedDiagnosticWriter` como componente C++ isolado
+em `include/lot/` e `src/lot/`. O adapter existente permanece inalterado: a
+nova classe apenas escreve saídas diagnósticas a partir de uma entrada
+estruturada, sem executar BUZ29-PENNY, sem conectar CLI e sem alterar o fluxo
+`lot-pkn`.
+
+O writer exige os caveats diagnósticos, preserva `*_1rad_m3`, calcula os
+equivalentes `*_equivalent_2pi_m3` com `source` explícito e rejeita
+`physically_validated=true`, `legacy_equivalent=true`,
+`active_simulation_case=true` e `volume_multiplier_is_2pi=true`.

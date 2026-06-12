@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">139/146</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">273</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">511</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">140/147</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">281</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">521</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8260,7 +8260,13 @@ unidades reais usadas no <code>LOT_APB_v5</code> antes de aceitar nomes ou dimen
   contrato 1 rad ↔ 2π da 11.10D, as fixtures da 11.10E, caveats obrigatórios e
   a separação entre <code>volume_multiplier</code> empírico e fator geométrico <code>2π</code>. A
   próxima fase provável é
-  <code>PHASE11_10G_IMPLEMENT_PENNY_DIAGNOSTIC_WRITER_OPT_IN</code>.</p>
+  <code>PHASE11_10G_IMPLEMENT_PENNY_DIAGNOSTIC_WRITER_OPT_IN</code>.
+- A Fase 11.10G implementa o writer diagnóstico PennyShaped opt-in em C++,
+  com <code>PENNY_DIAGNOSTIC_WRITER_IMPLEMENTED_OPT_IN</code>. O writer emite JSON/CSV em
+  memória, preserva <code>*_1rad_m3</code>, calcula equivalentes <code>*_equivalent_2pi_m3</code>
+  com <code>source</code>, exige caveats diagnósticos e rejeita validação física,
+  equivalência legada, caso ativo e <code>volume_multiplier</code> como <code>2π</code>. A fase não
+  implementa runner, não executa BUZ29-PENNY e não altera <code>lot-pkn</code>.</p>
 </div>
 </section>
 

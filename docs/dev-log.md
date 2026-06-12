@@ -57,6 +57,50 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-12] Fase 11.10G — writer diagnóstico PennyShaped opt-in — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Arquivos C++ criados:**
+
+```text
+include/lot/PennyShapedDiagnosticWriter.hpp
+src/lot/PennyShapedDiagnosticWriter.cpp
+tests/cpp/test_penny_shaped_diagnostic_writer.cpp
+```
+
+**Ferramenta criada:**
+
+```text
+tools/check_phase11_10g_penny_writer_against_fixtures.py
+```
+
+**Documento criado:**
+
+```text
+docs/81_penny_diagnostic_writer_implementation.md
+```
+
+**Resultado:**
+
+```text
+PENNY_DIAGNOSTIC_WRITER_IMPLEMENTED_OPT_IN
+NO_BUZ29_RUNTIME_EXECUTION
+NOT_PHYSICALLY_VALIDATED
+NOT_LEGACY_EQUIVALENT
+VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI
+```
+
+**Interpretação:** a fase implementa apenas o writer diagnóstico PennyShaped
+opt-in. Ele emite JSON/CSV em memória, preserva valores internos em 1 rad,
+calcula equivalentes volumétricos 2π com `source` explícito e rejeita flags que
+confundiriam o artefato com validação física, equivalência legada ou caso
+ativo. A fase não implementa runner não-PKN, não executa BUZ29-PENNY e não
+altera `lot-pkn`.
+
+---
+
 ### [2026-06-12] Fase 11.10F — especificação do writer diagnóstico PennyShaped — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase se todos os

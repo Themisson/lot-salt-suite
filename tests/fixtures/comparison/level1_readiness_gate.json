@@ -2394,6 +2394,48 @@
       "The specification does not validate BUZ29-PENNY physically and does not declare legacy equivalence."
     ]
   },
+  "phase11_10g_penny_diagnostic_writer": {
+    "status": "PHASE11_10G_PENNY_DIAGNOSTIC_WRITER_IMPLEMENTED_OPT_IN",
+    "phase": "11.10G",
+    "track": "PENNY_SHAPED",
+    "writer_implementation_status": "PENNY_DIAGNOSTIC_WRITER_IMPLEMENTED_OPT_IN",
+    "runtime_execution_allowed": false,
+    "buz29_executed": false,
+    "physical_validation": false,
+    "physically_validated": false,
+    "legacy_equivalence": false,
+    "legacy_equivalent": false,
+    "active_simulation_case": false,
+    "diagnostic_only": true,
+    "volume_multiplier_semantics": "VOLUME_MULTIPLIER_EMPIRICAL",
+    "volume_multiplier_interpretation": "VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI",
+    "volume_multiplier_is_2pi": false,
+    "header": "include/lot/PennyShapedDiagnosticWriter.hpp",
+    "source": "src/lot/PennyShapedDiagnosticWriter.cpp",
+    "test": "tests/cpp/test_penny_shaped_diagnostic_writer.cpp",
+    "tool": "tools/check_phase11_10g_penny_writer_against_fixtures.py",
+    "document": "docs/81_penny_diagnostic_writer_implementation.md",
+    "source_contract": "docs/77_axisymmetric_1rad_2pi_output_contract.md",
+    "source_fixtures": [
+      "tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_expected.json",
+      "tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_expected.csv",
+      "tests/fixtures/comparison/phase11_10e/penny_diagnostic_output_metadata.json"
+    ],
+    "required_statuses": [
+      "PENNY_DIAGNOSTIC_WRITER_IMPLEMENTED_OPT_IN",
+      "NO_BUZ29_RUNTIME_EXECUTION",
+      "NOT_PHYSICALLY_VALIDATED",
+      "NOT_LEGACY_EQUIVALENT",
+      "VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI"
+    ],
+    "recommended_next_phase": "PHASE11_10H_SPECIFY_NON_PKN_DIAGNOSTIC_RUNNER_GATE",
+    "caveats": [
+      "The writer is opt-in and emits in-memory JSON/CSV strings.",
+      "No non-PKN runner is implemented by Phase 11.10G.",
+      "BUZ29-PENNY is not executed or physically validated.",
+      "volume_multiplier remains empirical and is not the 1rad to 2pi conversion factor."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

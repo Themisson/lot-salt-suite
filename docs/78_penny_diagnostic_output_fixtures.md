@@ -145,3 +145,10 @@ A especificação resultante está em
 ```text
 PHASE11_10G_IMPLEMENT_PENNY_DIAGNOSTIC_WRITER_OPT_IN
 ```
+
+## Resultado da Fase 11.10G
+
+A Fase 11.10G implementou o writer C++ opt-in e adicionou testes Catch2 que
+verificam compatibilidade com a linha CSV da fixture 11.10E. As fixtures
+continuam servindo como contrato pequeno e versionado; elas não representam
+execução BUZ29-PENNY, validação física ou equivalência com o legado.

@@ -113,6 +113,7 @@ set(LSS_CORE_SOURCES
   src/lot/InjectionSchedule.cpp
   src/lot/LeakoffModel.cpp
   src/lot/PennyShapedDiagnosticAdapter.cpp
+  src/lot/PennyShapedDiagnosticWriter.cpp
   src/lot/PennyShapedModel.cpp
   src/lot/PknModel.cpp
   src/lot/PknRunner.cpp
@@ -173,6 +174,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_breakdown_detector.cpp
     tests/cpp/test_leakoff_model.cpp
     tests/cpp/test_penny_shaped_diagnostic_adapter.cpp
+    tests/cpp/test_penny_shaped_diagnostic_writer.cpp
     tests/cpp/test_penny_shaped_model.cpp
     tests/cpp/test_pkn_model_synthetic.cpp
     tests/cpp/test_pkn_runner.cpp

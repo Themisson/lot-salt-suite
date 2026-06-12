@@ -338,3 +338,26 @@ PHASE11_10G_IMPLEMENT_PENNY_DIAGNOSTIC_WRITER_OPT_IN
 A 11.10G poderá implementar C++ somente se preservar o escopo opt-in,
 independência do `lot-pkn` e as flags de não validação física estabelecidas
 nesta especificação.
+
+## Resultado da Fase 11.10G
+
+A Fase 11.10G implementou o writer especificado em:
+
+```text
+include/lot/PennyShapedDiagnosticWriter.hpp
+src/lot/PennyShapedDiagnosticWriter.cpp
+tests/cpp/test_penny_shaped_diagnostic_writer.cpp
+```
+
+Status:
+
+```text
+PENNY_DIAGNOSTIC_WRITER_IMPLEMENTED_OPT_IN
+NO_BUZ29_RUNTIME_EXECUTION
+NOT_PHYSICALLY_VALIDATED
+NOT_LEGACY_EQUIVALENT
+VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI
+```
+
+O writer permanece isolado, sem runner não-PKN, sem CLI, sem parser/schema e
+sem alteração do fluxo `lot-pkn`.

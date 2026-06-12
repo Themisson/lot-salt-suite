@@ -153,6 +153,7 @@ phases:
   phase_11_10e_penny_diagnostic_output_fixtures: completed
   phase_11_10f_aux_legacy_sestsal_standalone_constraint: completed
   phase_11_10f_penny_diagnostic_writer_spec: completed
+  phase_11_10g_penny_diagnostic_writer: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -232,6 +233,7 @@ docs:
   stage11_10e_penny_diagnostic_output_fixtures: implemented
   stage11_10f_aux_legacy_sestsal_standalone_constraint: implemented
   stage11_10f_penny_diagnostic_writer_spec: implemented
+  stage11_10g_penny_diagnostic_writer: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -295,14 +297,14 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 273        # Catch2 lot-salt-suite — 273/273 previstos apos Fase 11.8D (2026-06-11)
+  cpp_tests: 281        # Catch2 lot-salt-suite — 281/281 passaram apos Fase 11.10G (2026-06-12)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 511     # pytest lot-salt-suite — 511/511 previstos apos Fase 11.10F (2026-06-12)
+  python_tests: 521     # pytest lot-salt-suite — 521/521 passaram apos Fase 11.10G (2026-06-12)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-12"
-updated_by: "codex (Fase 11.10F PennyShaped diagnostic writer specification)"
+updated_by: "codex (Fase 11.10G PennyShaped diagnostic writer implementation)"
 project_version: "0.1.0"

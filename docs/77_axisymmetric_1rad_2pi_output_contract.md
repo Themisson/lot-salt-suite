@@ -270,3 +270,13 @@ IMPLEMENTATION_NOT_ALLOWED_IN_11_10F
 A especificação exige que o writer preserve simultaneamente os campos de origem
 em 1 rad e os equivalentes 2π com `source`. O campo `volume_multiplier` continua
 empírico e fora da conversão geométrica.
+
+## Resultado da Fase 11.10G
+
+A Fase 11.10G implementou o writer diagnóstico PennyShaped opt-in conforme este
+contrato. A implementação preserva a origem em 1 rad, calcula os equivalentes
+2π para os volumes de fratura e sólido, exige `source` para os equivalentes e
+mantém `volume_multiplier` como `VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI`.
+
+O writer continua diagnóstico: não executa BUZ29-PENNY, não cria runner
+não-PKN, não declara validação física e não declara equivalência com legado.

@@ -628,3 +628,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   a separação entre `volume_multiplier` empírico e fator geométrico `2π`. A
   próxima fase provável é
   `PHASE11_10G_IMPLEMENT_PENNY_DIAGNOSTIC_WRITER_OPT_IN`.
+- A Fase 11.10G implementa o writer diagnóstico PennyShaped opt-in em C++,
+  com `PENNY_DIAGNOSTIC_WRITER_IMPLEMENTED_OPT_IN`. O writer emite JSON/CSV em
+  memória, preserva `*_1rad_m3`, calcula equivalentes `*_equivalent_2pi_m3`
+  com `source`, exige caveats diagnósticos e rejeita validação física,
+  equivalência legada, caso ativo e `volume_multiplier` como `2π`. A fase não
+  implementa runner, não executa BUZ29-PENNY e não altera `lot-pkn`.

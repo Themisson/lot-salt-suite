@@ -402,6 +402,30 @@ CSV compatíveis com as fixtures 11.10E, preservar grandezas internas em 1 rad e
 reportar equivalentes 2π apenas com `source`/caveat. A rota permanece
 diagnóstica, não ativa e não equivalente ao legado.
 
+## Fase 11.10G — writer diagnóstico PennyShaped opt-in
+
+A Fase 11.10G implementa o writer C++ isolado:
+
+```text
+include/lot/PennyShapedDiagnosticWriter.hpp
+src/lot/PennyShapedDiagnosticWriter.cpp
+tests/cpp/test_penny_shaped_diagnostic_writer.cpp
+```
+
+O status é:
+
+```text
+PENNY_DIAGNOSTIC_WRITER_IMPLEMENTED_OPT_IN
+NO_BUZ29_RUNTIME_EXECUTION
+NOT_PHYSICALLY_VALIDATED
+NOT_LEGACY_EQUIVALENT
+VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI
+```
+
+O writer preserva campos internos em 1 rad, calcula equivalentes volumétricos
+2π apenas com `source`, rejeita flags proibidas e permanece fora de
+`lot-pkn`, parser, schema, CLI e runner não-PKN.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.
