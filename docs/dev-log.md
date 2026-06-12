@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10Y diagnostic pre-runner runtime gate
+Fase ativa  : 11.10Z diagnostic pre-runner fixtures
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 359/359 esperados apos Fase 11.10Y em 2026-06-12
-Testes Py   : 756/756 esperados apos Fase 11.10Y em 2026-06-12
+Testes Py   : 768/768 esperados apos Fase 11.10Z em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -56,6 +56,47 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ## Entradas de sessão
 
 ---
+
+### [2026-06-12] Fase 11.10Z — diagnostic pre-runner fixtures — Codex
+
+**Status:** Implementado; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Objetivo:** adicionar fixtures pequenas para validar o contrato do diagnostico
+pre-runner implementado na 11.10Y, sem alterar casos protegidos e sem executar
+BUZ29-PENNY.
+
+**Fixtures criadas:**
+
+```text
+tests/fixtures/comparison/phase11_10z/diagnostic_disabled_default.yaml
+tests/fixtures/comparison/phase11_10z/diagnostic_enabled_pkn_pre_runner.yaml
+tests/fixtures/comparison/phase11_10z/diagnostic_enabled_penny_pre_runner.yaml
+tests/fixtures/comparison/phase11_10z/diagnostic_dispatch_true_invalid.yaml
+tests/fixtures/comparison/phase11_10z/diagnostic_invalid_mode.yaml
+tests/fixtures/comparison/phase11_10z/diagnostic_missing_sigmatheta_blocks.yaml
+```
+
+**Validador criado:**
+
+```text
+tools/validate_phase11_10z_diagnostic_pre_runner_fixtures.py
+```
+
+**Status registrado:**
+
+```text
+PHASE11_10Z_DIAGNOSTIC_PRE_RUNNER_FIXTURES_DEFINED
+DIAGNOSTIC_PRE_RUNNER_FIXTURES_VALID
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE11_11A_VALIDATE_DIAGNOSTIC_PRE_RUNNER_ON_CONTROLLED_CASES
+```
 
 ### [2026-06-12] Fase 11.10Y — diagnostic pre-runner runtime gate — Codex
 

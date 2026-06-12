@@ -743,3 +743,17 @@ RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
 
 `PENNY_SHAPED` pode aparecer no JSON diagnostico como modelo selecionado, mas
 isso nao chama o adapter penny-shaped e nao executa BUZ29-PENNY.
+
+## Fase 11.10Z — fixtures diagnosticas pre-runner
+
+A Fase 11.10Z registra fixtures pequenas para o gate pre-runner. Para a trilha
+nao-PKN, o cenario `diagnostic_enabled_penny_pre_runner` confirma:
+
+```text
+PENNY_SHAPED = diagnostic_only
+physically_validated = false
+legacy_equivalent = false
+BUZ29_EXECUTION_BLOCKED
+```
+
+O status permanece documental/diagnostico; nenhum runner nao-PKN e executado.

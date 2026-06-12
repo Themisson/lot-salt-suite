@@ -1,0 +1,22 @@
+# Phase 11.10Z fixture.
+# Unknown diagnostic mode is rejected.
+fixture:
+  id: diagnostic_invalid_mode
+  phase: "11.10Z"
+  scenario: invalid_mode
+  expected:
+    validation_status: rejected
+    rejection_reason: invalid_diagnostic_mode
+    runtime_physical_dispatch_enabled: false
+    buz29_execution_allowed: false
+
+case:
+  id: diagnostic_invalid_mode
+
+lot:
+  fracture:
+    fracture_model: PKN
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: runtime
+      dispatch_runtime_enabled: false

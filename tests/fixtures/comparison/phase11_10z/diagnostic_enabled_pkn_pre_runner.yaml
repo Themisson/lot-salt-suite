@@ -1,0 +1,26 @@
+# Phase 11.10Z fixture.
+# PKN diagnostic pre-runner opt-in.
+fixture:
+  id: diagnostic_enabled_pkn_pre_runner
+  phase: "11.10Z"
+  scenario: pkn_pre_runner
+  expected:
+    diagnostics_enabled: true
+    diagnostic_output_expected: true
+    selected_model: PKN
+    gate_status: FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE
+    dispatch_status: FRACTURE_DISPATCH_NOT_ALLOWED
+    pkn_result_preserved: true
+    runtime_physical_dispatch_enabled: false
+    buz29_execution_allowed: false
+
+case:
+  id: diagnostic_enabled_pkn_pre_runner
+
+lot:
+  fracture:
+    fracture_model: PKN
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: pre_runner
+      dispatch_runtime_enabled: false

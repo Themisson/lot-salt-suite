@@ -105,3 +105,16 @@ PHASE11_10Z_ADD_DIAGNOSTIC_PRE_RUNNER_CASE_FIXTURES
 
 A proxima fase deve criar fixtures/casos diagnosticos pequenos para exercitar
 o JSON pre-runner sem liberar dispatch fisico.
+
+## Atualizacao 11.10Z — fixtures do diagnostico pre-runner
+
+A Fase 11.10Z adiciona fixtures versionadas em:
+
+```text
+tests/fixtures/comparison/phase11_10z/
+```
+
+Essas fixtures cobrem default disabled, PKN diagnostico, `PENNY_SHAPED`
+diagnostico, `dispatch_runtime_enabled=true` invalido, mode invalido e bloqueio
+por sigma_theta inicial ausente. Elas sao contrato diagnostico, nao casos de
+producao e nao executam BUZ29-PENNY.

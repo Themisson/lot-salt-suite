@@ -3250,6 +3250,34 @@
       "BUZ29-PENNY is not executed."
     ]
   },
+  "phase11_10z_diagnostic_pre_runner_fixtures": {
+    "status": "PHASE11_10Z_DIAGNOSTIC_PRE_RUNNER_FIXTURES_DEFINED",
+    "phase": "11.10Z",
+    "fixture_status": "DIAGNOSTIC_PRE_RUNNER_FIXTURES_VALID",
+    "fixture_count": 6,
+    "default_disabled_covered": true,
+    "pkn_diagnostic_covered": true,
+    "penny_diagnostic_covered": true,
+    "dispatch_true_invalid_covered": true,
+    "invalid_mode_covered": true,
+    "missing_sigmatheta_blocks_covered": true,
+    "runtime_physical_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "required_statuses": [
+      "PHASE11_10Z_DIAGNOSTIC_PRE_RUNNER_FIXTURES_DEFINED",
+      "DIAGNOSTIC_PRE_RUNNER_FIXTURES_VALID",
+      "BUZ29_EXECUTION_BLOCKED",
+      "RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED"
+    ],
+    "recommended_next_phase": "PHASE11_11A_VALIDATE_DIAGNOSTIC_PRE_RUNNER_ON_CONTROLLED_CASES",
+    "caveats": [
+      "Phase 11.10Z fixtures are diagnostic contracts, not production cases.",
+      "The fixtures do not execute BUZ29-PENNY.",
+      "Physical dispatch remains disabled.",
+      "The PKN behavior remains unchanged."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

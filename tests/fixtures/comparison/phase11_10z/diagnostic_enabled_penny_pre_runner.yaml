@@ -1,0 +1,26 @@
+# Phase 11.10Z fixture.
+# PENNY_SHAPED remains diagnostic-only and non-physical.
+fixture:
+  id: diagnostic_enabled_penny_pre_runner
+  phase: "11.10Z"
+  scenario: penny_pre_runner
+  expected:
+    diagnostics_enabled: true
+    diagnostic_output_expected: true
+    selected_model: PENNY_SHAPED
+    physically_validated: false
+    legacy_equivalent: false
+    runtime_physical_dispatch_enabled: false
+    buz29_execution_allowed: false
+    penny_adapter_called_by_diagnostic: false
+
+case:
+  id: diagnostic_enabled_penny_pre_runner
+
+lot:
+  fracture:
+    fracture_model: PENNY_SHAPED
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: diagnostic_only
+      dispatch_runtime_enabled: false

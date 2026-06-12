@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">158/165</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">159/166</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">359</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">756</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">768</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8423,6 +8423,16 @@ BUZ29_EXECUTION_BLOCKED
 <code>diagnostic_fracture_gate.json</code> sem alterar <code>result.json</code>, <code>timeseries.csv</code>,
 <code>PknModel</code> ou <code>PknRunner</code>. A execucao fisica de modelos nao-PKN e a rota
 BUZ29-PENNY continuam como trabalho futuro bloqueado.</p>
+<h2 id="fase-1110z-fixtures-do-diagnostic-pre-runner">Fase 11.10Z — fixtures do diagnostic pre-runner</h2>
+<p>Status registrado:</p>
+<pre><code class="language-text">PHASE11_10Z_DIAGNOSTIC_PRE_RUNNER_FIXTURES_DEFINED
+DIAGNOSTIC_PRE_RUNNER_FIXTURES_VALID
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+</code></pre>
+<p>A fase cria fixtures de contrato para exercitar o diagnostico pre-runner sem
+habilitar dispatch fisico. A proxima etapa pode validar casos controlados com o
+diagnostico habilitado, mantendo o resultado PKN fisico separado.</p>
 </div>
 </section>
 

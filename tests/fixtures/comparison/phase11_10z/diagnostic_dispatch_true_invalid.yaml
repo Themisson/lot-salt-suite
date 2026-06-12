@@ -1,0 +1,22 @@
+# Phase 11.10Z fixture.
+# dispatch_runtime_enabled=true is explicitly invalid in this phase.
+fixture:
+  id: diagnostic_dispatch_true_invalid
+  phase: "11.10Z"
+  scenario: dispatch_true_invalid
+  expected:
+    validation_status: rejected
+    rejection_reason: dispatch_runtime_enabled_true_forbidden
+    runtime_physical_dispatch_enabled: false
+    buz29_execution_allowed: false
+
+case:
+  id: diagnostic_dispatch_true_invalid
+
+lot:
+  fracture:
+    fracture_model: PKN
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: pre_runner
+      dispatch_runtime_enabled: true

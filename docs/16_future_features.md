@@ -832,3 +832,18 @@ A fase implementa um diagnostico pre-runner opt-in que grava
 `diagnostic_fracture_gate.json` sem alterar `result.json`, `timeseries.csv`,
 `PknModel` ou `PknRunner`. A execucao fisica de modelos nao-PKN e a rota
 BUZ29-PENNY continuam como trabalho futuro bloqueado.
+
+## Fase 11.10Z — fixtures do diagnostic pre-runner
+
+Status registrado:
+
+```text
+PHASE11_10Z_DIAGNOSTIC_PRE_RUNNER_FIXTURES_DEFINED
+DIAGNOSTIC_PRE_RUNNER_FIXTURES_VALID
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+```
+
+A fase cria fixtures de contrato para exercitar o diagnostico pre-runner sem
+habilitar dispatch fisico. A proxima etapa pode validar casos controlados com o
+diagnostico habilitado, mantendo o resultado PKN fisico separado.

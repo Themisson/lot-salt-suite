@@ -1,0 +1,20 @@
+# Phase 11.10Z fixture.
+# Diagnostic pre-runner disabled by default.
+fixture:
+  id: diagnostic_disabled_default
+  phase: "11.10Z"
+  scenario: default_disabled
+  expected:
+    diagnostics_enabled: false
+    diagnostic_output_expected: false
+    selected_model: PKN
+    pkn_result_preserved: true
+    runtime_physical_dispatch_enabled: false
+    buz29_execution_allowed: false
+
+case:
+  id: diagnostic_disabled_default
+
+lot:
+  fracture:
+    fracture_model: PKN
