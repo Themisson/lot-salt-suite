@@ -770,3 +770,10 @@ RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
 ```
 
 Nenhum adapter penny-shaped e chamado como runtime fisico.
+
+## Fase 11.11B — regressao PKN com diagnostico opt-in
+
+A Fase 11.11B reforca que o diagnostico pre-runner nao altera o comportamento
+PKN fisico. Para a trilha nao-PKN, o resultado e conservador: `PENNY_SHAPED`
+continua `diagnostic_only`, BUZ29-PENNY permanece bloqueado e nenhum adapter
+penny-shaped e chamado como runtime fisico.

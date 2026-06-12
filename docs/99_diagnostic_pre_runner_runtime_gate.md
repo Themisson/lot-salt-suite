@@ -125,3 +125,10 @@ A 11.11A confirma, a partir das fixtures da 11.10Z, que o diagnostico pre-runner
 e opt-in, que o default disabled permanece valido, que erros esperados sao
 rejeitados e que sigma_theta inicial ausente bloqueia o gate em vez de executar
 fratura.
+
+## Atualizacao 11.11B — regressao PKN disabled/enabled
+
+A 11.11B confirma que habilitar `fracture_gate_diagnostics` em copia temporaria
+dos casos LOT-PKN protegidos nao altera `result.json` nem `timeseries.csv`. O
+diagnostico continua isolado em `diagnostic_fracture_gate.json`, sem liberar
+dispatch fisico.

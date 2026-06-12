@@ -861,3 +861,20 @@ BUZ29_EXECUTION_BLOCKED
 
 A fase valida o contrato das fixtures sem comparar ainda os outputs fisicos PKN
 em profundidade. Essa comparacao fica para a 11.11B.
+
+## Fase 11.11B — comparacao PKN com diagnostico opt-in
+
+Status registrado:
+
+```text
+PHASE11_11B_PKN_OUTPUTS_COMPARED_WITH_DIAGNOSTICS
+PKN_OUTPUTS_UNCHANGED_WITH_DIAGNOSTICS
+DIAGNOSTIC_OUTPUT_ISOLATED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+```
+
+A fase compara `result.json` e `timeseries.csv` com diagnostico disabled/enabled
+e confirma que o diagnostico pre-runner nao muda os outputs fisicos PKN. A
+integracao segue limitada a diagnostico opt-in; dispatch fisico continua
+bloqueado.

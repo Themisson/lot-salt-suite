@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11A diagnostic pre-runner controlled validation
+Fase ativa  : 11.11B PKN diagnostic pre-runner regression comparison
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 359/359 esperados apos Fase 11.10Y em 2026-06-12
-Testes Py   : 781/781 esperados apos Fase 11.11A em 2026-06-12
+Testes Py   : 787/787 esperados apos Fase 11.11B em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -56,6 +56,42 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ## Entradas de sessão
 
 ---
+
+### [2026-06-12] Fase 11.11B — PKN diagnostic disabled/enabled comparison — Codex
+
+**Status:** Implementado; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Objetivo:** provar que habilitar o diagnostico pre-runner de forma opt-in nao
+altera `result.json` nem `timeseries.csv` dos casos LOT-PKN protegidos.
+
+**Ferramenta criada:**
+
+```text
+tools/compare_phase11_11b_pkn_outputs_with_diagnostics.py
+```
+
+**Documento criado:**
+
+```text
+docs/102_pkn_diagnostic_pre_runner_regression_comparison.md
+```
+
+**Status registrado:**
+
+```text
+PHASE11_11B_PKN_OUTPUTS_COMPARED_WITH_DIAGNOSTICS
+PKN_OUTPUTS_UNCHANGED_WITH_DIAGNOSTICS
+DIAGNOSTIC_OUTPUT_ISOLATED
+RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE11_11C_DECIDE_RUNTIME_WIRING_INTEGRATION_READINESS
+```
 
 ### [2026-06-12] Fase 11.11A — diagnostic pre-runner controlled validation — Codex
 

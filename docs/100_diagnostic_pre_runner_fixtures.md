@@ -91,3 +91,10 @@ BUZ29_EXECUTION_BLOCKED
 
 Essa validacao ainda nao compara os outputs fisicos PKN em profundidade; isso
 fica reservado para a 11.11B.
+
+## Atualizacao 11.11B — comparacao disabled/enabled
+
+A Fase 11.11B executa os casos LOT-PKN protegidos em copias temporarias com o
+diagnostico desabilitado e habilitado. A comparacao exige `result.json` e
+`timeseries.csv` identicos, e confirma que `diagnostic_fracture_gate.json`
+aparece apenas no run opt-in habilitado.

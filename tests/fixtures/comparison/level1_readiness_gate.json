@@ -3304,6 +3304,35 @@
       "It does not compare physical PKN outputs in depth; Phase 11.11B does that."
     ]
   },
+  "phase11_11b_pkn_diagnostic_regression_comparison": {
+    "status": "PHASE11_11B_PKN_OUTPUTS_COMPARED_WITH_DIAGNOSTICS",
+    "phase": "11.11B",
+    "comparison_status": "PKN_OUTPUTS_UNCHANGED_WITH_DIAGNOSTICS",
+    "physical_outputs_identical": true,
+    "diagnostic_output_isolated": true,
+    "pkn_behavior_changed": false,
+    "runtime_physical_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "compared_physical_outputs": [
+      "result.json",
+      "timeseries.csv"
+    ],
+    "diagnostic_output": "diagnostic_fracture_gate.json",
+    "required_statuses": [
+      "PHASE11_11B_PKN_OUTPUTS_COMPARED_WITH_DIAGNOSTICS",
+      "PKN_OUTPUTS_UNCHANGED_WITH_DIAGNOSTICS",
+      "DIAGNOSTIC_OUTPUT_ISOLATED",
+      "RUNTIME_PHYSICAL_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED"
+    ],
+    "recommended_next_phase": "PHASE11_11C_DECIDE_RUNTIME_WIRING_INTEGRATION_READINESS",
+    "caveats": [
+      "Phase 11.11B compares protected PKN cases with diagnostics disabled and enabled in temporary copies.",
+      "It proves no change in result.json or timeseries.csv for the compared cases.",
+      "It does not enable physical dispatch.",
+      "It does not execute BUZ29-PENNY."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
