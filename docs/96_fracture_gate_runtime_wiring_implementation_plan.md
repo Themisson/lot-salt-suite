@@ -189,3 +189,26 @@ RUNTIME_EXECUTION_STILL_BLOCKED
 BUZ29_EXECUTION_STILL_BLOCKED
 PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
 ```
+
+## Fase 11.10W — implementacao realizada
+
+A Fase 11.10W implementa o helper isolado planejado neste documento:
+
+```text
+include/lot/FractureGateRuntimeWiring.hpp
+src/lot/FractureGateRuntimeWiring.cpp
+tests/cpp/test_fracture_gate_runtime_wiring.cpp
+```
+
+O status registrado passa a ser:
+
+```text
+PHASE11_10W_FRACTURE_GATE_RUNTIME_WIRING_IMPLEMENTED
+FRACTURE_GATE_RUNTIME_WIRING_IMPLEMENTED
+RUNTIME_EXECUTION_NOT_ENABLED
+PKN_MODEL_NOT_CALLED
+PENNY_ADAPTER_NOT_CALLED
+BUZ29_EXECUTION_BLOCKED
+```
+
+A implementacao retorna elegibilidade de dispatch, nao execucao fisica.

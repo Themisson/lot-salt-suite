@@ -699,3 +699,16 @@ PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
 A trilha nao-PKN continua segura: `PENNY_SHAPED` pode ser marcado futuramente
 como `PennyDiagnosticEligible`, mas isso nao significa execucao fisica nem
 validacao BUZ29-PENNY.
+
+## Fase 11.10W — FractureGateRuntimeWiring
+
+A Fase 11.10W implementa o helper isolado de wiring. Para a trilha nao-PKN, a
+mudanca importante e que `PENNY_SHAPED` pode receber o status:
+
+```text
+FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE
+```
+
+Esse status nao executa BUZ29-PENNY, nao chama o adapter penny-shaped e nao
+declara validacao fisica. A proxima decisao continua sendo um gate explicito
+de integracao runtime.

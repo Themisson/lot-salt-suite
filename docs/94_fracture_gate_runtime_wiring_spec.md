@@ -82,6 +82,26 @@ BUZ29_EXECUTION_STILL_BLOCKED
 PKN_BEHAVIOR_CHANGE_NOT_ALLOWED
 ```
 
+## Fase 11.10W — wiring isolado implementado
+
+A Fase 11.10W implementa a especificacao como helper isolado
+`FractureGateRuntimeWiring`.
+
+O helper produz:
+
+```text
+fracture_gate_status
+fracture_dispatch_status
+selected_fracture_model
+fracture_initiated
+fracture_margin_Pa
+blocking_reasons
+```
+
+Ele nao chama `PknModel`, `PknRunner`, `PennyShapedDiagnosticAdapter` ou
+`PennyShapedDiagnosticWriter`. Assim, a especificacao de runtime continua
+separada da execucao fisica.
+
 ## Estados do fracture gate
 
 Estados minimos especificados:

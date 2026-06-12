@@ -3158,6 +3158,37 @@
       "No physical validation or legacy equivalence is claimed."
     ]
   },
+  "phase11_10w_fracture_gate_runtime_wiring": {
+    "status": "PHASE11_10W_FRACTURE_GATE_RUNTIME_WIRING_IMPLEMENTED",
+    "phase": "11.10W",
+    "implementation_status": "FRACTURE_GATE_RUNTIME_WIRING_IMPLEMENTED",
+    "runtime_wiring_component_created": true,
+    "runtime_execution_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_model_called": false,
+    "pkn_runner_called": false,
+    "penny_adapter_called": false,
+    "penny_writer_called": false,
+    "fixtures_covered": true,
+    "scenario_count": 7,
+    "required_statuses": [
+      "PHASE11_10W_FRACTURE_GATE_RUNTIME_WIRING_IMPLEMENTED",
+      "FRACTURE_GATE_RUNTIME_WIRING_IMPLEMENTED",
+      "RUNTIME_EXECUTION_NOT_ENABLED",
+      "PKN_MODEL_NOT_CALLED",
+      "PENNY_ADAPTER_NOT_CALLED",
+      "BUZ29_EXECUTION_BLOCKED"
+    ],
+    "recommended_next_phase": "PHASE11_10X_SPECIFY_RUNTIME_INTEGRATION_GATE",
+    "caveats": [
+      "Phase 11.10W implements an isolated C++ wiring helper only.",
+      "The helper returns dispatch eligibility, not physical model execution.",
+      "PKN eligibility does not call PknModel or PknRunner.",
+      "PENNY_SHAPED diagnostic eligibility does not call PennyShapedDiagnosticAdapter.",
+      "BUZ29-PENNY is not executed.",
+      "Parser, schema, CLI and lot-pkn runtime remain unchanged."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

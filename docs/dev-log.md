@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10V fracture gate runtime wiring implementation plan
+Fase ativa  : 11.10W FractureGateRuntimeWiring implementation
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : 335/335 esperados apos Fase 11.10V em 2026-06-12
-Testes Py   : 723/723 esperados apos Fase 11.10V em 2026-06-12
+Testes C++  : 347/347 esperados apos Fase 11.10W em 2026-06-12
+Testes Py   : 733/733 esperados apos Fase 11.10W em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,52 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10W — implementar FractureGateRuntimeWiring — Codex
+
+**Status:** Concluido; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Arquivos C++ criados:**
+
+```text
+include/lot/FractureGateRuntimeWiring.hpp
+src/lot/FractureGateRuntimeWiring.cpp
+tests/cpp/test_fracture_gate_runtime_wiring.cpp
+```
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase11_10w_fracture_gate_runtime_wiring.py
+```
+
+**Documento criado:**
+
+```text
+docs/97_fracture_gate_runtime_wiring_implementation.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10W_FRACTURE_GATE_RUNTIME_WIRING_IMPLEMENTED
+FRACTURE_GATE_RUNTIME_WIRING_IMPLEMENTED
+RUNTIME_EXECUTION_NOT_ENABLED
+PKN_MODEL_NOT_CALLED
+PENNY_ADAPTER_NOT_CALLED
+BUZ29_EXECUTION_BLOCKED
+```
+
+**Interpretacao:** a fase implementa um helper C++ isolado que compoe
+`FractureModelSelector`, `SigmaThetaInitialStateGuard` e
+`PressureSigmaThetaFractureCriterionGuard` para retornar apenas status de gate
+e elegibilidade de dispatch. `PknEligible` nao chama `PknModel`;
+`PennyDiagnosticEligible` nao chama `PennyShapedDiagnosticAdapter`.
+Parser/schema, CLI, `lot-pkn` e BUZ29-PENNY permanecem inalterados. A proxima
+fase recomendada e `PHASE11_10X_SPECIFY_RUNTIME_INTEGRATION_GATE`.
 
 ---
 

@@ -145,3 +145,17 @@ O plano de implementacao esta registrado em:
 ```text
 docs/96_fracture_gate_runtime_wiring_implementation_plan.md
 ```
+
+## Fase 11.10W — fixtures consumidas em C++
+
+A Fase 11.10W cobre os sete cenarios sinteticos em testes Catch2 do helper
+isolado `FractureGateRuntimeWiring`.
+
+O resultado continua sem execucao fisica:
+
+```text
+RUNTIME_EXECUTION_NOT_ENABLED
+PKN_MODEL_NOT_CALLED
+PENNY_ADAPTER_NOT_CALLED
+BUZ29_EXECUTION_BLOCKED
+```

@@ -781,3 +781,20 @@ A 11.10V autoriza apenas a proxima implementacao isolada do helper
 `FractureGateRuntimeWiring`. Ela nao libera execucao runtime, nao altera
 `lot-pkn`, nao chama `PknModel` ou `PennyShapedDiagnosticAdapter` e nao executa
 BUZ29-PENNY.
+
+## Fase 11.10W — FractureGateRuntimeWiring implementado
+
+Status registrado:
+
+```text
+PHASE11_10W_FRACTURE_GATE_RUNTIME_WIRING_IMPLEMENTED
+FRACTURE_GATE_RUNTIME_WIRING_IMPLEMENTED
+RUNTIME_EXECUTION_NOT_ENABLED
+PKN_MODEL_NOT_CALLED
+PENNY_ADAPTER_NOT_CALLED
+BUZ29_EXECUTION_BLOCKED
+```
+
+O helper C++ isolado esta disponivel para testes de gate/dispatch, mas ainda
+nao e conectado ao runtime real. A proxima fase deve especificar o gate de
+integracao antes de qualquer mudanca em `lot-pkn` ou execucao BUZ29-PENNY.
