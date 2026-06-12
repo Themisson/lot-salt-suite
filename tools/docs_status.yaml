@@ -161,6 +161,7 @@ phases:
   phase_11_10l_fracture_model_parser_schema_integration: completed
   phase_11_10m_fracture_model_parser_schema_integration: completed
   phase_11_10n_fracture_gate_initial_sigmatheta: completed
+  phase_11_10o_sigmatheta_initial_state_wiring: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -248,6 +249,7 @@ docs:
   stage11_10l_fracture_model_parser_schema_integration: implemented
   stage11_10m_fracture_model_parser_schema_integration: implemented
   stage11_10n_fracture_gate_initial_sigmatheta: implemented
+  stage11_10o_sigmatheta_initial_state_wiring: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -313,12 +315,12 @@ validation:
 test_counts:
   cpp_tests: 306        # Catch2 lot-salt-suite — 306/306 esperados apos Fase 11.10M (2026-06-12)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 607     # pytest lot-salt-suite — 607/607 esperados apos Fase 11.10N (2026-06-12)
+  python_tests: 620     # pytest lot-salt-suite — 620/620 esperados apos Fase 11.10O (2026-06-12)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-12"
-updated_by: "codex (Fase 11.10N fracture gate initial sigma-theta audit)"
+updated_by: "codex (Fase 11.10O sigma-theta initial-state wiring specification)"
 project_version: "0.1.0"

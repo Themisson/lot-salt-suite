@@ -175,3 +175,22 @@ PHASE11_10O_SPECIFY_SIGMATHETA_INITIAL_STATE_WIRING
 A próxima fase deve especificar a fronteira mínima para fornecer
 `sigma_theta_initial_after_drilling` ao critério de fratura, sem ainda executar
 BUZ29-PENNY e sem alterar o comportamento default de `lot-pkn`.
+
+## Encaminhamento 11.10O
+
+A Fase 11.10O atende a recomendação acima como especificação, não como
+implementação:
+
+```text
+PHASE11_10O_SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED
+SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED
+ELASTIC_INITIAL_WELLBORE_STATE_SELECTED_AS_PREFERRED_SOURCE
+FRACTURE_GATE_BLOCKED_UNTIL_SIGMATHETA_INITIALIZED
+PRESSURE_SIGMATHETA_COMPATIBILITY_REQUIRED
+DISPATCH_REMAINS_BLOCKED
+```
+
+O contrato futuro exige que `sigma_theta_initial_compression_positive_Pa`
+represente o estado pós-perfuração e pré-LOT. A próxima fase permitida é
+implementar um guard de wiring; dispatch físico, runtime BUZ29-PENNY e
+equivalência legada continuam bloqueados.

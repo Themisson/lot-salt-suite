@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">147/154</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">148/155</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">306</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">607</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">620</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8305,7 +8305,15 @@ unidades reais usadas no <code>LOT_APB_v5</code> antes de aceitar nomes ou dimen
   sigma-theta diagnóstico, mas ainda não prova um
   <code>sigma_theta_initial_after_drilling</code> calculado antes do gate. A próxima fase
   deve especificar esse wiring inicial antes de qualquer execução BUZ29-PENNY
-  ou dispatch físico por <code>fracture_model</code>.</p>
+  ou dispatch físico por <code>fracture_model</code>.
+- A Fase 11.10O especifica o wiring futuro do estado inicial
+  <code>sigma_theta_compression_positive_Pa</code>. A fonte preferencial passa a ser
+  <code>ELASTIC_INITIAL_WELLBORE_STATE</code>, representando o estado geomecânico
+  pós-perfuração e pré-LOT. O status é
+  <code>SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED</code>, com
+  <code>implementation_allowed_next = true</code>, mas <code>dispatch_allowed_next = false</code>:
+  a próxima etapa pode implementar o guard de wiring, não executar BUZ29-PENNY
+  nem liberar dispatch físico.</p>
 </div>
 </section>
 

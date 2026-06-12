@@ -330,3 +330,21 @@ Assim, `fracture_model` continua sendo uma seleção/metadata no parser/schema.
 Nenhum dispatch físico de `PKN` ou `PENNY_SHAPED` deve ser ligado enquanto o
 estado inicial `sigma_theta` pós-perfuração não estiver especificado e
 semanticamente alinhado com a pressão usada no gate.
+
+## Especificação 11.10O — wiring do estado inicial
+
+A Fase 11.10O especifica o contrato que deverá preceder qualquer dispatch:
+
+```text
+SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED
+ELASTIC_INITIAL_WELLBORE_STATE_SELECTED_AS_PREFERRED_SOURCE
+FRACTURE_GATE_BLOCKED_UNTIL_SIGMATHETA_INITIALIZED
+PRESSURE_SIGMATHETA_COMPATIBILITY_REQUIRED
+DISPATCH_REMAINS_BLOCKED
+```
+
+O seletor unificado continua válido como seleção sintática, mas não se torna
+execução. A próxima fase pode implementar o guard que verifica
+`sigma_theta_initialized`, `sigma_theta_initial_state_valid`,
+`sigma_theta_reference_frame` e `sigma_theta_sign_convention`; não pode ainda
+executar BUZ29-PENNY ou declarar equivalência física.

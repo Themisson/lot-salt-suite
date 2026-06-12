@@ -673,3 +673,11 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `sigma_theta_initial_after_drilling` calculado antes do gate. A próxima fase
   deve especificar esse wiring inicial antes de qualquer execução BUZ29-PENNY
   ou dispatch físico por `fracture_model`.
+- A Fase 11.10O especifica o wiring futuro do estado inicial
+  `sigma_theta_compression_positive_Pa`. A fonte preferencial passa a ser
+  `ELASTIC_INITIAL_WELLBORE_STATE`, representando o estado geomecânico
+  pós-perfuração e pré-LOT. O status é
+  `SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED`, com
+  `implementation_allowed_next = true`, mas `dispatch_allowed_next = false`:
+  a próxima etapa pode implementar o guard de wiring, não executar BUZ29-PENNY
+  nem liberar dispatch físico.

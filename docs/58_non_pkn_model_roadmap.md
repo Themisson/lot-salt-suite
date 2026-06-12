@@ -535,6 +535,27 @@ não pode virar execução. As rotas atuais consomem `sigma_theta_static`,
 gate. A próxima fase recomendada é
 `PHASE11_10O_SPECIFY_SIGMATHETA_INITIAL_STATE_WIRING`.
 
+## Fase 11.10O — especificação do wiring sigma-theta inicial
+
+A Fase 11.10O especifica, sem implementar runtime, o contrato futuro para
+conectar `sigma_theta_initial_compression_positive_Pa` ao
+`fracture_initiation_gate`:
+
+```text
+PHASE11_10O_SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED
+SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED
+ELASTIC_INITIAL_WELLBORE_STATE_SELECTED_AS_PREFERRED_SOURCE
+FRACTURE_GATE_BLOCKED_UNTIL_SIGMATHETA_INITIALIZED
+PRESSURE_SIGMATHETA_COMPATIBILITY_REQUIRED
+DISPATCH_REMAINS_BLOCKED
+```
+
+A fonte preferencial futura é o estado elástico/geomecânico inicial da parede
+do poço após perfuração e antes do LOT, não um valor arbitrário de YAML.
+`implementation_allowed_next = true` apenas para implementar o guard de wiring
+na próxima fase. `PENNY_SHAPED`, BUZ29-PENNY e dispatch físico continuam
+bloqueados.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

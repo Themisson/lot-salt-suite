@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10N fracture gate initial sigma-theta audit
+Fase ativa  : 11.10O sigma-theta initial-state wiring specification
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 306/306 esperados apos Fase 11.10M em 2026-06-12
-Testes Py   : 607/607 esperados apos Fase 11.10N em 2026-06-12
+Testes Py   : 620/620 esperados apos Fase 11.10O em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,45 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10O — especificação do wiring sigma-theta inicial — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/spec_phase11_10o_sigmatheta_initial_state_wiring.py
+```
+
+**Documento criado:**
+
+```text
+docs/89_sigmatheta_initial_state_wiring_spec.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10O_SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED
+SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED
+ELASTIC_INITIAL_WELLBORE_STATE_SELECTED_AS_PREFERRED_SOURCE
+FRACTURE_GATE_BLOCKED_UNTIL_SIGMATHETA_INITIALIZED
+PRESSURE_SIGMATHETA_COMPATIBILITY_REQUIRED
+DISPATCH_REMAINS_BLOCKED
+```
+
+**Interpretação:** a fase não implementa wiring, não altera C++/parser/schema
+e não executa BUZ29-PENNY. Ela especifica o contrato futuro para
+`sigma_theta_initial_compression_positive_Pa`, incluindo fonte preferencial
+`ELASTIC_INITIAL_WELLBORE_STATE`, campos obrigatórios, regras de bloqueio do
+gate, matriz pressão × sigma-theta e convenção `COMPRESSION_POSITIVE`.
+`implementation_allowed_next = true` apenas para
+`PHASE11_10P_IMPLEMENT_SIGMATHETA_INITIAL_STATE_WIRING_GUARD`;
+`dispatch_allowed_next` e `runtime_execution_allowed_next` permanecem falsos.
 
 ---
 

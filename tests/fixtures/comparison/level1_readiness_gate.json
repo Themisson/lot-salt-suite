@@ -2811,6 +2811,54 @@
       "BUZ29-PENNY is not executed."
     ]
   },
+  "phase11_10o_sigmatheta_initial_state_wiring": {
+    "status": "PHASE11_10O_SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED",
+    "phase": "11.10O",
+    "wiring_spec_status": "SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED",
+    "preferred_source": "ELASTIC_INITIAL_WELLBORE_STATE",
+    "fracture_gate_status": "FRACTURE_GATE_BLOCKED_UNTIL_SIGMATHETA_INITIALIZED",
+    "pressure_semantics": "PRESSURE_SIGMATHETA_COMPATIBILITY_REQUIRED",
+    "sign_convention": "COMPRESSION_POSITIVE",
+    "t0_lot_vs_drilling_distinction": true,
+    "dispatch_allowed_next": false,
+    "runtime_execution_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "implementation_allowed_next": true,
+    "tool": "tools/spec_phase11_10o_sigmatheta_initial_state_wiring.py",
+    "document": "docs/89_sigmatheta_initial_state_wiring_spec.md",
+    "required_fields": [
+      "sigma_theta_initial_compression_positive_Pa",
+      "sigma_theta_current_compression_positive_Pa",
+      "sigma_theta_source",
+      "sigma_theta_state_time",
+      "sigma_theta_initialized",
+      "sigma_theta_initial_state_valid",
+      "sigma_theta_sign_convention",
+      "sigma_theta_reference_frame"
+    ],
+    "required_statuses": [
+      "PHASE11_10O_SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED",
+      "SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED",
+      "ELASTIC_INITIAL_WELLBORE_STATE_SELECTED_AS_PREFERRED_SOURCE",
+      "FRACTURE_GATE_BLOCKED_UNTIL_SIGMATHETA_INITIALIZED",
+      "PRESSURE_SIGMATHETA_COMPATIBILITY_REQUIRED",
+      "DISPATCH_REMAINS_BLOCKED"
+    ],
+    "gate_rules": [
+      "Do not evaluate fracture if sigma_theta_initialized is false.",
+      "Do not evaluate fracture if sigma_theta_initial_state_valid is false.",
+      "Do not compare absolute pressure with incremental sigma-theta.",
+      "Do not compare pressure increment with total-stress sigma-theta.",
+      "Do not evaluate fracture if sigma_theta_sign_convention is UNKNOWN."
+    ],
+    "recommended_next_phase": "PHASE11_10P_IMPLEMENT_SIGMATHETA_INITIAL_STATE_WIRING_GUARD",
+    "caveats": [
+      "Phase 11.10O is specification only.",
+      "No C++, parser, schema, runtime or protected case is changed.",
+      "Implementation is allowed next only for the wiring guard, not for physical dispatch.",
+      "BUZ29-PENNY is not executed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

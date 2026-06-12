@@ -217,3 +217,22 @@ O motivo é que o runtime `lot-pkn` já consegue consumir sigma-theta por rota
 diagnóstica, mas ainda não comprova um estado inicial tangencial
 pós-perfuração antes do gate. A próxima fase segura é
 `PHASE11_10O_SPECIFY_SIGMATHETA_INITIAL_STATE_WIRING`.
+
+## Resultado da especificação 11.10O
+
+A Fase 11.10O não altera parser/schema, mas define o contrato que uma fase
+futura deverá implementar antes de qualquer dispatch:
+
+```text
+wiring_spec_status = SIGMATHETA_INITIAL_STATE_WIRING_SPECIFIED
+preferred_source = ELASTIC_INITIAL_WELLBORE_STATE
+dispatch_allowed_next = false
+runtime_execution_allowed_next = false
+implementation_allowed_next = true
+recommended_next_phase = PHASE11_10P_IMPLEMENT_SIGMATHETA_INITIAL_STATE_WIRING_GUARD
+```
+
+O parser/schema pode continuar armazenando `fracture_model`, mas a execução
+continua bloqueada até que o guard valide o estado inicial
+`AFTER_DRILLING_BEFORE_LOT`, a convenção `COMPRESSION_POSITIVE` e a
+compatibilidade entre pressão e referencial de `sigma_theta`.
