@@ -231,3 +231,24 @@ O guard deve bloquear dispatch quando `sigma_theta_guard_status` nao for
 `SIGMATHETA_INITIAL_STATE_READY`. Mesmo quando o guard estiver pronto, a fase
 mantem `dispatch_allowed_next = false` porque o criterio pressao x
 `sigma_theta` e a convencao de sinal associada ainda precisam ser especificados.
+## Atualização 11.10R — uso futuro do estado inicial
+
+A 11.10R mantém `sigma_theta_initial_compression_positive_Pa` como
+pré-condição do gate, mas não como critério corrente completo. O critério
+preferencial futuro deve usar:
+
+```text
+sigma_theta_current_compression_positive_Pa
+```
+
+Se somente o estado inicial estiver disponível, uma fase futura precisa definir
+explicitamente:
+
+```text
+sigma_theta_current_compression_positive_Pa =
+    sigma_theta_initial_compression_positive_Pa
+  + sigma_theta_increment_due_to_lot_Pa
+```
+
+Essa combinação só pode ocorrer se todos os termos estiverem no mesmo
+referencial total/efetivo e com convenção compression-positive.

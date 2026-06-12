@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10Q fracture gate dispatch with sigma-theta guard specification
+Fase ativa  : 11.10R pressure x sigma-theta fracture criterion specification
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 321/321 esperados apos Fase 11.10P em 2026-06-12
-Testes Py   : 646/646 esperados apos Fase 11.10Q em 2026-06-12
+Testes Py   : 667/667 esperados apos Fase 11.10R em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,45 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10R — especificacao do criterio pressao x sigma-theta — Codex
+
+**Status:** Concluido; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Ferramenta criada:**
+
+```text
+tools/spec_phase11_10r_pressure_sigmatheta_fracture_criterion.py
+```
+
+**Documento criado:**
+
+```text
+docs/92_pressure_sigmatheta_fracture_criterion_spec.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10R_PRESSURE_SIGMATHETA_FRACTURE_CRITERION_SPECIFIED
+PRESSURE_SIGMATHETA_FRACTURE_CRITERION_SPECIFIED
+SIGMATHETA_COMPRESSION_POSITIVE_SIGN_CONVENTION_RESOLVED
+PRESSURE_GREATER_THAN_SIGMATHETA_SHORTCUT_FORBIDDEN
+DISPATCH_REMAINS_BLOCKED_UNTIL_CRITERION_GUARD_IMPLEMENTED
+```
+
+**Interpretação:** a fase especifica a algebra futura para o
+`fracture_initiation_gate` com `sigma_theta` em convencao
+compression-positive. O criterio preferencial e
+`sigma_theta_current_compression_positive_Pa <= -tensile_strength_Pa`; a forma
+alternativa por threshold exige `fracture_threshold_pressure_Pa` derivada de
+`sigma_theta`, resistencia a tracao e referencial explicito. A fase nao altera
+C++, parser/schema, `PknModel`, `PknRunner`, CLI ou `lot-pkn`, e nao executa
+BUZ29-PENNY. A proxima fase recomendada e
+`PHASE11_10S_IMPLEMENT_PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD`.
 
 ---
 

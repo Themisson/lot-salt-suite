@@ -2929,6 +2929,43 @@
       "BUZ29-PENNY is not executed."
     ]
   },
+  "phase11_10r_pressure_sigmatheta_fracture_criterion": {
+    "status": "PHASE11_10R_PRESSURE_SIGMATHETA_FRACTURE_CRITERION_SPECIFIED",
+    "phase": "11.10R",
+    "criterion_spec_status": "PRESSURE_SIGMATHETA_FRACTURE_CRITERION_SPECIFIED",
+    "sigma_theta_sign_convention": "COMPRESSION_POSITIVE",
+    "pressure_semantics_required": true,
+    "guard_required": true,
+    "forbidden_shortcut": "pressure_greater_than_sigma_theta_without_sign_reference_transform",
+    "preferred_criterion": "sigma_theta_current_compression_positive_Pa <= -tensile_strength_Pa",
+    "alternative_threshold_form": "fracture_margin_Pa = wellbore_pressure_Pa - fracture_threshold_pressure_Pa",
+    "dispatch_allowed_next": false,
+    "runtime_execution_allowed_next": false,
+    "implementation_allowed_next": true,
+    "criterion_states": [
+      "FRACTURE_CRITERION_BLOCKED_SIGMATHETA_GUARD_NOT_READY",
+      "FRACTURE_CRITERION_BLOCKED_PRESSURE_SEMANTICS_UNKNOWN",
+      "FRACTURE_CRITERION_BLOCKED_SIGN_CONVENTION_UNKNOWN",
+      "FRACTURE_CRITERION_BLOCKED_REFERENCE_FRAME_MISMATCH",
+      "FRACTURE_CRITERION_READY",
+      "FRACTURE_NOT_INITIATED",
+      "FRACTURE_INITIATED"
+    ],
+    "required_statuses": [
+      "PHASE11_10R_PRESSURE_SIGMATHETA_FRACTURE_CRITERION_SPECIFIED",
+      "PRESSURE_SIGMATHETA_FRACTURE_CRITERION_SPECIFIED",
+      "SIGMATHETA_COMPRESSION_POSITIVE_SIGN_CONVENTION_RESOLVED",
+      "PRESSURE_GREATER_THAN_SIGMATHETA_SHORTCUT_FORBIDDEN",
+      "DISPATCH_REMAINS_BLOCKED_UNTIL_CRITERION_GUARD_IMPLEMENTED"
+    ],
+    "recommended_next_phase": "PHASE11_10S_IMPLEMENT_PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD",
+    "caveats": [
+      "Phase 11.10R is specification only.",
+      "No C++, parser, schema, CLI or runtime dispatch is changed.",
+      "pressure > sigma_theta_compression_positive_Pa remains forbidden as a final physical criterion without sign and reference-frame transform.",
+      "BUZ29-PENNY is not executed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

@@ -229,3 +229,22 @@ FRACTURE_MODEL_DISPATCH_NOT_ALLOWED
 
 Como o criterio pressao x sigma-theta ainda nao esta especificado, o dispatch
 permanece bloqueado.
+## Atualização 11.10R — critério algébrico especificado
+
+A 11.10R especifica como o estado sigma-theta auditado deve ser usado em fase
+futura. Com `sigma_theta_compression_positive_Pa`, compressão é positiva e
+tração é negativa. Assim, a condição de tração deve ser escrita como:
+
+```text
+tensile_condition_Pa = -sigma_theta_current_compression_positive_Pa
+tensile_condition_Pa >= tensile_strength_Pa
+```
+
+ou, de forma equivalente:
+
+```text
+sigma_theta_current_compression_positive_Pa <= -tensile_strength_Pa
+```
+
+O gate continua bloqueando dispatch se pressão, sinal ou referencial forem
+desconhecidos.

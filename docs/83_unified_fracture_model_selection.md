@@ -362,3 +362,17 @@ Assim, `FRACTURE_MODEL_SELECTOR_REQUIRED_BEFORE_DISPATCH` e
 `SIGMATHETA_GUARD_REQUIRED_BEFORE_DISPATCH` passam a ser gates formais. O
 dispatch segue bloqueado ate a especificacao do criterio pressao x
 `sigma_theta` na proxima fase.
+## Fase 11.10R — critério do gate após seleção do modelo
+
+Após `FractureModelSelector` e `SigmaThetaInitialStateGuard`, o próximo bloco
+do `fracture_initiation_gate` deve avaliar um critério pressão x sigma-theta
+com sinal explícito. A 11.10R define:
+
+```text
+preferred_criterion =
+  sigma_theta_current_compression_positive_Pa <= -tensile_strength_Pa
+```
+
+A forma alternativa por pressão crítica só é aceitável se
+`fracture_threshold_pressure_Pa` for derivada de `sigma_theta`, resistência à
+tração e referencial conhecido. O dispatch de modelo permanece bloqueado.

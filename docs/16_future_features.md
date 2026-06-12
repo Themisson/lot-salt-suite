@@ -691,3 +691,15 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   sigma_theta -> dispatch`. O dispatch permanece bloqueado. A próxima fase
   deve especificar o critério pressão x sigma-theta e a convenção de sinal
   associada antes de qualquer runtime físico.
+## Fase 11.10R — guard futuro do critério pressão x sigma-theta
+
+A próxima implementação recomendada é:
+
+```text
+PHASE11_10S_IMPLEMENT_PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD
+```
+
+Esse guard deve implementar apenas a validação algébrica especificada na
+11.10R, preservando `lot-pkn`, parser/schema e dispatch runtime bloqueados até
+que os testes provem semântica de pressão, sinal compression-positive e
+referencial compatível.

@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">150/157</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">151/158</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">321</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">646</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">667</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8324,6 +8324,14 @@ unidades reais usadas no <code>LOT_APB_v5</code> antes de aceitar nomes ou dimen
   sigma_theta -&gt; dispatch</code>. O dispatch permanece bloqueado. A próxima fase
   deve especificar o critério pressão x sigma-theta e a convenção de sinal
   associada antes de qualquer runtime físico.</p>
+<h2 id="fase-1110r-guard-futuro-do-criterio-pressao-x-sigma-theta">Fase 11.10R — guard futuro do critério pressão x sigma-theta</h2>
+<p>A próxima implementação recomendada é:</p>
+<pre><code class="language-text">PHASE11_10S_IMPLEMENT_PRESSURE_SIGMATHETA_FRACTURE_CRITERION_GUARD
+</code></pre>
+<p>Esse guard deve implementar apenas a validação algébrica especificada na
+11.10R, preservando <code>lot-pkn</code>, parser/schema e dispatch runtime bloqueados até
+que os testes provem semântica de pressão, sinal compression-positive e
+referencial compatível.</p>
 </div>
 </section>
 

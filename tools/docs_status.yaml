@@ -164,6 +164,7 @@ phases:
   phase_11_10o_sigmatheta_initial_state_wiring: completed
   phase_11_10p_sigmatheta_initial_state_guard: completed
   phase_11_10q_fracture_gate_dispatch_with_sigmatheta_guard: completed
+  phase_11_10r_pressure_sigmatheta_fracture_criterion: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -254,6 +255,7 @@ docs:
   stage11_10o_sigmatheta_initial_state_wiring: implemented
   stage11_10p_sigmatheta_initial_state_guard: implemented
   stage11_10q_fracture_gate_dispatch_with_sigmatheta_guard: implemented
+  stage11_10r_pressure_sigmatheta_fracture_criterion: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -319,12 +321,12 @@ validation:
 test_counts:
   cpp_tests: 321        # Catch2 lot-salt-suite — 321/321 esperados apos Fase 11.10P (2026-06-12)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 646     # pytest lot-salt-suite — 646/646 esperados apos Fase 11.10Q (2026-06-12)
+  python_tests: 667     # pytest lot-salt-suite — 667/667 esperados apos Fase 11.10R (2026-06-12)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-12"
-updated_by: "codex (Fase 11.10Q fracture gate dispatch with sigma-theta guard specification)"
+updated_by: "codex (Fase 11.10R pressure x sigma-theta fracture criterion specification)"
 project_version: "0.1.0"

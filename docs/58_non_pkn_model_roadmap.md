@@ -603,3 +603,24 @@ recomendada e `PHASE11_10R_SPECIFY_PRESSURE_SIGMATHETA_FRACTURE_CRITERION`.
 - Este roadmap não valida BUZ29 numericamente.
 - BUZ-67D modern-refined continua a rota executável principal enquanto BUZ29
   permanece em planejamento não-PKN.
+## Fase 11.10R — critério pressão x sigma-theta
+
+A Fase 11.10R especifica o critério algébrico futuro do
+`fracture_initiation_gate` sem implementar runtime. A decisão registrada é:
+
+```text
+PRESSURE_SIGMATHETA_FRACTURE_CRITERION_SPECIFIED
+SIGMATHETA_COMPRESSION_POSITIVE_SIGN_CONVENTION_RESOLVED
+PRESSURE_GREATER_THAN_SIGMATHETA_SHORTCUT_FORBIDDEN
+DISPATCH_REMAINS_BLOCKED_UNTIL_CRITERION_GUARD_IMPLEMENTED
+```
+
+Para `sigma_theta` em compressão positiva, o critério preferencial futuro é:
+
+```text
+sigma_theta_current_compression_positive_Pa <= -tensile_strength_Pa
+```
+
+`pressure > sigma_theta_compression_positive_Pa` não deve ser usado como
+critério físico final sem transformação de sinal, pressão crítica e referencial
+explícito. `PENNY_SHAPED` continua opt-in diagnóstico e sem execução BUZ29.

@@ -206,3 +206,22 @@ PRESSURE_SIGMATHETA_CRITERION_SPEC_REQUIRED
 SIGN_CONVENTION_RESOLUTION_REQUIRED
 DISPATCH_REMAINS_BLOCKED
 ```
+## Atualização 11.10R — critério pressão x sigma-theta
+
+A 11.10R completa a especificação algébrica que faltava após o dispatch
+especificado na 11.10Q. A regra futura não é `pressure > sigma_theta` como
+atalho. Com `sigma_theta` em compressão positiva, a forma preferencial é:
+
+```text
+sigma_theta_current_compression_positive_Pa <= -tensile_strength_Pa
+```
+
+A forma por threshold:
+
+```text
+fracture_margin_Pa = wellbore_pressure_Pa - fracture_threshold_pressure_Pa
+```
+
+só é aceitável se `fracture_threshold_pressure_Pa` for derivada com semântica
+explícita. O dispatch físico segue bloqueado até a 11.10S implementar e testar
+um guard específico para esse critério.

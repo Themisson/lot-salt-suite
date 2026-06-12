@@ -175,3 +175,18 @@ FRACTURE_MODEL_DISPATCH_NOT_ALLOWED
 
 Se `gate_ready = true`, o gate pode apenas avancar para a avaliacao futura do
 criterio pressao x sigma-theta. A 11.10Q nao libera dispatch fisico.
+## Atualização 11.10R — guard inicial antes do critério físico
+
+O `SigmaThetaInitialStateGuard` permanece uma precondição, não o critério de
+fratura. A 11.10R especifica que o futuro guard de critério deve aceitar apenas
+estado inicial pronto, semântica de pressão conhecida, referencial de
+`sigma_theta` conhecido e sinal `COMPRESSION_POSITIVE`.
+
+O próximo guard deve bloquear:
+
+```text
+FRACTURE_CRITERION_BLOCKED_SIGMATHETA_GUARD_NOT_READY
+FRACTURE_CRITERION_BLOCKED_PRESSURE_SEMANTICS_UNKNOWN
+FRACTURE_CRITERION_BLOCKED_SIGN_CONVENTION_UNKNOWN
+FRACTURE_CRITERION_BLOCKED_REFERENCE_FRAME_MISMATCH
+```
