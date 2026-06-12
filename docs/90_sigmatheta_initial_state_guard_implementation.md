@@ -211,3 +211,16 @@ FRACTURE_DISPATCH_NOT_ALLOWED
 ```
 
 Nenhum runtime wiring foi implementado nesta fase.
+
+## Atualizacao 11.10U — fixture de bloqueio por sigma-theta
+
+A 11.10U adiciona o cenario sintetico
+`sigmatheta_guard_blocks_dispatch`, no qual `sigma_theta_guard_ready = false`
+deve produzir:
+
+```text
+FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE
+FRACTURE_DISPATCH_NOT_ALLOWED
+```
+
+Esse cenario valida o contrato de bloqueio, nao uma chamada runtime real.

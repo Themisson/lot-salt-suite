@@ -747,3 +747,19 @@ DISPATCH_REMAINS_BLOCKED
 A especificacao define a ordem futura dos guards, mas nao altera runtime. PKN
 permanece default retrocompativel; `PENNY_SHAPED` e BUZ29-PENNY permanecem
 bloqueados ate haver fixtures e testes de wiring explicitos.
+
+## Fase 11.10U — fixtures do wiring runtime do fracture gate
+
+Status registrado:
+
+```text
+PHASE11_10U_FRACTURE_GATE_RUNTIME_WIRING_FIXTURES_DEFINED
+FRACTURE_GATE_RUNTIME_WIRING_FIXTURES_VALID
+RUNTIME_WIRING_NOT_IMPLEMENTED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_DIAGNOSTIC_ONLY
+```
+
+A fase adiciona fixtures e validador Python para o contrato do futuro
+`fracture_initiation_gate`. Nenhum runtime wiring, dispatch ou BUZ29-PENNY e
+executado.

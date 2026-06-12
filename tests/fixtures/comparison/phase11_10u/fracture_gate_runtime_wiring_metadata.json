@@ -1,0 +1,21 @@
+{
+  "phase": "11.10U",
+  "fixture_type": "runtime_wiring_contract_only",
+  "runtime_wiring_implemented": false,
+  "runtime_execution_allowed": false,
+  "buz29_execution_allowed": false,
+  "physically_validated": false,
+  "legacy_equivalent": false,
+  "required_components": [
+    "FractureModelSelector",
+    "SigmaThetaInitialStateGuard",
+    "PressureSigmaThetaFractureCriterionGuard"
+  ],
+  "required_caveats": [
+    "PKN_DEFAULT_RETROCOMPATIBLE",
+    "PENNY_SHAPED_DIAGNOSTIC_ONLY",
+    "SIGMATHETA_GUARD_REQUIRED_BEFORE_DISPATCH",
+    "PRESSURE_SIGMATHETA_CRITERION_REQUIRED_BEFORE_DISPATCH",
+    "BUZ29_EXECUTION_BLOCKED"
+  ]
+}

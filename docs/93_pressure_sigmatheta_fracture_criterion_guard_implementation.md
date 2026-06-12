@@ -245,3 +245,16 @@ FRACTURE_DISPATCH_NOT_ALLOWED
 ```
 
 Nenhuma chamada runtime ao helper foi adicionada nesta fase.
+
+## Atualizacao 11.10U — fixture de bloqueio pelo criterio
+
+A 11.10U adiciona o cenario sintetico
+`pressure_sigmatheta_criterion_blocks_dispatch`, no qual o guard inicial esta
+pronto, mas `criterion_ready = false` deve produzir:
+
+```text
+FRACTURE_GATE_BLOCKED_PRESSURE_SIGMATHETA_CRITERION
+FRACTURE_DISPATCH_NOT_ALLOWED
+```
+
+Isso protege o contrato antes de qualquer wiring runtime real.

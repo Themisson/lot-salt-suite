@@ -161,3 +161,22 @@ PRESSURE_SIGMATHETA_CRITERION_GUARD_REQUIRED
 RUNTIME_WIRING_NOT_IMPLEMENTED
 DISPATCH_REMAINS_BLOCKED
 ```
+
+## Atualizacao 11.10U — fixtures do contrato
+
+A fase seguinte criou fixtures versionadas em:
+
+```text
+tests/fixtures/comparison/phase11_10u/
+```
+
+Elas cobrem sete cenarios minimos do futuro wiring, incluindo default PKN,
+PKN explicito, `PENNY_SHAPED` diagnostico e bloqueios por guards. O status
+registrado e:
+
+```text
+FRACTURE_GATE_RUNTIME_WIRING_FIXTURES_VALID
+RUNTIME_WIRING_NOT_IMPLEMENTED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_DIAGNOSTIC_ONLY
+```

@@ -1,0 +1,75 @@
+{
+  "phase": "11.10U",
+  "fixture_type": "runtime_wiring_contract_scenarios",
+  "scenarios": [
+    {
+      "id": "missing_model_defaults_pkn_not_reached",
+      "fracture_model_input": null,
+      "expected_selected_model": "PKN",
+      "expected_selection_source": "DEFAULTED",
+      "sigma_theta_guard_ready": true,
+      "criterion_ready": true,
+      "fracture_initiated": false,
+      "expected_gate_status": "FRACTURE_GATE_READY_NOT_REACHED",
+      "expected_dispatch_status": "FRACTURE_DISPATCH_NOT_EXECUTED"
+    },
+    {
+      "id": "explicit_pkn_initiated_dispatch_eligible",
+      "fracture_model_input": "PKN",
+      "expected_selected_model": "PKN",
+      "expected_selection_source": "EXPLICIT",
+      "sigma_theta_guard_ready": true,
+      "criterion_ready": true,
+      "fracture_initiated": true,
+      "expected_gate_status": "FRACTURE_GATE_REACHED",
+      "expected_dispatch_status": "FRACTURE_DISPATCH_PKN_ELIGIBLE"
+    },
+    {
+      "id": "explicit_penny_initiated_diagnostic_eligible",
+      "fracture_model_input": "PENNY_SHAPED",
+      "expected_selected_model": "PENNY_SHAPED",
+      "expected_selection_source": "EXPLICIT",
+      "sigma_theta_guard_ready": true,
+      "criterion_ready": true,
+      "fracture_initiated": true,
+      "expected_gate_status": "FRACTURE_GATE_REACHED",
+      "expected_dispatch_status": "FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE",
+      "physically_validated": false,
+      "legacy_equivalent": false
+    },
+    {
+      "id": "sigmatheta_guard_blocks_dispatch",
+      "fracture_model_input": "PKN",
+      "expected_selected_model": "PKN",
+      "sigma_theta_guard_ready": false,
+      "criterion_ready": false,
+      "fracture_initiated": false,
+      "expected_gate_status": "FRACTURE_GATE_BLOCKED_SIGMATHETA_INITIAL_STATE",
+      "expected_dispatch_status": "FRACTURE_DISPATCH_NOT_ALLOWED"
+    },
+    {
+      "id": "pressure_sigmatheta_criterion_blocks_dispatch",
+      "fracture_model_input": "PKN",
+      "expected_selected_model": "PKN",
+      "sigma_theta_guard_ready": true,
+      "criterion_ready": false,
+      "fracture_initiated": false,
+      "expected_gate_status": "FRACTURE_GATE_BLOCKED_PRESSURE_SIGMATHETA_CRITERION",
+      "expected_dispatch_status": "FRACTURE_DISPATCH_NOT_ALLOWED"
+    },
+    {
+      "id": "unsupported_kgd_model_blocked",
+      "fracture_model_input": "KGD",
+      "expected_selection_error": "UNSUPPORTED_FRACTURE_MODEL",
+      "expected_gate_status": "FRACTURE_GATE_NOT_EVALUATED",
+      "expected_dispatch_status": "FRACTURE_DISPATCH_NOT_ALLOWED"
+    },
+    {
+      "id": "explicit_empty_model_blocked",
+      "fracture_model_input": "",
+      "expected_selection_error": "EXPLICIT_EMPTY_FRACTURE_MODEL_NOT_ALLOWED",
+      "expected_gate_status": "FRACTURE_GATE_NOT_EVALUATED",
+      "expected_dispatch_status": "FRACTURE_DISPATCH_NOT_ALLOWED"
+    }
+  ]
+}

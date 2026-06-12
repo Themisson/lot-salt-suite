@@ -3081,6 +3081,41 @@
       "BUZ29-PENNY is not executed."
     ]
   },
+  "phase11_10u_fracture_gate_runtime_wiring_fixtures": {
+    "status": "PHASE11_10U_FRACTURE_GATE_RUNTIME_WIRING_FIXTURES_DEFINED",
+    "phase": "11.10U",
+    "fixture_status": "FRACTURE_GATE_RUNTIME_WIRING_FIXTURES_VALID",
+    "runtime_wiring_implemented": false,
+    "runtime_execution_allowed": false,
+    "buz29_execution_allowed": false,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "scenario_count": 7,
+    "scenario_ids": [
+      "missing_model_defaults_pkn_not_reached",
+      "explicit_pkn_initiated_dispatch_eligible",
+      "explicit_penny_initiated_diagnostic_eligible",
+      "sigmatheta_guard_blocks_dispatch",
+      "pressure_sigmatheta_criterion_blocks_dispatch",
+      "unsupported_kgd_model_blocked",
+      "explicit_empty_model_blocked"
+    ],
+    "required_statuses": [
+      "PHASE11_10U_FRACTURE_GATE_RUNTIME_WIRING_FIXTURES_DEFINED",
+      "FRACTURE_GATE_RUNTIME_WIRING_FIXTURES_VALID",
+      "RUNTIME_WIRING_NOT_IMPLEMENTED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PENNY_SHAPED_DIAGNOSTIC_ONLY"
+    ],
+    "recommended_next_phase": "PHASE11_10V_SPECIFY_RUNTIME_WIRING_IMPLEMENTATION_PLAN",
+    "caveats": [
+      "Phase 11.10U defines synthetic fixtures only.",
+      "No C++, parser, schema, CLI or runtime dispatch is changed.",
+      "PENNY_SHAPED remains diagnostic-only.",
+      "BUZ29-PENNY is not executed.",
+      "No physical validation or legacy equivalence is claimed."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

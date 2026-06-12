@@ -343,6 +343,19 @@ PRESSURE_SIGMATHETA_COMPATIBILITY_REQUIRED
 DISPATCH_REMAINS_BLOCKED
 ```
 
+## Atualização 11.10U — cenários sintéticos de seleção
+
+A 11.10U adiciona fixtures que cobrem selecao ausente/default PKN, PKN
+explicito, `PENNY_SHAPED` explicito diagnostico, KGD nao suportado e valor
+vazio explicito bloqueado. O objetivo e preparar testes futuros de wiring, sem
+alterar parser/schema ou runtime.
+
+```text
+FRACTURE_GATE_RUNTIME_WIRING_FIXTURES_VALID
+PENNY_SHAPED_DIAGNOSTIC_ONLY
+BUZ29_EXECUTION_BLOCKED
+```
+
 O seletor unificado continua válido como seleção sintática, mas não se torna
 execução. A próxima fase pode implementar o guard que verifica
 `sigma_theta_initialized`, `sigma_theta_initial_state_valid`,

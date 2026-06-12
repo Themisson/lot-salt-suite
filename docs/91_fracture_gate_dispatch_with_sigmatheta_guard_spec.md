@@ -261,3 +261,16 @@ RUNTIME_WIRING_NOT_IMPLEMENTED
 DISPATCH_REMAINS_BLOCKED
 BUZ29_EXECUTION_ALLOWED_NEXT = false
 ```
+
+## Atualizacao 11.10U — fixtures de dispatch esperado
+
+A 11.10U define fixtures pequenas para os estados esperados de dispatch:
+
+```text
+FRACTURE_DISPATCH_NOT_EXECUTED
+FRACTURE_DISPATCH_PKN_ELIGIBLE
+FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE
+FRACTURE_DISPATCH_NOT_ALLOWED
+```
+
+Esses estados continuam contrato sintetico. Nenhum dispatch e executado.

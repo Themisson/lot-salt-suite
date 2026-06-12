@@ -665,3 +665,20 @@ Essa especificacao nao altera C++, runtime, parser, schema, CLI ou casos. PKN
 permanece o default retrocompativel e `PENNY_SHAPED` permanece diagnostico,
 nao fisicamente validado e nao equivalente ao legado. A proxima fase deve
 especificar fixtures/testes de wiring antes de qualquer conexao runtime real.
+
+## Fase 11.10U — fixtures do wiring runtime do fracture gate
+
+A Fase 11.10U materializa fixtures sinteticas para o contrato definido na
+11.10T. Os cenarios cobrem default PKN, PKN explicito, `PENNY_SHAPED`
+diagnostico, bloqueios por `SigmaThetaInitialStateGuard`, bloqueios pelo
+criterio pressao x sigma-theta, modelo KGD nao suportado e valor vazio
+explicito.
+
+```text
+FRACTURE_GATE_RUNTIME_WIRING_FIXTURES_VALID
+RUNTIME_WIRING_NOT_IMPLEMENTED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_DIAGNOSTIC_ONLY
+```
+
+Essas fixtures sao contrato de teste; nao executam runtime nem validam BUZ29.

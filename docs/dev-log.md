@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10T fracture gate runtime wiring specification
+Fase ativa  : 11.10U fracture gate runtime wiring fixtures
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
-Testes C++  : 335/335 esperados apos Fase 11.10T em 2026-06-12
-Testes Py   : 695/695 esperados apos Fase 11.10T em 2026-06-12
+Testes C++  : 335/335 esperados apos Fase 11.10U em 2026-06-12
+Testes Py   : 712/712 esperados apos Fase 11.10U em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,50 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10U — fixtures do wiring runtime do fracture gate — Codex
+
+**Status:** Concluido; commit/push executado ao final da fase se todos os
+gates passarem.
+
+**Fixtures criadas:**
+
+```text
+tests/fixtures/comparison/phase11_10u/fracture_gate_runtime_wiring_scenarios.json
+tests/fixtures/comparison/phase11_10u/fracture_gate_runtime_wiring_metadata.json
+```
+
+**Ferramenta criada:**
+
+```text
+tools/validate_phase11_10u_fracture_gate_runtime_wiring_fixtures.py
+```
+
+**Documento criado:**
+
+```text
+docs/95_fracture_gate_runtime_wiring_fixtures.md
+```
+
+**Resultado:**
+
+```text
+PHASE11_10U_FRACTURE_GATE_RUNTIME_WIRING_FIXTURES_DEFINED
+FRACTURE_GATE_RUNTIME_WIRING_FIXTURES_VALID
+RUNTIME_WIRING_NOT_IMPLEMENTED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_DIAGNOSTIC_ONLY
+```
+
+**Interpretacao:** a fase materializa sete cenarios sinteticos para o futuro
+wiring do `fracture_initiation_gate`, cobrindo default PKN, PKN explicito,
+`PENNY_SHAPED` diagnostico, bloqueios por sigma-theta guard, bloqueios pelo
+criterio pressao x sigma-theta, KGD nao suportado e valor vazio explicito.
+Nenhum runtime wiring foi implementado, BUZ29-PENNY nao foi executado e
+`lot-pkn` permanece inalterado. A proxima fase recomendada e
+`PHASE11_10V_SPECIFY_RUNTIME_WIRING_IMPLEMENTATION_PLAN`.
 
 ---
 
