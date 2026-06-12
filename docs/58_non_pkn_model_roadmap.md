@@ -773,6 +773,22 @@ LOT_TIME_ZERO_NOT_DRILLING_TIME_ZERO
 LEGACY_TRACE_NOT_PHYSICAL_VALIDATION_SOURCE
 ```
 
+## Fase 11.11J — auditoria runtime sigma-theta/pressao
+
+A Fase 11.11J confirma que o runtime diagnostico possui pressao de poco, mas
+nao possui ainda sigma-theta inicial/current real para alimentar fisicamente o
+gate:
+
+```text
+RUNTIME_SIGMATHETA_PRESSURE_AVAILABILITY_AUDITED
+sigma_theta_initial_runtime_available = false
+sigma_theta_current_runtime_available = false
+wellbore_pressure_runtime_available = true
+runtime_real_wiring_allowed_next = false
+```
+
+`PENNY_SHAPED` permanece diagnostic-only e BUZ29-PENNY continua bloqueado.
+
 O status permanece documental/diagnostico; nenhum runner nao-PKN e executado.
 
 ## Fase 11.11A — validacao controlada do pre-runner

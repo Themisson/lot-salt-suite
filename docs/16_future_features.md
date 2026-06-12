@@ -25,6 +25,23 @@ implementation_allowed_next = false
 A proxima etapa e auditar se o runtime real ja possui sigma-theta inicial,
 sigma-theta current e pressao com semantica suficiente.
 
+## Fase 11.11J — disponibilidade runtime de sigma-theta e pressao
+
+**Status:** `RUNTIME_SIGMATHETA_PRESSURE_AVAILABILITY_AUDITED`.
+
+Resultado da auditoria:
+
+```text
+sigma_theta_initial_runtime_available = false
+sigma_theta_current_runtime_available = false
+wellbore_pressure_runtime_available = true
+runtime_real_wiring_allowed_next = false
+```
+
+O gate limitado ainda nao pode ser alimentado fisicamente porque faltam fonte
+runtime de sigma-theta inicial/current, convencao de sinal runtime resolvida e
+referencial total na parede do poco.
+
 ---
 
 ## Fase 10.17C — acomodação, shut-in e fluido Zamora

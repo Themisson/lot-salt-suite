@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11I real sigma-theta initial source strategy
+Fase ativa  : 11.11J runtime sigma-theta pressure availability audit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 373/373 em 2026-06-12
-Testes Py   : 867/867 em 2026-06-12
+Testes Py   : 878/878 em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -7697,3 +7697,34 @@ de validação física automática.
 
 **Próxima fase recomendada:**
 `PHASE11_11J_AUDIT_RUNTIME_SIGMATHETA_AND_PRESSURE_AVAILABILITY`.
+
+---
+
+### [2026-06-12] Fase 11.11J — Auditoria runtime sigma-theta/pressão — Codex
+
+**Status:** Concluído; commit/push planejado ao final da fase.
+
+**Classificação:** `RUNTIME_SIGMATHETA_PRESSURE_AVAILABILITY_AUDITED`.
+
+**Resultado:**
+
+```text
+sigma_theta_initial_runtime_available = false
+sigma_theta_current_runtime_available = false
+wellbore_pressure_runtime_available = true
+pressure_semantics_resolved = false
+sign_convention_resolved = false
+reference_frame_resolved = false
+runtime_real_wiring_allowed_next = false
+```
+
+**Decisão:** o runtime real ainda não possui fonte sigma-theta inicial/current
+com semântica suficiente para wiring físico do `limited_gate`.
+
+**Entregáveis:**
+- `tools/audit_phase11_11j_runtime_sigmatheta_pressure_availability.py`
+- `tests/python/test_audit_phase11_11j_runtime_sigmatheta_pressure_availability.py`
+- `docs/110_runtime_sigmatheta_pressure_availability_audit.md`
+
+**Próxima fase recomendada:**
+`PHASE11_11K_SPECIFY_POST_DRILLING_INITIAL_STATE_INTEGRATION`.

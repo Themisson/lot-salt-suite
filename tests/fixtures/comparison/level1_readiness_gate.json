@@ -3541,6 +3541,31 @@
       "Runtime wiring remains blocked until availability is audited."
     ]
   },
+  "phase11_11j_runtime_sigmatheta_pressure_availability": {
+    "status": "RUNTIME_SIGMATHETA_PRESSURE_AVAILABILITY_AUDITED",
+    "phase": "11.11J",
+    "audit_status": "RUNTIME_SIGMATHETA_PRESSURE_AVAILABILITY_AUDITED",
+    "sigma_theta_initial_runtime_available": false,
+    "sigma_theta_current_runtime_available": false,
+    "wellbore_pressure_runtime_available": true,
+    "pressure_semantics_resolved": false,
+    "sign_convention_resolved": false,
+    "reference_frame_resolved": false,
+    "runtime_real_wiring_allowed_next": false,
+    "required_statuses": [
+      "RUNTIME_SIGMATHETA_PRESSURE_AVAILABILITY_AUDITED",
+      "MISSING_RUNTIME_SIGMATHETA_INITIAL_SOURCE",
+      "MISSING_RUNTIME_SIGMATHETA_CURRENT_SOURCE",
+      "PRESSURE_SEMANTICS_NOT_RESOLVED_FOR_REAL_GATE"
+    ],
+    "recommended_next_phase": "PHASE11_11K_SPECIFY_POST_DRILLING_INITIAL_STATE_INTEGRATION",
+    "caveats": [
+      "Phase 11.11J audits availability only.",
+      "Wellbore pressure exists in runtime outputs, but sigma-theta real source is missing.",
+      "Sign convention and reference frame are not runtime-resolved for real gate wiring.",
+      "No C++ wiring is implemented in this phase."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
