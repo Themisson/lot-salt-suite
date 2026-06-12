@@ -1,0 +1,16 @@
+# Phase 11.11N fixture: unsupported reference frame is invalid.
+fixture_id: sigma_theta_input_invalid_reference_frame
+expected:
+  invalid_reason: invalid_reference_frame
+lot:
+  fracture:
+    sigma_theta_diagnostic_input:
+      enabled: true
+      source: EXPLICIT_DIAGNOSTIC_INPUT
+      sigma_theta_initial_compression_positive_Pa: 5000000.0
+      sigma_theta_current_compression_positive_Pa: -2000000.0
+      sign_convention: COMPRESSION_POSITIVE
+      reference_frame: UNKNOWN_REFERENCE
+      state_time: POST_DRILLING_BEFORE_LOT
+      physically_validated: false
+      legacy_equivalent: false

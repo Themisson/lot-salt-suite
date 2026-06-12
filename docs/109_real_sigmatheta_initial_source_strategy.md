@@ -115,3 +115,20 @@ runtime_real_wiring_allowed_next = false
 
 Assim, a estrategia permanece especificada, mas ainda nao implementavel como
 wiring fisico real.
+## Fonte diagnóstica explícita adicionada na 11.11N
+
+A 11.11N nao substitui a fonte fisica futura `ELASTIC_INITIAL_WELLBORE_STATE`.
+Ela adiciona uma fonte diagnostica explicita para testes controlados:
+
+```text
+EXPLICIT_DIAGNOSTIC_INPUT
+SYNTHETIC_FIXTURE
+```
+
+Ambas exigem:
+
+```text
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+```

@@ -107,3 +107,20 @@ pkn_behavior_change_allowed = false
 
 Portanto, a fase 11.11M deve registrar plano de fonte sigma-theta, sem
 implementacao C++.
+## Atualização da 11.11N
+
+A 11.11N adicionou `sigma_theta_diagnostic_input` como fonte explicita
+diagnostica para exercitar o contrato `PostDrillingInitialState` sem resolver
+a fonte fisica definitiva.
+
+```text
+source = EXPLICIT_DIAGNOSTIC_INPUT | SYNTHETIC_FIXTURE
+state_time = POST_DRILLING_BEFORE_LOT
+sign_convention = COMPRESSION_POSITIVE
+reference_frame = WELLBORE_WALL_TOTAL_STRESS
+physically_validated = false
+legacy_equivalent = false
+```
+
+Essa entrada alimenta o guard em modo diagnostico, preservando dispatch fisico
+desabilitado.

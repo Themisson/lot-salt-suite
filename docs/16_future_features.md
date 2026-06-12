@@ -1064,3 +1064,22 @@ buz29_execution_allowed = false
 pkn_behavior_changed = false
 penny_shaped_runtime_enabled = false
 ```
+
+### Fase 11.11N — fonte diagnostica explicita de sigma-theta
+
+Status:
+
+```text
+SIGMATHETA_DIAGNOSTIC_SOURCE_IMPLEMENTED
+LIMITED_GATE_CAN_BE_FED_DIAGNOSTICALLY
+```
+
+A fase adiciona `lot.fracture.sigma_theta_diagnostic_input` como entrada
+opt-in para alimentar os guards do `limited_gate` em testes controlados. A fonte
+nao e fisicamente validada, nao e equivalente ao legado e nao habilita dispatch.
+
+Proxima fase:
+
+```text
+PHASE11_11O_VALIDATE_SIGMATHETA_DIAGNOSTIC_SOURCE_ON_CONTROLLED_CASES
+```

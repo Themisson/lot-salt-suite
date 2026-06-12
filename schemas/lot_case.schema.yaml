@@ -242,6 +242,51 @@ properties:
                 enum: [pre_runner, diagnostic_only, limited_gate]
               dispatch_runtime_enabled:
                 type: boolean
+          sigma_theta_diagnostic_input:
+            type: object
+            required: [enabled]
+            additionalProperties: false
+            properties:
+              enabled:
+                type: boolean
+              source:
+                type: string
+                enum: [EXPLICIT_DIAGNOSTIC_INPUT, SYNTHETIC_FIXTURE]
+              sigma_theta_initial_compression_positive_Pa:
+                type: number
+                exclusiveMinimum: 0
+              sigma_theta_current_compression_positive_Pa:
+                type: number
+              sign_convention:
+                type: string
+                enum: [COMPRESSION_POSITIVE]
+              reference_frame:
+                type: string
+                enum: [WELLBORE_WALL_TOTAL_STRESS]
+              state_time:
+                type: string
+                enum: [POST_DRILLING_BEFORE_LOT]
+              physically_validated:
+                type: boolean
+                const: false
+              legacy_equivalent:
+                type: boolean
+                const: false
+            allOf:
+              - if:
+                  properties:
+                    enabled:
+                      const: true
+                then:
+                  required:
+                    - source
+                    - sigma_theta_initial_compression_positive_Pa
+                    - sigma_theta_current_compression_positive_Pa
+                    - sign_convention
+                    - reference_frame
+                    - state_time
+                    - physically_validated
+                    - legacy_equivalent
           fluid_viscosity_cP: {type: number}
           height:
             $ref: "#/$defs/length_quantity"

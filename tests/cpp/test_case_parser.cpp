@@ -119,6 +119,32 @@ std::filesystem::path write_pkn_case_with_fracture_model(
   return write_temp_case("lss_fracture_model_" + suffix + ".yaml", yaml);
 }
 
+std::string valid_sigma_theta_diagnostic_input_block(
+    const std::string& source = "EXPLICIT_DIAGNOSTIC_INPUT") {
+  return "    sigma_theta_diagnostic_input:\n"
+         "      enabled: true\n"
+         "      source: " + source + "\n"
+         "      sigma_theta_initial_compression_positive_Pa: 5000000.0\n"
+         "      sigma_theta_current_compression_positive_Pa: -2000000.0\n"
+         "      sign_convention: COMPRESSION_POSITIVE\n"
+         "      reference_frame: WELLBORE_WALL_TOTAL_STRESS\n"
+         "      state_time: POST_DRILLING_BEFORE_LOT\n"
+         "      physically_validated: false\n"
+         "      legacy_equivalent: false\n";
+}
+
+std::filesystem::path write_pkn_case_with_sigma_theta_diagnostic_input(
+    const std::string& block, const std::string& suffix) {
+  auto yaml = read_text_file(kPknMinimalCasePath);
+  const std::string geometry_line = "    geometry: pkn\n";
+  const auto pos = yaml.find(geometry_line);
+  REQUIRE(pos != std::string::npos);
+  yaml.insert(pos + geometry_line.size(), block);
+
+  return write_temp_case("lss_sigmatheta_diagnostic_" + suffix + ".yaml",
+                         yaml);
+}
+
 void require_parse_error_contains(const std::filesystem::path& path,
                                   const std::string& expected_message) {
   try {
@@ -310,6 +336,140 @@ TEST_CASE("CaseParser accepts explicit PENNY_SHAPED fracture_model as diagnostic
   CHECK_FALSE(data.lot.fracture_model_runtime_dispatch_enabled);
   CHECK(data.lot.fracture_model_requires_fracture_initiation_gate);
   CHECK(data.lot.fracture_model_sigma_theta_initial_state_audit_required);
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser accepts absent sigma theta diagnostic input") {
+  const auto data = lss::io::parse_yaml(kPknMinimalCasePath);
+
+  CHECK_FALSE(data.lot.sigma_theta_diagnostic_input.enabled);
+}
+
+TEST_CASE("CaseParser accepts disabled sigma theta diagnostic input") {
+  const auto path = write_pkn_case_with_sigma_theta_diagnostic_input(
+      "    sigma_theta_diagnostic_input:\n"
+      "      enabled: false\n",
+      "disabled");
+  const auto data = lss::io::parse_yaml(path);
+
+  CHECK_FALSE(data.lot.sigma_theta_diagnostic_input.enabled);
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser accepts explicit sigma theta diagnostic input") {
+  const auto path = write_pkn_case_with_sigma_theta_diagnostic_input(
+      valid_sigma_theta_diagnostic_input_block(), "explicit");
+  const auto data = lss::io::parse_yaml(path);
+
+  const auto& input = data.lot.sigma_theta_diagnostic_input;
+  CHECK(input.enabled);
+  CHECK(input.source == "EXPLICIT_DIAGNOSTIC_INPUT");
+  CHECK(input.sigma_theta_initial_compression_positive_Pa ==
+        Catch::Approx(5000000.0));
+  CHECK(input.sigma_theta_current_compression_positive_Pa ==
+        Catch::Approx(-2000000.0));
+  CHECK(input.sign_convention == "COMPRESSION_POSITIVE");
+  CHECK(input.reference_frame == "WELLBORE_WALL_TOTAL_STRESS");
+  CHECK(input.state_time == "POST_DRILLING_BEFORE_LOT");
+  CHECK_FALSE(input.physically_validated);
+  CHECK_FALSE(input.legacy_equivalent);
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser accepts synthetic fixture sigma theta diagnostic input") {
+  const auto path = write_pkn_case_with_sigma_theta_diagnostic_input(
+      valid_sigma_theta_diagnostic_input_block("SYNTHETIC_FIXTURE"),
+      "synthetic");
+  const auto data = lss::io::parse_yaml(path);
+
+  CHECK(data.lot.sigma_theta_diagnostic_input.enabled);
+  CHECK(data.lot.sigma_theta_diagnostic_input.source == "SYNTHETIC_FIXTURE");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects invalid sigma theta diagnostic source") {
+  const auto path = write_pkn_case_with_sigma_theta_diagnostic_input(
+      valid_sigma_theta_diagnostic_input_block("UNKNOWN"), "bad_source");
+
+  require_parse_error_contains(path, "sigma_theta_diagnostic_input.source");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects invalid sigma theta diagnostic sign convention") {
+  auto block = valid_sigma_theta_diagnostic_input_block();
+  const auto pos = block.find("COMPRESSION_POSITIVE");
+  REQUIRE(pos != std::string::npos);
+  block.replace(pos, std::string("COMPRESSION_POSITIVE").size(),
+                "TENSION_POSITIVE");
+  const auto path =
+      write_pkn_case_with_sigma_theta_diagnostic_input(block, "bad_sign");
+
+  require_parse_error_contains(path,
+                               "sigma_theta_diagnostic_input.sign_convention");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects invalid sigma theta diagnostic reference frame") {
+  auto block = valid_sigma_theta_diagnostic_input_block();
+  const auto pos = block.find("WELLBORE_WALL_TOTAL_STRESS");
+  REQUIRE(pos != std::string::npos);
+  block.replace(pos, std::string("WELLBORE_WALL_TOTAL_STRESS").size(),
+                "UNKNOWN_REFERENCE");
+  const auto path =
+      write_pkn_case_with_sigma_theta_diagnostic_input(block, "bad_reference");
+
+  require_parse_error_contains(path,
+                               "sigma_theta_diagnostic_input.reference_frame");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects invalid sigma theta diagnostic state time") {
+  auto block = valid_sigma_theta_diagnostic_input_block();
+  const auto pos = block.find("POST_DRILLING_BEFORE_LOT");
+  REQUIRE(pos != std::string::npos);
+  block.replace(pos, std::string("POST_DRILLING_BEFORE_LOT").size(),
+                "DURING_LOT_STEP");
+  const auto path =
+      write_pkn_case_with_sigma_theta_diagnostic_input(block, "bad_state_time");
+
+  require_parse_error_contains(path, "sigma_theta_diagnostic_input.state_time");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects physically validated sigma theta diagnostic input") {
+  auto block = valid_sigma_theta_diagnostic_input_block();
+  const auto pos = block.find("physically_validated: false");
+  REQUIRE(pos != std::string::npos);
+  block.replace(pos, std::string("physically_validated: false").size(),
+                "physically_validated: true");
+  const auto path = write_pkn_case_with_sigma_theta_diagnostic_input(
+      block, "physically_validated");
+
+  require_parse_error_contains(path,
+                               "sigma_theta_diagnostic_input.physically_validated");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects legacy equivalent sigma theta diagnostic input") {
+  auto block = valid_sigma_theta_diagnostic_input_block();
+  const auto pos = block.find("legacy_equivalent: false");
+  REQUIRE(pos != std::string::npos);
+  block.replace(pos, std::string("legacy_equivalent: false").size(),
+                "legacy_equivalent: true");
+  const auto path = write_pkn_case_with_sigma_theta_diagnostic_input(
+      block, "legacy_equivalent");
+
+  require_parse_error_contains(path,
+                               "sigma_theta_diagnostic_input.legacy_equivalent");
 
   std::filesystem::remove(path);
 }

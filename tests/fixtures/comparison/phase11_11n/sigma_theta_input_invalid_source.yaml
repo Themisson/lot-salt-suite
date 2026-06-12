@@ -1,0 +1,16 @@
+# Phase 11.11N fixture: unsupported source is invalid.
+fixture_id: sigma_theta_input_invalid_source
+expected:
+  invalid_reason: invalid_source
+lot:
+  fracture:
+    sigma_theta_diagnostic_input:
+      enabled: true
+      source: UNKNOWN
+      sigma_theta_initial_compression_positive_Pa: 5000000.0
+      sigma_theta_current_compression_positive_Pa: -2000000.0
+      sign_convention: COMPRESSION_POSITIVE
+      reference_frame: WELLBORE_WALL_TOTAL_STRESS
+      state_time: POST_DRILLING_BEFORE_LOT
+      physically_validated: false
+      legacy_equivalent: false

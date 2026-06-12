@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">172/179</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">373</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">908</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">173/180</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">387</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">920</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8577,6 +8577,17 @@ convencao de sinal e referencial resolvidos.</p>
 buz29_execution_allowed = false
 pkn_behavior_changed = false
 penny_shaped_runtime_enabled = false
+</code></pre>
+<h3 id="fase-1111n-fonte-diagnostica-explicita-de-sigma-theta">Fase 11.11N — fonte diagnostica explicita de sigma-theta</h3>
+<p>Status:</p>
+<pre><code class="language-text">SIGMATHETA_DIAGNOSTIC_SOURCE_IMPLEMENTED
+LIMITED_GATE_CAN_BE_FED_DIAGNOSTICALLY
+</code></pre>
+<p>A fase adiciona <code>lot.fracture.sigma_theta_diagnostic_input</code> como entrada
+opt-in para alimentar os guards do <code>limited_gate</code> em testes controlados. A fonte
+nao e fisicamente validada, nao e equivalente ao legado e nao habilita dispatch.</p>
+<p>Proxima fase:</p>
+<pre><code class="language-text">PHASE11_11O_VALIDATE_SIGMATHETA_DIAGNOSTIC_SOURCE_ON_CONTROLLED_CASES
 </code></pre>
 </div>
 </section>

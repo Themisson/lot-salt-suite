@@ -305,6 +305,90 @@ void parse_fracture_gate_diagnostics(const YAML::Node& fracture,
   }
 }
 
+void parse_sigma_theta_diagnostic_input(const YAML::Node& fracture,
+                                        lss::core::LotConfig& lot) {
+  const YAML::Node node = fracture["sigma_theta_diagnostic_input"];
+  if (!node) {
+    return;
+  }
+
+  auto& input = lot.sigma_theta_diagnostic_input;
+  input.enabled = require_as<bool>(
+      node["enabled"],
+      "lot.fracture.sigma_theta_diagnostic_input.enabled");
+  if (!input.enabled) {
+    return;
+  }
+
+  input.source = require_as<std::string>(
+      node["source"],
+      "lot.fracture.sigma_theta_diagnostic_input.source");
+  input.sigma_theta_initial_compression_positive_Pa = require_as<double>(
+      node["sigma_theta_initial_compression_positive_Pa"],
+      "lot.fracture.sigma_theta_diagnostic_input.sigma_theta_initial_compression_positive_Pa");
+  input.sigma_theta_current_compression_positive_Pa = require_as<double>(
+      node["sigma_theta_current_compression_positive_Pa"],
+      "lot.fracture.sigma_theta_diagnostic_input.sigma_theta_current_compression_positive_Pa");
+  input.sign_convention = require_as<std::string>(
+      node["sign_convention"],
+      "lot.fracture.sigma_theta_diagnostic_input.sign_convention");
+  input.reference_frame = require_as<std::string>(
+      node["reference_frame"],
+      "lot.fracture.sigma_theta_diagnostic_input.reference_frame");
+  input.state_time = require_as<std::string>(
+      node["state_time"],
+      "lot.fracture.sigma_theta_diagnostic_input.state_time");
+  input.physically_validated = require_as<bool>(
+      node["physically_validated"],
+      "lot.fracture.sigma_theta_diagnostic_input.physically_validated");
+  input.legacy_equivalent = require_as<bool>(
+      node["legacy_equivalent"],
+      "lot.fracture.sigma_theta_diagnostic_input.legacy_equivalent");
+
+  if (input.source != "EXPLICIT_DIAGNOSTIC_INPUT" &&
+      input.source != "SYNTHETIC_FIXTURE") {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_diagnostic_input.source exige "
+        "EXPLICIT_DIAGNOSTIC_INPUT ou SYNTHETIC_FIXTURE");
+  }
+  if (!std::isfinite(input.sigma_theta_initial_compression_positive_Pa) ||
+      input.sigma_theta_initial_compression_positive_Pa <= 0.0) {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_diagnostic_input exige "
+        "sigma_theta_initial_compression_positive_Pa finito e > 0");
+  }
+  if (!std::isfinite(input.sigma_theta_current_compression_positive_Pa)) {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_diagnostic_input exige "
+        "sigma_theta_current_compression_positive_Pa finito");
+  }
+  if (input.sign_convention != "COMPRESSION_POSITIVE") {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_diagnostic_input.sign_convention exige "
+        "COMPRESSION_POSITIVE");
+  }
+  if (input.reference_frame != "WELLBORE_WALL_TOTAL_STRESS") {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_diagnostic_input.reference_frame exige "
+        "WELLBORE_WALL_TOTAL_STRESS");
+  }
+  if (input.state_time != "POST_DRILLING_BEFORE_LOT") {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_diagnostic_input.state_time exige "
+        "POST_DRILLING_BEFORE_LOT");
+  }
+  if (input.physically_validated) {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_diagnostic_input.physically_validated "
+        "deve ser false");
+  }
+  if (input.legacy_equivalent) {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_diagnostic_input.legacy_equivalent "
+        "deve ser false");
+  }
+}
+
 }  // namespace
 
 namespace lss::io {
@@ -422,6 +506,7 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
   apply_fracture_model_selection(
       lss::lot::select_fracture_model(fracture_model_input), data.lot);
   parse_fracture_gate_diagnostics(fracture, data.lot);
+  parse_sigma_theta_diagnostic_input(fracture, data.lot);
   if (data.lot.model.empty()) {
     data.lot.model = data.lot.fracture_geometry;
   }

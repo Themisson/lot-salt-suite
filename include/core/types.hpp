@@ -159,6 +159,18 @@ struct FractureGateDiagnosticsData {
   bool dispatch_runtime_enabled = false;
 };
 
+struct SigmaThetaDiagnosticInputData {
+  bool enabled = false;
+  std::string source;
+  double sigma_theta_initial_compression_positive_Pa = 0.0;
+  double sigma_theta_current_compression_positive_Pa = 0.0;
+  std::string sign_convention;
+  std::string reference_frame;
+  std::string state_time;
+  bool physically_validated = false;
+  bool legacy_equivalent = false;
+};
+
 struct LotConfig {
   bool enabled = false;
   double shoe_depth_m = 0.0;
@@ -175,6 +187,7 @@ struct LotConfig {
   bool fracture_model_runtime_dispatch_enabled = false;
   bool fracture_model_sigma_theta_initial_state_audit_required = true;
   FractureGateDiagnosticsData fracture_gate_diagnostics;
+  SigmaThetaDiagnosticInputData sigma_theta_diagnostic_input;
   double fracture_fluid_viscosity_cP = 0.0;
   double fracture_fluid_viscosity_Pa_s = 0.0;
   double injection_rate_m3_s = 0.0;

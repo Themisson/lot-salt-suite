@@ -917,3 +917,15 @@ penny_shaped_runtime_enabled = false
 
 O PENNY_SHAPED continua como contrato diagnostico. BUZ29-PENNY permanece
 bloqueado ate existir fonte runtime real de sigma-theta e novo gate explicito.
+
+### Fase 11.11N — fonte sigma-theta diagnostica
+
+A 11.11N permite que PENNY_SHAPED atinja
+`FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE` em fixtures diagnosticas quando
+`sigma_theta_diagnostic_input` e fornecido, mas isso nao habilita runtime fisico.
+
+```text
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_DISPATCH_NOT_ENABLED
+```

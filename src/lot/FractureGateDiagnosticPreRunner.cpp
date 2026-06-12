@@ -46,6 +46,17 @@ std::string json_string(const std::string& value) {
   return "\"" + json_escape(value) + "\"";
 }
 
+SigmaThetaSource sigma_theta_source_from_diagnostic_input(
+    const std::string& source) {
+  if (source == "EXPLICIT_DIAGNOSTIC_INPUT") {
+    return SigmaThetaSource::ExplicitDiagnosticInput;
+  }
+  if (source == "SYNTHETIC_FIXTURE") {
+    return SigmaThetaSource::SyntheticFixture;
+  }
+  return SigmaThetaSource::Unknown;
+}
+
 }  // namespace
 
 FractureGateRuntimeInput make_fracture_gate_runtime_input_from_case(
@@ -75,6 +86,35 @@ FractureGateRuntimeInput make_fracture_gate_runtime_input_from_case(
       SigmaThetaReferenceFrame::Unknown;
   input.pressure_sigma_theta_criterion.sigma_theta_sign_convention =
       SigmaThetaSignConvention::Unknown;
+
+  const auto& diagnostic = data.lot.sigma_theta_diagnostic_input;
+  if (diagnostic.enabled) {
+    input.sigma_theta_initial_state.sigma_theta_initialized = true;
+    input.sigma_theta_initial_state.sigma_theta_initial_state_valid = true;
+    input.sigma_theta_initial_state.sigma_theta_initial_compression_positive_Pa =
+        diagnostic.sigma_theta_initial_compression_positive_Pa;
+    input.sigma_theta_initial_state.sigma_theta_source =
+        sigma_theta_source_from_diagnostic_input(diagnostic.source);
+    input.sigma_theta_initial_state.sigma_theta_state_time =
+        SigmaThetaStateTime::AfterDrillingBeforeLot;
+    input.sigma_theta_initial_state.sigma_theta_reference_frame =
+        SigmaThetaReferenceFrame::TotalStress;
+    input.sigma_theta_initial_state.sigma_theta_sign_convention =
+        SigmaThetaSignConvention::CompressionPositive;
+    input.sigma_theta_initial_state.pressure_semantics =
+        PressureSemantics::WellborePressureAbsolute;
+
+    input.pressure_sigma_theta_criterion
+        .sigma_theta_current_compression_positive_Pa =
+        diagnostic.sigma_theta_current_compression_positive_Pa;
+    input.pressure_sigma_theta_criterion.tensile_strength_Pa = 0.0;
+    input.pressure_sigma_theta_criterion.pressure_semantics =
+        PressureSemantics::WellborePressureAbsolute;
+    input.pressure_sigma_theta_criterion.sigma_theta_reference_frame =
+        SigmaThetaReferenceFrame::TotalStress;
+    input.pressure_sigma_theta_criterion.sigma_theta_sign_convention =
+        SigmaThetaSignConvention::CompressionPositive;
+  }
 
   return input;
 }

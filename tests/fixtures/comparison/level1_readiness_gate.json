@@ -3644,6 +3644,36 @@
       "PKN physical behavior remains unchanged."
     ]
   },
+  "phase11_11n_sigmatheta_diagnostic_source": {
+    "status": "PHASE11_11N_SIGMATHETA_DIAGNOSTIC_SOURCE_IMPLEMENTED",
+    "phase": "11.11N",
+    "implementation_status": "SIGMATHETA_DIAGNOSTIC_SOURCE_IMPLEMENTED",
+    "source_type": "EXPLICIT_DIAGNOSTIC_INPUT",
+    "synthetic_fixture_source_allowed": true,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "limited_gate_can_be_fed_diagnostically": true,
+    "required_statuses": [
+      "PHASE11_11N_SIGMATHETA_DIAGNOSTIC_SOURCE_IMPLEMENTED",
+      "SIGMATHETA_DIAGNOSTIC_SOURCE_IMPLEMENTED",
+      "LIMITED_GATE_CAN_BE_FED_DIAGNOSTICALLY",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PKN_BEHAVIOR_NOT_CHANGED",
+      "PENNY_SHAPED_RUNTIME_NOT_ENABLED"
+    ],
+    "recommended_next_phase": "PHASE11_11O_VALIDATE_SIGMATHETA_DIAGNOSTIC_SOURCE_ON_CONTROLLED_CASES",
+    "caveats": [
+      "The sigma-theta source is explicit and diagnostic.",
+      "The source is not physically validated.",
+      "The source is not legacy equivalent.",
+      "Physical dispatch remains disabled."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

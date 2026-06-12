@@ -1,0 +1,15 @@
+# Phase 11.11N fixture: missing initial sigma_theta is invalid when enabled.
+fixture_id: sigma_theta_input_missing_initial_invalid
+expected:
+  invalid_reason: missing_initial
+lot:
+  fracture:
+    sigma_theta_diagnostic_input:
+      enabled: true
+      source: EXPLICIT_DIAGNOSTIC_INPUT
+      sigma_theta_current_compression_positive_Pa: -2000000.0
+      sign_convention: COMPRESSION_POSITIVE
+      reference_frame: WELLBORE_WALL_TOTAL_STRESS
+      state_time: POST_DRILLING_BEFORE_LOT
+      physically_validated: false
+      legacy_equivalent: false

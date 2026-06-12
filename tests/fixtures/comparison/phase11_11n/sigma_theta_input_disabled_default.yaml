@@ -1,0 +1,11 @@
+# Phase 11.11N fixture: sigma_theta_diagnostic_input absent by default.
+fixture_id: sigma_theta_input_disabled_default
+expected:
+  diagnostics_enabled: false
+  sigma_theta_diagnostic_input_enabled: false
+  runtime_dispatch_enabled: false
+  pkn_behavior_changed: false
+lot:
+  fracture:
+    geometry: pkn
+    fracture_model: PKN

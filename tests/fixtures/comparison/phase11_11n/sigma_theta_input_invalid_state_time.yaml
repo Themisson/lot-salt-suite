@@ -1,0 +1,16 @@
+# Phase 11.11N fixture: unsupported state time is invalid.
+fixture_id: sigma_theta_input_invalid_state_time
+expected:
+  invalid_reason: invalid_state_time
+lot:
+  fracture:
+    sigma_theta_diagnostic_input:
+      enabled: true
+      source: EXPLICIT_DIAGNOSTIC_INPUT
+      sigma_theta_initial_compression_positive_Pa: 5000000.0
+      sigma_theta_current_compression_positive_Pa: -2000000.0
+      sign_convention: COMPRESSION_POSITIVE
+      reference_frame: WELLBORE_WALL_TOTAL_STRESS
+      state_time: DURING_LOT_STEP
+      physically_validated: false
+      legacy_equivalent: false

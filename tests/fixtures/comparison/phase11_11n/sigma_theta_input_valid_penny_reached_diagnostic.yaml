@@ -1,0 +1,24 @@
+# Phase 11.11N fixture: PENNY_SHAPED remains diagnostic-only when reached.
+fixture_id: sigma_theta_input_valid_penny_reached_diagnostic
+expected:
+  gate_status: FRACTURE_GATE_REACHED
+  dispatch_status: FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE
+  penny_shaped_runtime_enabled: false
+lot:
+  fracture:
+    geometry: pkn
+    fracture_model: PENNY_SHAPED
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: limited_gate
+      dispatch_runtime_enabled: false
+    sigma_theta_diagnostic_input:
+      enabled: true
+      source: EXPLICIT_DIAGNOSTIC_INPUT
+      sigma_theta_initial_compression_positive_Pa: 5000000.0
+      sigma_theta_current_compression_positive_Pa: -2000000.0
+      sign_convention: COMPRESSION_POSITIVE
+      reference_frame: WELLBORE_WALL_TOTAL_STRESS
+      state_time: POST_DRILLING_BEFORE_LOT
+      physically_validated: false
+      legacy_equivalent: false

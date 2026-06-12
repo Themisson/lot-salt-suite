@@ -62,3 +62,18 @@ PHASE11_11N_IMPLEMENT_OR_CONNECT_SIGMATHETA_SOURCE
 A proxima fase deve implementar ou conectar uma fonte real de sigma-theta apenas
 se conseguir preservar os guardas acima. Caso contrario, o `limited_gate` deve
 continuar diagnostico.
+
+## Implementação diagnóstica da 11.11N
+
+A Fase 11.11N implementou a alternativa segura prevista por este plano: uma
+fonte explicita, diagnostica e opt-in de sigma-theta. Ela permite alimentar o
+`limited_gate` para exercitar guards e dispatch status diagnostico, mas ainda
+nao e a fonte fisica definitiva.
+
+```text
+SIGMATHETA_DIAGNOSTIC_SOURCE_IMPLEMENTED
+LIMITED_GATE_CAN_BE_FED_DIAGNOSTICALLY
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PKN_BEHAVIOR_NOT_CHANGED
+```
