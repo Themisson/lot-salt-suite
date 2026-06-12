@@ -145,3 +145,23 @@ fase recomendada é:
 ```text
 PHASE11_10C_AUDIT_PENNY_SHAPED_MODEL_MATH_AXISYMMETRIC_1RAD
 ```
+
+## Resultado da 11.10C
+
+A auditoria matemática foi executada sem alterar C++ e sem executar
+BUZ29-PENNY:
+
+```text
+primary_classification = PENNY_MATH_HYDRAULIC_DIAGNOSTIC_SCALING
+secondary_classification = PENNY_MATH_AXISYMMETRIC_1RAD_PROXY
+tertiary_classification = PENNY_MATH_LEGACY_INSPIRED_EMPIRICAL
+math_audit_passed = true
+requires_code_correction = false
+requires_output_contract = true
+recommended_next_phase = PHASE11_10D_DEFINE_AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT
+```
+
+Com isso, a rota BUZ29-PENNY continua diagnóstica e inativa. A divergência
+principal não é uma correção matemática imediata do núcleo, mas a falta de um
+contrato explícito para `fracture_volume_proxy_m3` entre base interna de 1 rad
+e volume total equivalente 2π.

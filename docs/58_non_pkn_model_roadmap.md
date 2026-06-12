@@ -312,6 +312,27 @@ Mesmo com esse status parcial, a próxima fase não deve executar BUZ29; ela dev
 auditar matematicamente o `PennyShapedModel` na formulação axissimétrica de 1
 rad.
 
+## Fase 11.10C — auditoria matemática PennyShaped 1 rad
+
+A Fase 11.10C auditou o `PennyShapedModel` já implementado, sem alterar C++ e
+sem executar BUZ29-PENNY. A conclusão formal foi:
+
+```text
+primary_classification = PENNY_MATH_HYDRAULIC_DIAGNOSTIC_SCALING
+secondary_classification = PENNY_MATH_AXISYMMETRIC_1RAD_PROXY
+tertiary_classification = PENNY_MATH_LEGACY_INSPIRED_EMPIRICAL
+math_audit_passed = true
+requires_code_correction = false
+requires_output_contract = true
+recommended_next_phase = PHASE11_10D_DEFINE_AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT
+```
+
+As fórmulas de abertura e raio são dimensionalmente consistentes para uso
+diagnóstico, mas `fracture_volume_proxy_m3` permanece proxy de volume na
+interpretação axissimétrica de 1 rad. O multiplicador `10.0` continua
+legado-inspirado e empírico; ele não deve ser promovido a conversão formal
+`2π` sem contrato de saída específico.
+
 ## Caveats
 
 - Este roadmap não implementa solver novo.

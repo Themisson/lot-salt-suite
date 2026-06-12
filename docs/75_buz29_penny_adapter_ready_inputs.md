@@ -155,6 +155,25 @@ recommended_next_phase = PHASE11_10C_AUDIT_PENNY_SHAPED_MODEL_MATH_AXISYMMETRIC_
 
 A próxima fase recomendada é auditoria matemática, não execução BUZ29.
 
+## Resultado da 11.10C
+
+A auditoria matemática do `PennyShapedModel` foi concluída:
+
+```text
+primary_classification = PENNY_MATH_HYDRAULIC_DIAGNOSTIC_SCALING
+secondary_classification = PENNY_MATH_AXISYMMETRIC_1RAD_PROXY
+pressure_semantics = PRESSURE_SEMANTICS_CLEAR
+volume_multiplier_semantics = VOLUME_MULTIPLIER_EMPIRICAL
+math_audit_passed = true
+requires_code_correction = false
+requires_output_contract = true
+```
+
+Isso reduz o risco de correção matemática imediata no núcleo, mas não torna o
+candidato BUZ29 adapter-ready. Os campos ausentes continuam ausentes, e o
+próximo gate deve definir o contrato de saída 1 rad/2π antes de qualquer
+execução diagnóstica BUZ29.
+
 ## Riscos remanescentes
 
 - A pressão legada ainda precisa ser transformada em amostra `wellbore_pressure_Pa`.

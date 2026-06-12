@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.10B BUZ29-PENNY adapter-ready input inspection
+Fase ativa  : 11.10C PennyShaped math axisymmetric 1rad audit
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-12
 Testes C++  : 273/273 passaram apos Fase 11.10A em 2026-06-12
-Testes Py   : 449/449 passaram apos Fase 11.10B em 2026-06-12
+Testes Py   : 461/461 esperados apos Fase 11.10C em 2026-06-12
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,45 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-12] Fase 11.10C — auditoria matemática PennyShaped 1 rad — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Ferramenta criada:**
+
+```text
+tools/audit_phase11_10c_penny_math_axisymmetric_1rad.py
+```
+
+**Documento criado:**
+
+```text
+docs/76_penny_math_axisymmetric_1rad_audit.md
+```
+
+**Resultado:**
+
+```text
+primary_classification = PENNY_MATH_HYDRAULIC_DIAGNOSTIC_SCALING
+secondary_classification = PENNY_MATH_AXISYMMETRIC_1RAD_PROXY
+tertiary_classification = PENNY_MATH_LEGACY_INSPIRED_EMPIRICAL
+pressure_semantics = PRESSURE_SEMANTICS_CLEAR
+volume_multiplier_semantics = VOLUME_MULTIPLIER_EMPIRICAL
+math_audit_passed = true
+requires_code_correction = false
+requires_output_contract = true
+recommended_next_phase = PHASE11_10D_DEFINE_AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT
+```
+
+**Interpretação:** as relações de abertura e raio do `PennyShapedModel` são
+dimensionalmente consistentes para uso diagnóstico hidráulico. O campo
+`fracture_volume_proxy_m3` deve permanecer proxy axissimétrico de 1 rad, com
+contrato explícito futuro para separar volume interno 1-rad de volume total
+equivalente 2π. A fase não executa BUZ29-PENNY, não valida BUZ29 e não altera
+código C++.
 
 ---
 

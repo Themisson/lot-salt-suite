@@ -2211,6 +2211,38 @@
       "Phase 11.10B inspects inputs only; it does not execute BUZ29-PENNY."
     ]
   },
+  "phase11_10c_penny_math_axisymmetric_1rad_audit": {
+    "status": "PHASE11_10C_PENNY_MATH_AXISYMMETRIC_1RAD_AUDITED",
+    "phase": "11.10C",
+    "track": "PENNY_SHAPED",
+    "primary_classification": "PENNY_MATH_HYDRAULIC_DIAGNOSTIC_SCALING",
+    "secondary_classification": "PENNY_MATH_AXISYMMETRIC_1RAD_PROXY",
+    "tertiary_classification": "PENNY_MATH_LEGACY_INSPIRED_EMPIRICAL",
+    "pressure_semantics": "PRESSURE_SEMANTICS_CLEAR",
+    "volume_multiplier_semantics": "VOLUME_MULTIPLIER_EMPIRICAL",
+    "math_audit_passed": true,
+    "requires_code_correction": false,
+    "requires_documentation_update": true,
+    "requires_output_contract": true,
+    "tool": "tools/audit_phase11_10c_penny_math_axisymmetric_1rad.py",
+    "document": "docs/76_penny_math_axisymmetric_1rad_audit.md",
+    "axisymmetric_interpretation": "PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED",
+    "future_output_requirement": "AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED",
+    "recommended_next_phase": "PHASE11_10D_DEFINE_AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT",
+    "simulation_executed": false,
+    "physical_validation": false,
+    "legacy_equivalence": false,
+    "caveats": [
+      "NOT_PHYSICALLY_VALIDATED",
+      "NOT_LEGACY_EQUIVALENT",
+      "NOT_ACTIVE_SIMULATION_CASE",
+      "BUZ29_PENNY_NOT_EXECUTED",
+      "PENNY_MODEL_AXISYMMETRIC_1RAD_INTERPRETATION_REQUIRED",
+      "AXISYMMETRIC_1RAD_INTERNAL_TOTAL_VOLUME_OUTPUT_REQUIRED",
+      "fracture_volume_proxy_m3 is dimensionally a volume but remains a diagnostic proxy until the 1-rad versus 2pi output contract is defined.",
+      "volume_multiplier = 10.0 is legacy-inspired and empirical; it is not a formal 2pi conversion."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

@@ -82,3 +82,20 @@ cases/validation/non_pkn/penny_shaped_synthetic_minimal.yaml
 
 O caso é verificado por `tools/verify_phase11_9a_penny_synthetic_case.py` e
 permanece fora do parser/schema oficial.
+
+## Resultado da Fase 11.10C
+
+A auditoria matemática posterior classificou o núcleo usado pelo adapter como:
+
+```text
+primary_classification = PENNY_MATH_HYDRAULIC_DIAGNOSTIC_SCALING
+secondary_classification = PENNY_MATH_AXISYMMETRIC_1RAD_PROXY
+math_audit_passed = true
+requires_code_correction = false
+requires_output_contract = true
+```
+
+Essa classificação preserva o adapter atual: não há correção C++ obrigatória.
+O próximo passo técnico é definir contrato de saída para separar grandezas
+internas em 1 rad e volumes equivalentes 2π antes de qualquer uso físico forte
+do `fracture_volume_proxy_m3`.

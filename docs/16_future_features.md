@@ -598,3 +598,9 @@ CaseData -> SaltCreepTimeBridge -> SaltWallStressDiagnostics
   `sigma_theta_compression_positive_Pa` ainda não estão adapter-ready. A
   próxima fase permanece `PHASE11_10C_AUDIT_PENNY_SHAPED_MODEL_MATH_AXISYMMETRIC_1RAD`
   antes de qualquer execução diagnóstica.
+- A Fase 11.10C audita a matemática do `PennyShapedModel` na interpretação
+  axissimétrica de 1 rad e classifica a rota como
+  `PENNY_MATH_HYDRAULIC_DIAGNOSTIC_SCALING` /
+  `PENNY_MATH_AXISYMMETRIC_1RAD_PROXY`. A auditoria passa sem correção C++,
+  mas exige `PHASE11_10D_DEFINE_AXISYMMETRIC_1RAD_2PI_OUTPUT_CONTRACT` antes
+  de tratar `fracture_volume_proxy_m3` como volume físico total.
