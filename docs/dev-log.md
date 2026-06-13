@@ -8189,8 +8189,6 @@ elegibilidade diagnóstica, não execução física de fratura.
 **Próxima fase recomendada:**
 `PHASE11_11Q_SPECIFY_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH`.
 
----
-
 ### [2026-06-13] Fase 11.11Q — Caminho de integração da fonte real sigma-theta — Codex
 
 **Status:** Concluído; commit/push executado ao final da fase.
@@ -8220,3 +8218,37 @@ pkn_behavior_change_allowed = false
 
 **Próxima fase recomendada:**
 `PHASE11_11R_CREATE_POST_DRILLING_SIGMATHETA_PROVIDER_FIXTURES`.
+
+---
+
+### [2026-06-13] Decisão — Readiness da fonte elástica sigma-theta — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `ELASTIC_SIGMATHETA_SOURCE_READY_FOR_DIAGNOSTIC_SEMIPHYSICAL_USE`.
+
+**Decisão:**
+
+```text
+ready_for_diagnostic_semiphysical_use = true
+ready_for_physical_validation = false
+ready_for_physical_dispatch = false
+ready_for_kirsch_upgrade_spec = true
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_change_allowed = false
+```
+
+**Interpretação:** a fonte `ELASTIC_INITIAL_WELLBORE_STATE` pode alimentar
+diagnósticos semi-físicos controlados do `limited_gate`, mas não representa
+validação física plena, equivalência com legado ou execução física de fratura.
+
+**Entregáveis:**
+- `tools/decide_elastic_sigmatheta_source_readiness.py`
+- `tests/python/test_decide_elastic_sigmatheta_source_readiness.py`
+- `docs/125_elastic_sigmatheta_source_readiness_decision.md`
+
+**Próxima fase recomendada:**
+`PHASE_SPECIFY_KIRSCH_OR_AXISYMMETRIC_ELASTIC_SIGMATHETA_UPGRADE`.

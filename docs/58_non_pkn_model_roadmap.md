@@ -1010,3 +1010,17 @@ PENNY_SHAPED_RUNTIME_NOT_ENABLED
 BUZ29_EXECUTION_BLOCKED
 RUNTIME_DISPATCH_NOT_ENABLED
 ```
+
+### Readiness da fonte elástica — ainda sem runtime não-PKN
+
+A decisão posterior classifica a fonte como pronta para uso diagnóstico
+semi-físico:
+
+```text
+ELASTIC_SIGMATHETA_SOURCE_READY_FOR_DIAGNOSTIC_SEMIPHYSICAL_USE
+READY_FOR_KIRSCH_OR_AXISYMMETRIC_UPGRADE_SPEC
+```
+
+Isso não desbloqueia `PENNY_SHAPED` como runtime físico. BUZ29-PENNY permanece
+bloqueado, `runtime_dispatch_enabled` permanece `false` e o próximo passo é
+especificar uma formulação Kirsch/hoop stress ou elástica axisimétrica.

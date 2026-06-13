@@ -4020,6 +4020,46 @@
       "Physical dispatch, legacy equivalence and BUZ29-PENNY execution remain blocked."
     ]
   },
+  "phase_elastic_sigmatheta_source_readiness": {
+    "status": "PHASE_ELASTIC_SIGMATHETA_SOURCE_READINESS_DECIDED",
+    "phase": "ELASTIC_SIGMATHETA_SOURCE_READINESS",
+    "readiness_status": "ELASTIC_SIGMATHETA_SOURCE_READY_FOR_DIAGNOSTIC_SEMIPHYSICAL_USE",
+    "source": "ELASTIC_INITIAL_WELLBORE_STATE",
+    "ready_for_diagnostic_semiphysical_use": true,
+    "ready_for_physical_validation": false,
+    "ready_for_physical_dispatch": false,
+    "ready_for_kirsch_upgrade_spec": true,
+    "formula_verified": true,
+    "sign_convention_verified": true,
+    "threshold_behavior_verified": true,
+    "semi_physical": true,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "pkn_behavior_change_allowed": false,
+    "penny_shaped_runtime_enabled": false,
+    "preferred_upgrade_path": "AXISYMMETRIC_ELASTIC_SIGMATHETA_UPGRADE",
+    "required_statuses": [
+      "PHASE_ELASTIC_SIGMATHETA_SOURCE_READINESS_DECIDED",
+      "ELASTIC_SIGMATHETA_SOURCE_READY_FOR_DIAGNOSTIC_SEMIPHYSICAL_USE",
+      "READY_FOR_KIRSCH_OR_AXISYMMETRIC_UPGRADE_SPEC",
+      "PHYSICALLY_VALIDATED_FALSE",
+      "LEGACY_EQUIVALENT_FALSE",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PKN_BEHAVIOR_NOT_CHANGED"
+    ],
+    "recommended_next_phase": "PHASE_SPECIFY_KIRSCH_OR_AXISYMMETRIC_ELASTIC_SIGMATHETA_UPGRADE",
+    "caveats": [
+      "The elastic source is ready for semi-physical diagnostics only.",
+      "The source is not physically validated.",
+      "The source is not legacy-equivalent.",
+      "Physical dispatch, BUZ29-PENNY execution and PENNY_SHAPED runtime remain blocked.",
+      "The next phase should specify a Kirsch/hoop-stress or axisymmetric elastic upgrade."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

@@ -177,3 +177,26 @@ THRESHOLD_BEHAVIOR_VERIFIED
 
 Essa validação confirma consistência algébrica da fonte e do critério
 diagnóstico, mas não constitui validação física plena.
+
+## Decisão de readiness
+
+A fase de decisão posterior classificou a fonte como:
+
+```text
+ELASTIC_SIGMATHETA_SOURCE_READY_FOR_DIAGNOSTIC_SEMIPHYSICAL_USE
+READY_FOR_KIRSCH_OR_AXISYMMETRIC_UPGRADE_SPEC
+```
+
+A fonte pode alimentar diagnósticos semi-físicos do `limited_gate`, mas segue
+com:
+
+```text
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_changed = false
+```
+
+O próximo salto técnico recomendado é especificar uma formulação
+Kirsch/hoop-stress ou elástica axisimétrica mais alinhada ao runtime.

@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">184/191</div><div class="l">fases ativas/concluídas</div></div>
-      <div class="stat"><div class="n tealc">398</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">1026</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">185/192</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n tealc">414</div><div class="l">testes C++ verdes</div></div>
+      <div class="stat"><div class="n coppc">1049</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8652,6 +8652,18 @@ THRESHOLD_BEHAVIOR_VERIFIED
 <p>A validação analítica cobre cinco casos controlados e confirma que o threshold
 exato e classificado como <code>Reached</code>. A próxima decisão deve avaliar readiness
 diagnóstico da fonte elástica sem promover o resultado a validação física plena.</p>
+<h3 id="readiness-da-fonte-elastica-sigma-theta">Readiness da fonte elástica sigma-theta</h3>
+<p>Status:</p>
+<pre><code class="language-text">ELASTIC_SIGMATHETA_SOURCE_READY_FOR_DIAGNOSTIC_SEMIPHYSICAL_USE
+READY_FOR_KIRSCH_OR_AXISYMMETRIC_UPGRADE_SPEC
+PHYSICALLY_VALIDATED_FALSE
+LEGACY_EQUIVALENT_FALSE
+RUNTIME_DISPATCH_NOT_ENABLED
+</code></pre>
+<p>A fonte <code>ELASTIC_INITIAL_WELLBORE_STATE</code> está pronta para diagnóstico
+semi-físico controlado. A próxima evolução deve especificar Kirsch/hoop stress
+ou uma formulação elástica axisimétrica mais alinhada ao runtime, ainda sem
+dispatch físico e sem BUZ29-PENNY.</p>
 </div>
 </section>
 

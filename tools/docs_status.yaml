@@ -198,6 +198,7 @@ phases:
   master_phase_f_sigmatheta_provider_readiness_decision: completed
   phase_elastic_initial_wellbore_sigmatheta_source: completed
   phase_elastic_sigmatheta_analytic_validation: completed
+  phase_elastic_sigmatheta_source_readiness: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -322,6 +323,7 @@ docs:
   master_phase_f_sigmatheta_provider_readiness_decision: implemented
   phase_elastic_initial_wellbore_sigmatheta_source: implemented
   phase_elastic_sigmatheta_analytic_validation: implemented
+  phase_elastic_sigmatheta_source_readiness: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -385,14 +387,14 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 398        # Catch2 lot-salt-suite — atualizado apos execucao da Fase D sigma-theta provider wiring (2026-06-13)
+  cpp_tests: 414        # Catch2 lot-salt-suite — atualizado apos execucao da decisao elastic sigma-theta readiness (2026-06-13)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 1026    # pytest lot-salt-suite — atualizar apos execucao da Fase F sigma-theta provider readiness (2026-06-13)
+  python_tests: 1049    # pytest lot-salt-suite — atualizado apos execucao da decisao elastic sigma-theta readiness (2026-06-13)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-13"
-updated_by: "codex (Fase D sigma-theta provider pre-runner wiring)"
+updated_by: "codex (decisao elastic sigma-theta source readiness)"
 project_version: "0.1.0"

@@ -1176,3 +1176,20 @@ THRESHOLD_BEHAVIOR_VERIFIED
 A validação analítica cobre cinco casos controlados e confirma que o threshold
 exato e classificado como `Reached`. A próxima decisão deve avaliar readiness
 diagnóstico da fonte elástica sem promover o resultado a validação física plena.
+
+### Readiness da fonte elástica sigma-theta
+
+Status:
+
+```text
+ELASTIC_SIGMATHETA_SOURCE_READY_FOR_DIAGNOSTIC_SEMIPHYSICAL_USE
+READY_FOR_KIRSCH_OR_AXISYMMETRIC_UPGRADE_SPEC
+PHYSICALLY_VALIDATED_FALSE
+LEGACY_EQUIVALENT_FALSE
+RUNTIME_DISPATCH_NOT_ENABLED
+```
+
+A fonte `ELASTIC_INITIAL_WELLBORE_STATE` está pronta para diagnóstico
+semi-físico controlado. A próxima evolução deve especificar Kirsch/hoop stress
+ou uma formulação elástica axisimétrica mais alinhada ao runtime, ainda sem
+dispatch físico e sem BUZ29-PENNY.

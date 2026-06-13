@@ -93,6 +93,19 @@ ELASTIC_SIGMATHETA_ANALYTIC_CASES_VALID
 Essa validacao confirma a formula especificada e a convencao de sinal em casos
 controlados, sem declarar equivalencia fisica plena.
 
+Decisao de readiness posterior:
+
+```text
+ELASTIC_SIGMATHETA_SOURCE_READY_FOR_DIAGNOSTIC_SEMIPHYSICAL_USE
+READY_FOR_KIRSCH_OR_AXISYMMETRIC_UPGRADE_SPEC
+PHYSICALLY_VALIDATED_FALSE
+LEGACY_EQUIVALENT_FALSE
+RUNTIME_DISPATCH_NOT_ENABLED
+```
+
+A fonte elastica inicial pode ser usada em diagnostico semi-fisico, mas ainda
+nao deve ser tratada como validacao fisica plena nem como dispatch fisico.
+
 Fonte secundária:
 
 ```text

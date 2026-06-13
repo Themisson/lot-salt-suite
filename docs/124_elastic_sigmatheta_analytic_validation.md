@@ -118,3 +118,21 @@ A fase não:
 PHASE_DECIDE_ELASTIC_SIGMATHETA_SOURCE_READINESS
 ```
 
+## Decisão posterior
+
+A fase de readiness decidiu:
+
+```text
+ELASTIC_SIGMATHETA_SOURCE_READY_FOR_DIAGNOSTIC_SEMIPHYSICAL_USE
+ready_for_diagnostic_semiphysical_use = true
+ready_for_physical_validation = false
+ready_for_physical_dispatch = false
+ready_for_kirsch_upgrade_spec = true
+```
+
+A validação analítica permanece evidência de consistência algébrica e de sinal,
+não validação física plena. O próximo salto técnico recomendado é:
+
+```text
+PHASE_SPECIFY_KIRSCH_OR_AXISYMMETRIC_ELASTIC_SIGMATHETA_UPGRADE
+```
