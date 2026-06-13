@@ -57,6 +57,34 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-13] Fase B — sigma-theta source solution plan — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Plano:** `SIGMATHETA_SOURCE_SOLUTION_PLAN_READY`.
+
+**Rota escolhida:** `SEMI_PHYSICAL_ELASTIC_SIGMATHETA_SOURCE_IMPLEMENTABLE`.
+
+**Componente proposto:** `PostDrillingSigmaThetaProvider`.
+
+**Ferramenta criada:**
+
+```text
+tools/plan_sigmatheta_source_solution.py
+```
+
+**Documento criado:**
+
+```text
+docs/118_sigmatheta_source_solution_plan.md
+```
+
+**Gate:** `implementation_allowed_next = true`;
+`runtime_dispatch_allowed_next = false`.
+
+---
+
 ### [2026-06-13] Fase A — sigma-theta source root cause diagnosis — Codex
 
 **Status:** Implementado; commit/push executado ao final se todos os gates

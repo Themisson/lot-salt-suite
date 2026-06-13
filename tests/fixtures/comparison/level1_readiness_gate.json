@@ -3810,6 +3810,31 @@
       "PKN physical behavior must remain unchanged."
     ]
   },
+  "master_phase_b_sigmatheta_source_solution_plan": {
+    "status": "MASTER_PHASE_B_SIGMATHETA_SOURCE_SOLUTION_PLAN_READY",
+    "phase": "master-B",
+    "solution_plan_status": "SIGMATHETA_SOURCE_SOLUTION_PLAN_READY",
+    "selected_solution_path": "SEMI_PHYSICAL_ELASTIC_SIGMATHETA_SOURCE_IMPLEMENTABLE",
+    "proposed_component": "PostDrillingSigmaThetaProvider",
+    "implementation_allowed_next": true,
+    "runtime_dispatch_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "pkn_behavior_change_allowed": false,
+    "penny_shaped_runtime_enabled": false,
+    "required_statuses": [
+      "MASTER_PHASE_B_SIGMATHETA_SOURCE_SOLUTION_PLAN_READY",
+      "SIGMATHETA_SOURCE_SOLUTION_PLAN_READY",
+      "POST_DRILLING_SIGMATHETA_PROVIDER_SELECTED",
+      "RUNTIME_DISPATCH_NOT_ALLOWED",
+      "BUZ29_EXECUTION_BLOCKED"
+    ],
+    "recommended_next_phase": "MASTER_PHASE_C_IMPLEMENT_POST_DRILLING_SIGMATHETA_PROVIDER",
+    "caveats": [
+      "The plan does not claim physical validation.",
+      "ElasticInitialWellboreState remains semi-physical until a validated derivation exists.",
+      "PKN output compatibility remains mandatory."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
