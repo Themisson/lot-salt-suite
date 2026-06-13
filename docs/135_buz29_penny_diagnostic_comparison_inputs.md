@@ -62,3 +62,17 @@ legacy_equivalent = false
 ```
 
 This does not execute BUZ29/PENNY and does not change the physical PKN runtime.
+
+## Diagnostic Run Attempt
+
+The next phase audited the available route and blocked execution because there
+is no safe BUZ29/PENNY diagnostic runner yet:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+execution_completed = false
+diagnostic_only = true
+runtime_dispatch_enabled = false
+physically_validated = false
+legacy_equivalent = false
+```

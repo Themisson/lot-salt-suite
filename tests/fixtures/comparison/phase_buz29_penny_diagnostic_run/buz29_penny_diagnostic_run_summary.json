@@ -1,0 +1,34 @@
+{
+  "phase": "PHASE_RUN_BUZ29_PENNY_DIAGNOSTIC_COMPARISON",
+  "case_id": "BUZ29_PENNY_DIAGNOSTIC",
+  "execution_status": "BUZ29_PENNY_DIAGNOSTIC_EXECUTION_BLOCKED_BY_MISSING_RUNNER",
+  "execution_completed": false,
+  "diagnostic_only": true,
+  "physically_validated": false,
+  "legacy_equivalent": false,
+  "runtime_dispatch_enabled": false,
+  "penny_shaped_runtime_enabled": false,
+  "pkn_behavior_changed": false,
+  "physical_validation_claimed": false,
+  "legacy_equivalence_claimed": false,
+  "candidate_case": "cases/validation/non_pkn/buz29_penny_candidate.yaml",
+  "candidate_case_active": false,
+  "diagnostic_route_located": true,
+  "diagnostic_runner_available": false,
+  "adapter_ready": false,
+  "partial_adapter_ready": true,
+  "writer_available": true,
+  "outputs_generated": [],
+  "blocking_reasons": [
+    "BUZ29_PENNY_DIAGNOSTIC_RUNNER_NOT_AVAILABLE",
+    "BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL",
+    "NO_RUNTIME_NON_PKN_RUNNER",
+    "CANDIDATE_CASE_NOT_ACTIVE_RUNTIME_CASE"
+  ],
+  "blocking_caveats": [
+    "NO_PHYSICAL_VALIDATION",
+    "NO_LEGACY_EQUIVALENCE",
+    "NO_RUNTIME_DISPATCH"
+  ],
+  "recommended_next_phase": "PHASE_FIX_BUZ29_PENNY_DIAGNOSTIC_RUNNER"
+}

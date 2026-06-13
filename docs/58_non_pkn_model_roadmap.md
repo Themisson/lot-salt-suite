@@ -1088,3 +1088,18 @@ RUNTIME_DISPATCH_NOT_ENABLED
 
 A próxima fase pode executar apenas comparação diagnóstica. `PENNY_SHAPED`
 permanece não físico, sem equivalência legada e isolado de dispatch runtime.
+
+### Tentativa de execução diagnóstica BUZ29/PENNY
+
+A execução foi bloqueada por ausência de runner diagnóstico seguro:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_RUN_BLOCKED
+BUZ29_PENNY_DIAGNOSTIC_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+NO_RUNTIME_NON_PKN_RUNNER
+BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL
+```
+
+O writer e o adapter continuam disponíveis como componentes diagnósticos
+isolados, mas ainda não existe caminho operacional para executar o candidato
+BUZ29/PENNY sem nova integração C++ controlada.

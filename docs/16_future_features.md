@@ -1364,3 +1364,17 @@ RUNTIME_DISPATCH_NOT_ENABLED
 
 This is a narrow future-work authorization for diagnostic comparison. It is not
 physical validation and it is not legacy equivalence.
+
+### BUZ29 Penny Diagnostic Run Blocker
+
+Status:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_RUN_BLOCKED
+BUZ29_PENNY_DIAGNOSTIC_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+RUNTIME_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+Future work should add a dedicated diagnostic runner, or explicitly complete
+the missing adapter-ready BUZ29/PENNY inputs before attempting execution again.

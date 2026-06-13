@@ -53,3 +53,21 @@ legacy equivalence remains unclaimed
 ```text
 PHASE_RUN_BUZ29_PENNY_DIAGNOSTIC_COMPARISON
 ```
+
+## Execution Audit Result
+
+The next phase attempted to locate a safe diagnostic route and blocked before
+execution:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_RUN_BLOCKED
+BUZ29_PENNY_DIAGNOSTIC_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+execution_completed = false
+runtime_dispatch_enabled = false
+physically_validated = false
+legacy_equivalent = false
+pkn_behavior_changed = false
+```
+
+The block preserves the gate's intent: do not improvise a physical runtime path
+when only isolated diagnostic components are available.

@@ -8725,3 +8725,49 @@ o legado.
 
 **Próxima fase recomendada:**
 `PHASE_RUN_BUZ29_PENNY_DIAGNOSTIC_COMPARISON`.
+
+---
+
+### [2026-06-13] Tentativa de execução diagnóstica BUZ29/PENNY — Codex
+
+**Status:** Bloqueado com motivo explícito; commit/push executado ao final da
+fase.
+
+**Classificação:** `BUZ29_PENNY_DIAGNOSTIC_RUN_BLOCKED`.
+
+**Motivo principal:** `BUZ29_PENNY_DIAGNOSTIC_EXECUTION_BLOCKED_BY_MISSING_RUNNER`.
+
+**Resultado:**
+
+```text
+execution_completed = false
+diagnostic_only = true
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+penny_shaped_runtime_enabled = false
+pkn_behavior_changed = false
+```
+
+**Bloqueios:**
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_RUNNER_NOT_AVAILABLE
+BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL
+NO_RUNTIME_NON_PKN_RUNNER
+CANDIDATE_CASE_NOT_ACTIVE_RUNTIME_CASE
+```
+
+**Interpretação:** a rota possui candidato inativo, adapter e writer
+diagnósticos isolados, mas ainda não possui runner BUZ29/PENNY seguro. A fase
+não executou BUZ29/PENNY, não habilitou dispatch físico, não declarou validação
+física e não alterou PKN.
+
+**Entregáveis:**
+- `tools/audit_buz29_penny_diagnostic_run.py`
+- `tests/python/test_audit_buz29_penny_diagnostic_run.py`
+- `tests/fixtures/comparison/phase_buz29_penny_diagnostic_run/`
+- `docs/137_buz29_penny_diagnostic_run.md`
+
+**Próxima fase recomendada:**
+`PHASE_FIX_BUZ29_PENNY_DIAGNOSTIC_RUNNER`.

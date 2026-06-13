@@ -95,6 +95,24 @@ diagnostic-comparison phase. It does not enable runtime dispatch, does not
 execute BUZ29/PENNY in this phase, and does not claim physical validation or
 legacy equivalence.
 
+## BUZ29/PENNY Diagnostic Run Audit
+
+The attempted diagnostic execution was blocked before running:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_RUN_BLOCKED
+BUZ29_PENNY_DIAGNOSTIC_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+diagnostic_only = true
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+pkn_behavior_changed = false
+```
+
+The candidate route has an inactive YAML, an isolated adapter and an isolated
+writer, but no safe non-PKN diagnostic runner that can consume the BUZ29/PENNY
+candidate without new runtime integration.
+
 ## BUZ29/PENNY Inputs Prepared
 
 The BUZ29/PENNY diagnostic input manifest was prepared without execution:

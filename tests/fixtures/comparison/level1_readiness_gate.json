@@ -4301,6 +4301,37 @@
     "semantic_flags_registered": true,
     "recommended_next_phase": "PHASE_RUN_BUZ29_PENNY_DIAGNOSTIC_COMPARISON"
   },
+  "phase_buz29_penny_diagnostic_run": {
+    "phase": "PHASE_RUN_BUZ29_PENNY_DIAGNOSTIC_COMPARISON",
+    "status": "BUZ29_PENNY_DIAGNOSTIC_RUN_BLOCKED",
+    "execution_status": "BUZ29_PENNY_DIAGNOSTIC_EXECUTION_BLOCKED_BY_MISSING_RUNNER",
+    "execution_completed": false,
+    "diagnostic_only": true,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "runtime_dispatch_enabled": false,
+    "penny_shaped_runtime_enabled": false,
+    "pkn_behavior_changed": false,
+    "physical_validation_claimed": false,
+    "legacy_equivalence_claimed": false,
+    "diagnostic_route_located": true,
+    "diagnostic_runner_available": false,
+    "adapter_ready": false,
+    "partial_adapter_ready": true,
+    "writer_available": true,
+    "blocking_reasons": [
+      "BUZ29_PENNY_DIAGNOSTIC_RUNNER_NOT_AVAILABLE",
+      "BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL",
+      "NO_RUNTIME_NON_PKN_RUNNER",
+      "CANDIDATE_CASE_NOT_ACTIVE_RUNTIME_CASE"
+    ],
+    "blocking_caveats": [
+      "NO_PHYSICAL_VALIDATION",
+      "NO_LEGACY_EQUIVALENCE",
+      "NO_RUNTIME_DISPATCH"
+    ],
+    "recommended_next_phase": "PHASE_FIX_BUZ29_PENNY_DIAGNOSTIC_RUNNER"
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
