@@ -1,0 +1,8 @@
+metadata:
+  name: modern_json_volume_balance_pre_iterative_explicit_output
+apb_lot:
+  output_format: json
+  legacy_dat_output_enabled: true
+  leakoff_coupling_mode: volume_balance
+  salt_displacement_mode: pre_iterative
+caveat: "Explicit output path is validated by the regression manifest."

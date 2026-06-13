@@ -57,6 +57,35 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-13] APB/LOT extended regression suite — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Classificações:**
+
+```text
+APB_LOT_RUN_EXTENDED_REGRESSION_SUITE
+APB_LOT_EXTENDED_REGRESSION_PASSED
+MODERN_APB_LOT_MODES_VALID
+LEGACY_APB_LOT_MODES_PRESERVED
+JSON_OUTPUT_CONTRACT_VALID
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_PENNY_NOT_EXECUTED
+```
+
+**Escopo:** regressao contratual estendida para fixtures APB/LOT, regra
+`*_out.json`, modos modernos/legados e rejeicao de modos invalidos. A fase nao
+executa BUZ29/PENNY, nao altera PKN e nao versiona `results/`.
+
+**Próxima fase recomendada:**
+
+```text
+APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE
+```
+
+---
+
 ### [2026-06-13] APB/LOT JSON, leakoff volumétrico e sal pré-iterativo — Codex
 
 **Status:** Implementado; commit/push executado ao final se todos os gates

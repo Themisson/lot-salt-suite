@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">208/215</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">209/216</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">443</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">1160</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">1172</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8829,6 +8829,17 @@ PKN_BEHAVIOR_NOT_CHANGED
 <code>volume_balance</code> leakoff coupling and <code>pre_iterative</code> salt displacement
 scheduling. These contracts do not enable a full APB solver, do not alter PKN,
 and do not resolve BUZ29/PENNY adapter inputs.</p>
+<h3 id="apblot-extended-regression-suite">APB/LOT Extended Regression Suite</h3>
+<p>Status:</p>
+<pre><code class="language-text">APB_LOT_EXTENDED_REGRESSION_PASSED
+MODERN_APB_LOT_MODES_VALID
+LEGACY_APB_LOT_MODES_PRESERVED
+JSON_OUTPUT_CONTRACT_VALID
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_PENNY_NOT_EXECUTED
+</code></pre>
+<p>This is a contract-level regression. Runtime APB metrics remain unavailable
+until a real APB runner/case is connected to the modern path.</p>
 </div>
 </section>
 

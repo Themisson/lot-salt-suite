@@ -4465,5 +4465,17 @@
     "pkn_behavior_changed": false,
     "buz29_penny_executed": false,
     "recommended_next_phase": "APB_LOT_RUN_EXTENDED_REGRESSION_SUITE"
+  },
+  "apb_lot_extended_regression_suite": {
+    "status": "APB_LOT_EXTENDED_REGRESSION_PASSED",
+    "modern_modes_valid": true,
+    "legacy_modes_valid": true,
+    "invalid_modes_rejected": true,
+    "json_output_contract_valid": true,
+    "pkn_behavior_changed": false,
+    "buz29_penny_executed": false,
+    "runtime_metrics_available": false,
+    "contract_validation_only": true,
+    "recommended_next_phase": "APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE"
   }
 }

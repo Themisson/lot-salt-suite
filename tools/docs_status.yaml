@@ -222,6 +222,7 @@ phases:
   phase_apb_lot_modern_modes_validation: completed
   phase_apb_lot_legacy_vs_modern_comparison: completed
   phase_apb_lot_modern_modes_default_decision: completed
+  phase_apb_lot_extended_regression_suite: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -370,6 +371,7 @@ docs:
   phase_apb_lot_modern_modes_validation: implemented
   phase_apb_lot_legacy_vs_modern_comparison: implemented
   phase_apb_lot_modern_modes_default_decision: implemented
+  phase_apb_lot_extended_regression_suite: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -433,14 +435,14 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 443        # Catch2 lot-salt-suite — atualizado apos APB/LOT modern modes (2026-06-13)
+  cpp_tests: 443        # Catch2 lot-salt-suite — atualizado apos APB/LOT extended regression (2026-06-13)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 1160    # pytest lot-salt-suite — atualizado apos APB/LOT modern modes (2026-06-13)
+  python_tests: 1172    # pytest lot-salt-suite — atualizado apos APB/LOT extended regression (2026-06-13)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-13"
-updated_by: "codex (apb lot modern output and modes)"
+updated_by: "codex (apb lot extended regression)"
 project_version: "0.1.0"

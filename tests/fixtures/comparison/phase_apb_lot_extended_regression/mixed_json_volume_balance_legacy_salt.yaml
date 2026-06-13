@@ -1,0 +1,8 @@
+metadata:
+  name: mixed_json_volume_balance_legacy_salt
+apb_lot:
+  output_format: json
+  legacy_dat_output_enabled: true
+  leakoff_coupling_mode: volume_balance
+  salt_displacement_mode: legacy_inside_newton
+caveat: "Mixed mode fixture for backwards compatibility."

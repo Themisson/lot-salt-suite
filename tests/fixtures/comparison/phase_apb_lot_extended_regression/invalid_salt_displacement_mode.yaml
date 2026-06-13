@@ -1,0 +1,8 @@
+metadata:
+  name: invalid_salt_displacement_mode
+apb_lot:
+  output_format: json
+  legacy_dat_output_enabled: true
+  leakoff_coupling_mode: volume_balance
+  salt_displacement_mode: inside_magic_loop
+caveat: "Invalid fixture; salt displacement mode must be rejected."

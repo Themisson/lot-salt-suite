@@ -1,0 +1,8 @@
+metadata:
+  name: legacy_dat_nodal_force_inside_newton
+apb_lot:
+  output_format: legacy_dat
+  legacy_dat_output_enabled: true
+  leakoff_coupling_mode: legacy_nodal_force
+  salt_displacement_mode: legacy_inside_newton
+caveat: "Legacy APB/LOT mode fixture; comparison only."

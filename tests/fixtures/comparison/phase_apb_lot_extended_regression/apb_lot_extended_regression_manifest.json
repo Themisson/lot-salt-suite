@@ -1,0 +1,99 @@
+{
+  "phase": "APB_LOT_RUN_EXTENDED_REGRESSION_SUITE",
+  "fixtures": [
+    {
+      "id": "modern_json_volume_balance_pre_iterative",
+      "path": "modern_json_volume_balance_pre_iterative.yaml",
+      "expected_valid": true,
+      "expected_output_format": "json",
+      "expected_output_suffix": "_out.json",
+      "expected_leakoff_coupling_mode": "volume_balance",
+      "expected_salt_displacement_mode": "pre_iterative"
+    },
+    {
+      "id": "modern_json_volume_balance_pre_iterative_explicit_output",
+      "path": "modern_json_volume_balance_pre_iterative_explicit_output.yaml",
+      "expected_valid": true,
+      "expected_output_format": "json",
+      "expected_explicit_output_path": "custom/apb_lot_explicit_out.json",
+      "expected_leakoff_coupling_mode": "volume_balance",
+      "expected_salt_displacement_mode": "pre_iterative"
+    },
+    {
+      "id": "legacy_dat_nodal_force_inside_newton",
+      "path": "legacy_dat_nodal_force_inside_newton.yaml",
+      "expected_valid": true,
+      "expected_output_format": "legacy_dat",
+      "expected_leakoff_coupling_mode": "legacy_nodal_force",
+      "expected_salt_displacement_mode": "legacy_inside_newton"
+    },
+    {
+      "id": "mixed_json_legacy_leakoff_pre_iterative",
+      "path": "mixed_json_legacy_leakoff_pre_iterative.yaml",
+      "expected_valid": true,
+      "expected_output_format": "json",
+      "expected_leakoff_coupling_mode": "legacy_nodal_force",
+      "expected_salt_displacement_mode": "pre_iterative"
+    },
+    {
+      "id": "mixed_json_volume_balance_legacy_salt",
+      "path": "mixed_json_volume_balance_legacy_salt.yaml",
+      "expected_valid": true,
+      "expected_output_format": "json",
+      "expected_leakoff_coupling_mode": "volume_balance",
+      "expected_salt_displacement_mode": "legacy_inside_newton"
+    },
+    {
+      "id": "invalid_output_format",
+      "path": "invalid_output_format.yaml",
+      "expected_valid": false,
+      "expected_rejection": "invalid_output_format"
+    },
+    {
+      "id": "invalid_leakoff_coupling_mode",
+      "path": "invalid_leakoff_coupling_mode.yaml",
+      "expected_valid": false,
+      "expected_rejection": "invalid_leakoff_coupling_mode"
+    },
+    {
+      "id": "invalid_salt_displacement_mode",
+      "path": "invalid_salt_displacement_mode.yaml",
+      "expected_valid": false,
+      "expected_rejection": "invalid_salt_displacement_mode"
+    },
+    {
+      "id": "missing_apb_lot_block_defaults",
+      "path": "missing_apb_lot_block_defaults.yaml",
+      "expected_valid": true,
+      "expected_output_format": "json",
+      "expected_leakoff_coupling_mode": "volume_balance",
+      "expected_salt_displacement_mode": "pre_iterative",
+      "expected_defaults": true
+    }
+  ],
+  "output_name_rule_cases": [
+    ["input.yaml", "input_out.json"],
+    ["input.json", "input_out.json"],
+    ["input.dat", "input_out.json"]
+  ],
+  "required_json_sections": [
+    "metadata",
+    "configuration",
+    "time_series",
+    "layers",
+    "annulars",
+    "summary",
+    "caveats"
+  ],
+  "required_metadata_fields": [
+    "input_file",
+    "output_file",
+    "schema_version",
+    "generated_by"
+  ],
+  "required_configuration_fields": [
+    "output_format",
+    "leakoff_coupling_mode",
+    "salt_displacement_mode"
+  ]
+}

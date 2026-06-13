@@ -8,6 +8,7 @@
 namespace lss::io {
 
 struct ApbLotOutputConfiguration {
+  std::string output_format = "json";
   std::string leakoff_coupling_mode = "volume_balance";
   std::string salt_displacement_mode = "pre_iterative";
   double axisymmetric_angle_rad = 1.0;

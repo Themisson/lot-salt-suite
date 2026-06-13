@@ -1,0 +1,8 @@
+metadata:
+  name: invalid_output_format
+apb_lot:
+  output_format: xml
+  legacy_dat_output_enabled: true
+  leakoff_coupling_mode: volume_balance
+  salt_displacement_mode: pre_iterative
+caveat: "Invalid fixture; output_format must be rejected."

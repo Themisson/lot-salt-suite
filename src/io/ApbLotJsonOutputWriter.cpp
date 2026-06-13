@@ -146,6 +146,8 @@ void write_apb_lot_output_json(const ApbLotOutputDocument& document) {
       << (document.legacy_dat_available ? "true" : "false") << "\n";
   out << "  },\n";
   out << "  \"configuration\": {\n";
+  out << "    \"output_format\": \""
+      << escape_json(document.configuration.output_format) << "\",\n";
   out << "    \"leakoff_coupling_mode\": \""
       << escape_json(document.configuration.leakoff_coupling_mode) << "\",\n";
   out << "    \"salt_displacement_mode\": \""

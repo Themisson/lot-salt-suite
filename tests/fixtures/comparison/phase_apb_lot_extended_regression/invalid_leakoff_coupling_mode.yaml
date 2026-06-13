@@ -1,0 +1,8 @@
+metadata:
+  name: invalid_leakoff_coupling_mode
+apb_lot:
+  output_format: json
+  legacy_dat_output_enabled: true
+  leakoff_coupling_mode: force_balance_unknown
+  salt_displacement_mode: pre_iterative
+caveat: "Invalid fixture; leakoff mode must be rejected."

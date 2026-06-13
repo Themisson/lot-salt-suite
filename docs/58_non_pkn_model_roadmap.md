@@ -13,6 +13,17 @@ Isso nao altera a decisao de roadmap nao-PKN: `PENNY_SHAPED` continua sem
 runtime fisico, BUZ29-PENNY continua bloqueado e qualquer estado `Reached`
 representa somente gate diagnostico.
 
+## Atualizacao APB/LOT extended regression
+
+A regressao estendida APB/LOT validou contratos de output JSON e modos modernos
+sem executar BUZ29/PENNY. Isso nao altera o roadmap nao-PKN: `PENNY_SHAPED`
+continua sem runtime fisico e BUZ29-PENNY continua bloqueado.
+
+```text
+BUZ29_PENNY_NOT_EXECUTED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+```
+
 ```text
 SIGMATHETA_DIAGNOSTIC_CONTROLLED_CASES_VALID
 PENNY_SHAPED_RUNTIME_NOT_ENABLED

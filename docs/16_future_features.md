@@ -1429,3 +1429,19 @@ The APB/LOT modernization route now has isolated contracts for `*_out.json`,
 `volume_balance` leakoff coupling and `pre_iterative` salt displacement
 scheduling. These contracts do not enable a full APB solver, do not alter PKN,
 and do not resolve BUZ29/PENNY adapter inputs.
+
+### APB/LOT Extended Regression Suite
+
+Status:
+
+```text
+APB_LOT_EXTENDED_REGRESSION_PASSED
+MODERN_APB_LOT_MODES_VALID
+LEGACY_APB_LOT_MODES_PRESERVED
+JSON_OUTPUT_CONTRACT_VALID
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_PENNY_NOT_EXECUTED
+```
+
+This is a contract-level regression. Runtime APB metrics remain unavailable
+until a real APB runner/case is connected to the modern path.

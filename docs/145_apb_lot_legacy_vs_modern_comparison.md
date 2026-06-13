@@ -37,3 +37,16 @@ diferentes. Exige-se:
 A metodologia moderna e preferida como contrato novo por separar balanco
 volumetrico e deslocamento do sal do vetor de forcas legado. Isso nao declara
 equivalencia fisica com `APB1da`.
+
+## Regressao estendida APB/LOT
+
+A regressao estendida confirmou que os modos modernos e legados podem coexistir
+no contrato:
+
+```text
+json + volume_balance + pre_iterative
+legacy_dat + legacy_nodal_force + legacy_inside_newton
+```
+
+Essa comparacao ainda e contratual. Nao ha metricas runtime APB reais nesta
+fase.

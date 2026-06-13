@@ -24,3 +24,15 @@ pressao e reutiliza o deslocamento durante as iteracoes.
 
 Esta fase nao implementa um solver APB/sal completo nem altera `saltcreep`.
 Ela cria o contrato moderno e os testes de contagem/planejamento.
+
+## Regressao estendida APB/LOT
+
+A suite `APB_LOT_RUN_EXTENDED_REGRESSION_SUITE` validou:
+
+```text
+pre_iterative
+legacy_inside_newton
+```
+
+e rejeitou `inside_magic_loop`. A validacao e contratual e nao declara
+equivalencia fisica com o legado.

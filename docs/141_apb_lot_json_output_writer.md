@@ -33,3 +33,18 @@ apb_lot_output_v1
 
 `.dat` legado permanece disponivel como modo opcional. O writer JSON nao altera
 `ResultWriter` do PKN nem o formato fisico `result.json`/`timeseries.csv`.
+
+## Regressao estendida APB/LOT
+
+A fase `APB_LOT_RUN_EXTENDED_REGRESSION_SUITE` confirmou que o contrato minimo
+do `_out.json` contem `metadata`, `configuration`, `time_series`, `layers`,
+`annulars`, `summary` e `caveats`. A secao `configuration` registra
+explicitamente:
+
+```text
+output_format
+leakoff_coupling_mode
+salt_displacement_mode
+```
+
+Status: `JSON_OUTPUT_CONTRACT_VALID`.

@@ -75,6 +75,7 @@ TEST_CASE("APB LOT JSON writer emits parseable contract sections") {
         std::string::npos);
   CHECK(json.find("\"configuration\"") != std::string::npos);
   CHECK(json.find("\"time_series\"") != std::string::npos);
+  CHECK(json.find("\"output_format\": \"json\"") != std::string::npos);
   CHECK(json.find("\"leakoff_coupling_mode\": \"volume_balance\"") !=
         std::string::npos);
   CHECK(json.find("\"salt_displacement_mode\": \"pre_iterative\"") !=
