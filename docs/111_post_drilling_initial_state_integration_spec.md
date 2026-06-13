@@ -153,3 +153,17 @@ ready_for_physical_dispatch = false
 
 O contrato `PostDrillingInitialState` ainda precisa de uma fonte real para
 qualquer uso fisico. A prontidao atual e somente diagnostica.
+
+## Caminho 11.11Q
+
+A 11.11Q especifica o futuro `PostDrillingSigmaThetaProvider` como ponte entre
+o estado pos-perfuracao e os guards do `limited_gate`. O contrato continua:
+
+```text
+state_time = POST_DRILLING_BEFORE_LOT
+reference_frame = WELLBORE_WALL_TOTAL_STRESS
+sign_convention = COMPRESSION_POSITIVE
+```
+
+Nenhuma implementacao fisica e autorizada pela 11.11Q; a proxima fase deve
+criar fixtures do contrato.

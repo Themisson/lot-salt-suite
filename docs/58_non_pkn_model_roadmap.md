@@ -966,3 +966,19 @@ RUNTIME_DISPATCH_NOT_ENABLED
 
 `FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE` continua sendo elegibilidade
 diagnostica, nao execucao fisica.
+
+### Fase 11.11Q — fonte real sigma-theta ainda especificada, nao implementada
+
+A 11.11Q especifica o caminho futuro para uma fonte real de sigma-theta sem
+liberar a trilha nao-PKN:
+
+```text
+REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH_SPECIFIED
+PRIMARY_REAL_SOURCE_ELASTIC_INITIAL_WELLBORE_STATE
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+RUNTIME_DISPATCH_NOT_ALLOWED
+```
+
+BUZ29-PENNY permanece bloqueado ate que uma fonte real seja implementada,
+validada e aprovada por novo gate.

@@ -1125,3 +1125,19 @@ Proxima fase recomendada:
 ```text
 PHASE11_11Q_SPECIFY_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH
 ```
+
+### Fase 11.11Q — caminho da fonte real sigma-theta
+
+Status:
+
+```text
+PHASE11_11Q_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH_SPECIFIED
+PRIMARY_REAL_SOURCE_ELASTIC_INITIAL_WELLBORE_STATE
+POST_DRILLING_SIGMATHETA_PROVIDER_REQUIRED
+IMPLEMENTATION_NOT_ALLOWED_NEXT
+RUNTIME_DISPATCH_NOT_ALLOWED
+```
+
+A fase especifica `PostDrillingSigmaThetaProvider` como componente futuro. A
+proxima fase deve criar fixtures do contrato antes de implementar qualquer
+provider real.

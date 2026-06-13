@@ -166,3 +166,17 @@ especificar o caminho de integracao dessa fonte real:
 REAL_SIGMATHETA_SOURCE_INTEGRATION_SPEC_REQUIRED
 PHASE11_11Q_SPECIFY_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH
 ```
+
+## Especificação 11.11Q
+
+A 11.11Q fixa o caminho de integração futura:
+
+```text
+primary_real_source = ELASTIC_INITIAL_WELLBORE_STATE
+secondary_real_source = APB_SALT_COUPLED_STATE
+future_real_source = SALT_CREEP_PRE_LOT_STATE
+diagnostic_only_sources = EXPLICIT_DIAGNOSTIC_INPUT, SYNTHETIC_FIXTURE
+```
+
+`LEGACY_DIAGNOSTIC_TRACE` permanece fonte auditada, mas nao fonte de validação
+física. A próxima etapa deve criar fixtures do `PostDrillingSigmaThetaProvider`.

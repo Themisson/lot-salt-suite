@@ -3743,6 +3743,44 @@
       "A real sigma-theta source integration path still needs specification."
     ]
   },
+  "phase11_11q_real_sigmatheta_source_integration_path": {
+    "status": "PHASE11_11Q_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH_SPECIFIED",
+    "phase": "11.11Q",
+    "integration_path_status": "REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH_SPECIFIED",
+    "primary_real_source": "ELASTIC_INITIAL_WELLBORE_STATE",
+    "secondary_real_source": "APB_SALT_COUPLED_STATE",
+    "future_real_source": "SALT_CREEP_PRE_LOT_STATE",
+    "diagnostic_only_sources": [
+      "EXPLICIT_DIAGNOSTIC_INPUT",
+      "SYNTHETIC_FIXTURE"
+    ],
+    "legacy_trace_physical_validation_allowed": false,
+    "requires_post_drilling_state": true,
+    "lot_time_zero_is_not_drilling_time_zero": true,
+    "provider_contract_specified": true,
+    "implementation_allowed_next": false,
+    "runtime_dispatch_allowed_next": false,
+    "buz29_execution_allowed_next": false,
+    "pkn_behavior_change_allowed": false,
+    "required_statuses": [
+      "PHASE11_11Q_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH_SPECIFIED",
+      "REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH_SPECIFIED",
+      "PRIMARY_REAL_SOURCE_ELASTIC_INITIAL_WELLBORE_STATE",
+      "POST_DRILLING_SIGMATHETA_PROVIDER_REQUIRED",
+      "IMPLEMENTATION_NOT_ALLOWED_NEXT",
+      "RUNTIME_DISPATCH_NOT_ALLOWED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PKN_BEHAVIOR_NOT_CHANGED"
+    ],
+    "recommended_next_phase": "PHASE11_11R_CREATE_POST_DRILLING_SIGMATHETA_PROVIDER_FIXTURES",
+    "caveats": [
+      "Phase 11.11Q is specification only.",
+      "A real provider is not implemented in this phase.",
+      "Diagnostic sources remain diagnostic-only.",
+      "LEGACY_DIAGNOSTIC_TRACE is not a physical validation source.",
+      "Physical dispatch remains disabled."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

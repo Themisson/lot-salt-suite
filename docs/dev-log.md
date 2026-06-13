@@ -7939,3 +7939,35 @@ elegibilidade diagnóstica, não execução física de fratura.
 
 **Próxima fase recomendada:**
 `PHASE11_11Q_SPECIFY_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH`.
+
+---
+
+### [2026-06-13] Fase 11.11Q — Caminho de integração da fonte real sigma-theta — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH_SPECIFIED`.
+
+**Decisão:**
+
+```text
+primary_real_source = ELASTIC_INITIAL_WELLBORE_STATE
+secondary_real_source = APB_SALT_COUPLED_STATE
+future_real_source = SALT_CREEP_PRE_LOT_STATE
+diagnostic_only_sources = EXPLICIT_DIAGNOSTIC_INPUT, SYNTHETIC_FIXTURE
+legacy_trace_physical_validation_allowed = false
+implementation_allowed_next = false
+runtime_dispatch_allowed_next = false
+buz29_execution_allowed_next = false
+pkn_behavior_change_allowed = false
+```
+
+**Contrato futuro:** `PostDrillingSigmaThetaProvider`, ainda nao implementado.
+
+**Entregáveis:**
+- `tools/spec_phase11_11q_real_sigmatheta_source_integration_path.py`
+- `tests/python/test_spec_phase11_11q_real_sigmatheta_source_integration_path.py`
+- `docs/117_real_sigmatheta_source_integration_path.md`
+
+**Próxima fase recomendada:**
+`PHASE11_11R_CREATE_POST_DRILLING_SIGMATHETA_PROVIDER_FIXTURES`.

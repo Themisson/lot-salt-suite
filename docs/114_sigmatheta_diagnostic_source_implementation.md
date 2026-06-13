@@ -147,3 +147,18 @@ READY_FOR_DIAGNOSTIC_USE
 
 Essa decisao nao promove `sigma_theta_diagnostic_input` a fonte fisica, nao
 habilita dispatch e nao declara equivalencia com legado.
+
+## Caminho da fonte real 11.11Q
+
+A 11.11Q preserva `sigma_theta_diagnostic_input` como fonte diagnostica e
+especifica uma trilha separada para fonte real:
+
+```text
+PostDrillingSigmaThetaProvider
+primary_real_source = ELASTIC_INITIAL_WELLBORE_STATE
+implementation_allowed_next = false
+runtime_dispatch_allowed_next = false
+```
+
+Assim, a entrada diagnostica continua util para fixtures, mas nao substitui a
+fonte fisica futura.

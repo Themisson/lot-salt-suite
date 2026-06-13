@@ -234,7 +234,7 @@
   <div class="brand">
     <h1>lot-salt-suite<span class="dot">.</span></h1>
     <div class="sub">LOT · APB · Fluência de sal</div>
-    <span class="ver">v0.1.0 · atualizado 2026-06-12</span>
+    <span class="ver">v0.1.0 · atualizado 2026-06-13</span>
   </div>
   <div class="search-wrap">
     <input type="text" id="navSearch" placeholder="buscar na navegação..." autocomplete="off">
@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">175/182</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">176/183</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">387</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">950</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">966</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8617,6 +8617,17 @@ equivalencia com legado e nao habilita dispatch.</p>
 <p>Proxima fase recomendada:</p>
 <pre><code class="language-text">PHASE11_11Q_SPECIFY_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH
 </code></pre>
+<h3 id="fase-1111q-caminho-da-fonte-real-sigma-theta">Fase 11.11Q — caminho da fonte real sigma-theta</h3>
+<p>Status:</p>
+<pre><code class="language-text">PHASE11_11Q_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH_SPECIFIED
+PRIMARY_REAL_SOURCE_ELASTIC_INITIAL_WELLBORE_STATE
+POST_DRILLING_SIGMATHETA_PROVIDER_REQUIRED
+IMPLEMENTATION_NOT_ALLOWED_NEXT
+RUNTIME_DISPATCH_NOT_ALLOWED
+</code></pre>
+<p>A fase especifica <code>PostDrillingSigmaThetaProvider</code> como componente futuro. A
+proxima fase deve criar fixtures do contrato antes de implementar qualquer
+provider real.</p>
 </div>
 </section>
 
@@ -10389,7 +10400,7 @@ provado.</p>
 
   </div>
 </main>
-<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-12 por <span class="mono">generate_docs_index.py</span></footer>
+<footer><strong>lot-salt-suite</strong> v0.1.0 · Gerado em 2026-06-13 por <span class="mono">generate_docs_index.py</span></footer>
 <script>
   const sidebar = document.getElementById('sidebar');
   const menuBtn = document.getElementById('menuBtn');

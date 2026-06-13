@@ -82,3 +82,17 @@ PHASE11_11Q_SPECIFY_REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH
 
 Essa próxima fase deve especificar como uma fonte real de sigma-theta poderia ser
 integrada sem confundir o estado diagnóstico atual com validação física.
+
+## Resultado da especificação 11.11Q
+
+A 11.11Q especifica o caminho de integração da fonte real:
+
+```text
+REAL_SIGMATHETA_SOURCE_INTEGRATION_PATH_SPECIFIED
+primary_real_source = ELASTIC_INITIAL_WELLBORE_STATE
+secondary_real_source = APB_SALT_COUPLED_STATE
+future_real_source = SALT_CREEP_PRE_LOT_STATE
+```
+
+A próxima etapa recomendada é criar fixtures do
+`PostDrillingSigmaThetaProvider`, ainda sem implementar provider real.

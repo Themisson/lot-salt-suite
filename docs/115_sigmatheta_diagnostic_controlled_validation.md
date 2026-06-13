@@ -136,3 +136,17 @@ ready_for_physical_dispatch = false
 
 O estado `Reached` continua significando elegibilidade diagnostica do gate, nao
 execucao fisica de fratura.
+
+## Continuidade 11.11Q
+
+A 11.11Q usa a validação controlada da 11.11O como evidência para planejar uma
+fonte real futura, mas mantém:
+
+```text
+EXPLICIT_DIAGNOSTIC_INPUT = diagnostic_only
+SYNTHETIC_FIXTURE = diagnostic_only
+runtime_dispatch_allowed_next = false
+```
+
+O próximo passo recomendado é criar fixtures do provider futuro antes de
+qualquer implementação física.
