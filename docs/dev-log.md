@@ -57,6 +57,36 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-13] Fase C — PostDrillingSigmaThetaProvider — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Componente C++ criado:**
+
+```text
+include/lot/PostDrillingSigmaThetaProvider.hpp
+src/lot/PostDrillingSigmaThetaProvider.cpp
+tests/cpp/test_post_drilling_sigma_theta_provider.cpp
+```
+
+**Ferramenta criada:**
+
+```text
+tools/audit_post_drilling_sigma_theta_provider.py
+```
+
+**Documento criado:**
+
+```text
+docs/119_post_drilling_sigma_theta_provider_implementation.md
+```
+
+**Garantia:** provider isolado; sem dispatch fisico; sem chamada a PKN/Penny
+runtime; wiring para pre-runner fica para a Fase D.
+
+---
+
 ### [2026-06-13] Fase B — sigma-theta source solution plan — Codex
 
 **Status:** Implementado; commit/push executado ao final se todos os gates

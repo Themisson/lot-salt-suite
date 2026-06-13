@@ -3835,6 +3835,35 @@
       "PKN output compatibility remains mandatory."
     ]
   },
+  "master_phase_c_post_drilling_sigmatheta_provider": {
+    "status": "MASTER_PHASE_C_POST_DRILLING_SIGMATHETA_PROVIDER_IMPLEMENTED",
+    "phase": "master-C",
+    "implementation_status": "POST_DRILLING_SIGMATHETA_PROVIDER_IMPLEMENTED",
+    "provider": "PostDrillingSigmaThetaProvider",
+    "supported_sources": [
+      "EXPLICIT_DIAGNOSTIC_INPUT",
+      "SYNTHETIC_FIXTURE",
+      "ELASTIC_INITIAL_WELLBORE_STATE"
+    ],
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "wiring_to_pre_runner": false,
+    "required_statuses": [
+      "MASTER_PHASE_C_POST_DRILLING_SIGMATHETA_PROVIDER_IMPLEMENTED",
+      "POST_DRILLING_SIGMATHETA_PROVIDER_IMPLEMENTED",
+      "UNKNOWN_SOURCE_REJECTED",
+      "PHYSICAL_FLAGS_REJECTED",
+      "RUNTIME_DISPATCH_NOT_ENABLED"
+    ],
+    "recommended_next_phase": "MASTER_PHASE_D_WIRE_SIGMATHETA_PROVIDER_TO_PRE_RUNNER",
+    "caveats": [
+      "The provider is implemented but not wired to the diagnostic pre-runner in this phase.",
+      "ElasticInitialWellboreState is semi-physical and not physically validated.",
+      "PKN behavior remains unchanged."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

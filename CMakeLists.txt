@@ -121,6 +121,7 @@ set(LSS_CORE_SOURCES
   src/lot/PennyShapedModel.cpp
   src/lot/PknModel.cpp
   src/lot/PknRunner.cpp
+  src/lot/PostDrillingSigmaThetaProvider.cpp
   src/lot/PressureSigmaThetaFractureCriterionGuard.cpp
   src/lot/SigmaThetaInitialStateGuard.cpp
   src/lot/SigmaThetaProvider.cpp
@@ -188,6 +189,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_penny_shaped_model.cpp
     tests/cpp/test_pkn_model_synthetic.cpp
     tests/cpp/test_pkn_runner.cpp
+    tests/cpp/test_post_drilling_sigma_theta_provider.cpp
     tests/cpp/test_pressure_sigma_theta_fracture_criterion_guard.cpp
     tests/cpp/test_lot_pkn_salt_adapter_substitutability.cpp
     tests/cpp/test_lot_salt_bridge_config_builder.cpp
