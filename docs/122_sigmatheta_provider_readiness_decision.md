@@ -64,3 +64,19 @@ ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE_IMPLEMENTED
 
 O resultado nao altera a decisao de readiness fisica: dispatch fisico,
 BUZ29-PENNY e validacao fisica permanecem bloqueados.
+
+## Atualizacao da validacao analitica
+
+A fonte `ELASTIC_INITIAL_WELLBORE_STATE` foi verificada contra cinco casos
+analiticos controlados:
+
+```text
+ELASTIC_SIGMATHETA_ANALYTIC_CASES_VALID
+FORMULA_VERIFIED
+SIGN_CONVENTION_VERIFIED
+THRESHOLD_BEHAVIOR_VERIFIED
+```
+
+A verificacao confirma a algebra implementada, inclusive o threshold exato
+`fracture_margin_Pa = 0`, mas nao muda o status fisico: a fonte permanece
+semi-fisica, nao equivalente ao legado e sem dispatch runtime.

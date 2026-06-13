@@ -3986,6 +3986,40 @@
       "Physical dispatch, BUZ29-PENNY execution and PENNY_SHAPED runtime remain blocked."
     ]
   },
+  "phase_elastic_sigmatheta_analytic_validation": {
+    "status": "ELASTIC_SIGMATHETA_ANALYTIC_CASES_VALID",
+    "phase": "ELASTIC_SIGMATHETA_ANALYTIC_VALIDATION",
+    "source": "ELASTIC_INITIAL_WELLBORE_STATE",
+    "formula_verified": true,
+    "sign_convention_verified": true,
+    "threshold_behavior_verified": true,
+    "case_count": 5,
+    "semi_physical": true,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "required_statuses": [
+      "PHASE_ELASTIC_SIGMATHETA_ANALYTIC_VALIDATION",
+      "ELASTIC_SIGMATHETA_ANALYTIC_CASES_VALID",
+      "FORMULA_VERIFIED",
+      "SIGN_CONVENTION_VERIFIED",
+      "THRESHOLD_BEHAVIOR_VERIFIED",
+      "PHYSICALLY_VALIDATED_FALSE",
+      "LEGACY_EQUIVALENT_FALSE",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PKN_BEHAVIOR_NOT_CHANGED"
+    ],
+    "recommended_next_phase": "PHASE_DECIDE_ELASTIC_SIGMATHETA_SOURCE_READINESS",
+    "caveats": [
+      "The analytic validation verifies algebra and sign convention only.",
+      "Reached remains diagnostic gate eligibility, not physical fracture execution.",
+      "Physical dispatch, legacy equivalence and BUZ29-PENNY execution remain blocked."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

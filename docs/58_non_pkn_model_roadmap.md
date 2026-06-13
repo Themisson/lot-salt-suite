@@ -998,3 +998,15 @@ RUNTIME_DISPATCH_NOT_ENABLED
 Mesmo quando o gate atinge `FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE`, esse
 estado continua sendo elegibilidade diagnostica. O adapter `PENNY_SHAPED` nao e
 executado como runtime fisico.
+
+### Validação analítica da fonte elástica — sem runtime não-PKN
+
+A validação analítica da fonte `ELASTIC_INITIAL_WELLBORE_STATE` confirma
+`FORMULA_VERIFIED`, `SIGN_CONVENTION_VERIFIED` e
+`THRESHOLD_BEHAVIOR_VERIFIED`, mas não altera o bloqueio não-PKN:
+
+```text
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_DISPATCH_NOT_ENABLED
+```

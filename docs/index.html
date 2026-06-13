@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">183/190</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">184/191</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">398</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">1026</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -8642,6 +8642,16 @@ PENNY_SHAPED_RUNTIME_NOT_ENABLED
 wellbore_pressure_Pa</code>.</p>
 <p>Ela permanece semi-fisica e diagnostica: nao e validacao fisica plena, nao e
 equivalencia com legado, nao habilita dispatch fisico e nao libera BUZ29-PENNY.</p>
+<h3 id="validacao-analitica-da-fonte-elastica-sigma-theta">Validação analítica da fonte elástica sigma-theta</h3>
+<p>Status:</p>
+<pre><code class="language-text">ELASTIC_SIGMATHETA_ANALYTIC_CASES_VALID
+FORMULA_VERIFIED
+SIGN_CONVENTION_VERIFIED
+THRESHOLD_BEHAVIOR_VERIFIED
+</code></pre>
+<p>A validação analítica cobre cinco casos controlados e confirma que o threshold
+exato e classificado como <code>Reached</code>. A próxima decisão deve avaliar readiness
+diagnóstico da fonte elástica sem promover o resultado a validação física plena.</p>
 </div>
 </section>
 

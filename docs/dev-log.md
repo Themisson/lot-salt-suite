@@ -13,8 +13,8 @@ Fase ativa  : 11.11O sigma-theta diagnostic controlled validation
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-13
-Testes C++  : 413/413 em 2026-06-13
-Testes Py   : 1038/1038 em 2026-06-13
+Testes C++  : 414/414 em 2026-06-13
+Testes Py   : 1045/1045 em 2026-06-13
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,46 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-13] Validação analítica da fonte elástica sigma-theta — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Classificacao:** `ELASTIC_SIGMATHETA_ANALYTIC_CASES_VALID`.
+
+**Casos analíticos:** 5 cenários cobrindo compressivo, hoop nulo, trativo
+insuficiente, trativo suficiente e threshold exato.
+
+**Formula verificada:**
+
+```text
+sigma_theta_initial = far_field_stress_compression_positive_Pa
+sigma_theta_current = far_field_stress_compression_positive_Pa - wellbore_pressure_Pa
+tensile_condition = -sigma_theta_current
+fracture_margin = tensile_condition - tensile_strength
+fracture_initiated = fracture_margin >= 0
+```
+
+**Garantias preservadas:**
+
+```text
+semi_physical = true
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_changed = false
+penny_shaped_runtime_enabled = false
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE_DECIDE_ELASTIC_SIGMATHETA_SOURCE_READINESS
+```
 
 ---
 

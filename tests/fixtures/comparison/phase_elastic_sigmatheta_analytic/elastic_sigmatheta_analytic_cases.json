@@ -1,0 +1,67 @@
+{
+  "phase": "ELASTIC_SIGMATHETA_ANALYTIC_VALIDATION",
+  "source": "ELASTIC_INITIAL_WELLBORE_STATE",
+  "absolute_tolerance": 1e-9,
+  "cases": [
+    {
+      "id": "compressive_not_reached",
+      "far_field_stress_compression_positive_Pa": 10000000.0,
+      "wellbore_pressure_Pa": 6000000.0,
+      "tensile_strength_Pa": 1000000.0,
+      "expected_sigma_theta_initial_compression_positive_Pa": 10000000.0,
+      "expected_sigma_theta_current_compression_positive_Pa": 4000000.0,
+      "expected_tensile_condition_Pa": -4000000.0,
+      "expected_fracture_margin_Pa": -5000000.0,
+      "expected_gate_status": "ReadyNotReached",
+      "expected_fracture_initiated": false
+    },
+    {
+      "id": "zero_hoop_not_reached",
+      "far_field_stress_compression_positive_Pa": 8000000.0,
+      "wellbore_pressure_Pa": 8000000.0,
+      "tensile_strength_Pa": 1000000.0,
+      "expected_sigma_theta_initial_compression_positive_Pa": 8000000.0,
+      "expected_sigma_theta_current_compression_positive_Pa": 0.0,
+      "expected_tensile_condition_Pa": 0.0,
+      "expected_fracture_margin_Pa": -1000000.0,
+      "expected_gate_status": "ReadyNotReached",
+      "expected_fracture_initiated": false
+    },
+    {
+      "id": "tension_below_strength_not_reached",
+      "far_field_stress_compression_positive_Pa": 8000000.0,
+      "wellbore_pressure_Pa": 8500000.0,
+      "tensile_strength_Pa": 1000000.0,
+      "expected_sigma_theta_initial_compression_positive_Pa": 8000000.0,
+      "expected_sigma_theta_current_compression_positive_Pa": -500000.0,
+      "expected_tensile_condition_Pa": 500000.0,
+      "expected_fracture_margin_Pa": -500000.0,
+      "expected_gate_status": "ReadyNotReached",
+      "expected_fracture_initiated": false
+    },
+    {
+      "id": "tension_above_strength_reached",
+      "far_field_stress_compression_positive_Pa": 8000000.0,
+      "wellbore_pressure_Pa": 9500000.0,
+      "tensile_strength_Pa": 1000000.0,
+      "expected_sigma_theta_initial_compression_positive_Pa": 8000000.0,
+      "expected_sigma_theta_current_compression_positive_Pa": -1500000.0,
+      "expected_tensile_condition_Pa": 1500000.0,
+      "expected_fracture_margin_Pa": 500000.0,
+      "expected_gate_status": "Reached",
+      "expected_fracture_initiated": true
+    },
+    {
+      "id": "exact_threshold_reached",
+      "far_field_stress_compression_positive_Pa": 8000000.0,
+      "wellbore_pressure_Pa": 9000000.0,
+      "tensile_strength_Pa": 1000000.0,
+      "expected_sigma_theta_initial_compression_positive_Pa": 8000000.0,
+      "expected_sigma_theta_current_compression_positive_Pa": -1000000.0,
+      "expected_tensile_condition_Pa": 1000000.0,
+      "expected_fracture_margin_Pa": 0.0,
+      "expected_gate_status": "Reached",
+      "expected_fracture_initiated": true
+    }
+  ]
+}

@@ -1161,3 +1161,18 @@ wellbore_pressure_Pa`.
 
 Ela permanece semi-fisica e diagnostica: nao e validacao fisica plena, nao e
 equivalencia com legado, nao habilita dispatch fisico e nao libera BUZ29-PENNY.
+
+### Validação analítica da fonte elástica sigma-theta
+
+Status:
+
+```text
+ELASTIC_SIGMATHETA_ANALYTIC_CASES_VALID
+FORMULA_VERIFIED
+SIGN_CONVENTION_VERIFIED
+THRESHOLD_BEHAVIOR_VERIFIED
+```
+
+A validação analítica cobre cinco casos controlados e confirma que o threshold
+exato e classificado como `Reached`. A próxima decisão deve avaliar readiness
+diagnóstico da fonte elástica sem promover o resultado a validação física plena.

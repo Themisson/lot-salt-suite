@@ -84,6 +84,15 @@ ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE_IMPLEMENTED
 A fonte implementada permanece semi-fisica, nao fisicamente validada e nao
 equivalente ao legado.
 
+Validacao analitica posterior:
+
+```text
+ELASTIC_SIGMATHETA_ANALYTIC_CASES_VALID
+```
+
+Essa validacao confirma a formula especificada e a convencao de sinal em casos
+controlados, sem declarar equivalencia fisica plena.
+
 Fonte secundária:
 
 ```text

@@ -163,3 +163,17 @@ PHASE_VALIDATE_ELASTIC_SIGMATHETA_SOURCE_AGAINST_KNOWN_ANALYTIC_CASE
 
 A próxima fase deve validar a fonte elástica contra caso analítico controlado
 antes de qualquer uso físico mais amplo.
+
+## Validação analítica controlada
+
+A fase seguinte foi executada e confirmou:
+
+```text
+ELASTIC_SIGMATHETA_ANALYTIC_CASES_VALID
+FORMULA_VERIFIED
+SIGN_CONVENTION_VERIFIED
+THRESHOLD_BEHAVIOR_VERIFIED
+```
+
+Essa validação confirma consistência algébrica da fonte e do critério
+diagnóstico, mas não constitui validação física plena.
