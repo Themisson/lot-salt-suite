@@ -190,6 +190,7 @@ phases:
   phase_11_11o_sigmatheta_diagnostic_controlled_validation: completed
   phase_11_11p_diagnostic_sigmatheta_gate_readiness: completed
   phase_11_11q_real_sigmatheta_source_integration_path: completed
+  master_phase_a_sigmatheta_source_root_cause: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -306,6 +307,7 @@ docs:
   stage11_11o_sigmatheta_diagnostic_controlled_validation: implemented
   stage11_11p_diagnostic_sigmatheta_gate_readiness: implemented
   stage11_11q_real_sigmatheta_source_integration_path: implemented
+  master_phase_a_sigmatheta_source_root_cause: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -369,14 +371,14 @@ validation:
 # Contagem de testes (atualizar após cada execução)
 # ============================================================
 test_counts:
-  cpp_tests: 387        # Catch2 lot-salt-suite — atualizar apos execucao da Fase 11.11O (2026-06-12)
+  cpp_tests: 387        # Catch2 lot-salt-suite — atualizar apos execucao da Fase A sigma-theta source root cause (2026-06-13)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 966     # pytest lot-salt-suite — atualizar apos execucao da Fase 11.11Q (2026-06-13)
+  python_tests: 980     # pytest lot-salt-suite — atualizar apos execucao da Fase A sigma-theta source root cause (2026-06-13)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-13"
-updated_by: "codex (Fase 11.11Q real sigma-theta source integration path)"
+updated_by: "codex (Fase A sigma-theta source root cause)"
 project_version: "0.1.0"

@@ -57,6 +57,34 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-13] Fase A — sigma-theta source root cause diagnosis — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Classificacao:** `SEMI_PHYSICAL_ELASTIC_SIGMATHETA_SOURCE_IMPLEMENTABLE`.
+
+**Gate:** `implementation_allowed_next = true`.
+
+**Ferramenta criada:**
+
+```text
+tools/diagnose_sigmatheta_source_root_cause.py
+```
+
+**Documento criado:**
+
+```text
+docs/117_sigmatheta_source_root_cause_diagnosis.md
+```
+
+**Resumo:** o runtime moderno tem `wellbore_pressure_Pa`, mas ainda nao tem
+fonte fisica de `sigma_theta_initial/current`. A proxima fase deve planejar e
+implementar um `PostDrillingSigmaThetaProvider` diagnostico/semi-fisico, sem
+dispatch fisico e sem alterar PKN.
+
+---
+
 ### [2026-06-12] Fase 11.11O — sigma-theta diagnostic controlled validation — Codex
 
 **Status:** Implementado; commit/push executado ao final da fase se todos os

@@ -3781,6 +3781,35 @@
       "Physical dispatch remains disabled."
     ]
   },
+  "master_phase_a_sigmatheta_source_root_cause": {
+    "status": "MASTER_PHASE_A_SIGMATHETA_SOURCE_ROOT_CAUSE_DIAGNOSED",
+    "phase": "master-A",
+    "diagnosis_status": "SEMI_PHYSICAL_ELASTIC_SIGMATHETA_SOURCE_IMPLEMENTABLE",
+    "sigma_theta_initial_runtime_available": false,
+    "sigma_theta_current_runtime_available": false,
+    "wellbore_pressure_runtime_available": true,
+    "elastic_provider_implementable": true,
+    "recommended_solution_path": "SEMI_PHYSICAL_ELASTIC_SIGMATHETA_SOURCE_IMPLEMENTABLE",
+    "implementation_allowed_next": true,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_change_allowed": false,
+    "penny_shaped_runtime_enabled": false,
+    "proposed_component": "PostDrillingSigmaThetaProvider",
+    "required_statuses": [
+      "MASTER_PHASE_A_SIGMATHETA_SOURCE_ROOT_CAUSE_DIAGNOSED",
+      "SEMI_PHYSICAL_ELASTIC_SIGMATHETA_SOURCE_IMPLEMENTABLE",
+      "MISSING_RUNTIME_SIGMATHETA_INITIAL_SOURCE",
+      "MISSING_RUNTIME_SIGMATHETA_CURRENT_SOURCE",
+      "WELLBORE_PRESSURE_RUNTIME_AVAILABLE"
+    ],
+    "recommended_next_phase": "MASTER_PHASE_B_PLAN_SIGMATHETA_SOURCE_SOLUTION",
+    "caveats": [
+      "The diagnosis does not enable physical dispatch.",
+      "The next provider remains diagnostic/semi-physical until validated.",
+      "PKN physical behavior must remain unchanged."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
