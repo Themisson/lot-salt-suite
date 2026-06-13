@@ -1,0 +1,22 @@
+{
+  "fixture_id": "runner_partial_inputs_blocked",
+  "phase": "PHASE_FIX_BUZ29_PENNY_DIAGNOSTIC_RUNNER",
+  "expected_status": "BUZ29_PENNY_DIAGNOSTIC_RUN_BLOCKED_BY_PARTIAL_INPUTS",
+  "diagnostic_only": true,
+  "physically_validated": false,
+  "legacy_equivalent": false,
+  "runtime_dispatch_enabled": false,
+  "penny_shaped_runtime_enabled": false,
+  "pkn_behavior_changed": false,
+  "case_id": "buz29_penny_candidate_partial",
+  "fracture_model": "PENNY_SHAPED",
+  "adapter_inputs_complete": false,
+  "missing_adapter_fields": [
+    "wellbore_pressure_Pa",
+    "sigma_theta_compression_positive_Pa",
+    "elapsed_since_opening_min"
+  ],
+  "blocking_reasons": [
+    "BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL"
+  ]
+}

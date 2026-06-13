@@ -1,0 +1,30 @@
+{
+  "fixture_id": "runner_valid_complete_inputs",
+  "phase": "PHASE_FIX_BUZ29_PENNY_DIAGNOSTIC_RUNNER",
+  "expected_status": "BUZ29_PENNY_DIAGNOSTIC_RUN_COMPLETED",
+  "diagnostic_only": true,
+  "physically_validated": false,
+  "legacy_equivalent": false,
+  "runtime_dispatch_enabled": false,
+  "penny_shaped_runtime_enabled": false,
+  "pkn_behavior_changed": false,
+  "case_id": "buz29_penny_synthetic_complete",
+  "fracture_model": "PENNY_SHAPED",
+  "adapter_inputs_complete": true,
+  "young_modulus_Pa": 5710000.0,
+  "poisson_ratio": 0.36,
+  "viscosity_Pa_min": 180.0,
+  "flow_rate_m3_min": 0.05,
+  "elapsed_since_opening_min": 1.25,
+  "wellbore_pressure_Pa": 67000000.0,
+  "sigma_theta_compression_positive_Pa": 66000000.0,
+  "volume_multiplier": 10.0,
+  "caveats": [
+    "DIAGNOSTIC_ONLY",
+    "NOT_PHYSICALLY_VALIDATED",
+    "NOT_LEGACY_EQUIVALENT",
+    "NO_RUNTIME_DISPATCH",
+    "PENNY_SHAPED_DIAGNOSTIC_ONLY",
+    "BUZ29_REAL_INPUTS_NOT_IMPROVISED"
+  ]
+}

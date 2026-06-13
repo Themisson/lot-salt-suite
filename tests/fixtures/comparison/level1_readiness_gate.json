@@ -4332,6 +4332,33 @@
     ],
     "recommended_next_phase": "PHASE_FIX_BUZ29_PENNY_DIAGNOSTIC_RUNNER"
   },
+  "phase_buz29_penny_diagnostic_runner": {
+    "phase": "PHASE_FIX_BUZ29_PENNY_DIAGNOSTIC_RUNNER",
+    "status": "BUZ29_PENNY_DIAGNOSTIC_RUNNER_IMPLEMENTED_INPUTS_PARTIAL",
+    "runner_status": "BUZ29_PENNY_DIAGNOSTIC_RUNNER_IMPLEMENTED_INPUTS_PARTIAL",
+    "synthetic_complete_case_runs": true,
+    "partial_inputs_blocked": true,
+    "invalid_flags_rejected": true,
+    "unsupported_model_rejected": true,
+    "diagnostic_only": true,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "runtime_dispatch_enabled": false,
+    "penny_shaped_runtime_enabled": false,
+    "pkn_behavior_changed": false,
+    "physical_validation_claimed": false,
+    "legacy_equivalence_claimed": false,
+    "buz29_candidate_inputs_complete": false,
+    "required_caveats": [
+      "DIAGNOSTIC_ONLY",
+      "NOT_PHYSICALLY_VALIDATED",
+      "NOT_LEGACY_EQUIVALENT",
+      "NO_RUNTIME_DISPATCH",
+      "PENNY_SHAPED_DIAGNOSTIC_ONLY",
+      "BUZ29_REAL_INPUTS_NOT_IMPROVISED"
+    ],
+    "recommended_next_phase": "PHASE_COMPLETE_BUZ29_PENNY_ADAPTER_INPUTS"
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

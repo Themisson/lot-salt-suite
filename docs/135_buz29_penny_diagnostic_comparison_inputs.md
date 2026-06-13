@@ -76,3 +76,16 @@ runtime_dispatch_enabled = false
 physically_validated = false
 legacy_equivalent = false
 ```
+
+## Runner Follow-up
+
+The diagnostic runner is now available for complete synthetic adapter inputs,
+but the BUZ29 candidate remains partial:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_RUNNER_IMPLEMENTED_INPUTS_PARTIAL
+buz29_candidate_inputs_complete = false
+```
+
+Missing BUZ29/PENNY fields must be completed explicitly before a real candidate
+diagnostic run is attempted.

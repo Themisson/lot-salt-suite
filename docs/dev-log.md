@@ -8771,3 +8771,43 @@ física e não alterou PKN.
 
 **Próxima fase recomendada:**
 `PHASE_FIX_BUZ29_PENNY_DIAGNOSTIC_RUNNER`.
+
+---
+
+### [2026-06-13] Runner diagnóstico BUZ29/PENNY — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:**
+`BUZ29_PENNY_DIAGNOSTIC_RUNNER_IMPLEMENTED_INPUTS_PARTIAL`.
+
+**Resultado:**
+
+```text
+synthetic_complete_case_runs = true
+partial_inputs_blocked = true
+invalid_flags_rejected = true
+unsupported_model_rejected = true
+runtime_dispatch_enabled = false
+penny_shaped_runtime_enabled = false
+pkn_behavior_changed = false
+buz29_candidate_inputs_complete = false
+```
+
+**Interpretação:** o runner diagnóstico isolado agora conecta adapter e writer
+para entradas sintéticas completas, mas bloqueia o candidato real BUZ29/PENNY
+enquanto seus inputs permanecerem parciais. A fase não habilita dispatch físico,
+não valida BUZ29 fisicamente, não declara equivalência com legado e não altera
+PKN.
+
+**Entregáveis:**
+- `include/lot/Buz29PennyDiagnosticRunner.hpp`
+- `src/lot/Buz29PennyDiagnosticRunner.cpp`
+- `tests/cpp/test_buz29_penny_diagnostic_runner.cpp`
+- `tools/audit_buz29_penny_diagnostic_runner.py`
+- `tests/python/test_audit_buz29_penny_diagnostic_runner.py`
+- `tests/fixtures/comparison/phase_buz29_penny_diagnostic_runner/`
+- `docs/138_buz29_penny_diagnostic_runner.md`
+
+**Próxima fase recomendada:**
+`PHASE_COMPLETE_BUZ29_PENNY_ADAPTER_INPUTS`.

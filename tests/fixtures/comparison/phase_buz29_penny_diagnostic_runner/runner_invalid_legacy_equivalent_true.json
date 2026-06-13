@@ -1,0 +1,16 @@
+{
+  "fixture_id": "runner_invalid_legacy_equivalent_true",
+  "phase": "PHASE_FIX_BUZ29_PENNY_DIAGNOSTIC_RUNNER",
+  "expected_status": "BUZ29_PENNY_DIAGNOSTIC_RUN_REJECTED_INVALID_FLAGS",
+  "diagnostic_only": true,
+  "physically_validated": false,
+  "legacy_equivalent": true,
+  "runtime_dispatch_enabled": false,
+  "penny_shaped_runtime_enabled": false,
+  "pkn_behavior_changed": false,
+  "fracture_model": "PENNY_SHAPED",
+  "adapter_inputs_complete": true,
+  "blocking_reasons": [
+    "LEGACY_EQUIVALENT_FORBIDDEN"
+  ]
+}

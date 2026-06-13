@@ -1,0 +1,16 @@
+{
+  "fixture_id": "runner_invalid_model_pkn",
+  "phase": "PHASE_FIX_BUZ29_PENNY_DIAGNOSTIC_RUNNER",
+  "expected_status": "BUZ29_PENNY_DIAGNOSTIC_RUN_REJECTED_UNSUPPORTED_MODEL",
+  "diagnostic_only": true,
+  "physically_validated": false,
+  "legacy_equivalent": false,
+  "runtime_dispatch_enabled": false,
+  "penny_shaped_runtime_enabled": false,
+  "pkn_behavior_changed": false,
+  "fracture_model": "PKN",
+  "adapter_inputs_complete": true,
+  "blocking_reasons": [
+    "ONLY_PENNY_SHAPED_DIAGNOSTIC_MODEL_SUPPORTED"
+  ]
+}

@@ -1103,3 +1103,20 @@ BUZ29_PENNY_ADAPTER_INPUTS_PARTIAL
 O writer e o adapter continuam disponíveis como componentes diagnósticos
 isolados, mas ainda não existe caminho operacional para executar o candidato
 BUZ29/PENNY sem nova integração C++ controlada.
+
+### Runner diagnóstico isolado BUZ29/PENNY
+
+O caminho operacional diagnóstico foi adicionado com escopo limitado:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_RUNNER_IMPLEMENTED_INPUTS_PARTIAL
+synthetic_complete_case_runs = true
+partial_inputs_blocked = true
+runtime_dispatch_enabled = false
+penny_shaped_runtime_enabled = false
+```
+
+Esse runner resolve o bloqueio de infraestrutura para entradas sintéticas
+completas, mas mantém o candidato real BUZ29/PENNY bloqueado enquanto os campos
+adapter-ready permanecerem parciais. Ele não é dispatch físico e não transforma
+`PENNY_SHAPED` em modelo operacional de runtime.

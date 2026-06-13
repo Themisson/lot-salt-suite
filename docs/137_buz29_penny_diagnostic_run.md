@@ -64,3 +64,20 @@ is outside the scope of this phase.
 ```text
 PHASE_FIX_BUZ29_PENNY_DIAGNOSTIC_RUNNER
 ```
+
+## Follow-up Fix
+
+The follow-up phase adds an isolated diagnostic runner:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_RUNNER_IMPLEMENTED_INPUTS_PARTIAL
+synthetic_complete_case_runs = true
+partial_inputs_blocked = true
+runtime_dispatch_enabled = false
+penny_shaped_runtime_enabled = false
+buz29_candidate_inputs_complete = false
+```
+
+The original blocker is resolved for synthetic complete diagnostic inputs, but
+the real BUZ29/PENNY candidate remains blocked until adapter-ready fields are
+completed. No physical dispatch or legacy equivalence is enabled.

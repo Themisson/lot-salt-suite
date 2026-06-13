@@ -71,3 +71,14 @@ pkn_behavior_changed = false
 
 The block preserves the gate's intent: do not improvise a physical runtime path
 when only isolated diagnostic components are available.
+
+## Diagnostic Runner Follow-up
+
+The next implementation adds a dedicated isolated diagnostic runner. It accepts
+only `PENNY_SHAPED`, rejects physical validation, rejects legacy equivalence,
+rejects runtime dispatch, and blocks partial BUZ29 candidate inputs.
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_RUNNER_IMPLEMENTED_INPUTS_PARTIAL
+PHASE_COMPLETE_BUZ29_PENNY_ADAPTER_INPUTS
+```

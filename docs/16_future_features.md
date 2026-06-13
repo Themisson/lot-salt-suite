@@ -1378,3 +1378,20 @@ PKN_BEHAVIOR_NOT_CHANGED
 
 Future work should add a dedicated diagnostic runner, or explicitly complete
 the missing adapter-ready BUZ29/PENNY inputs before attempting execution again.
+
+### BUZ29 Penny Diagnostic Runner
+
+Status:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_RUNNER_IMPLEMENTED_INPUTS_PARTIAL
+SYNTHETIC_COMPLETE_CASE_RUNS
+REAL_BUZ29_INPUTS_STILL_PARTIAL
+RUNTIME_DISPATCH_NOT_ENABLED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+```
+
+The dedicated runner now exists as an isolated diagnostic path around the
+PennyShaped adapter and writer. It does not enable non-PKN runtime dispatch and
+does not change PKN behavior. Future work should complete the BUZ29/PENNY
+adapter-ready input set before attempting a real candidate diagnostic run.
