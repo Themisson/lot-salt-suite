@@ -57,6 +57,36 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-13] Fase E — sigma-theta provider controlled validation — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Classificacao:** `SIGMATHETA_PROVIDER_CONTROLLED_CASES_VALID`.
+
+**Fixtures criadas:**
+
+```text
+tests/fixtures/comparison/phase_sigmatheta_provider/
+```
+
+**Ferramenta criada:**
+
+```text
+tools/validate_sigmatheta_provider_controlled_cases.py
+```
+
+**Documento criado:**
+
+```text
+docs/121_sigmatheta_provider_controlled_validation.md
+```
+
+**Garantia:** `runtime_dispatch_enabled=false`; BUZ29-PENNY permanece
+bloqueado; PENNY_SHAPED permanece diagnostico; PKN nao muda comportamento.
+
+---
+
 ### [2026-06-13] Fase D — sigma-theta provider pre-runner wiring — Codex
 
 **Status:** Implementado; commit/push executado ao final se todos os gates

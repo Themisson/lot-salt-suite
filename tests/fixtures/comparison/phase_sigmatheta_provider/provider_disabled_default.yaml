@@ -1,0 +1,22 @@
+# Master Phase E controlled fixture.
+# Provider disabled by default; diagnostic gate is not evaluated.
+fixture:
+  id: provider_disabled_default
+  phase: "master-E"
+  scenario: provider_disabled_default
+  expected:
+    diagnostics_enabled: false
+    diagnostic_output_expected: false
+    provider_evaluated: false
+    runtime_dispatch_enabled: false
+    buz29_execution_allowed: false
+    pkn_behavior_changed: false
+    penny_shaped_runtime_enabled: false
+
+case:
+  id: provider_disabled_default
+
+lot:
+  fracture:
+    fracture_model: PKN
+

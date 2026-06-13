@@ -194,6 +194,7 @@ phases:
   master_phase_b_sigmatheta_source_solution_plan: completed
   master_phase_c_post_drilling_sigmatheta_provider: completed
   master_phase_d_sigmatheta_provider_pre_runner_wiring: completed
+  master_phase_e_sigmatheta_provider_controlled_validation: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -314,6 +315,7 @@ docs:
   master_phase_b_sigmatheta_source_solution_plan: implemented
   master_phase_c_post_drilling_sigmatheta_provider: implemented
   master_phase_d_sigmatheta_provider_pre_runner_wiring: implemented
+  master_phase_e_sigmatheta_provider_controlled_validation: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -379,7 +381,7 @@ validation:
 test_counts:
   cpp_tests: 398        # Catch2 lot-salt-suite — atualizado apos execucao da Fase D sigma-theta provider wiring (2026-06-13)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 1006    # pytest lot-salt-suite — atualizar apos execucao da Fase D sigma-theta provider wiring (2026-06-13)
+  python_tests: 1017    # pytest lot-salt-suite — atualizar apos execucao da Fase E sigma-theta provider fixtures (2026-06-13)
   regression_baselines: 4
 
 # ============================================================

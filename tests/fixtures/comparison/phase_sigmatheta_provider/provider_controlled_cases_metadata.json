@@ -1,0 +1,21 @@
+{
+  "phase": "master-E",
+  "fixture_type": "sigmatheta_provider_controlled_cases",
+  "provider_component": "PostDrillingSigmaThetaProvider",
+  "pre_runner_wiring_status": "SIGMATHETA_PROVIDER_WIRED_TO_DIAGNOSTIC_PRE_RUNNER",
+  "validation_status": "SIGMATHETA_PROVIDER_CONTROLLED_CASES_VALID",
+  "runtime_dispatch_enabled": false,
+  "runtime_physical_dispatch_allowed": false,
+  "buz29_execution_allowed": false,
+  "pkn_behavior_changed": false,
+  "penny_shaped_runtime_enabled": false,
+  "required_caveats": [
+    "DIAGNOSTIC_PROVIDER_ONLY",
+    "RUNTIME_DISPATCH_NOT_ENABLED",
+    "BUZ29_EXECUTION_BLOCKED",
+    "PKN_BEHAVIOR_NOT_CHANGED",
+    "PENNY_SHAPED_RUNTIME_NOT_ENABLED",
+    "NO_LEGACY_EQUIVALENCE_CLAIM"
+  ]
+}
+

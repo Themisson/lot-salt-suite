@@ -1,0 +1,39 @@
+# Master Phase E controlled fixture.
+# Diagnostic provider input must not claim physical validation.
+fixture:
+  id: provider_physically_validated_true_invalid
+  phase: "master-E"
+  scenario: physically_validated_true_invalid
+  expected:
+    diagnostics_enabled: true
+    diagnostic_output_expected: false
+    provider_evaluated: false
+    provider_status: POST_DRILLING_SIGMATHETA_PROVIDER_REJECTED
+    blocking_reason: PHYSICAL_VALIDATION_NOT_ALLOWED_FOR_DIAGNOSTIC_PROVIDER
+    runtime_dispatch_enabled: false
+    buz29_execution_allowed: false
+    pkn_behavior_changed: false
+    penny_shaped_runtime_enabled: false
+
+case:
+  id: provider_physically_validated_true_invalid
+
+lot:
+  fracture:
+    fracture_model: PKN
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: limited_gate
+      dispatch_runtime_enabled: false
+    sigma_theta_diagnostic_input:
+      enabled: true
+      source: EXPLICIT_DIAGNOSTIC_INPUT
+      sigma_theta_initial_compression_positive_Pa: 5000000.0
+      sigma_theta_current_compression_positive_Pa: 2000000.0
+      tensile_strength_Pa: 0.0
+      sign_convention: COMPRESSION_POSITIVE
+      reference_frame: WELLBORE_WALL_TOTAL_STRESS
+      state_time: POST_DRILLING_BEFORE_LOT
+      physically_validated: true
+      legacy_equivalent: false
+

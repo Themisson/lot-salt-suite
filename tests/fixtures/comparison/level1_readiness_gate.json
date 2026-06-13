@@ -3891,6 +3891,39 @@
       "BUZ29-PENNY remains blocked."
     ]
   },
+  "master_phase_e_sigmatheta_provider_controlled_validation": {
+    "status": "SIGMATHETA_PROVIDER_CONTROLLED_CASES_VALID",
+    "phase": "master-E",
+    "provider_component": "PostDrillingSigmaThetaProvider",
+    "pre_runner_wiring_status": "SIGMATHETA_PROVIDER_WIRED_TO_DIAGNOSTIC_PRE_RUNNER",
+    "fixtures_dir": "tests/fixtures/comparison/phase_sigmatheta_provider",
+    "fixture_count": 7,
+    "ready_not_reached_case_valid": true,
+    "pkn_reached_case_valid": true,
+    "penny_reached_diagnostic_case_valid": true,
+    "unknown_source_invalid": true,
+    "physically_validated_true_invalid": true,
+    "legacy_equivalent_true_invalid": true,
+    "physical_outputs_identical": true,
+    "diagnostic_output_isolated": true,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "required_statuses": [
+      "SIGMATHETA_PROVIDER_CONTROLLED_CASES_VALID",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PKN_BEHAVIOR_NOT_CHANGED",
+      "PENNY_SHAPED_RUNTIME_NOT_ENABLED"
+    ],
+    "recommended_next_phase": "MASTER_PHASE_F_DECIDE_SIGMATHETA_PROVIDER_READINESS",
+    "caveats": [
+      "The controlled provider fixtures validate contract behavior only.",
+      "The provider remains diagnostic and does not enable physical fracture dispatch.",
+      "BUZ29-PENNY remains blocked."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
