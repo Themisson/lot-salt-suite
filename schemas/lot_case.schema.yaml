@@ -29,7 +29,7 @@ properties:
       version: {type: string}
       mode:
         type: string
-        enum: [lot, lot-pkn, apb, salt, lot-salt, apb-salt, coupled]
+        enum: [lot, lot-pkn, apb-lot, apb, salt, lot-salt, apb-salt, coupled]
       legacy_source: {type: string}
   simulation:
     type: object
@@ -38,7 +38,7 @@ properties:
     properties:
       mode:
         type: string
-        enum: [lot, lot-pkn, apb, salt, lot-salt, apb-salt, coupled]
+        enum: [lot, lot-pkn, apb-lot, apb, salt, lot-salt, apb-salt, coupled]
   apb_lot:
     type: object
     additionalProperties: false
@@ -46,6 +46,8 @@ properties:
       output_format:
         type: string
         enum: [json, legacy_dat]
+      output_path:
+        type: string
       legacy_dat_output_enabled:
         type: boolean
       leakoff_coupling_mode:

@@ -218,6 +218,7 @@ void parse_apb_lot_modern_modes(const YAML::Node& root,
 
   data.apb_lot.output_format =
       optional_string(apb_lot, "output_format", "json");
+  data.apb_lot.output_path = optional_string(apb_lot, "output_path");
   data.apb_lot.legacy_dat_output_enabled =
       optional_bool(apb_lot, "legacy_dat_output_enabled", true);
   data.apb_lot.leakoff_coupling_mode =

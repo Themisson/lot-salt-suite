@@ -12,6 +12,7 @@ from typing import Any
 
 PHASE = "APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE"
 BLOCKED_STATUS = "APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER"
+AVAILABLE_STATUS = "APB_LOT_REAL_CASE_RUNNER_AVAILABLE_NEEDS_OUTPUT"
 VALID_STATUS = "APB_LOT_MODERN_MODES_REAL_CASE_VALID"
 
 
@@ -87,7 +88,10 @@ def audit_runtime(fixtures_dir: Path, modern_json: Path | None = None) -> dict[s
     writer_text = _read(Path("src/io/ApbLotJsonOutputWriter.cpp"))
     case_parser_text = _read(Path("src/io/CaseParser.cpp"))
     pkn_only_runtime = "run suporta apenas --mode lot-pkn nesta fase" in app_text
-    writer_integrated_with_runtime = "write_apb_lot_output_json" in app_text
+    writer_integrated_with_runtime = (
+        "write_apb_lot_output_json" in app_text
+        or ("ApbLotRunner" in app_text and "run_apb_lot_case" in app_text)
+    )
     parser_accepts_apb_lot = "parse_apb_lot_modern_modes" in case_parser_text
     writer_available = "write_apb_lot_output_json" in writer_text
 
@@ -114,7 +118,12 @@ def audit_runtime(fixtures_dir: Path, modern_json: Path | None = None) -> dict[s
         "time_series_non_empty": False,
         "summary_finite": False,
     }
-    validation_status = VALID_STATUS if runner_available and json_status["modern_json_has_effective_data"] else BLOCKED_STATUS
+    if runner_available and json_status["modern_json_has_effective_data"]:
+        validation_status = VALID_STATUS
+    elif runner_available:
+        validation_status = AVAILABLE_STATUS
+    else:
+        validation_status = BLOCKED_STATUS
 
     report: dict[str, Any] = {
         "phase": PHASE,
@@ -142,7 +151,11 @@ def audit_runtime(fixtures_dir: Path, modern_json: Path | None = None) -> dict[s
         "recommended_next_phase": (
             "APB_LOT_DECIDE_MODERN_MODES_RUNTIME_READINESS"
             if validation_status == VALID_STATUS
-            else "APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION"
+            else (
+                "APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION"
+                if validation_status == BLOCKED_STATUS
+                else "APB_LOT_RUN_REAL_CASE_OUTPUT_VALIDATION"
+            )
         ),
     }
     if not runner_available:
@@ -205,7 +218,7 @@ def main() -> int:
     if args.output_md:
         write_markdown(args.output_md, report)
     print(report["validation_status"])
-    return 0 if report["validation_status"] in {VALID_STATUS, BLOCKED_STATUS} else 1
+    return 0 if report["validation_status"] in {VALID_STATUS, BLOCKED_STATUS, AVAILABLE_STATUS} else 1
 
 
 if __name__ == "__main__":

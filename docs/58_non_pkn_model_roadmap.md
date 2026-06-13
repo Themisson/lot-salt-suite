@@ -1164,3 +1164,19 @@ BUZ29_PENNY_NOT_EXECUTED
 
 Esse bloqueio deve ser resolvido sem reutilizar a rota BUZ29/PENNY como atalho
 fisico.
+
+### APB/LOT runner controlado implementado
+
+A fase `APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION` resolveu o bloqueio de
+infraestrutura APB/LOT por uma rota separada de BUZ29/PENNY:
+
+```text
+lot-sim run --mode apb-lot
+APB_LOT_REAL_CASE_RUNNER_IMPLEMENTED
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_PENNY_NOT_EXECUTED
+```
+
+Essa rota e controlada e diagnostica. Ela nao habilita runner nao-PKN, nao
+executa BUZ29/PENNY e nao deve ser usada como atalho para validacao fisica dos
+modelos nao PKN.

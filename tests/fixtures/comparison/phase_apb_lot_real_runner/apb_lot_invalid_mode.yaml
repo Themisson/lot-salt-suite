@@ -1,0 +1,96 @@
+metadata:
+  name: apb_lot_invalid_mode
+  version: "0.1"
+  mode: apb-lot
+
+simulation:
+  mode: apb-lot
+
+apb_lot:
+  output_format: json
+  legacy_dat_output_enabled: true
+  leakoff_coupling_mode: invalid_volume_mode
+  salt_displacement_mode: pre_iterative
+
+units:
+  length: m
+  pressure: Pa
+  temperature: degC
+  density: ppg
+  viscosity: cP
+
+wellbore:
+  airgap_m: 0.0
+  water_depth_m: 0.0
+  total_depth_m: 1000.0
+  shoe_depth_m: 900.0
+
+casings:
+  - id: casing
+    top_m: 0.0
+    base_m: 900.0
+    di_in: 10.0
+    de_in: 12.0
+    E_Pa: 210000000000.0
+    nu: 0.3
+
+cements: []
+
+annulars:
+  - id: annulus
+    fluid: mud
+    top_m: 0.0
+    base_m: 900.0
+
+fluids:
+  - id: mud
+    mode: constant
+    density_ppg: 10.0
+    viscosity_cP: 2.0
+    compressibility_per_Pa: 0.00000000045
+
+temperature:
+  mode: profile
+  data:
+    - depth_m: 0.0
+      temp_C: 25.0
+
+layers:
+  - id: layer
+    top_m: 0.0
+    base_m: 1000.0
+    rock: rock
+
+rocks:
+  - id: rock
+    model: elastic_isotropic
+    E_Pa: 20000000000.0
+    nu: 0.25
+    density_kg_m3: 2400.0
+
+lot:
+  enabled: true
+  shoe_depth_m: 900.0
+  fracture:
+    geometry: pkn
+
+apb:
+  enabled: true
+  top_packer_m: 800.0
+  leakage_enabled: false
+  venting_enabled: false
+
+time:
+  total_h: 1.0
+  dt_h: 1.0
+  scheme: explicit
+  solver:
+    tol_pressure_bar: 1.0
+    tol_eq: 0.00000001
+    stabilization_h: 0.0
+
+output:
+  directory: output/apb_lot_invalid_mode
+  every_n_steps: 1
+  fields: [pressure]
+  format: json

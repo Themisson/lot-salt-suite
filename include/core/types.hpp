@@ -231,6 +231,7 @@ struct ApbConfig {
 
 struct ApbLotModernModesConfig {
   std::string output_format = "json";
+  std::string output_path;
   bool legacy_dat_output_enabled = true;
   std::string leakoff_coupling_mode = "volume_balance";
   std::string salt_displacement_mode = "pre_iterative";

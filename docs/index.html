@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">210/217</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">211/218</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">443</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">1180</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -8854,6 +8854,16 @@ modern APB/LOT modes still do not have a real integrated runner:</p>
    mode with a specific technical reason.</li>
 </ol>
 <p>Until then, the modes remain valid contracts, not APB physical validation.</p>
+<h3 id="apblot-controlled-real-runner">APB/LOT controlled real runner</h3>
+<p>The follow-up <code>APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION</code> phase adds a
+limited C++ runtime route for:</p>
+<pre><code class="language-text">lot-sim run --mode apb-lot
+</code></pre>
+<p>The route calls <code>ApbLotJsonOutputWriter</code>, generates a controlled <code>*_out.json</code>,
+exercises <code>volume_balance</code> and <code>pre_iterative</code>, preserves legacy APB/LOT modes,
+and leaves <code>lot-pkn</code> unchanged. This is still not a full APB physical solver and
+not a LOT_Tese equivalence claim. The next technical step is to audit the
+numerical semantics of the controlled APB/LOT runner before expanding it.</p>
 </div>
 </section>
 

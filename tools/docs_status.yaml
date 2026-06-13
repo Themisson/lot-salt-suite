@@ -224,6 +224,7 @@ phases:
   phase_apb_lot_modern_modes_default_decision: completed
   phase_apb_lot_extended_regression_suite: completed
   phase_apb_lot_real_case_validation: completed
+  phase_apb_lot_real_runner_integration: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -338,6 +339,7 @@ docs:
   stage11_11m_limited_gate_sigmatheta_source_plan: implemented
   stage11_11n_sigmatheta_diagnostic_source: implemented
   stage11_11o_sigmatheta_diagnostic_controlled_validation: implemented
+  apb_lot_real_runner_integration: implemented
   stage11_11p_diagnostic_sigmatheta_gate_readiness: implemented
   stage11_11q_real_sigmatheta_source_integration_path: implemented
   master_phase_a_sigmatheta_source_root_cause: implemented

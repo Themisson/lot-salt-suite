@@ -1464,3 +1464,18 @@ Required future work:
    mode with a specific technical reason.
 
 Until then, the modes remain valid contracts, not APB physical validation.
+
+### APB/LOT controlled real runner
+
+The follow-up `APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION` phase adds a
+limited C++ runtime route for:
+
+```text
+lot-sim run --mode apb-lot
+```
+
+The route calls `ApbLotJsonOutputWriter`, generates a controlled `*_out.json`,
+exercises `volume_balance` and `pre_iterative`, preserves legacy APB/LOT modes,
+and leaves `lot-pkn` unchanged. This is still not a full APB physical solver and
+not a LOT_Tese equivalence claim. The next technical step is to audit the
+numerical semantics of the controlled APB/LOT runner before expanding it.

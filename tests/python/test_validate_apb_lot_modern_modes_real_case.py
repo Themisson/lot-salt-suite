@@ -59,17 +59,17 @@ def test_buz29_penny_not_executed(tmp_path: Path) -> None:
     assert payload["buz29_penny_executed"] is False
 
 
-def test_missing_runner_is_blocked(tmp_path: Path) -> None:
+def test_runner_is_available_after_integration(tmp_path: Path) -> None:
     payload = run_payload(tmp_path)
-    assert payload["validation_status"] == "APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER"
-    assert payload["real_case_runner_available"] is False
-    assert payload["blocked_by_missing_runtime_integration"] is True
+    assert payload["validation_status"] == "APB_LOT_REAL_CASE_RUNNER_AVAILABLE_NEEDS_OUTPUT"
+    assert payload["real_case_runner_available"] is True
+    assert payload["blocked_by_missing_runtime_integration"] is False
 
 
-def test_writer_is_not_integrated_with_runtime(tmp_path: Path) -> None:
+def test_writer_is_integrated_with_runtime(tmp_path: Path) -> None:
     payload = run_payload(tmp_path)
     assert payload["writer_available"] is True
-    assert payload["writer_integrated_with_runtime"] is False
+    assert payload["writer_integrated_with_runtime"] is True
 
 
 def test_contract_fixtures_cover_modern_and_legacy_modes(tmp_path: Path) -> None:

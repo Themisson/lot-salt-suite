@@ -110,6 +110,7 @@ set(LSS_CORE_SOURCES
   src/io/CaseParser.cpp
   src/io/ResultWriter.cpp
   src/wellbore/AnnularVolume.cpp
+  src/lot/ApbLotRunner.cpp
   src/lot/BreakdownDetector.cpp
   src/lot/Buz29PennyDiagnosticRunner.cpp
   src/lot/FractureGateDiagnosticPreRunner.cpp
@@ -180,6 +181,7 @@ endif()
 if(LSS_BUILD_TESTS)
   add_executable(lot_sim_tests
     tests/cpp/test_units.cpp
+    tests/cpp/test_apb_lot_runner.cpp
     tests/cpp/test_apb_lot_json_output_writer.cpp
     tests/cpp/test_annular_volume.cpp
     tests/cpp/test_case_parser.cpp

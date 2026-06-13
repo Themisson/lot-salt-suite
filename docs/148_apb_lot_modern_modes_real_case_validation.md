@@ -65,3 +65,18 @@ Essa fase deve criar uma rota APB/LOT real ou controlada que:
 4. exercite `volume_balance` e `pre_iterative` no solver, ou bloqueie cada modo
    com motivo tecnico especifico;
 5. preserve `lot-pkn` e BUZ29/PENNY.
+
+## Atualizacao posterior
+
+A fase seguinte `APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION` resolveu o
+bloqueio de infraestrutura por meio de uma rota controlada:
+
+```text
+APB_LOT_REAL_CASE_RUNNER_IMPLEMENTED
+LOT_SIM_APB_LOT_MODE_AVAILABLE
+MODERN_JSON_OUTPUT_GENERATED
+```
+
+O registro acima permanece como histórico do bloqueio original. A nova rota
+continua diagnostica/controlada e nao deve ser interpretada como validacao
+fisica APB/LOT ou equivalencia com LOT_Tese.

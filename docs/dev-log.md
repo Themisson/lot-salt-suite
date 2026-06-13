@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : 11.11O sigma-theta diagnostic controlled validation
+Fase ativa  : APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-13
-Testes C++  : 414/414 em 2026-06-13
-Testes Py   : 1045/1045 em 2026-06-13
+Testes C++  : 447/447 em 2026-06-13
+Testes Py   : 1187/1187 em 2026-06-13
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,38 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-13] APB/LOT real-case runner integration — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Classificações:**
+
+```text
+APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION
+APB_LOT_REAL_CASE_RUNNER_IMPLEMENTED
+LOT_SIM_APB_LOT_MODE_AVAILABLE
+MODERN_JSON_OUTPUT_GENERATED
+VOLUME_BALANCE_EXERCISED
+PRE_ITERATIVE_EXERCISED
+LEGACY_MODES_PRESERVED
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_PENNY_NOT_EXECUTED
+```
+
+**Escopo:** rota C++ controlada `lot-sim run --mode apb-lot`, runner
+`ApbLotRunner`, fixtures parseáveis, ferramenta de validação e documentação. A
+fase não altera `PknModel`, `PknRunner`, BUZ29/PENNY, legados, saltcreep,
+baselines ou `postprocess/`.
+
+**Próxima fase recomendada:**
+
+```text
+APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS
+```
 
 ---
 

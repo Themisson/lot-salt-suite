@@ -7,6 +7,7 @@
 #include "core/types.hpp"
 #include "io/CaseParser.hpp"
 #include "io/ResultWriter.hpp"
+#include "lot/ApbLotRunner.hpp"
 #include "lot/FractureGateDiagnosticPreRunner.hpp"
 #include "lot/PknRunner.hpp"
 
@@ -75,11 +76,28 @@ int run_case(int argc, char* argv[]) {
   if (case_arg.empty() || mode_arg.empty() || output_arg.empty()) {
     throw std::runtime_error("run exige --case, --mode e --output");
   }
+  const auto data = lss::io::parse_yaml(case_arg);
+  if (mode_arg == "apb-lot") {
+    const auto input = lss::lot::make_apb_lot_runner_input(
+        data, std::filesystem::path(case_arg), std::filesystem::path(output_arg));
+    const auto run = lss::lot::run_apb_lot_case(input);
+
+    std::cout << "OK: " << data.name << '\n';
+    std::cout << "Mode: apb-lot\n";
+    std::cout << "Output: " << std::filesystem::path(output_arg).string()
+              << '\n';
+    std::cout << "Status: " << run.run_status << '\n';
+    if (run.json_output_generated) {
+      std::cout << "Files: " << run.output_file.filename().string() << '\n';
+    } else {
+      std::cout << "Files: none (legacy_dat mode preserved)\n";
+    }
+    return EXIT_SUCCESS;
+  }
   if (mode_arg != "lot-pkn") {
-    throw std::runtime_error("run suporta apenas --mode lot-pkn nesta fase");
+    throw std::runtime_error("run suporta --mode lot-pkn ou apb-lot nesta fase");
   }
 
-  const auto data = lss::io::parse_yaml(case_arg);
   const auto diagnostic =
       lss::lot::evaluate_fracture_gate_diagnostic_pre_runner(data);
   if (diagnostic.fracture_gate_diagnostics_enabled) {
@@ -104,7 +122,8 @@ void print_usage() {
   std::cerr << "Uso:\n"
             << "  lot-sim inspect --case <arquivo.yaml>\n"
             << "  lot-sim validate --case <arquivo.yaml>\n"
-            << "  lot-sim run --case <arquivo.yaml> --mode lot-pkn --output <dir>\n";
+            << "  lot-sim run --case <arquivo.yaml> --mode lot-pkn --output <dir>\n"
+            << "  lot-sim run --case <arquivo.yaml> --mode apb-lot --output <dir>\n";
 }
 
 }  // namespace

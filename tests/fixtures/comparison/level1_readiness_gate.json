@@ -4494,5 +4494,22 @@
     "pkn_behavior_changed": false,
     "buz29_penny_executed": false,
     "recommended_next_phase": "APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION"
+  },
+  "apb_lot_real_runner_integration": {
+    "phase": "APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION",
+    "status": "APB_LOT_REAL_CASE_RUNNER_IMPLEMENTED",
+    "lot_sim_apb_lot_mode_available": true,
+    "modern_case_executed": true,
+    "legacy_case_accepted": true,
+    "json_output_generated": true,
+    "json_has_effective_data": true,
+    "volume_balance_exercised": true,
+    "pre_iterative_exercised": true,
+    "legacy_modes_preserved": true,
+    "not_physically_validated": true,
+    "not_legacy_equivalent": true,
+    "pkn_behavior_changed": false,
+    "buz29_penny_executed": false,
+    "recommended_next_phase": "APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS"
   }
 }
