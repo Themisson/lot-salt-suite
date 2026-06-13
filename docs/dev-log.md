@@ -57,6 +57,26 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-13] Fase D — sigma-theta provider pre-runner wiring — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Wiring:** `SIGMATHETA_PROVIDER_WIRED_TO_DIAGNOSTIC_PRE_RUNNER`.
+
+**Arquivos principais:**
+
+```text
+src/lot/FractureGateDiagnosticPreRunner.cpp
+tools/audit_sigmatheta_provider_pre_runner_wiring.py
+docs/120_sigmatheta_provider_pre_runner_wiring.md
+```
+
+**Garantia:** `runtime_dispatch_enabled=false`; PKN/Penny runtime nao sao
+chamados pelo gate; `sigma_theta_diagnostic_input` continua aceito.
+
+---
+
 ### [2026-06-13] Fase C — PostDrillingSigmaThetaProvider — Codex
 
 **Status:** Implementado; commit/push executado ao final se todos os gates

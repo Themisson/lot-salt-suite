@@ -6,6 +6,7 @@
 #include <string>
 
 #include "lot/LimitedFractureGateRuntimeIntegration.hpp"
+#include "lot/PostDrillingSigmaThetaProvider.hpp"
 
 namespace lss::lot {
 namespace {
@@ -57,6 +58,17 @@ SigmaThetaSource sigma_theta_source_from_diagnostic_input(
   return SigmaThetaSource::Unknown;
 }
 
+PostDrillingSigmaThetaSource provider_source_from_diagnostic_input(
+    const std::string& source) {
+  if (source == "EXPLICIT_DIAGNOSTIC_INPUT") {
+    return PostDrillingSigmaThetaSource::ExplicitDiagnosticInput;
+  }
+  if (source == "SYNTHETIC_FIXTURE") {
+    return PostDrillingSigmaThetaSource::SyntheticFixture;
+  }
+  return PostDrillingSigmaThetaSource::Unknown;
+}
+
 }  // namespace
 
 FractureGateRuntimeInput make_fracture_gate_runtime_input_from_case(
@@ -89,10 +101,24 @@ FractureGateRuntimeInput make_fracture_gate_runtime_input_from_case(
 
   const auto& diagnostic = data.lot.sigma_theta_diagnostic_input;
   if (diagnostic.enabled) {
+    PostDrillingSigmaThetaProviderInput provider_input;
+    provider_input.source =
+        provider_source_from_diagnostic_input(diagnostic.source);
+    provider_input.sigma_theta_initial_compression_positive_Pa =
+        diagnostic.sigma_theta_initial_compression_positive_Pa;
+    provider_input.sigma_theta_current_compression_positive_Pa =
+        diagnostic.sigma_theta_current_compression_positive_Pa;
+    provider_input.wellbore_pressure_Pa = 0.0;
+    provider_input.tensile_strength_Pa = 0.0;
+    provider_input.physically_validated = diagnostic.physically_validated;
+    provider_input.legacy_equivalent = diagnostic.legacy_equivalent;
+    const auto provider_result =
+        evaluate_post_drilling_sigma_theta(provider_input);
+
     input.sigma_theta_initial_state.sigma_theta_initialized = true;
     input.sigma_theta_initial_state.sigma_theta_initial_state_valid = true;
     input.sigma_theta_initial_state.sigma_theta_initial_compression_positive_Pa =
-        diagnostic.sigma_theta_initial_compression_positive_Pa;
+        provider_result.sigma_theta_initial_compression_positive_Pa;
     input.sigma_theta_initial_state.sigma_theta_source =
         sigma_theta_source_from_diagnostic_input(diagnostic.source);
     input.sigma_theta_initial_state.sigma_theta_state_time =
@@ -106,8 +132,9 @@ FractureGateRuntimeInput make_fracture_gate_runtime_input_from_case(
 
     input.pressure_sigma_theta_criterion
         .sigma_theta_current_compression_positive_Pa =
-        diagnostic.sigma_theta_current_compression_positive_Pa;
-    input.pressure_sigma_theta_criterion.tensile_strength_Pa = 0.0;
+        provider_result.sigma_theta_current_compression_positive_Pa;
+    input.pressure_sigma_theta_criterion.tensile_strength_Pa =
+        provider_result.tensile_strength_Pa;
     input.pressure_sigma_theta_criterion.pressure_semantics =
         PressureSemantics::WellborePressureAbsolute;
     input.pressure_sigma_theta_criterion.sigma_theta_reference_frame =

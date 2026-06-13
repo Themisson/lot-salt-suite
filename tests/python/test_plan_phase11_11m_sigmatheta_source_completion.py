@@ -1,24 +1,22 @@
 from __future__ import annotations
 
 import json
-import subprocess
 import sys
 from pathlib import Path
 
-from tools.plan_phase11_11m_sigmatheta_source_completion import build_plan
+from tools.plan_phase11_11m_sigmatheta_source_completion import build_plan, main
 
 
 SCRIPT = Path("tools/plan_phase11_11m_sigmatheta_source_completion.py")
 
 
-def test_help() -> None:
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT), "--help"],
-        check=True,
-        text=True,
-        capture_output=True,
-    )
-    assert "sigma-theta source completion" in result.stdout
+def test_help(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--help"])
+    try:
+        main()
+    except SystemExit as exc:
+        assert exc.code == 0
+    assert "sigma-theta source completion" in capsys.readouterr().out
 
 
 def test_plan_status_records_diagnostic_only_path() -> None:
@@ -68,22 +66,17 @@ def test_completion_steps_include_pressure_and_reference_resolution() -> None:
     assert "resolve_reference_frame" in steps
 
 
-def test_writes_json_and_markdown(tmp_path: Path) -> None:
+def test_writes_json_and_markdown(tmp_path: Path, monkeypatch) -> None:
     output_json = tmp_path / "plan.json"
     output_md = tmp_path / "plan.md"
-    subprocess.run(
-        [
-            sys.executable,
-            str(SCRIPT),
-            "--output-json",
-            str(output_json),
-            "--output-md",
-            str(output_md),
-        ],
-        check=True,
-        text=True,
-        capture_output=True,
-    )
+    monkeypatch.setattr(sys, "argv", [
+        str(SCRIPT),
+        "--output-json",
+        str(output_json),
+        "--output-md",
+        str(output_md),
+    ])
+    assert main() == 0
     data = json.loads(output_json.read_text(encoding="utf-8"))
     assert data["recommended_next_phase"] == "PHASE11_11N_IMPLEMENT_OR_CONNECT_SIGMATHETA_SOURCE"
     assert "MISSING_RUNTIME_SIGMATHETA_INITIAL_SOURCE" in output_md.read_text(

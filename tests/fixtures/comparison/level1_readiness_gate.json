@@ -3864,6 +3864,33 @@
       "PKN behavior remains unchanged."
     ]
   },
+  "master_phase_d_sigmatheta_provider_pre_runner_wiring": {
+    "status": "MASTER_PHASE_D_SIGMATHETA_PROVIDER_WIRED_TO_DIAGNOSTIC_PRE_RUNNER",
+    "phase": "master-D",
+    "wiring_status": "SIGMATHETA_PROVIDER_WIRED_TO_DIAGNOSTIC_PRE_RUNNER",
+    "provider": "PostDrillingSigmaThetaProvider",
+    "pre_runner": "FractureGateDiagnosticPreRunner",
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "pkn_model_called_by_gate": false,
+    "pkn_runner_called_by_gate": false,
+    "penny_adapter_called_by_gate": false,
+    "required_statuses": [
+      "MASTER_PHASE_D_SIGMATHETA_PROVIDER_WIRED_TO_DIAGNOSTIC_PRE_RUNNER",
+      "SIGMATHETA_PROVIDER_WIRED_TO_DIAGNOSTIC_PRE_RUNNER",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "PKN_BEHAVIOR_NOT_CHANGED",
+      "PENNY_SHAPED_RUNTIME_NOT_ENABLED"
+    ],
+    "recommended_next_phase": "MASTER_PHASE_E_VALIDATE_SIGMATHETA_PROVIDER_CONTROLLED_CASES",
+    "caveats": [
+      "The provider wiring is diagnostic only.",
+      "The gate does not execute PKN or PENNY_SHAPED physical runtime.",
+      "BUZ29-PENNY remains blocked."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

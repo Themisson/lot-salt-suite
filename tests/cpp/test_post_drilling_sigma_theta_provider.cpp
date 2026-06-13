@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iterator>
+#include <limits>
 #include <string>
 #include <stdexcept>
 
@@ -82,14 +83,25 @@ TEST_CASE("PostDrillingSigmaThetaProvider rejects unknown source") {
                   std::runtime_error);
 }
 
-TEST_CASE("PostDrillingSigmaThetaProvider rejects invalid sigma theta values") {
+TEST_CASE("PostDrillingSigmaThetaProvider rejects invalid initial sigma theta") {
   auto input = valid_input();
   input.sigma_theta_initial_compression_positive_Pa = 0.0;
   CHECK_THROWS_AS(lss::lot::evaluate_post_drilling_sigma_theta(input),
                   std::runtime_error);
+}
 
-  input = valid_input();
+TEST_CASE("PostDrillingSigmaThetaProvider accepts tensile current sigma theta") {
+  auto input = valid_input();
   input.sigma_theta_current_compression_positive_Pa = -1.0;
+  const auto result = lss::lot::evaluate_post_drilling_sigma_theta(input);
+
+  CHECK(result.sigma_theta_current_compression_positive_Pa == -1.0);
+}
+
+TEST_CASE("PostDrillingSigmaThetaProvider rejects nonfinite current sigma theta") {
+  auto input = valid_input();
+  input.sigma_theta_current_compression_positive_Pa =
+      std::numeric_limits<double>::quiet_NaN();
   CHECK_THROWS_AS(lss::lot::evaluate_post_drilling_sigma_theta(input),
                   std::runtime_error);
 }

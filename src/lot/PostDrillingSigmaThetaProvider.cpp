@@ -53,8 +53,11 @@ PostDrillingSigmaThetaProviderResult evaluate_post_drilling_sigma_theta(
 
   require_positive_finite(input.sigma_theta_initial_compression_positive_Pa,
                           "sigma_theta_initial_compression_positive_Pa");
-  require_positive_finite(input.sigma_theta_current_compression_positive_Pa,
-                          "sigma_theta_current_compression_positive_Pa");
+  if (!std::isfinite(input.sigma_theta_current_compression_positive_Pa)) {
+    throw std::runtime_error(
+        "PostDrillingSigmaThetaProvider: "
+        "sigma_theta_current_compression_positive_Pa must be finite");
+  }
   require_nonnegative_finite(input.wellbore_pressure_Pa,
                              "wellbore_pressure_Pa");
   require_nonnegative_finite(input.tensile_strength_Pa,
