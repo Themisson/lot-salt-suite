@@ -8317,3 +8317,37 @@ do provider elástico.
 
 **Próxima fase recomendada:**
 `PHASE_PLAN_ELASTIC_SIGMATHETA_UPGRADE_IMPLEMENTATION`.
+
+---
+
+### [2026-06-13] Fase C — Plano de implementação do upgrade elástico sigma-theta — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `ELASTIC_SIGMATHETA_UPGRADE_IMPLEMENTATION_PLAN_READY`.
+
+**Plano:**
+
+```text
+selected_formula = AXISYMMETRIC_ELASTIC_WELLBORE_SOURCE
+proposed_provider_source = AXISYMMETRIC_ELASTIC_WELLBORE_STATE
+implementation_allowed_next = true
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_change_allowed = false
+```
+
+**Interpretação:** a próxima implementação deve adicionar uma fonte diagnóstica
+axisimétrica ao `PostDrillingSigmaThetaProvider`, preservando a fonte elástica
+inicial existente e mantendo Kirsch completo bloqueado até existirem
+`sigma_H`, `sigma_h` e azimute.
+
+**Entregáveis:**
+- `tools/plan_elastic_sigmatheta_upgrade_implementation.py`
+- `tests/python/test_plan_elastic_sigmatheta_upgrade_implementation.py`
+- `docs/128_elastic_sigmatheta_upgrade_implementation_plan.md`
+
+**Próxima fase recomendada:**
+`PHASE_IMPLEMENT_ELASTIC_SIGMATHETA_UPGRADE_SOURCE`.

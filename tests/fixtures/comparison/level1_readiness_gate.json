@@ -4108,6 +4108,25 @@
       "Physical dispatch remains disabled."
     ]
   },
+  "phase_elastic_sigmatheta_upgrade_implementation_plan": {
+    "status": "ELASTIC_SIGMATHETA_UPGRADE_IMPLEMENTATION_PLAN_READY",
+    "phase": "ELASTIC_SIGMATHETA_UPGRADE_IMPLEMENTATION_PLAN",
+    "selected_formula": "AXISYMMETRIC_ELASTIC_WELLBORE_SOURCE",
+    "proposed_provider_source": "AXISYMMETRIC_ELASTIC_WELLBORE_STATE",
+    "implementation_allowed_next": true,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_change_allowed": false,
+    "recommended_next_phase": "PHASE_IMPLEMENT_ELASTIC_SIGMATHETA_UPGRADE_SOURCE",
+    "caveats": [
+      "The upgrade remains diagnostic and opt-in.",
+      "The implementation plan does not enable physical dispatch.",
+      "Kirsch full orientation remains blocked until sigma_H, sigma_h and azimuth are available.",
+      "PKN behavior must remain unchanged."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
