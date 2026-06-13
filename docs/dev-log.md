@@ -8545,3 +8545,50 @@ equivalência com legado.
 
 **Próxima fase recomendada:**
 `PHASE_PREPARE_BUZ_OR_LEGACY_COMPARISON_GATE`.
+
+---
+
+### [2026-06-13] Fase 7 — Gate BUZ/Legacy para source elástica sigma-theta — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `BUZ_OR_LEGACY_COMPARISON_GATE_PREPARED`.
+
+**Gate preparado:**
+
+```text
+source = AXISYMMETRIC_ELASTIC_WELLBORE_STATE
+recommended_first_comparison = ANALYTIC_OR_BUZ67D_PKN_DIAGNOSTIC
+buz29_penny_execution_allowed = false
+legacy_equivalence_allowed = false
+physical_validation_allowed = false
+runtime_dispatch_enabled = false
+pkn_behavior_change_allowed = false
+penny_shaped_runtime_enabled = false
+```
+
+**Campos que devem ser alinhados antes de comparar:**
+
+```text
+wellbore_pressure_Pa
+far_field_stress_compression_positive_Pa
+tensile_strength_Pa
+sigma_theta_current_compression_positive_Pa
+fracture_gate_reached
+time_s
+pressure_semantics
+stress_reference_frame
+sign_convention
+```
+
+**Interpretação:** o gate autoriza apenas a próxima fase de comparação
+controlada com referência analítica ou BUZ67D/PKN diagnóstico. BUZ29-PENNY
+continua bloqueado, assim como validação física e equivalência legada.
+
+**Entregáveis:**
+- `tools/prepare_buz_or_legacy_comparison_gate.py`
+- `tests/python/test_prepare_buz_or_legacy_comparison_gate.py`
+- `docs/134_buz_or_legacy_comparison_gate.md`
+
+**Próxima fase recomendada:**
+`PHASE_RUN_FIRST_CONTROLLED_REFERENCE_COMPARISON`.

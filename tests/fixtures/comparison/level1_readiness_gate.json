@@ -4217,6 +4217,30 @@
     "penny_shaped_runtime_enabled": false,
     "recommended_next_phase": "PHASE_PREPARE_BUZ_OR_LEGACY_COMPARISON_GATE"
   },
+  "phase_buz_or_legacy_comparison_gate": {
+    "status": "BUZ_OR_LEGACY_COMPARISON_GATE_PREPARED",
+    "phase": "PHASE_PREPARE_BUZ_OR_LEGACY_COMPARISON_GATE",
+    "source": "AXISYMMETRIC_ELASTIC_WELLBORE_STATE",
+    "recommended_first_comparison": "ANALYTIC_OR_BUZ67D_PKN_DIAGNOSTIC",
+    "buz29_penny_execution_allowed": false,
+    "legacy_equivalence_allowed": false,
+    "physical_validation_allowed": false,
+    "runtime_dispatch_enabled": false,
+    "pkn_behavior_change_allowed": false,
+    "penny_shaped_runtime_enabled": false,
+    "fields_to_align_before_comparison": [
+      "wellbore_pressure_Pa",
+      "far_field_stress_compression_positive_Pa",
+      "tensile_strength_Pa",
+      "sigma_theta_current_compression_positive_Pa",
+      "fracture_gate_reached",
+      "time_s",
+      "pressure_semantics",
+      "stress_reference_frame",
+      "sign_convention"
+    ],
+    "recommended_next_phase": "PHASE_RUN_FIRST_CONTROLLED_REFERENCE_COMPARISON"
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

@@ -1281,3 +1281,20 @@ A source axisimétrica pode avançar para a preparação de um gate BUZ/Legacy,
 mas essa decisão permite apenas organizar escopo, campos, tolerâncias e
 caveats. Ela não autoriza comparação física executada, equivalência com o
 LOT_Tese, BUZ29-PENNY ou dispatch runtime.
+
+### Gate BUZ/Legacy preparado para source elástica sigma-theta
+
+Status:
+
+```text
+BUZ_OR_LEGACY_COMPARISON_GATE_PREPARED
+RECOMMENDED_FIRST_COMPARISON_ANALYTIC_OR_BUZ67D_PKN_DIAGNOSTIC
+PHYSICAL_VALIDATION_ALLOWED_FALSE
+LEGACY_EQUIVALENCE_ALLOWED_FALSE
+BUZ29_PENNY_EXECUTION_ALLOWED_FALSE
+```
+
+O gate define que a primeira comparação futura deve permanecer em referência
+analítica ou BUZ67D/PKN diagnóstico. Antes de qualquer comparação com legado,
+devem ser alinhados pressão, tensão, tempo, semântica de pressão, referencial de
+tensão e convenção de sinais. BUZ29-PENNY continua bloqueado.
