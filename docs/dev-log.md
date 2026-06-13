@@ -57,6 +57,34 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-13] APB/LOT modern modes real-case gate — Codex
+
+**Status:** Bloqueio registrado; commit/push executado ao final se todos os
+gates passarem.
+
+**Classificações:**
+
+```text
+APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE
+APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+REAL_CASE_RUNNER_INTEGRATION_REQUIRED
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_PENNY_NOT_EXECUTED
+```
+
+**Escopo:** auditoria do runtime moderno APB/LOT, fixtures de contrato para
+caso real/controlado e ferramenta de validação. O resultado confirma que
+`ApbLotJsonOutputWriter` existe, mas ainda não é chamado por `lot-sim run`; o
+executável permanece limitado a `--mode lot-pkn`.
+
+**Próxima fase recomendada:**
+
+```text
+APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION
+```
+
+---
+
 ### [2026-06-13] APB/LOT extended regression suite — Codex
 
 **Status:** Implementado; commit/push executado ao final se todos os gates

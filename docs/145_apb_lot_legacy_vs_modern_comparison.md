@@ -50,3 +50,15 @@ legacy_dat + legacy_nodal_force + legacy_inside_newton
 
 Essa comparacao ainda e contratual. Nao ha metricas runtime APB reais nesta
 fase.
+
+## Comparacao real ainda bloqueada
+
+A fase `APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE` confirmou que ainda
+nao existe runner APB/LOT moderno para comparar outputs reais. A trilha
+legado-moderno permanece limitada a contratos e fixtures ate que:
+
+```text
+APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION
+```
+
+crie uma execucao controlada que gere dados efetivos.

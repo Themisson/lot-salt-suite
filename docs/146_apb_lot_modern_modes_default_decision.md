@@ -41,3 +41,16 @@ APB_LOT_MODERN_MODES_READY_AS_DEFAULT_FOR_NEW_CASES
 
 O proximo gate e validar esses modos contra um caso APB real, quando houver
 runner moderno correspondente.
+
+## Dependencia para default operacional
+
+O gate de caso real bloqueou a promocao operacional dos modos modernos. Eles
+continuam recomendados como contrato, mas nao como default fisico validado,
+porque ainda nao ha runner APB/LOT moderno consumindo `volume_balance` e
+`pre_iterative`.
+
+Status:
+
+```text
+APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+```

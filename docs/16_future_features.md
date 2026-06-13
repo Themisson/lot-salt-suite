@@ -1445,3 +1445,22 @@ BUZ29_PENNY_NOT_EXECUTED
 
 This is a contract-level regression. Runtime APB metrics remain unavailable
 until a real APB runner/case is connected to the modern path.
+
+### APB/LOT real-case runner integration
+
+The `APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE` phase recorded that the
+modern APB/LOT modes still do not have a real integrated runner:
+
+```text
+APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+```
+
+Required future work:
+
+1. add a runtime APB/LOT route separate from `lot-pkn`;
+2. call `ApbLotJsonOutputWriter` from that route;
+3. fill `time_series`, `layers`, `annulars`, and `summary` with effective data;
+4. exercise `volume_balance` and `pre_iterative` in the solver, or block each
+   mode with a specific technical reason.
+
+Until then, the modes remain valid contracts, not APB physical validation.

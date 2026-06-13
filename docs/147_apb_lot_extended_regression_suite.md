@@ -41,3 +41,15 @@ um caso APB real quando o runner correspondente existir.
 ```text
 APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE
 ```
+
+## Resultado da fase de caso real
+
+A fase recomendada foi executada e encontrou o bloqueio esperado de runtime:
+
+```text
+APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+REAL_CASE_RUNNER_INTEGRATION_REQUIRED
+```
+
+O contrato permanece valido, mas `runtime_metrics_available = false` continua
+verdadeiro. Nenhum `*_out.json` efetivo foi fabricado.

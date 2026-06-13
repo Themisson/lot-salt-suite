@@ -1,0 +1,10 @@
+case:
+  name: apb_lot_legacy_controlled
+apb_lot:
+  output_format: legacy_dat
+  legacy_dat_output_enabled: true
+  leakoff_coupling_mode: legacy_nodal_force
+  salt_displacement_mode: legacy_inside_newton
+caveats:
+  - legacy modes preserved as contract fixture
+  - fixture only; not a runnable legacy APB execution

@@ -48,3 +48,17 @@ salt_displacement_mode
 ```
 
 Status: `JSON_OUTPUT_CONTRACT_VALID`.
+
+## Validacao com caso real APB/LOT
+
+A fase `APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE` confirmou que o
+writer ainda nao esta integrado ao runtime. `apps/lot-sim.cpp` continua
+executando apenas `run --mode lot-pkn`, portanto nenhum `*_out.json` efetivo
+foi gerado por um caso APB/LOT real.
+
+Status:
+
+```text
+APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+REAL_CASE_RUNNER_INTEGRATION_REQUIRED
+```

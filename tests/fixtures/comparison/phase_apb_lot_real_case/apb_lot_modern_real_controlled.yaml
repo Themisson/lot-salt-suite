@@ -1,0 +1,10 @@
+case:
+  name: apb_lot_modern_real_controlled
+apb_lot:
+  output_format: json
+  legacy_dat_output_enabled: true
+  leakoff_coupling_mode: volume_balance
+  salt_displacement_mode: pre_iterative
+caveats:
+  - APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+  - fixture only; not a runnable APB/LOT physical case

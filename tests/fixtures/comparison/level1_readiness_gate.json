@@ -4477,5 +4477,22 @@
     "runtime_metrics_available": false,
     "contract_validation_only": true,
     "recommended_next_phase": "APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE"
+  },
+  "apb_lot_real_case_validation": {
+    "phase": "APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE",
+    "status": "APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER",
+    "real_case_runner_available": false,
+    "modern_case_executed": false,
+    "legacy_case_executed": false,
+    "modern_json_output_generated": false,
+    "modern_json_has_effective_data": false,
+    "volume_balance_exercised": false,
+    "pre_iterative_exercised": false,
+    "blocked_by_missing_runtime_integration": true,
+    "writer_integrated_with_runtime": false,
+    "legacy_modes_preserved": true,
+    "pkn_behavior_changed": false,
+    "buz29_penny_executed": false,
+    "recommended_next_phase": "APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION"
   }
 }

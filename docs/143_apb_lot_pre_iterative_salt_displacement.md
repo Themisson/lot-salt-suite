@@ -36,3 +36,12 @@ legacy_inside_newton
 
 e rejeitou `inside_magic_loop`. A validacao e contratual e nao declara
 equivalencia fisica com o legado.
+
+## Gate de caso real
+
+A fase `APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE` confirmou que
+`pre_iterative` ainda nao e exercitado por um runner APB/LOT real. O modo
+continua registrado como contrato moderno; a chamada efetiva ao sal no runtime
+depende de uma fase futura de integracao de runner APB/LOT.
+
+Status: `REAL_CASE_RUNNER_INTEGRATION_REQUIRED`.

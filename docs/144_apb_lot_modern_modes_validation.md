@@ -44,3 +44,16 @@ runtime_metrics_available = false
 ```
 
 O comportamento PKN permanece inalterado.
+
+## Validacao com caso real
+
+A etapa seguinte auditou a existencia de um caso APB/LOT real/controlado. O
+resultado foi bloqueado porque o executavel `lot-sim` ainda nao possui runner
+APB/LOT:
+
+```text
+APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+```
+
+Assim, a validacao desta pagina segue sendo contratual. Nao ha afirmacao de
+execucao fisica APB, de `*_out.json` efetivo nem de metricas runtime.

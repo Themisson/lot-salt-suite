@@ -1,0 +1,11 @@
+case:
+  name: apb_lot_modern_explicit_output
+apb_lot:
+  output_format: json
+  output_path: custom/apb_lot_modern_explicit_out.json
+  legacy_dat_output_enabled: true
+  leakoff_coupling_mode: volume_balance
+  salt_displacement_mode: pre_iterative
+caveats:
+  - explicit output path contract fixture
+  - runner integration still required before real-case execution

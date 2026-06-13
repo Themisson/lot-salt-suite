@@ -39,3 +39,12 @@ legacy_nodal_force
 Tambem confirmou que `force_balance_unknown` e rejeitado no contrato de
 regressao. Status: `MODERN_APB_LOT_MODES_VALID` e
 `LEGACY_APB_LOT_MODES_PRESERVED`.
+
+## Gate de caso real
+
+A validacao `APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE` auditou a
+disponibilidade de um runner APB/LOT real. Como nao ha runner moderno integrado,
+`volume_balance` permanece contrato/helper e ainda nao foi exercitado por um
+solver APB runtime.
+
+Status: `APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER`.

@@ -1149,3 +1149,18 @@ Os campos ausentes são `young_modulus_Pa`, `poisson_ratio`,
 `sigma_theta_compression_positive_Pa`. Os campos
 `elapsed_since_opening_min` e `wellbore_pressure_Pa` exigem seleção semântica
 explícita de tempo/amostra antes de alimentar o adapter.
+
+### APB/LOT real-case runner separado
+
+A fase `APB_LOT_VALIDATE_MODERN_MODES_WITH_REAL_APB_CASE` nao executou
+BUZ29/PENNY e nao alterou a trilha nao-PKN. Ela confirmou apenas que o caminho
+APB/LOT moderno tambem precisa de runner proprio antes de validar outputs reais:
+
+```text
+APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_PENNY_NOT_EXECUTED
+```
+
+Esse bloqueio deve ser resolvido sem reutilizar a rota BUZ29/PENNY como atalho
+fisico.
