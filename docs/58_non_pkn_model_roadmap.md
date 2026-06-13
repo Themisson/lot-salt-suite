@@ -1180,3 +1180,17 @@ BUZ29_PENNY_NOT_EXECUTED
 Essa rota e controlada e diagnostica. Ela nao habilita runner nao-PKN, nao
 executa BUZ29/PENNY e nao deve ser usada como atalho para validacao fisica dos
 modelos nao PKN.
+
+### APB/LOT runner controlado — semantica numerica
+
+A fase `APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS` confirmou que a rota
+APB/LOT controlada gera JSON numericamente coerente para contrato:
+
+```text
+APB_LOT_REAL_RUNNER_NUMERICAL_SEMANTICS_VALID
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_PENNY_NOT_EXECUTED
+```
+
+Esse resultado nao muda o roadmap nao-PKN: BUZ29/PENNY continua bloqueado e a
+rota APB/LOT nao deve ser usada como dispatch fisico de `PENNY_SHAPED`.

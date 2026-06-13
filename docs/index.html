@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">211/218</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">212/219</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">443</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">1180</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -8864,6 +8864,17 @@ exercises <code>volume_balance</code> and <code>pre_iterative</code>, preserves 
 and leaves <code>lot-pkn</code> unchanged. This is still not a full APB physical solver and
 not a LOT_Tese equivalence claim. The next technical step is to audit the
 numerical semantics of the controlled APB/LOT runner before expanding it.</p>
+<h3 id="apblot-controlled-runner-numerical-semantics">APB/LOT controlled runner numerical semantics</h3>
+<p>The <code>APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS</code> phase validated the
+controlled runner output contract:</p>
+<pre><code class="language-text">APB_LOT_REAL_RUNNER_NUMERICAL_SEMANTICS_VALID
+VOLUME_BALANCE_SEMANTICS_VALID
+PRE_ITERATIVE_SEMANTICS_VALID
+controlled_runner = true
+physical_validation_claimed = false
+</code></pre>
+<p>The next future step is a controlled modern-vs-legacy semantics comparison,
+without treating the controlled APB/LOT route as a full physical APB solver.</p>
 </div>
 </section>
 

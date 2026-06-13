@@ -4511,5 +4511,25 @@
     "pkn_behavior_changed": false,
     "buz29_penny_executed": false,
     "recommended_next_phase": "APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS"
+  },
+  "apb_lot_real_runner_numerical_semantics": {
+    "phase": "APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS",
+    "status": "APB_LOT_REAL_RUNNER_NUMERICAL_SEMANTICS_VALID",
+    "modern_case_executed": true,
+    "legacy_case_executed": true,
+    "json_output_parseable": true,
+    "json_minimum_schema": true,
+    "time_series_non_empty": true,
+    "finite_values": true,
+    "time_monotonic": true,
+    "summary_consistent": true,
+    "volume_balance_semantics_valid": true,
+    "pre_iterative_semantics_valid": true,
+    "legacy_modes_preserved": true,
+    "controlled_runner": true,
+    "physical_validation_claimed": false,
+    "pkn_behavior_changed": false,
+    "buz29_penny_executed": false,
+    "recommended_next_phase": "APB_LOT_COMPARE_REAL_RUNNER_MODERN_VS_LEGACY_SEMANTICS"
   }
 }

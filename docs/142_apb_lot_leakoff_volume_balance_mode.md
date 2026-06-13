@@ -48,3 +48,18 @@ disponibilidade de um runner APB/LOT real. Como nao ha runner moderno integrado,
 solver APB runtime.
 
 Status: `APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER`.
+
+## Validacao posterior no runner controlado
+
+A fase `APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS` exercitou
+`volume_balance` no runner APB/LOT controlado. A semantica validada usa os
+campos reais:
+
+```text
+dV_m3
+dV_leakoff_m3
+summary.total_leakoff_volume_m3
+```
+
+A validacao confirma coerencia numerica do contrato controlado, nao validacao
+fisica APB/LOT.

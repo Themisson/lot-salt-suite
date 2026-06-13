@@ -129,3 +129,21 @@ APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS
 Essa próxima fase deve revisar a semântica numérica do runner APB/LOT
 controlado antes de qualquer expansão para solver APB físico ou comparação com
 legado.
+
+## Atualizacao posterior — semantica numerica validada
+
+A fase `APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS` executou os fixtures
+controlados e validou o JSON gerado pelo runner:
+
+```text
+APB_LOT_REAL_RUNNER_NUMERICAL_SEMANTICS_VALID
+FINITE_VALUES_VALID
+TIME_SERIES_NON_EMPTY
+SUMMARY_CONSISTENT
+VOLUME_BALANCE_SEMANTICS_VALID
+PRE_ITERATIVE_SEMANTICS_VALID
+```
+
+A validacao usa os campos reais `dV_m3`, `dV_leakoff_m3` e
+`salt_displacement_m`. O runner permanece controlado:
+`controlled_runner = true` e `physical_validation_claimed = false`.

@@ -53,3 +53,16 @@ REAL_CASE_RUNNER_INTEGRATION_REQUIRED
 
 O contrato permanece valido, mas `runtime_metrics_available = false` continua
 verdadeiro. Nenhum `*_out.json` efetivo foi fabricado.
+
+## Atualizacao posterior — contrato exercitado no runner controlado
+
+As fases posteriores adicionaram `lot-sim run --mode apb-lot` em rota
+controlada e validaram sua semantica numerica minima:
+
+```text
+APB_LOT_REAL_RUNNER_NUMERICAL_SEMANTICS_VALID
+```
+
+O status anterior `runtime_metrics_available = false` permanece correto para a
+fase original. A disponibilidade posterior e controlada/diagnostica, nao uma
+validacao fisica APB completa.

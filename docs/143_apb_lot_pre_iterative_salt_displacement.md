@@ -45,3 +45,12 @@ continua registrado como contrato moderno; a chamada efetiva ao sal no runtime
 depende de uma fase futura de integracao de runner APB/LOT.
 
 Status: `REAL_CASE_RUNNER_INTEGRATION_REQUIRED`.
+
+## Validacao posterior no runner controlado
+
+A fase `APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS` exercitou
+`pre_iterative` no runner APB/LOT controlado. O campo
+`salt_displacement_m` foi validado como finito e nao nulo, com caveat
+`CONTROLLED_PRE_ITERATIVE_SALT_DISPLACEMENT`.
+
+Isso valida o contrato numerico controlado, nao acoplamento iterativo sal/APB.

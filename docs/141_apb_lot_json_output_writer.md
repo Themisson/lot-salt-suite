@@ -62,3 +62,11 @@ Status:
 APB_LOT_REAL_CASE_EXECUTION_BLOCKED_BY_MISSING_RUNNER
 REAL_CASE_RUNNER_INTEGRATION_REQUIRED
 ```
+
+## Validacao posterior da semantica numerica
+
+Depois da integracao controlada do runner APB/LOT, a fase
+`APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS` confirmou que o `_out.json`
+moderno e parseavel e contem `time_series` com valores finitos, tempo monotono e
+`summary` consistente. A validacao permanece diagnostica/controlada e nao altera
+`ResultWriter` do PKN.

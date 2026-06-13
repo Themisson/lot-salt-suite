@@ -1479,3 +1479,19 @@ exercises `volume_balance` and `pre_iterative`, preserves legacy APB/LOT modes,
 and leaves `lot-pkn` unchanged. This is still not a full APB physical solver and
 not a LOT_Tese equivalence claim. The next technical step is to audit the
 numerical semantics of the controlled APB/LOT runner before expanding it.
+
+### APB/LOT controlled runner numerical semantics
+
+The `APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS` phase validated the
+controlled runner output contract:
+
+```text
+APB_LOT_REAL_RUNNER_NUMERICAL_SEMANTICS_VALID
+VOLUME_BALANCE_SEMANTICS_VALID
+PRE_ITERATIVE_SEMANTICS_VALID
+controlled_runner = true
+physical_validation_claimed = false
+```
+
+The next future step is a controlled modern-vs-legacy semantics comparison,
+without treating the controlled APB/LOT route as a full physical APB solver.

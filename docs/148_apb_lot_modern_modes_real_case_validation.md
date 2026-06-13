@@ -80,3 +80,13 @@ MODERN_JSON_OUTPUT_GENERATED
 O registro acima permanece como histórico do bloqueio original. A nova rota
 continua diagnostica/controlada e nao deve ser interpretada como validacao
 fisica APB/LOT ou equivalencia com LOT_Tese.
+
+## Atualizacao posterior — semantica numerica do runner
+
+A rota controlada criada na fase seguinte foi posteriormente auditada por
+`APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS`. O resultado confirmou JSON
+parseavel, serie temporal nao vazia, valores finitos, tempo monotono, resumo
+consistente e exercicio dos modos `volume_balance` e `pre_iterative`.
+
+Essa validacao fecha o bloqueio de semantica numerica minima, mas mantem
+`physical_validation_claimed = false`.

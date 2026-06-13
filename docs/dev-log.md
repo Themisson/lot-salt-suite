@@ -9,12 +9,12 @@
 ## Estado atual do projeto
 
 ```
-Fase ativa  : APB_LOT_IMPLEMENT_REAL_CASE_RUNNER_INTEGRATION
+Fase ativa  : APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
 Último push : 2026-06-13
 Testes C++  : 447/447 em 2026-06-13
-Testes Py   : 1187/1187 em 2026-06-13
+Testes Py   : 1194/1194 em 2026-06-13
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,43 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-13] APB/LOT real runner numerical semantics — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Classificações:**
+
+```text
+APB_LOT_VALIDATE_REAL_RUNNER_NUMERICAL_SEMANTICS
+APB_LOT_REAL_RUNNER_NUMERICAL_SEMANTICS_VALID
+FINITE_VALUES_VALID
+TIME_SERIES_NON_EMPTY
+SUMMARY_CONSISTENT
+VOLUME_BALANCE_SEMANTICS_VALID
+PRE_ITERATIVE_SEMANTICS_VALID
+LEGACY_MODES_PRESERVED
+PKN_BEHAVIOR_NOT_CHANGED
+BUZ29_PENNY_NOT_EXECUTED
+```
+
+**Escopo:** validacao numerica do runner APB/LOT controlado com fixtures
+modernos e legados. A fase confirma JSON parseavel, valores finitos, tempo
+monotono, resumo consistente e semantica minima dos campos `dV_m3`,
+`dV_leakoff_m3` e `salt_displacement_m`.
+
+**Limites:** `controlled_runner = true` e
+`physical_validation_claimed = false`. Nao ha validacao fisica APB/LOT,
+equivalencia com LOT_Tese ou execucao BUZ29/PENNY.
+
+**Proxima fase recomendada:**
+
+```text
+APB_LOT_COMPARE_REAL_RUNNER_MODERN_VS_LEGACY_SEMANTICS
+```
 
 ---
 
