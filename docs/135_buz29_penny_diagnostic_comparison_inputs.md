@@ -89,3 +89,17 @@ buz29_candidate_inputs_complete = false
 
 Missing BUZ29/PENNY fields must be completed explicitly before a real candidate
 diagnostic run is attempted.
+
+## Adapter Input Completion
+
+The input completion pass audited the actual adapter fields and kept the gate
+closed:
+
+```text
+BUZ29_PENNY_ADAPTER_INPUTS_STILL_PARTIAL
+blocking_fields = young_modulus_Pa, poisson_ratio, viscosity_Pa_min,
+  flow_rate_m3_min, sigma_theta_compression_positive_Pa
+ambiguous_fields = elapsed_since_opening_min, wellbore_pressure_Pa
+```
+
+No resolved BUZ29/PENNY adapter input was created.

@@ -1120,3 +1120,21 @@ Esse runner resolve o bloqueio de infraestrutura para entradas sintéticas
 completas, mas mantém o candidato real BUZ29/PENNY bloqueado enquanto os campos
 adapter-ready permanecerem parciais. Ele não é dispatch físico e não transforma
 `PENNY_SHAPED` em modelo operacional de runtime.
+
+### Inputs BUZ29/PENNY do adapter ainda parciais
+
+A fase `PHASE_COMPLETE_BUZ29_PENNY_ADAPTER_INPUTS` manteve o candidato real
+bloqueado:
+
+```text
+BUZ29_PENNY_ADAPTER_INPUTS_STILL_PARTIAL
+blocking_fields_count = 5
+ambiguous_fields_count = 2
+resolved_input_created = false
+```
+
+Os campos ausentes são `young_modulus_Pa`, `poisson_ratio`,
+`viscosity_Pa_min`, `flow_rate_m3_min` e
+`sigma_theta_compression_positive_Pa`. Os campos
+`elapsed_since_opening_min` e `wellbore_pressure_Pa` exigem seleção semântica
+explícita de tempo/amostra antes de alimentar o adapter.

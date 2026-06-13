@@ -19,6 +19,7 @@ def run_script(*args: str, check: bool = True) -> subprocess.CompletedProcess[st
         [sys.executable, str(SCRIPT), *args],
         check=check,
         text=True,
+        stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )

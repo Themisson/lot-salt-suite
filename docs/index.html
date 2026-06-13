@@ -265,9 +265,9 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">200/207</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">201/208</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">426</div><div class="l">testes C++ verdes</div></div>
-      <div class="stat"><div class="n coppc">1139</div><div class="l">testes Python registrados</div></div>
+      <div class="stat"><div class="n coppc">1147</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
     </div>
   </div>
@@ -8805,6 +8805,17 @@ PENNY_SHAPED_RUNTIME_NOT_ENABLED
 PennyShaped adapter and writer. It does not enable non-PKN runtime dispatch and
 does not change PKN behavior. Future work should complete the BUZ29/PENNY
 adapter-ready input set before attempting a real candidate diagnostic run.</p>
+<h3 id="buz29-penny-adapter-inputs-still-partial">BUZ29 Penny Adapter Inputs Still Partial</h3>
+<p>Status:</p>
+<pre><code class="language-text">BUZ29_PENNY_ADAPTER_INPUTS_STILL_PARTIAL
+PHYSICAL_VALIDATION_NOT_CLAIMED
+LEGACY_EQUIVALENCE_NOT_CLAIMED
+RUNTIME_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+</code></pre>
+<p>The adapter input matrix identifies five missing fields and two semantically
+ambiguous fields. Future work must resolve these from explicit BUZ29 sources,
+not synthetic fixtures.</p>
 </div>
 </section>
 

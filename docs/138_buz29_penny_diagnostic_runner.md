@@ -76,3 +76,18 @@ the existing diagnostic-only `PennyShapedDiagnosticAdapter`.
 ```text
 PHASE_COMPLETE_BUZ29_PENNY_ADAPTER_INPUTS
 ```
+
+## Adapter Input Completion Follow-up
+
+The follow-up input audit keeps the real BUZ29/PENNY candidate blocked:
+
+```text
+BUZ29_PENNY_ADAPTER_INPUTS_STILL_PARTIAL
+blocking_fields_count = 5
+ambiguous_fields_count = 2
+resolved_input_created = false
+```
+
+The runner can execute complete diagnostic inputs, but it must not execute the
+real BUZ29/PENNY candidate until the missing and ambiguous adapter fields are
+resolved from explicit sources.

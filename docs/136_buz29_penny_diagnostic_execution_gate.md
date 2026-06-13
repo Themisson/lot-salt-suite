@@ -82,3 +82,10 @@ rejects runtime dispatch, and blocks partial BUZ29 candidate inputs.
 BUZ29_PENNY_DIAGNOSTIC_RUNNER_IMPLEMENTED_INPUTS_PARTIAL
 PHASE_COMPLETE_BUZ29_PENNY_ADAPTER_INPUTS
 ```
+
+The input completion follow-up records that the candidate remains partial:
+
+```text
+BUZ29_PENNY_ADAPTER_INPUTS_STILL_PARTIAL
+PHASE_RESOLVE_BUZ29_PENNY_BLOCKING_ADAPTER_FIELDS
+```

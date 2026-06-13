@@ -4359,6 +4359,41 @@
     ],
     "recommended_next_phase": "PHASE_COMPLETE_BUZ29_PENNY_ADAPTER_INPUTS"
   },
+  "phase_buz29_penny_adapter_inputs_completion": {
+    "phase": "PHASE_COMPLETE_BUZ29_PENNY_ADAPTER_INPUTS",
+    "status": "BUZ29_PENNY_ADAPTER_INPUTS_STILL_PARTIAL",
+    "input_status": "BUZ29_PENNY_ADAPTER_INPUTS_STILL_PARTIAL",
+    "all_required_inputs_complete": false,
+    "resolved_input_created": false,
+    "diagnostic_only": true,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "runtime_dispatch_enabled": false,
+    "pkn_behavior_changed": false,
+    "safe_fields": [
+      "volume_multiplier"
+    ],
+    "blocking_fields": [
+      "young_modulus_Pa",
+      "poisson_ratio",
+      "viscosity_Pa_min",
+      "flow_rate_m3_min",
+      "sigma_theta_compression_positive_Pa"
+    ],
+    "ambiguous_fields": [
+      "elapsed_since_opening_min",
+      "wellbore_pressure_Pa"
+    ],
+    "blocking_fields_count": 5,
+    "ambiguous_fields_count": 2,
+    "forbidden_substitutions": [
+      "do not copy values from penny_shaped_synthetic_minimal.yaml into BUZ29",
+      "do not use volume_multiplier = 2pi automatically",
+      "do not use pressure history as a single adapter pressure without selected diagnostic time",
+      "do not derive sigma_theta without compression-positive source"
+    ],
+    "recommended_next_phase": "PHASE_RESOLVE_BUZ29_PENNY_BLOCKING_ADAPTER_FIELDS"
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

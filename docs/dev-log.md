@@ -8811,3 +8811,45 @@ PKN.
 
 **Próxima fase recomendada:**
 `PHASE_COMPLETE_BUZ29_PENNY_ADAPTER_INPUTS`.
+
+---
+
+### [2026-06-13] Completar inputs BUZ29/PENNY do adapter — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `BUZ29_PENNY_ADAPTER_INPUTS_STILL_PARTIAL`.
+
+**Resultado:**
+
+```text
+all_required_inputs_complete = false
+resolved_input_created = false
+blocking_fields_count = 5
+ambiguous_fields_count = 2
+diagnostic_only = true
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+pkn_behavior_changed = false
+```
+
+**Campos bloqueantes:** `young_modulus_Pa`, `poisson_ratio`,
+`viscosity_Pa_min`, `flow_rate_m3_min` e
+`sigma_theta_compression_positive_Pa`.
+
+**Campos ambíguos:** `elapsed_since_opening_min` e
+`wellbore_pressure_Pa`.
+
+**Interpretação:** a fase não inventou valores físicos, não criou input
+resolvido e não executou BUZ29/PENNY real. O runner continua disponível para
+entradas diagnósticas completas, mas o candidato real permanece bloqueado.
+
+**Entregáveis:**
+- `tests/fixtures/comparison/phase_buz29_penny_adapter_inputs/buz29_penny_adapter_input_matrix.json`
+- `tools/complete_buz29_penny_adapter_inputs.py`
+- `tests/python/test_complete_buz29_penny_adapter_inputs.py`
+- `docs/139_buz29_penny_adapter_inputs_completion.md`
+
+**Próxima fase recomendada:**
+`PHASE_RESOLVE_BUZ29_PENNY_BLOCKING_ADAPTER_FIELDS`.

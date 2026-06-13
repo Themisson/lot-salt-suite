@@ -1,0 +1,143 @@
+{
+  "phase": "PHASE_COMPLETE_BUZ29_PENNY_ADAPTER_INPUTS",
+  "case_id": "BUZ29_PENNY_DIAGNOSTIC",
+  "adapter": "PennyShapedDiagnosticAdapter",
+  "diagnostic_only": true,
+  "physically_validated": false,
+  "legacy_equivalent": false,
+  "runtime_dispatch_enabled": false,
+  "source_scope": "documented BUZ29/PENNY diagnostic candidate and prior audits",
+  "fields": [
+    {
+      "name": "young_modulus_Pa",
+      "required": true,
+      "status": "MISSING",
+      "source": "docs/75_buz29_penny_adapter_ready_inputs.md",
+      "source_file_or_source_component": "cases/validation/non_pkn/buz29_penny_candidate.yaml",
+      "derivation_rule": "none; no BUZ29 adapter-ready elastic modulus is declared",
+      "value_available": false,
+      "can_use_for_buz29_diagnostic": false,
+      "caveats": [
+        "DO_NOT_USE_SYNTHETIC_FIXTURE_VALUE_FOR_BUZ29"
+      ]
+    },
+    {
+      "name": "poisson_ratio",
+      "required": true,
+      "status": "MISSING",
+      "source": "docs/75_buz29_penny_adapter_ready_inputs.md",
+      "source_file_or_source_component": "cases/validation/non_pkn/buz29_penny_candidate.yaml",
+      "derivation_rule": "none; no BUZ29 adapter-ready Poisson ratio is declared",
+      "value_available": false,
+      "can_use_for_buz29_diagnostic": false,
+      "caveats": [
+        "DO_NOT_USE_SYNTHETIC_FIXTURE_VALUE_FOR_BUZ29"
+      ]
+    },
+    {
+      "name": "viscosity_Pa_min",
+      "required": true,
+      "status": "MISSING",
+      "source": "docs/75_buz29_penny_adapter_ready_inputs.md",
+      "source_file_or_source_component": "cases/validation/non_pkn/buz29_penny_candidate.yaml",
+      "derivation_rule": "none; no BUZ29 adapter-ready viscosity with explicit unit is declared",
+      "value_available": false,
+      "can_use_for_buz29_diagnostic": false,
+      "caveats": [
+        "UNIT_CONVERSION_NOT_ALLOWED_WITHOUT_SOURCE_UNIT"
+      ]
+    },
+    {
+      "name": "flow_rate_m3_min",
+      "required": true,
+      "status": "MISSING",
+      "source": "docs/75_buz29_penny_adapter_ready_inputs.md",
+      "source_file_or_source_component": "cases/validation/non_pkn/buz29_penny_candidate.yaml",
+      "derivation_rule": "none; no BUZ29 adapter-ready flow rate with explicit unit is declared",
+      "value_available": false,
+      "can_use_for_buz29_diagnostic": false,
+      "caveats": [
+        "UNIT_CONVERSION_NOT_ALLOWED_WITHOUT_SOURCE_UNIT"
+      ]
+    },
+    {
+      "name": "elapsed_since_opening_min",
+      "required": true,
+      "status": "AMBIGUOUS_SEMANTICS",
+      "source": "docs/72_buz29_pressure_opening_evidence_audit.md",
+      "source_file_or_source_component": "legance/LOT_Tese/results/7-BUZ-29D-RJS10_PENNY-SHAPED.dat",
+      "derivation_rule": "requires current_time_min - opening_time_min; opening_time_min = 10.4 exists, but diagnostic current time is not selected",
+      "value_available": false,
+      "available_source_value": 10.4,
+      "available_source_unit": "min",
+      "can_use_for_buz29_diagnostic": false,
+      "caveats": [
+        "OPENING_TIME_IS_EVENT_MARKER_NOT_ELAPSED_DURATION"
+      ]
+    },
+    {
+      "name": "wellbore_pressure_Pa",
+      "required": true,
+      "status": "AMBIGUOUS_SEMANTICS",
+      "source": "docs/72_buz29_pressure_opening_evidence_audit.md",
+      "source_file_or_source_component": "legance/LOT_Tese/results/7-BUZ-29D-RJS10_PENNY-SHAPED.dat plus PressureDataVisualizer29D-RAA.py",
+      "derivation_rule": "pressure history exists, but adapter needs one wellbore pressure sample at the selected diagnostic time with explicit semantics",
+      "value_available": false,
+      "can_use_for_buz29_diagnostic": false,
+      "caveats": [
+        "PRESSURE_HISTORY_FOUND_CONSUMABLE_BUT_SAMPLE_NOT_SELECTED",
+        "DO_NOT_USE_PRESSURE_HISTORY_AS_WELLBORE_PRESSURE_WITHOUT_SEMANTIC_SELECTION"
+      ]
+    },
+    {
+      "name": "sigma_theta_compression_positive_Pa",
+      "required": true,
+      "status": "MISSING",
+      "source": "docs/74_buz29_penny_diagnostic_route.md",
+      "source_file_or_source_component": "legacy BUZ29 output",
+      "derivation_rule": "none; BUZ29 .dat does not export sigmaTheta directly",
+      "value_available": false,
+      "can_use_for_buz29_diagnostic": false,
+      "caveats": [
+        "SIGMATHETA_NOT_EXPORTED_BY_BUZ29_LEGACY_OUTPUT",
+        "DO_NOT_REUSE_SYNTHETIC_SIGMATHETA_FOR_BUZ29"
+      ]
+    },
+    {
+      "name": "volume_multiplier",
+      "required": true,
+      "status": "AVAILABLE_FROM_DIAGNOSTIC_SOURCE",
+      "source": "docs/78_penny_diagnostic_output_fixtures.md and docs/81_penny_diagnostic_writer_implementation.md",
+      "source_file_or_source_component": "PennyShapedDiagnosticInput default and PennyShaped diagnostic output contract",
+      "derivation_rule": "use empirical diagnostic volume_multiplier = 10.0 only as diagnostic adapter contract; do not treat as 2pi conversion",
+      "value_available": true,
+      "resolved_value": 10.0,
+      "unit": "dimensionless",
+      "can_use_for_buz29_diagnostic": true,
+      "caveats": [
+        "VOLUME_MULTIPLIER_EMPIRICAL_NOT_2PI",
+        "DIAGNOSTIC_ONLY"
+      ]
+    }
+  ],
+  "all_required_inputs_complete": false,
+  "blocking_fields": [
+    "young_modulus_Pa",
+    "poisson_ratio",
+    "viscosity_Pa_min",
+    "flow_rate_m3_min",
+    "sigma_theta_compression_positive_Pa"
+  ],
+  "ambiguous_fields": [
+    "elapsed_since_opening_min",
+    "wellbore_pressure_Pa"
+  ],
+  "resolved_input_created": false,
+  "forbidden_substitutions": [
+    "do not copy values from penny_shaped_synthetic_minimal.yaml into BUZ29",
+    "do not use volume_multiplier = 2pi automatically",
+    "do not use pressure history as a single adapter pressure without selected diagnostic time",
+    "do not derive sigma_theta without compression-positive source"
+  ],
+  "recommended_next_phase": "PHASE_RESOLVE_BUZ29_PENNY_BLOCKING_ADAPTER_FIELDS"
+}

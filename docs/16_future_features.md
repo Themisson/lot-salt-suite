@@ -1395,3 +1395,19 @@ The dedicated runner now exists as an isolated diagnostic path around the
 PennyShaped adapter and writer. It does not enable non-PKN runtime dispatch and
 does not change PKN behavior. Future work should complete the BUZ29/PENNY
 adapter-ready input set before attempting a real candidate diagnostic run.
+
+### BUZ29 Penny Adapter Inputs Still Partial
+
+Status:
+
+```text
+BUZ29_PENNY_ADAPTER_INPUTS_STILL_PARTIAL
+PHYSICAL_VALIDATION_NOT_CLAIMED
+LEGACY_EQUIVALENCE_NOT_CLAIMED
+RUNTIME_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+The adapter input matrix identifies five missing fields and two semantically
+ambiguous fields. Future work must resolve these from explicit BUZ29 sources,
+not synthetic fixtures.

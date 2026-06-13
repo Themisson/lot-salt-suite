@@ -81,3 +81,16 @@ buz29_candidate_inputs_complete = false
 The original blocker is resolved for synthetic complete diagnostic inputs, but
 the real BUZ29/PENNY candidate remains blocked until adapter-ready fields are
 completed. No physical dispatch or legacy equivalence is enabled.
+
+## Adapter Input Completion Follow-up
+
+The adapter input completion phase did not create a resolved BUZ29 input:
+
+```text
+BUZ29_PENNY_ADAPTER_INPUTS_STILL_PARTIAL
+resolved_input_created = false
+runtime_dispatch_enabled = false
+```
+
+The real candidate remains blocked by missing physical fields and ambiguous
+pressure/time sampling.
