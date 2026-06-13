@@ -4087,6 +4087,27 @@
       "Physical validation and dispatch remain blocked."
     ]
   },
+  "phase_elastic_sigmatheta_upgrade_formula_decision": {
+    "status": "ELASTIC_SIGMATHETA_UPGRADE_FORMULA_SELECTED",
+    "phase": "ELASTIC_SIGMATHETA_UPGRADE_FORMULA_DECISION",
+    "selected_formula": "AXISYMMETRIC_ELASTIC_WELLBORE_SOURCE",
+    "implementation_allowed_next": true,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_change_allowed": false,
+    "rejected_formulas": [
+      "KIRSCH_ELASTIC_WELLBORE_SOURCE",
+      "KEEP_SIMPLIFIED_ELASTIC_SOURCE"
+    ],
+    "recommended_next_phase": "PHASE_PLAN_ELASTIC_SIGMATHETA_UPGRADE_IMPLEMENTATION",
+    "caveats": [
+      "Kirsch remains blocked until sigma_H, sigma_h and azimuth are available.",
+      "Axisymmetric source remains diagnostic and opt-in.",
+      "Physical dispatch remains disabled."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

@@ -8285,3 +8285,35 @@ axisimétrica é a menor evolução segura e permanece diagnóstica.
 
 **Próxima fase recomendada:**
 `PHASE_DECIDE_ELASTIC_SIGMATHETA_UPGRADE_FORMULA`.
+
+---
+
+### [2026-06-13] Fase B — Decisão da formulação do upgrade elástico sigma-theta — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `ELASTIC_SIGMATHETA_UPGRADE_FORMULA_SELECTED`.
+
+**Decisão:**
+
+```text
+selected_formula = AXISYMMETRIC_ELASTIC_WELLBORE_SOURCE
+implementation_allowed_next = true
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_change_allowed = false
+```
+
+**Interpretação:** Kirsch completo fica bloqueado até existirem tensões
+horizontais orientadas e azimute. A rota axisimétrica é a menor evolução segura
+do provider elástico.
+
+**Entregáveis:**
+- `tools/decide_elastic_sigmatheta_upgrade_formula.py`
+- `tests/python/test_decide_elastic_sigmatheta_upgrade_formula.py`
+- `docs/127_elastic_sigmatheta_upgrade_formula_decision.md`
+
+**Próxima fase recomendada:**
+`PHASE_PLAN_ELASTIC_SIGMATHETA_UPGRADE_IMPLEMENTATION`.
