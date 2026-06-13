@@ -70,10 +70,11 @@ std::string sigma_theta_diagnostic_input_block(
 
 std::string sigma_theta_provider_block(
     const double far_field_stress_compression_positive_Pa,
-    const double wellbore_pressure_Pa) {
+    const double wellbore_pressure_Pa,
+    const std::string& source = "ELASTIC_INITIAL_WELLBORE_STATE") {
   return "    sigma_theta_provider:\n"
          "      enabled: true\n"
-         "      source: ELASTIC_INITIAL_WELLBORE_STATE\n"
+         "      source: " + source + "\n"
          "      far_field_stress_compression_positive_Pa: " +
          std::to_string(far_field_stress_compression_positive_Pa) + "\n"
          "      wellbore_pressure_Pa: " +
@@ -102,7 +103,8 @@ std::filesystem::path write_enabled_case_with_sigma_theta_provider(
     const std::string& suffix,
     const double far_field_stress_compression_positive_Pa,
     const double wellbore_pressure_Pa,
-    const std::string& fracture_model_line = "") {
+    const std::string& fracture_model_line = "",
+    const std::string& source = "ELASTIC_INITIAL_WELLBORE_STATE") {
   return write_case_with_diagnostics(
       fracture_model_line +
           "    fracture_gate_diagnostics:\n"
@@ -110,7 +112,7 @@ std::filesystem::path write_enabled_case_with_sigma_theta_provider(
           "      mode: limited_gate\n"
           "      dispatch_runtime_enabled: false\n" +
           sigma_theta_provider_block(far_field_stress_compression_positive_Pa,
-                                     wellbore_pressure_Pa),
+                                     wellbore_pressure_Pa, source),
       suffix);
 }
 
@@ -297,6 +299,29 @@ TEST_CASE("Diagnostic pre-runner fills sigma theta guards from elastic provider"
         Catch::Approx(-2000000.0));
   CHECK(input.pressure_sigma_theta_criterion.tensile_strength_Pa ==
         Catch::Approx(0.0));
+  CHECK(input.pressure_sigma_theta_criterion.pressure_semantics ==
+        lss::lot::PressureSemantics::WellborePressureAbsolute);
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("Diagnostic pre-runner fills sigma theta guards from axisymmetric elastic provider") {
+  const auto path = write_enabled_case_with_sigma_theta_provider(
+      "axisymmetric_elastic_provider", 5000000.0, 7000000.0, "",
+      "AXISYMMETRIC_ELASTIC_WELLBORE_STATE");
+  const auto data = lss::io::parse_yaml(path);
+  const auto input = lss::lot::make_fracture_gate_runtime_input_from_case(data);
+
+  CHECK(input.sigma_theta_initial_state.sigma_theta_initialized);
+  CHECK(input.sigma_theta_initial_state.sigma_theta_initial_state_valid);
+  CHECK(input.sigma_theta_initial_state.sigma_theta_source ==
+        lss::lot::SigmaThetaSource::AxisymmetricElasticWellboreState);
+  CHECK(input.sigma_theta_initial_state
+            .sigma_theta_initial_compression_positive_Pa ==
+        Catch::Approx(5000000.0));
+  CHECK(input.pressure_sigma_theta_criterion
+            .sigma_theta_current_compression_positive_Pa ==
+        Catch::Approx(-2000000.0));
   CHECK(input.pressure_sigma_theta_criterion.pressure_semantics ==
         lss::lot::PressureSemantics::WellborePressureAbsolute);
 

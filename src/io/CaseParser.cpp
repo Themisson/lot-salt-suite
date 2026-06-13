@@ -421,10 +421,12 @@ void parse_sigma_theta_provider(const YAML::Node& fracture,
       node["legacy_equivalent"],
       "lot.fracture.sigma_theta_provider.legacy_equivalent");
 
-  if (provider.source != "ELASTIC_INITIAL_WELLBORE_STATE") {
+  if (provider.source != "ELASTIC_INITIAL_WELLBORE_STATE" &&
+      provider.source != "AXISYMMETRIC_ELASTIC_WELLBORE_STATE") {
     throw std::runtime_error(
         "Validacao falhou: sigma_theta_provider.source exige "
-        "ELASTIC_INITIAL_WELLBORE_STATE");
+        "ELASTIC_INITIAL_WELLBORE_STATE ou "
+        "AXISYMMETRIC_ELASTIC_WELLBORE_STATE");
   }
   if (!std::isfinite(provider.far_field_stress_compression_positive_Pa) ||
       provider.far_field_stress_compression_positive_Pa <= 0.0) {

@@ -8351,3 +8351,47 @@ inicial existente e mantendo Kirsch completo bloqueado até existirem
 
 **Próxima fase recomendada:**
 `PHASE_IMPLEMENT_ELASTIC_SIGMATHETA_UPGRADE_SOURCE`.
+
+---
+
+### [2026-06-13] Fase D — Implementação da source axisimétrica sigma-theta — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `ELASTIC_SIGMATHETA_UPGRADE_SOURCE_IMPLEMENTED`.
+
+**Source adicionada:**
+
+```text
+AXISYMMETRIC_ELASTIC_WELLBORE_STATE
+```
+
+**Contrato implementado:**
+
+```text
+sigma_theta_initial_compression_positive_Pa =
+  far_field_stress_compression_positive_Pa
+
+sigma_theta_current_compression_positive_Pa =
+  far_field_stress_compression_positive_Pa - wellbore_pressure_Pa
+
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_changed = false
+penny_shaped_runtime_enabled = false
+physically_validated = false
+legacy_equivalent = false
+```
+
+**Interpretação:** a source axisimétrica foi conectada ao provider, ao
+pre-runner, ao guard, ao parser e ao schema. Ela permanece diagnóstica,
+semi-física, opt-in e sem equivalência legada declarada.
+
+**Entregáveis:**
+- `docs/129_elastic_sigmatheta_upgrade_source_implementation.md`
+- `tools/audit_elastic_sigmatheta_upgrade_source.py`
+- `tests/python/test_audit_elastic_sigmatheta_upgrade_source.py`
+- `tests/fixtures/comparison/phase_elastic_sigmatheta_upgrade/`
+
+**Próxima fase recomendada:**
+`PHASE_VALIDATE_ELASTIC_SIGMATHETA_UPGRADE_ANALYTIC_CASES`.

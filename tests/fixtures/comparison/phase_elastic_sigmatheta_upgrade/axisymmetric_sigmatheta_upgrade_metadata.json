@@ -1,0 +1,19 @@
+{
+  "phase": "ELASTIC_SIGMATHETA_UPGRADE_SOURCE_IMPLEMENTATION",
+  "implementation_status": "ELASTIC_SIGMATHETA_UPGRADE_SOURCE_IMPLEMENTED",
+  "source": "AXISYMMETRIC_ELASTIC_WELLBORE_STATE",
+  "selected_formula": "AXISYMMETRIC_ELASTIC_WELLBORE_SOURCE",
+  "runtime_dispatch_enabled": false,
+  "buz29_execution_allowed": false,
+  "pkn_behavior_changed": false,
+  "penny_shaped_runtime_enabled": false,
+  "physically_validated": false,
+  "legacy_equivalent": false,
+  "required_caveats": [
+    "AXISYMMETRIC_ELASTIC_WELLBORE_APPROXIMATION",
+    "AXISYMMETRIC_WALL_STRESS_DIAGNOSTIC_SOURCE",
+    "SEMI_PHYSICAL_ELASTIC_APPROXIMATION",
+    "NOT_PHYSICALLY_VALIDATED",
+    "NOT_LEGACY_EQUIVALENT"
+  ]
+}

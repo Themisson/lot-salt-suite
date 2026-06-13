@@ -4127,6 +4127,26 @@
       "PKN behavior must remain unchanged."
     ]
   },
+  "phase_elastic_sigmatheta_upgrade_source": {
+    "status": "ELASTIC_SIGMATHETA_UPGRADE_SOURCE_IMPLEMENTED",
+    "phase": "ELASTIC_SIGMATHETA_UPGRADE_SOURCE_IMPLEMENTATION",
+    "source": "AXISYMMETRIC_ELASTIC_WELLBORE_STATE",
+    "selected_formula": "AXISYMMETRIC_ELASTIC_WELLBORE_SOURCE",
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "recommended_next_phase": "PHASE_VALIDATE_ELASTIC_SIGMATHETA_UPGRADE_ANALYTIC_CASES",
+    "required_caveats": [
+      "AXISYMMETRIC_ELASTIC_WELLBORE_APPROXIMATION",
+      "AXISYMMETRIC_WALL_STRESS_DIAGNOSTIC_SOURCE",
+      "SEMI_PHYSICAL_ELASTIC_APPROXIMATION",
+      "NOT_PHYSICALLY_VALIDATED",
+      "NOT_LEGACY_EQUIVALENT"
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

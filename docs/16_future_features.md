@@ -1193,3 +1193,25 @@ A fonte `ELASTIC_INITIAL_WELLBORE_STATE` está pronta para diagnóstico
 semi-físico controlado. A próxima evolução deve especificar Kirsch/hoop stress
 ou uma formulação elástica axisimétrica mais alinhada ao runtime, ainda sem
 dispatch físico e sem BUZ29-PENNY.
+
+### Upgrade axisimétrico da fonte elástica sigma-theta
+
+Status:
+
+```text
+ELASTIC_SIGMATHETA_UPGRADE_SOURCE_IMPLEMENTED
+AXISYMMETRIC_ELASTIC_WELLBORE_STATE
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+```
+
+A fonte `AXISYMMETRIC_ELASTIC_WELLBORE_STATE` foi adicionada ao provider
+pós-perfuração como rota diagnóstica opt-in. Ela usa os campos atualmente
+disponíveis (`far_field_stress_compression_positive_Pa`,
+`wellbore_pressure_Pa` e `tensile_strength_Pa`) e registra caveats
+axisimétricos explícitos.
+
+Kirsch completo permanece bloqueado até existirem `sigma_H`, `sigma_h` e
+azimute no contrato de entrada. A nova source não é validação física, não é
+equivalência com legado e não habilita dispatch físico.

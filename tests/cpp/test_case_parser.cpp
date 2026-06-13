@@ -406,6 +406,25 @@ TEST_CASE("CaseParser accepts elastic initial wellbore sigma theta provider") {
   std::filesystem::remove(path);
 }
 
+TEST_CASE("CaseParser accepts axisymmetric elastic wellbore sigma theta provider") {
+  const auto path = write_pkn_case_with_sigma_theta_provider(
+      valid_sigma_theta_provider_block("AXISYMMETRIC_ELASTIC_WELLBORE_STATE"),
+      "axisymmetric_elastic");
+  const auto data = lss::io::parse_yaml(path);
+
+  const auto& provider = data.lot.sigma_theta_provider;
+  CHECK(provider.enabled);
+  CHECK(provider.source == "AXISYMMETRIC_ELASTIC_WELLBORE_STATE");
+  CHECK(provider.far_field_stress_compression_positive_Pa ==
+        Catch::Approx(5000000.0));
+  CHECK(provider.wellbore_pressure_Pa == Catch::Approx(7000000.0));
+  CHECK(provider.tensile_strength_Pa == Catch::Approx(0.0));
+  CHECK_FALSE(provider.physically_validated);
+  CHECK_FALSE(provider.legacy_equivalent);
+
+  std::filesystem::remove(path);
+}
+
 TEST_CASE("CaseParser rejects invalid sigma theta provider source") {
   const auto path = write_pkn_case_with_sigma_theta_provider(
       valid_sigma_theta_provider_block("UNKNOWN_SOURCE"), "bad_source");

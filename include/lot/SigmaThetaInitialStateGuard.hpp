@@ -13,6 +13,7 @@ enum class SigmaThetaStateTime {
 
 enum class SigmaThetaSource {
   ElasticInitialWellboreState,
+  AxisymmetricElasticWellboreState,
   ApbSaltCoupledState,
   LegacyDiagnosticTrace,
   ExplicitDiagnosticInput,

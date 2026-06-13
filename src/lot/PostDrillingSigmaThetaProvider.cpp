@@ -30,6 +30,8 @@ const char* to_string(PostDrillingSigmaThetaSource source) {
       return "SYNTHETIC_FIXTURE";
     case PostDrillingSigmaThetaSource::ElasticInitialWellboreState:
       return "ELASTIC_INITIAL_WELLBORE_STATE";
+    case PostDrillingSigmaThetaSource::AxisymmetricElasticWellboreState:
+      return "AXISYMMETRIC_ELASTIC_WELLBORE_STATE";
     case PostDrillingSigmaThetaSource::Unknown:
       return "UNKNOWN";
   }
@@ -56,7 +58,10 @@ PostDrillingSigmaThetaProviderResult evaluate_post_drilling_sigma_theta(
   double sigma_theta_current_compression_positive_Pa =
       input.sigma_theta_current_compression_positive_Pa;
 
-  if (input.source == PostDrillingSigmaThetaSource::ElasticInitialWellboreState) {
+  if (input.source ==
+          PostDrillingSigmaThetaSource::ElasticInitialWellboreState ||
+      input.source ==
+          PostDrillingSigmaThetaSource::AxisymmetricElasticWellboreState) {
     require_positive_finite(input.far_field_stress_compression_positive_Pa,
                             "far_field_stress_compression_positive_Pa");
     require_nonnegative_finite(input.wellbore_pressure_Pa,
@@ -100,6 +105,13 @@ PostDrillingSigmaThetaProviderResult evaluate_post_drilling_sigma_theta(
   if (input.source == PostDrillingSigmaThetaSource::ElasticInitialWellboreState) {
     result.caveats.push_back("ELASTIC_INITIAL_WELLBORE_APPROXIMATION");
     result.caveats.push_back("ELASTIC_WELLBORE_APPROXIMATION_SIMPLIFIED");
+    result.caveats.push_back("SEMI_PHYSICAL_ELASTIC_APPROXIMATION");
+    result.caveats.push_back("NOT_PHYSICALLY_VALIDATED");
+    result.caveats.push_back("NOT_LEGACY_EQUIVALENT");
+  } else if (input.source ==
+             PostDrillingSigmaThetaSource::AxisymmetricElasticWellboreState) {
+    result.caveats.push_back("AXISYMMETRIC_ELASTIC_WELLBORE_APPROXIMATION");
+    result.caveats.push_back("AXISYMMETRIC_WALL_STRESS_DIAGNOSTIC_SOURCE");
     result.caveats.push_back("SEMI_PHYSICAL_ELASTIC_APPROXIMATION");
     result.caveats.push_back("NOT_PHYSICALLY_VALIDATED");
     result.caveats.push_back("NOT_LEGACY_EQUIVALENT");

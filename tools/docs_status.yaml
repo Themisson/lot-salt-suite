@@ -202,6 +202,7 @@ phases:
   phase_elastic_sigmatheta_upgrade_field_diagnosis: completed
   phase_elastic_sigmatheta_upgrade_formula_decision: completed
   phase_elastic_sigmatheta_upgrade_implementation_plan: completed
+  phase_elastic_sigmatheta_upgrade_source: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -330,6 +331,7 @@ docs:
   phase_elastic_sigmatheta_upgrade_field_diagnosis: implemented
   phase_elastic_sigmatheta_upgrade_formula_decision: implemented
   phase_elastic_sigmatheta_upgrade_implementation_plan: implemented
+  phase_elastic_sigmatheta_upgrade_source: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented

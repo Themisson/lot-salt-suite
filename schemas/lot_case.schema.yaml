@@ -251,7 +251,9 @@ properties:
                 type: boolean
               source:
                 type: string
-                enum: [ELASTIC_INITIAL_WELLBORE_STATE]
+                enum:
+                  - ELASTIC_INITIAL_WELLBORE_STATE
+                  - AXISYMMETRIC_ELASTIC_WELLBORE_STATE
               far_field_stress_compression_positive_Pa:
                 type: number
                 exclusiveMinimum: 0

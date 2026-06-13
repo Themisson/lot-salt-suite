@@ -115,6 +115,30 @@ TEST_CASE("PostDrillingSigmaThetaProvider elastic source can remain compressive"
         Catch::Approx(5.0e6));
 }
 
+TEST_CASE("PostDrillingSigmaThetaProvider accepts axisymmetric elastic source") {
+  auto input = valid_input(
+      lss::lot::PostDrillingSigmaThetaSource::AxisymmetricElasticWellboreState);
+  input.far_field_stress_compression_positive_Pa = 9.0e6;
+  input.wellbore_pressure_Pa = 11.0e6;
+  input.tensile_strength_Pa = 1.0e6;
+  const auto result = lss::lot::evaluate_post_drilling_sigma_theta(input);
+
+  CHECK(result.available);
+  CHECK(result.source == "AXISYMMETRIC_ELASTIC_WELLBORE_STATE");
+  CHECK(result.sigma_theta_initial_compression_positive_Pa ==
+        Catch::Approx(9.0e6));
+  CHECK(result.sigma_theta_current_compression_positive_Pa ==
+        Catch::Approx(-2.0e6));
+  CHECK(result.tensile_strength_Pa == Catch::Approx(1.0e6));
+  CHECK(contains(result.caveats,
+                 "AXISYMMETRIC_ELASTIC_WELLBORE_APPROXIMATION"));
+  CHECK(contains(result.caveats,
+                 "AXISYMMETRIC_WALL_STRESS_DIAGNOSTIC_SOURCE"));
+  CHECK(contains(result.caveats, "SEMI_PHYSICAL_ELASTIC_APPROXIMATION"));
+  CHECK(contains(result.caveats, "NOT_PHYSICALLY_VALIDATED"));
+  CHECK(contains(result.caveats, "NOT_LEGACY_EQUIVALENT"));
+}
+
 TEST_CASE("PostDrillingSigmaThetaProvider rejects unknown source") {
   auto input = valid_input();
   input.source = lss::lot::PostDrillingSigmaThetaSource::Unknown;
@@ -161,6 +185,13 @@ TEST_CASE("PostDrillingSigmaThetaProvider rejects invalid pressure values") {
 TEST_CASE("PostDrillingSigmaThetaProvider rejects invalid elastic far field") {
   auto input = valid_input(
       lss::lot::PostDrillingSigmaThetaSource::ElasticInitialWellboreState);
+  input.far_field_stress_compression_positive_Pa = 0.0;
+
+  CHECK_THROWS_AS(lss::lot::evaluate_post_drilling_sigma_theta(input),
+                  std::runtime_error);
+
+  input = valid_input(
+      lss::lot::PostDrillingSigmaThetaSource::AxisymmetricElasticWellboreState);
   input.far_field_stress_compression_positive_Pa = 0.0;
 
   CHECK_THROWS_AS(lss::lot::evaluate_post_drilling_sigma_theta(input),
@@ -303,6 +334,84 @@ TEST_CASE("PostDrillingSigmaThetaProvider matches elastic analytic cases") {
           Catch::Approx(analytic_case.expected_tensile_condition_Pa));
     CHECK(criterion_result.fracture_margin_Pa ==
           Catch::Approx(analytic_case.expected_fracture_margin_Pa));
+    CHECK(criterion_result.status == analytic_case.expected_status);
+    CHECK(criterion_result.fracture_initiated ==
+          analytic_case.expected_fracture_initiated);
+  }
+}
+
+TEST_CASE("PostDrillingSigmaThetaProvider axisymmetric source matches analytic cases") {
+  const ElasticAnalyticCase cases[] = {
+      {"compressive_not_reached",
+       10000000.0,
+       6000000.0,
+       1000000.0,
+       10000000.0,
+       4000000.0,
+       -4000000.0,
+       -5000000.0,
+       lss::lot::FractureCriterionStatus::NotInitiated,
+       false},
+      {"tension_above_strength_reached",
+       8000000.0,
+       9500000.0,
+       1000000.0,
+       8000000.0,
+       -1500000.0,
+       1500000.0,
+       500000.0,
+       lss::lot::FractureCriterionStatus::Initiated,
+       true},
+      {"exact_threshold_reached",
+       8000000.0,
+       9000000.0,
+       1000000.0,
+       8000000.0,
+       -1000000.0,
+       1000000.0,
+       0.0,
+       lss::lot::FractureCriterionStatus::Initiated,
+       true},
+  };
+
+  for (const auto& analytic_case : cases) {
+    INFO(analytic_case.id);
+    auto input = valid_input(
+        lss::lot::PostDrillingSigmaThetaSource::
+            AxisymmetricElasticWellboreState);
+    input.far_field_stress_compression_positive_Pa =
+        analytic_case.far_field_stress_compression_positive_Pa;
+    input.wellbore_pressure_Pa = analytic_case.wellbore_pressure_Pa;
+    input.tensile_strength_Pa = analytic_case.tensile_strength_Pa;
+
+    const auto provider_result =
+        lss::lot::evaluate_post_drilling_sigma_theta(input);
+
+    CHECK(provider_result.sigma_theta_initial_compression_positive_Pa ==
+          Catch::Approx(
+              analytic_case.expected_sigma_theta_initial_compression_positive_Pa));
+    CHECK(provider_result.sigma_theta_current_compression_positive_Pa ==
+          Catch::Approx(
+              analytic_case.expected_sigma_theta_current_compression_positive_Pa));
+    CHECK(contains(provider_result.caveats,
+                   "AXISYMMETRIC_WALL_STRESS_DIAGNOSTIC_SOURCE"));
+
+    lss::lot::PressureSigmaThetaCriterionInput criterion_input;
+    criterion_input.sigma_theta_guard_ready = true;
+    criterion_input.sigma_theta_current_compression_positive_Pa =
+        provider_result.sigma_theta_current_compression_positive_Pa;
+    criterion_input.tensile_strength_Pa = provider_result.tensile_strength_Pa;
+    criterion_input.pressure_semantics =
+        lss::lot::PressureSemantics::WellborePressureAbsolute;
+    criterion_input.sigma_theta_reference_frame =
+        lss::lot::SigmaThetaReferenceFrame::TotalStress;
+    criterion_input.sigma_theta_sign_convention =
+        lss::lot::SigmaThetaSignConvention::CompressionPositive;
+
+    const auto criterion_result =
+        lss::lot::evaluate_pressure_sigma_theta_fracture_criterion(
+            criterion_input);
+
     CHECK(criterion_result.status == analytic_case.expected_status);
     CHECK(criterion_result.fracture_initiated ==
           analytic_case.expected_fracture_initiated);

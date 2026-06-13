@@ -9,6 +9,7 @@ enum class PostDrillingSigmaThetaSource {
   ExplicitDiagnosticInput,
   SyntheticFixture,
   ElasticInitialWellboreState,
+  AxisymmetricElasticWellboreState,
   Unknown,
 };
 

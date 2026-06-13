@@ -74,12 +74,18 @@ PostDrillingSigmaThetaSource provider_source_from_provider(
   if (source == "ELASTIC_INITIAL_WELLBORE_STATE") {
     return PostDrillingSigmaThetaSource::ElasticInitialWellboreState;
   }
+  if (source == "AXISYMMETRIC_ELASTIC_WELLBORE_STATE") {
+    return PostDrillingSigmaThetaSource::AxisymmetricElasticWellboreState;
+  }
   return PostDrillingSigmaThetaSource::Unknown;
 }
 
 SigmaThetaSource sigma_theta_source_from_provider(const std::string& source) {
   if (source == "ELASTIC_INITIAL_WELLBORE_STATE") {
     return SigmaThetaSource::ElasticInitialWellboreState;
+  }
+  if (source == "AXISYMMETRIC_ELASTIC_WELLBORE_STATE") {
+    return SigmaThetaSource::AxisymmetricElasticWellboreState;
   }
   return SigmaThetaSource::Unknown;
 }
