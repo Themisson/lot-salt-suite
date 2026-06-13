@@ -1072,3 +1072,19 @@ RUNTIME_DISPATCH_NOT_ENABLED
 ```
 
 Esse manifesto permite apenas decidir um gate futuro de execução diagnóstica.
+
+### Gate de execução diagnóstica BUZ29/PENNY
+
+O gate progressivo foi decidido:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_EXECUTION_ALLOWED_NEXT
+EXECUTION_ALLOWED_NEXT_TRUE
+BUZ29_PENNY_EXECUTED_NOW_FALSE
+PHYSICAL_VALIDATION_NOT_CLAIMED
+LEGACY_EQUIVALENCE_NOT_CLAIMED
+RUNTIME_DISPATCH_NOT_ENABLED
+```
+
+A próxima fase pode executar apenas comparação diagnóstica. `PENNY_SHAPED`
+permanece não físico, sem equivalência legada e isolado de dispatch runtime.

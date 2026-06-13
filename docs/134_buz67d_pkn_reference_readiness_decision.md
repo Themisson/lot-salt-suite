@@ -55,3 +55,12 @@ PHYSICAL_VALIDATION_NOT_CLAIMED
 LEGACY_EQUIVALENCE_NOT_CLAIMED
 RUNTIME_DISPATCH_NOT_ENABLED
 ```
+
+The subsequent BUZ29/PENNY gate is now recorded as:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_EXECUTION_ALLOWED_NEXT
+```
+
+This remains a diagnostic-only next-step authorization and does not alter the
+BUZ67D/PKN reference-readiness decision.

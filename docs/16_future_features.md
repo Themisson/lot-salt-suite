@@ -1350,3 +1350,17 @@ RUNTIME_DISPATCH_NOT_ENABLED
 
 Os insumos mínimos para o próximo gate diagnóstico foram registrados em
 manifesto versionado. BUZ29/PENNY ainda não foi executado.
+
+### BUZ29 Penny Diagnostic Execution Gate
+
+Status:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_EXECUTION_ALLOWED_NEXT
+PHASE_RUN_BUZ29_PENNY_DIAGNOSTIC_COMPARISON_ALLOWED_NEXT
+BUZ29_PENNY_NOT_EXECUTED_IN_GATE
+RUNTIME_DISPATCH_NOT_ENABLED
+```
+
+This is a narrow future-work authorization for diagnostic comparison. It is not
+physical validation and it is not legacy equivalence.

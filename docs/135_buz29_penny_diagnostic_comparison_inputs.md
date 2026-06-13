@@ -46,3 +46,19 @@ NO_RUNTIME_DISPATCH
 ```text
 PHASE_DECIDE_BUZ29_PENNY_DIAGNOSTIC_EXECUTION_GATE
 ```
+
+## Execution Gate Decision
+
+The follow-up gate was evaluated and authorizes only a future diagnostic
+execution phase:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_EXECUTION_ALLOWED_NEXT
+execution_allowed_next = true
+buz29_penny_executed_now = false
+runtime_dispatch_enabled = false
+physically_validated = false
+legacy_equivalent = false
+```
+
+This does not execute BUZ29/PENNY and does not change the physical PKN runtime.

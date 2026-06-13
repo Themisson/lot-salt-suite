@@ -77,6 +77,24 @@ buz29_penny_executed = false
 pkn_behavior_changed = false
 ```
 
+## BUZ29/PENNY Diagnostic Execution Gate
+
+The execution gate was decided for a future diagnostic-only step:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_EXECUTION_ALLOWED_NEXT
+execution_allowed_next = true
+buz29_penny_executed_now = false
+runtime_dispatch_enabled = false
+physically_validated = false
+legacy_equivalent = false
+```
+
+The authorization is progressive and scoped: it permits only the next
+diagnostic-comparison phase. It does not enable runtime dispatch, does not
+execute BUZ29/PENNY in this phase, and does not claim physical validation or
+legacy equivalence.
+
 ## BUZ29/PENNY Inputs Prepared
 
 The BUZ29/PENNY diagnostic input manifest was prepared without execution:

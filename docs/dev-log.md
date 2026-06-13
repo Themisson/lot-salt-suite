@@ -8692,3 +8692,36 @@ BUZ29/PENNY não foi executado e não há validação física ou equivalência l
 
 **Próxima fase recomendada:**
 `PHASE_DECIDE_BUZ29_PENNY_DIAGNOSTIC_EXECUTION_GATE`.
+
+---
+
+### [2026-06-13] Gate de execução diagnóstica BUZ29/PENNY — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `BUZ29_PENNY_DIAGNOSTIC_EXECUTION_ALLOWED_NEXT`.
+
+**Resultado:**
+
+```text
+execution_allowed_next = true
+diagnostic_only = true
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+buz29_penny_executed_now = false
+pkn_behavior_change_allowed = false
+```
+
+**Interpretação:** a próxima fase pode executar uma comparação diagnóstica
+BUZ29/PENNY controlada. Esta fase não executou BUZ29/PENNY, não habilitou
+dispatch físico, não declarou validação física e não declarou equivalência com
+o legado.
+
+**Entregáveis:**
+- `tools/decide_buz29_penny_diagnostic_execution_gate.py`
+- `tests/python/test_decide_buz29_penny_diagnostic_execution_gate.py`
+- `docs/136_buz29_penny_diagnostic_execution_gate.md`
+
+**Próxima fase recomendada:**
+`PHASE_RUN_BUZ29_PENNY_DIAGNOSTIC_COMPARISON`.
