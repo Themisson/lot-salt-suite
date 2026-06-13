@@ -1248,3 +1248,20 @@ A source axisimétrica está pronta para uso diagnóstico controlado, mas contin
 fora de validação física plena, equivalência com o LOT_Tese e dispatch físico.
 Kirsch completo segue bloqueado até que `sigma_H`, `sigma_h` e azimute existam
 como campos auditados no contrato de entrada.
+
+### Comparação analítica controlada da source axisimétrica
+
+Status:
+
+```text
+ELASTIC_SIGMATHETA_SOURCE_REFERENCE_COMPARISON_VALID
+ANALYTIC_CONTROLLED_REFERENCE
+WITHIN_TOLERANCE_TRUE
+PHYSICALLY_VALIDATED_FALSE
+LEGACY_EQUIVALENT_FALSE
+```
+
+A source `AXISYMMETRIC_ELASTIC_WELLBORE_STATE` foi comparada contra uma
+referência analítica controlada versionada em fixtures. A comparação verifica
+fórmula, sinal e comportamento de threshold, mas não usa trace legado como
+validação física e não libera dispatch runtime.

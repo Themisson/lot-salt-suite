@@ -8469,3 +8469,43 @@ que `sigma_H`, `sigma_h` e azimute estejam disponíveis no contrato de entrada.
 
 **Próxima fase recomendada:**
 `PHASE_COMPARE_ELASTIC_SIGMATHETA_SOURCE_WITH_LEGACY_OR_ANALYTIC_REFERENCE`.
+
+---
+
+### [2026-06-13] Fase 5 — Comparação da source elástica sigma-theta com referência — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `ELASTIC_SIGMATHETA_SOURCE_REFERENCE_COMPARISON_VALID`.
+
+**Referência:** `ANALYTIC_CONTROLLED_REFERENCE`.
+
+**Resultado:**
+
+```text
+source = AXISYMMETRIC_ELASTIC_WELLBORE_STATE
+max_abs_error_Pa = 0.0
+within_tolerance = true
+formula_verified = true
+sign_convention_verified = true
+threshold_behavior_verified = true
+physically_validated = false
+legacy_equivalent = false
+legacy_trace_used_as_physical_validation = false
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_change_allowed = false
+```
+
+**Interpretação:** a comparação fecha a álgebra e a convenção de sinais contra
+uma referência analítica controlada. Ela não é validação física plena, não é
+equivalência com o LOT_Tese e não usa trace legado como referência física.
+
+**Entregáveis:**
+- `tools/compare_elastic_sigmatheta_source_with_reference.py`
+- `tests/python/test_compare_elastic_sigmatheta_source_with_reference.py`
+- `tests/fixtures/comparison/phase_elastic_sigmatheta_reference/`
+- `docs/132_elastic_sigmatheta_source_reference_comparison.md`
+
+**Próxima fase recomendada:**
+`PHASE_DECIDE_CONTROLLED_PHYSICAL_COMPARISON_READINESS`.

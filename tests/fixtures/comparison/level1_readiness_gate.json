@@ -4181,6 +4181,25 @@
     "kirsch_full_blocked": true,
     "recommended_next_phase": "PHASE_COMPARE_ELASTIC_SIGMATHETA_SOURCE_WITH_LEGACY_OR_ANALYTIC_REFERENCE"
   },
+  "phase_elastic_sigmatheta_reference_comparison": {
+    "status": "ELASTIC_SIGMATHETA_SOURCE_REFERENCE_COMPARISON_VALID",
+    "phase": "PHASE_COMPARE_ELASTIC_SIGMATHETA_SOURCE_WITH_REFERENCE",
+    "source": "AXISYMMETRIC_ELASTIC_WELLBORE_STATE",
+    "reference_type": "ANALYTIC_CONTROLLED_REFERENCE",
+    "max_abs_error_Pa": 0.0,
+    "within_tolerance": true,
+    "formula_verified": true,
+    "sign_convention_verified": true,
+    "threshold_behavior_verified": true,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "legacy_trace_used_as_physical_validation": false,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_change_allowed": false,
+    "penny_shaped_runtime_enabled": false,
+    "recommended_next_phase": "PHASE_DECIDE_CONTROLLED_PHYSICAL_COMPARISON_READINESS"
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

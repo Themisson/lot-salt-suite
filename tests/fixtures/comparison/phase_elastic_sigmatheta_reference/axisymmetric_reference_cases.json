@@ -1,0 +1,54 @@
+{
+  "phase": "PHASE_COMPARE_ELASTIC_SIGMATHETA_SOURCE_WITH_REFERENCE",
+  "reference_type": "ANALYTIC_CONTROLLED_REFERENCE",
+  "source": "AXISYMMETRIC_ELASTIC_WELLBORE_STATE",
+  "formula": {
+    "sigma_theta_initial_compression_positive_Pa": "far_field_stress_compression_positive_Pa",
+    "sigma_theta_current_compression_positive_Pa": "far_field_stress_compression_positive_Pa - wellbore_pressure_Pa",
+    "tensile_condition_Pa": "-sigma_theta_current_compression_positive_Pa",
+    "margin_Pa": "tensile_condition_Pa - tensile_strength_Pa",
+    "reached": "margin_Pa >= 0"
+  },
+  "cases": [
+    {
+      "case_id": "compressive_not_reached",
+      "far_field_stress_compression_positive_Pa": 70000000.0,
+      "wellbore_pressure_Pa": 20000000.0,
+      "tensile_strength_Pa": 1000000.0,
+      "expected_sigma_theta_initial_compression_positive_Pa": 70000000.0,
+      "expected_sigma_theta_current_compression_positive_Pa": 50000000.0,
+      "expected_margin_Pa": -51000000.0,
+      "expected_reached": false
+    },
+    {
+      "case_id": "zero_threshold_reached",
+      "far_field_stress_compression_positive_Pa": 50000000.0,
+      "wellbore_pressure_Pa": 51000000.0,
+      "tensile_strength_Pa": 1000000.0,
+      "expected_sigma_theta_initial_compression_positive_Pa": 50000000.0,
+      "expected_sigma_theta_current_compression_positive_Pa": -1000000.0,
+      "expected_margin_Pa": 0.0,
+      "expected_reached": true
+    },
+    {
+      "case_id": "tension_below_strength_not_reached",
+      "far_field_stress_compression_positive_Pa": 40000000.0,
+      "wellbore_pressure_Pa": 40500000.0,
+      "tensile_strength_Pa": 1000000.0,
+      "expected_sigma_theta_initial_compression_positive_Pa": 40000000.0,
+      "expected_sigma_theta_current_compression_positive_Pa": -500000.0,
+      "expected_margin_Pa": -500000.0,
+      "expected_reached": false
+    },
+    {
+      "case_id": "tension_above_strength_reached",
+      "far_field_stress_compression_positive_Pa": 40000000.0,
+      "wellbore_pressure_Pa": 42000000.0,
+      "tensile_strength_Pa": 1000000.0,
+      "expected_sigma_theta_initial_compression_positive_Pa": 40000000.0,
+      "expected_sigma_theta_current_compression_positive_Pa": -2000000.0,
+      "expected_margin_Pa": 1000000.0,
+      "expected_reached": true
+    }
+  ]
+}
