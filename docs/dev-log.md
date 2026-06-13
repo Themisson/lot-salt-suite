@@ -57,6 +57,54 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-13] APB/LOT JSON, leakoff volumétrico e sal pré-iterativo — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Classificações:**
+
+```text
+APB_LOT_JSON_OUTPUT_IMPLEMENTED
+LEAKOFF_VOLUME_BALANCE_MODE_IMPLEMENTED
+PRE_ITERATIVE_SALT_DISPLACEMENT_IMPLEMENTED
+APB_LOT_MODERN_METHOD_VALIDATED
+LEGACY_MODE_PRESERVED_FOR_COMPARISON
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+**Escopo:** contratos modernos APB/LOT isolados, fixtures e ferramentas de
+diagnóstico/comparação/decisão. A fase não executa BUZ29/PENNY, não altera
+`legacy/`, `legance/`, `external/saltcreep/` ou baselines, e não altera a física
+PKN.
+
+**Arquivos principais:**
+
+```text
+include/io/ApbLotJsonOutputWriter.hpp
+include/lot/LeakoffCouplingMode.hpp
+include/lot/SaltDisplacementMode.hpp
+tools/diagnose_apb_lot_output_leakoff_salt_displacement.py
+tools/validate_apb_lot_modern_modes.py
+tools/compare_apb_lot_legacy_vs_modern_modes.py
+tools/decide_apb_lot_modern_modes_default.py
+docs/140_apb_lot_output_leakoff_salt_displacement_diagnosis.md
+docs/141_apb_lot_json_output_writer.md
+docs/142_apb_lot_leakoff_volume_balance_mode.md
+docs/143_apb_lot_pre_iterative_salt_displacement.md
+docs/144_apb_lot_modern_modes_validation.md
+docs/145_apb_lot_legacy_vs_modern_comparison.md
+docs/146_apb_lot_modern_modes_default_decision.md
+```
+
+**Próxima fase recomendada:**
+
+```text
+APB_LOT_RUN_EXTENDED_REGRESSION_SUITE
+```
+
+---
+
 ### [2026-06-13] Validação analítica da fonte elástica sigma-theta — Codex
 
 **Status:** Implementado; commit/push executado ao final se todos os gates

@@ -39,6 +39,21 @@ properties:
       mode:
         type: string
         enum: [lot, lot-pkn, apb, salt, lot-salt, apb-salt, coupled]
+  apb_lot:
+    type: object
+    additionalProperties: false
+    properties:
+      output_format:
+        type: string
+        enum: [json, legacy_dat]
+      legacy_dat_output_enabled:
+        type: boolean
+      leakoff_coupling_mode:
+        type: string
+        enum: [legacy_nodal_force, volume_balance]
+      salt_displacement_mode:
+        type: string
+        enum: [legacy_inside_newton, pre_iterative]
   units:
     type: object
     required: [length, pressure, temperature, density, viscosity]

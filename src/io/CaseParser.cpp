@@ -8,6 +8,8 @@
 #include <yaml-cpp/yaml.h>
 
 #include "lot/FractureModelSelector.hpp"
+#include "lot/LeakoffCouplingMode.hpp"
+#include "lot/SaltDisplacementMode.hpp"
 #include "units/units.hpp"
 
 namespace {
@@ -205,6 +207,33 @@ void parse_wellbore(const YAML::Node& root, lss::core::CaseData& data) {
   if (dp.depth_m < 0.0) {
     throw std::runtime_error("Validacao falhou: wellbore.drill_pipe.depth deve ser >= 0");
   }
+}
+
+void parse_apb_lot_modern_modes(const YAML::Node& root,
+                                lss::core::CaseData& data) {
+  const YAML::Node apb_lot = root["apb_lot"];
+  if (!apb_lot) {
+    return;
+  }
+
+  data.apb_lot.output_format =
+      optional_string(apb_lot, "output_format", "json");
+  data.apb_lot.legacy_dat_output_enabled =
+      optional_bool(apb_lot, "legacy_dat_output_enabled", true);
+  data.apb_lot.leakoff_coupling_mode =
+      optional_string(apb_lot, "leakoff_coupling_mode", "volume_balance");
+  data.apb_lot.salt_displacement_mode =
+      optional_string(apb_lot, "salt_displacement_mode", "pre_iterative");
+
+  if (data.apb_lot.output_format != "json" &&
+      data.apb_lot.output_format != "legacy_dat") {
+    throw std::runtime_error(
+        "Validacao falhou: apb_lot.output_format exige json ou legacy_dat");
+  }
+  (void)lss::lot::parse_leakoff_coupling_mode(
+      data.apb_lot.leakoff_coupling_mode);
+  (void)lss::lot::parse_salt_displacement_mode(
+      data.apb_lot.salt_displacement_mode);
 }
 
 void validate_references(const lss::core::CaseData& data) {
@@ -474,6 +503,8 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
   if (root["simulation"] && root["simulation"]["mode"]) {
     data.mode = root["simulation"]["mode"].as<std::string>();
   }
+
+  parse_apb_lot_modern_modes(root, data);
 
   parse_wellbore(root, data);
 

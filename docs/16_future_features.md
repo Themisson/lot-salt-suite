@@ -1411,3 +1411,21 @@ PKN_BEHAVIOR_NOT_CHANGED
 The adapter input matrix identifies five missing fields and two semantically
 ambiguous fields. Future work must resolve these from explicit BUZ29 sources,
 not synthetic fixtures.
+
+### APB/LOT Modern Output And Mode Contracts
+
+Status:
+
+```text
+APB_LOT_JSON_OUTPUT_IMPLEMENTED
+LEAKOFF_VOLUME_BALANCE_MODE_IMPLEMENTED
+PRE_ITERATIVE_SALT_DISPLACEMENT_IMPLEMENTED
+APB_LOT_MODERN_METHOD_VALIDATED
+LEGACY_MODE_PRESERVED_FOR_COMPARISON
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+The APB/LOT modernization route now has isolated contracts for `*_out.json`,
+`volume_balance` leakoff coupling and `pre_iterative` salt displacement
+scheduling. These contracts do not enable a full APB solver, do not alter PKN,
+and do not resolve BUZ29/PENNY adapter inputs.

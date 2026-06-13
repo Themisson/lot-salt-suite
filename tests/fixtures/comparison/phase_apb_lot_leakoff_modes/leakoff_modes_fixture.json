@@ -1,0 +1,9 @@
+{
+  "phase": "APB_LOT_LEAKOFF_MODES",
+  "legacy_mode": "legacy_nodal_force",
+  "modern_mode": "volume_balance",
+  "base_dV_m3": 10.0,
+  "leakoff_dV_m3": -2.0,
+  "expected_volume_balance_dV_m3": 8.0,
+  "pkn_behavior_changed": false
+}

@@ -1,0 +1,7 @@
+metadata:
+  name: invalid_leakoff_mode
+apb_lot:
+  output_format: json
+  leakoff_coupling_mode: force_vector_and_volume
+  salt_displacement_mode: pre_iterative
+expected_status: invalid

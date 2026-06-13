@@ -1,0 +1,7 @@
+metadata:
+  name: invalid_salt_displacement_mode
+apb_lot:
+  output_format: json
+  leakoff_coupling_mode: volume_balance
+  salt_displacement_mode: inside_picard
+expected_status: invalid

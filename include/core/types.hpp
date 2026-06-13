@@ -229,6 +229,13 @@ struct ApbConfig {
   bool venting_enabled = false;
 };
 
+struct ApbLotModernModesConfig {
+  std::string output_format = "json";
+  bool legacy_dat_output_enabled = true;
+  std::string leakoff_coupling_mode = "volume_balance";
+  std::string salt_displacement_mode = "pre_iterative";
+};
+
 struct CaseData {
   std::string name;
   std::string version;
@@ -244,6 +251,7 @@ struct CaseData {
   TimeConfig time;
   LotConfig lot;
   ApbConfig apb;
+  ApbLotModernModesConfig apb_lot;
 };
 
 }  // namespace lss::core

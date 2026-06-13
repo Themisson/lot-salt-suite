@@ -4455,5 +4455,15 @@
     "Legacy pw_Pa and modern net_pressure_Pa may differ semantically.",
     "The gate does not validate pressure, fracture opening, damage, rupture or stress equivalence.",
     "The gate does not compare tensor fields or hoop-state classifications."
-  ]
+  ],
+  "apb_lot_modern_output_and_modes": {
+    "status": "APB_LOT_MODERN_METHOD_VALIDATED",
+    "json_output": "APB_LOT_JSON_OUTPUT_IMPLEMENTED",
+    "leakoff_coupling_mode": "LEAKOFF_VOLUME_BALANCE_MODE_IMPLEMENTED",
+    "salt_displacement_mode": "PRE_ITERATIVE_SALT_DISPLACEMENT_IMPLEMENTED",
+    "legacy_modes_preserved": true,
+    "pkn_behavior_changed": false,
+    "buz29_penny_executed": false,
+    "recommended_next_phase": "APB_LOT_RUN_EXTENDED_REGRESSION_SUITE"
+  }
 }

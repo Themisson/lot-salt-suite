@@ -1,0 +1,10 @@
+{
+  "phase": "APB_LOT_SALT_DISPLACEMENT_MODES",
+  "legacy_mode": "legacy_inside_newton",
+  "modern_mode": "pre_iterative",
+  "layer_count": 3,
+  "newton_iteration_count": 5,
+  "expected_pre_iterative_solve_calls": 3,
+  "expected_legacy_solve_calls": 15,
+  "pkn_behavior_changed": false
+}

@@ -106,6 +106,7 @@ set(LSS_SALTCREEP_TIME_GEOSTATIC_SOURCES
 )
 
 set(LSS_CORE_SOURCES
+  src/io/ApbLotJsonOutputWriter.cpp
   src/io/CaseParser.cpp
   src/io/ResultWriter.cpp
   src/wellbore/AnnularVolume.cpp
@@ -115,6 +116,7 @@ set(LSS_CORE_SOURCES
   src/lot/FractureGateRuntimeWiring.cpp
   src/lot/FractureModelSelector.cpp
   src/lot/InjectionSchedule.cpp
+  src/lot/LeakoffCouplingMode.cpp
   src/lot/LeakoffModel.cpp
   src/lot/LimitedFractureGateRuntimeIntegration.cpp
   src/lot/PennyShapedDiagnosticAdapter.cpp
@@ -126,6 +128,7 @@ set(LSS_CORE_SOURCES
   src/lot/PressureSigmaThetaFractureCriterionGuard.cpp
   src/lot/SigmaThetaInitialStateGuard.cpp
   src/lot/SigmaThetaProvider.cpp
+  src/lot/SaltDisplacementMode.cpp
   src/coupling/LotSaltBridgeConfigBuilder.cpp
   src/coupling/LotSaltCouplingConfigBuilder.cpp
   src/coupling/LotSaltHydrostaticContext.cpp
@@ -177,6 +180,7 @@ endif()
 if(LSS_BUILD_TESTS)
   add_executable(lot_sim_tests
     tests/cpp/test_units.cpp
+    tests/cpp/test_apb_lot_json_output_writer.cpp
     tests/cpp/test_annular_volume.cpp
     tests/cpp/test_case_parser.cpp
     tests/cpp/test_breakdown_detector.cpp
@@ -186,6 +190,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_fracture_model_selector.cpp
     tests/cpp/test_limited_fracture_gate_runtime_integration.cpp
     tests/cpp/test_leakoff_model.cpp
+    tests/cpp/test_leakoff_coupling_mode.cpp
     tests/cpp/test_penny_shaped_diagnostic_adapter.cpp
     tests/cpp/test_penny_shaped_diagnostic_writer.cpp
     tests/cpp/test_penny_shaped_model.cpp
@@ -205,6 +210,7 @@ if(LSS_BUILD_TESTS)
     tests/cpp/test_lot_salt_sigma_theta_driver.cpp
     tests/cpp/test_lot_pkn_salt_coupling_step.cpp
     tests/cpp/test_result_writer.cpp
+    tests/cpp/test_salt_displacement_mode.cpp
     tests/cpp/test_sigma_theta_initial_state_guard.cpp
     tests/cpp/test_salt_creep_adapter_config.cpp
     tests/cpp/test_salt_creep_adapter_state.cpp
