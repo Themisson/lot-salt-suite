@@ -8395,3 +8395,39 @@ semi-física, opt-in e sem equivalência legada declarada.
 
 **Próxima fase recomendada:**
 `PHASE_VALIDATE_ELASTIC_SIGMATHETA_UPGRADE_ANALYTIC_CASES`.
+
+---
+
+### [2026-06-13] Fase E — Validação analítica do upgrade elástico sigma-theta — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `ELASTIC_SIGMATHETA_UPGRADE_ANALYTIC_CASES_VALID`.
+
+**Fonte validada:**
+
+```text
+source = AXISYMMETRIC_ELASTIC_WELLBORE_STATE
+formula_verified = true
+sign_convention_verified = true
+threshold_behavior_verified = true
+case_count = 5
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_changed = false
+physically_validated = false
+legacy_equivalent = false
+```
+
+**Interpretação:** os cinco casos analíticos cobrem estados compressivos, hoop
+zero, tração abaixo da resistência, tração acima da resistência e threshold
+exato. A validação permanece diagnóstica e não declara validação física plena.
+
+**Entregáveis:**
+- `tools/validate_elastic_sigmatheta_upgrade_analytic_cases.py`
+- `tests/python/test_validate_elastic_sigmatheta_upgrade_analytic_cases.py`
+- `tests/fixtures/comparison/phase_elastic_sigmatheta_upgrade_analytic/`
+- `docs/130_elastic_sigmatheta_upgrade_analytic_validation.md`
+
+**Próxima fase recomendada:**
+`PHASE_DECIDE_ELASTIC_SIGMATHETA_UPGRADE_READINESS`.

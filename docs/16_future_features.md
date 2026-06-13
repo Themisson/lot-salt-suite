@@ -1215,3 +1215,19 @@ axisimétricos explícitos.
 Kirsch completo permanece bloqueado até existirem `sigma_H`, `sigma_h` e
 azimute no contrato de entrada. A nova source não é validação física, não é
 equivalência com legado e não habilita dispatch físico.
+
+### Validação analítica do upgrade axisimétrico sigma-theta
+
+Status:
+
+```text
+ELASTIC_SIGMATHETA_UPGRADE_ANALYTIC_CASES_VALID
+FORMULA_VERIFIED
+SIGN_CONVENTION_VERIFIED
+THRESHOLD_BEHAVIOR_VERIFIED
+```
+
+A validação analítica da source `AXISYMMETRIC_ELASTIC_WELLBORE_STATE` cobre
+cinco casos controlados e confirma que o threshold exato permanece classificado
+como atingido. O próximo gate deve decidir readiness diagnóstico da source sem
+promovê-la a validação física plena.

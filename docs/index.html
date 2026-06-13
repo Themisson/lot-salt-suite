@@ -265,7 +265,7 @@
     <h2>Simulador integrado de LOT, APB e fluência de sal</h2>
     <p class="lead">Manual navegável do projeto, com formulações, contratos de entrada, validação, arquitetura, auditorias e riscos conhecidos em um único arquivo HTML gerado a partir dos Markdown versionados.</p>
     <div class="stat-row">
-      <div class="stat"><div class="n coppc">189/196</div><div class="l">fases ativas/concluídas</div></div>
+      <div class="stat"><div class="n coppc">190/197</div><div class="l">fases ativas/concluídas</div></div>
       <div class="stat"><div class="n tealc">414</div><div class="l">testes C++ verdes</div></div>
       <div class="stat"><div class="n coppc">1049</div><div class="l">testes Python registrados</div></div>
       <div class="stat"><div class="n tealc">0/10</div><div class="l">validações iniciadas</div></div>
@@ -8680,6 +8680,17 @@ axisimétricos explícitos.</p>
 <p>Kirsch completo permanece bloqueado até existirem <code>sigma_H</code>, <code>sigma_h</code> e
 azimute no contrato de entrada. A nova source não é validação física, não é
 equivalência com legado e não habilita dispatch físico.</p>
+<h3 id="validacao-analitica-do-upgrade-axisimetrico-sigma-theta">Validação analítica do upgrade axisimétrico sigma-theta</h3>
+<p>Status:</p>
+<pre><code class="language-text">ELASTIC_SIGMATHETA_UPGRADE_ANALYTIC_CASES_VALID
+FORMULA_VERIFIED
+SIGN_CONVENTION_VERIFIED
+THRESHOLD_BEHAVIOR_VERIFIED
+</code></pre>
+<p>A validação analítica da source <code>AXISYMMETRIC_ELASTIC_WELLBORE_STATE</code> cobre
+cinco casos controlados e confirma que o threshold exato permanece classificado
+como atingido. O próximo gate deve decidir readiness diagnóstico da source sem
+promovê-la a validação física plena.</p>
 </div>
 </section>
 
