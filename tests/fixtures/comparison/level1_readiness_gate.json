@@ -3924,6 +3924,38 @@
       "BUZ29-PENNY remains blocked."
     ]
   },
+  "master_phase_f_sigmatheta_provider_readiness_decision": {
+    "status": "SIGMATHETA_PROVIDER_READY_FOR_DIAGNOSTIC_RUNTIME_USE",
+    "phase": "master-F",
+    "provider_component": "PostDrillingSigmaThetaProvider",
+    "ready_for_diagnostic_runtime_use": true,
+    "ready_for_physical_dispatch": false,
+    "ready_for_physical_validation": false,
+    "ready_for_real_source_extension": true,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "legacy_equivalence_claimed": false,
+    "required_statuses": [
+      "SIGMATHETA_PROVIDER_READY_FOR_DIAGNOSTIC_RUNTIME_USE",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PKN_BEHAVIOR_NOT_CHANGED",
+      "PENNY_SHAPED_RUNTIME_NOT_ENABLED"
+    ],
+    "recommended_next_phase": "PHASE_IMPLEMENT_ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE",
+    "remaining_blockers": [
+      "NO_PHYSICAL_SIGMATHETA_RUNTIME_SOURCE_CONSUMED_YET",
+      "NO_SALT_WALL_STRESS_RUNTIME_WIRING",
+      "NO_BUZ29_PHYSICAL_EXECUTION_ALLOWED"
+    ],
+    "caveats": [
+      "Readiness is diagnostic runtime readiness only.",
+      "Physical dispatch and physical validation remain blocked.",
+      "The next source extension must remain opt-in until separately validated."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

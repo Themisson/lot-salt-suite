@@ -57,6 +57,36 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 
 ---
 
+### [2026-06-13] Fase F — sigma-theta provider readiness decision — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Decisao:** `SIGMATHETA_PROVIDER_READY_FOR_DIAGNOSTIC_RUNTIME_USE`.
+
+**Ferramenta criada:**
+
+```text
+tools/decide_sigmatheta_provider_readiness.py
+```
+
+**Documento criado:**
+
+```text
+docs/122_sigmatheta_provider_readiness_decision.md
+```
+
+**Gate:** uso diagnostico runtime permitido; dispatch fisico, BUZ29-PENNY e
+validacao fisica continuam bloqueados.
+
+**Proxima fase recomendada:**
+
+```text
+PHASE_IMPLEMENT_ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE
+```
+
+---
+
 ### [2026-06-13] Fase E — sigma-theta provider controlled validation — Codex
 
 **Status:** Implementado; commit/push executado ao final se todos os gates
