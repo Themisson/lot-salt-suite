@@ -8661,3 +8661,34 @@ não declara equivalência com legado e não altera PKN.
 
 **Próxima fase recomendada:**
 `PHASE_PREPARE_BUZ29_PENNY_DIAGNOSTIC_COMPARISON_INPUTS`.
+
+---
+
+### [2026-06-13] Insumos diagnósticos BUZ29/PENNY — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `BUZ29_PENNY_DIAGNOSTIC_INPUTS_PREPARED`.
+
+**Resultado:**
+
+```text
+execution_allowed = false
+diagnostic_only = true
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+available_inputs_sufficient_for_diagnostic_gate = true
+```
+
+**Interpretação:** os insumos foram preparados apenas para um gate futuro.
+BUZ29/PENNY não foi executado e não há validação física ou equivalência legada.
+
+**Entregáveis:**
+- `tools/prepare_buz29_penny_diagnostic_comparison_inputs.py`
+- `tests/python/test_prepare_buz29_penny_diagnostic_comparison_inputs.py`
+- `tests/fixtures/comparison/phase_buz29_penny_diagnostic_inputs/`
+- `docs/135_buz29_penny_diagnostic_comparison_inputs.md`
+
+**Próxima fase recomendada:**
+`PHASE_DECIDE_BUZ29_PENNY_DIAGNOSTIC_EXECUTION_GATE`.

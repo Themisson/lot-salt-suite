@@ -77,6 +77,19 @@ buz29_penny_executed = false
 pkn_behavior_changed = false
 ```
 
+## BUZ29/PENNY Inputs Prepared
+
+The BUZ29/PENNY diagnostic input manifest was prepared without execution:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_INPUTS_PREPARED
+execution_allowed = false
+diagnostic_only = true
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+```
+
 O próximo gate progressivo é
 `PHASE_DECIDE_BUZ67D_PKN_REFERENCE_READINESS`.
 

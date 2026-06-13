@@ -1334,3 +1334,19 @@ PKN_BEHAVIOR_NOT_CHANGED
 BUZ67D/PKN pode ser usado como primeira referência diagnóstica controlada antes
 de qualquer BUZ29/PENNY. O próximo passo é preparar o manifesto de insumos
 BUZ29/PENNY sem executar o caso.
+
+### BUZ29 Penny Diagnostic Inputs
+
+Status:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_INPUTS_PREPARED
+EXECUTION_NOT_ALLOWED_YET
+DIAGNOSTIC_ONLY
+PHYSICAL_VALIDATION_NOT_CLAIMED
+LEGACY_EQUIVALENCE_NOT_CLAIMED
+RUNTIME_DISPATCH_NOT_ENABLED
+```
+
+Os insumos mínimos para o próximo gate diagnóstico foram registrados em
+manifesto versionado. BUZ29/PENNY ainda não foi executado.

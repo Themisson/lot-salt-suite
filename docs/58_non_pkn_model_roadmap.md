@@ -1057,3 +1057,18 @@ PKN_BEHAVIOR_NOT_CHANGED
 
 Isso autoriza apenas a preparação de insumos BUZ29/PENNY; a execução
 BUZ29/PENNY permanece bloqueada para fase futura.
+
+### Insumos diagnósticos BUZ29/PENNY preparados
+
+O manifesto diagnóstico BUZ29/PENNY foi preparado:
+
+```text
+BUZ29_PENNY_DIAGNOSTIC_INPUTS_PREPARED
+EXECUTION_NOT_ALLOWED_YET
+DIAGNOSTIC_ONLY
+PHYSICAL_VALIDATION_NOT_CLAIMED
+LEGACY_EQUIVALENCE_NOT_CLAIMED
+RUNTIME_DISPATCH_NOT_ENABLED
+```
+
+Esse manifesto permite apenas decidir um gate futuro de execução diagnóstica.

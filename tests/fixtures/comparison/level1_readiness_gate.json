@@ -4269,6 +4269,23 @@
     "pkn_behavior_changed": false,
     "recommended_next_phase": "PHASE_PREPARE_BUZ29_PENNY_DIAGNOSTIC_COMPARISON_INPUTS"
   },
+  "phase_buz29_penny_diagnostic_comparison_inputs": {
+    "phase": "PHASE_PREPARE_BUZ29_PENNY_DIAGNOSTIC_COMPARISON_INPUTS",
+    "status": "BUZ29_PENNY_DIAGNOSTIC_INPUTS_PREPARED",
+    "execution_allowed": false,
+    "diagnostic_only": true,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "runtime_dispatch_enabled": false,
+    "required_inputs_count": 7,
+    "available_inputs_sufficient_for_diagnostic_gate": true,
+    "blocking_caveats": [
+      "NO_PHYSICAL_VALIDATION",
+      "NO_LEGACY_EQUIVALENCE",
+      "NO_RUNTIME_DISPATCH"
+    ],
+    "recommended_next_phase": "PHASE_DECIDE_BUZ29_PENNY_DIAGNOSTIC_EXECUTION_GATE"
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

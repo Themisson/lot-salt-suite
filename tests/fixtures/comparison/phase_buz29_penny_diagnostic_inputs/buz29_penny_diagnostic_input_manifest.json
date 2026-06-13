@@ -1,0 +1,43 @@
+{
+  "case_id": "BUZ29_PENNY_DIAGNOSTIC",
+  "execution_allowed": false,
+  "diagnostic_only": true,
+  "physically_validated": false,
+  "legacy_equivalent": false,
+  "runtime_dispatch_enabled": false,
+  "required_inputs": [
+    "fracture_model",
+    "pressure_history",
+    "opening_time_min",
+    "sigma_theta_source",
+    "wellbore_pressure_semantics",
+    "tensile_strength_Pa",
+    "axisymmetric_angle_rad"
+  ],
+  "available_inputs": [
+    "fracture_model",
+    "pressure_history",
+    "opening_time_min",
+    "sigma_theta_source",
+    "wellbore_pressure_semantics",
+    "tensile_strength_Pa",
+    "axisymmetric_angle_rad"
+  ],
+  "missing_inputs": [],
+  "evidence_documents": [
+    "docs/70_buz29_penny_evidence_audit.md",
+    "docs/72_buz29_pressure_opening_evidence_audit.md",
+    "docs/74_buz29_penny_diagnostic_route.md",
+    "docs/75_buz29_penny_adapter_ready_inputs.md",
+    "docs/78_penny_diagnostic_output_fixtures.md",
+    "docs/81_penny_diagnostic_writer_implementation.md"
+  ],
+  "blocking_caveats": [
+    "NO_PHYSICAL_VALIDATION",
+    "NO_LEGACY_EQUIVALENCE",
+    "NO_RUNTIME_DISPATCH"
+  ],
+  "axisymmetric_caveats_registered": true,
+  "pressure_semantics_registered": true,
+  "sigma_theta_source_registered": true
+}
