@@ -1265,3 +1265,19 @@ A source `AXISYMMETRIC_ELASTIC_WELLBORE_STATE` foi comparada contra uma
 referência analítica controlada versionada em fixtures. A comparação verifica
 fórmula, sinal e comportamento de threshold, mas não usa trace legado como
 validação física e não libera dispatch runtime.
+
+### Readiness para preparar gate BUZ/Legacy
+
+Status:
+
+```text
+READY_FOR_BUZ_OR_LEGACY_COMPARISON_GATE
+READY_FOR_PHYSICAL_VALIDATION_FALSE
+LEGACY_EQUIVALENCE_ALLOWED_FALSE
+BUZ29_EXECUTION_ALLOWED_FALSE
+```
+
+A source axisimétrica pode avançar para a preparação de um gate BUZ/Legacy,
+mas essa decisão permite apenas organizar escopo, campos, tolerâncias e
+caveats. Ela não autoriza comparação física executada, equivalência com o
+LOT_Tese, BUZ29-PENNY ou dispatch runtime.

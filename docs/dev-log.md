@@ -8509,3 +8509,39 @@ equivalência com o LOT_Tese e não usa trace legado como referência física.
 
 **Próxima fase recomendada:**
 `PHASE_DECIDE_CONTROLLED_PHYSICAL_COMPARISON_READINESS`.
+
+---
+
+### [2026-06-13] Fase 6 — Readiness de comparação física controlada — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `READY_FOR_BUZ_OR_LEGACY_COMPARISON_GATE`.
+
+**Decisão:**
+
+```text
+source = AXISYMMETRIC_ELASTIC_WELLBORE_STATE
+reference_comparison_status = ELASTIC_SIGMATHETA_SOURCE_REFERENCE_COMPARISON_VALID
+reference_within_tolerance = true
+pkn_regression_ok = true
+ready_for_buz_or_legacy_gate = true
+ready_for_physical_validation = false
+ready_for_physical_dispatch = false
+legacy_equivalence_allowed = false
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_change_allowed = false
+```
+
+**Interpretação:** a próxima etapa pode preparar um gate BUZ/Legacy, mas ainda
+não pode executar BUZ29-PENNY, declarar validação física ou declarar
+equivalência com legado.
+
+**Entregáveis:**
+- `tools/decide_controlled_physical_comparison_readiness.py`
+- `tests/python/test_decide_controlled_physical_comparison_readiness.py`
+- `docs/133_controlled_physical_comparison_readiness_decision.md`
+
+**Próxima fase recomendada:**
+`PHASE_PREPARE_BUZ_OR_LEGACY_COMPARISON_GATE`.

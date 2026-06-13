@@ -4200,6 +4200,23 @@
     "penny_shaped_runtime_enabled": false,
     "recommended_next_phase": "PHASE_DECIDE_CONTROLLED_PHYSICAL_COMPARISON_READINESS"
   },
+  "phase_controlled_physical_comparison_readiness": {
+    "status": "READY_FOR_BUZ_OR_LEGACY_COMPARISON_GATE",
+    "phase": "PHASE_DECIDE_CONTROLLED_PHYSICAL_COMPARISON_READINESS",
+    "source": "AXISYMMETRIC_ELASTIC_WELLBORE_STATE",
+    "reference_comparison_status": "ELASTIC_SIGMATHETA_SOURCE_REFERENCE_COMPARISON_VALID",
+    "reference_within_tolerance": true,
+    "pkn_regression_ok": true,
+    "ready_for_buz_or_legacy_gate": true,
+    "ready_for_physical_validation": false,
+    "ready_for_physical_dispatch": false,
+    "legacy_equivalence_allowed": false,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_change_allowed": false,
+    "penny_shaped_runtime_enabled": false,
+    "recommended_next_phase": "PHASE_PREPARE_BUZ_OR_LEGACY_COMPARISON_GATE"
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",
