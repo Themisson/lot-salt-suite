@@ -199,6 +199,7 @@ phases:
   phase_elastic_initial_wellbore_sigmatheta_source: completed
   phase_elastic_sigmatheta_analytic_validation: completed
   phase_elastic_sigmatheta_source_readiness: completed
+  phase_elastic_sigmatheta_upgrade_field_diagnosis: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -324,6 +325,7 @@ docs:
   phase_elastic_initial_wellbore_sigmatheta_source: implemented
   phase_elastic_sigmatheta_analytic_validation: implemented
   phase_elastic_sigmatheta_source_readiness: implemented
+  phase_elastic_sigmatheta_upgrade_field_diagnosis: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented

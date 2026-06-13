@@ -8252,3 +8252,36 @@ validação física plena, equivalência com legado ou execução física de fra
 
 **Próxima fase recomendada:**
 `PHASE_SPECIFY_KIRSCH_OR_AXISYMMETRIC_ELASTIC_SIGMATHETA_UPGRADE`.
+
+---
+
+### [2026-06-13] Fase A — Diagnóstico de campos do upgrade elástico sigma-theta — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `ELASTIC_SIGMATHETA_UPGRADE_FIELDS_DIAGNOSED`.
+
+**Resultado:**
+
+```text
+has_kirsch_required_fields = false
+has_axisymmetric_required_fields = true
+has_simplified_required_fields = true
+recommended_formula_path = AXISYMMETRIC_ELASTIC_WELLBORE_SOURCE
+implementation_allowed_next = true
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_change_allowed = false
+```
+
+**Interpretação:** a formulação Kirsch completa está bloqueada pela ausência de
+`sigma_H`, `sigma_h` e orientação angular no contrato atual. A rota
+axisimétrica é a menor evolução segura e permanece diagnóstica.
+
+**Entregáveis:**
+- `tools/diagnose_elastic_sigmatheta_upgrade_fields.py`
+- `tests/python/test_diagnose_elastic_sigmatheta_upgrade_fields.py`
+- `docs/126_elastic_sigmatheta_upgrade_field_diagnosis.md`
+
+**Próxima fase recomendada:**
+`PHASE_DECIDE_ELASTIC_SIGMATHETA_UPGRADE_FORMULA`.
