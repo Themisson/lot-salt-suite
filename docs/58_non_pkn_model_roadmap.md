@@ -982,3 +982,19 @@ RUNTIME_DISPATCH_NOT_ALLOWED
 
 BUZ29-PENNY permanece bloqueado ate que uma fonte real seja implementada,
 validada e aprovada por novo gate.
+
+### Fonte elastica inicial sigma-theta — sem desbloqueio nao-PKN
+
+A fonte `ELASTIC_INITIAL_WELLBORE_STATE` foi implementada como alimentacao
+diagnostica semi-fisica do `limited_gate`.
+
+```text
+ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE_IMPLEMENTED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+RUNTIME_DISPATCH_NOT_ENABLED
+```
+
+Mesmo quando o gate atinge `FRACTURE_DISPATCH_PENNY_DIAGNOSTIC_ELIGIBLE`, esse
+estado continua sendo elegibilidade diagnostica. O adapter `PENNY_SHAPED` nao e
+executado como runtime fisico.

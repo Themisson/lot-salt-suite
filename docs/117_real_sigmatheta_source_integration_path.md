@@ -22,8 +22,9 @@ PKN_BEHAVIOR_NOT_CHANGED
 ```
 
 A 11.11Q especifica apenas o caminho de integração da fonte real de
-sigma_theta. Ela não implementa provider real, não habilita dispatch físico e
-não valida BUZ29-PENNY.
+sigma_theta. A fase posterior implementou a primeira fonte elastica inicial
+semi-fisica, ainda opt-in e diagnostica; isso nao habilita dispatch físico e
+nao valida BUZ29-PENNY.
 
 ## Contexto pós-11.11P
 
@@ -73,6 +74,15 @@ Fonte primária recomendada:
 ```text
 primary_real_source = ELASTIC_INITIAL_WELLBORE_STATE
 ```
+
+Status posterior:
+
+```text
+ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE_IMPLEMENTED
+```
+
+A fonte implementada permanece semi-fisica, nao fisicamente validada e nao
+equivalente ao legado.
 
 Fonte secundária:
 

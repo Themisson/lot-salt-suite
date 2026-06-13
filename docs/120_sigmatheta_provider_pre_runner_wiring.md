@@ -19,7 +19,13 @@ SIGMATHETA_PROVIDER_WIRED_TO_DIAGNOSTIC_PRE_RUNNER
 - `FractureGateDiagnosticPreRunner` chama
   `evaluate_post_drilling_sigma_theta(...)` quando
   `sigma_theta_diagnostic_input.enabled=true`.
+- `FractureGateDiagnosticPreRunner` tambem chama
+  `evaluate_post_drilling_sigma_theta(...)` quando
+  `sigma_theta_provider.enabled=true` e a fonte e
+  `ELASTIC_INITIAL_WELLBORE_STATE`.
 - A fonte diagnostica continua aceita.
+- `sigma_theta_provider` e `sigma_theta_diagnostic_input` sao mutuamente
+  exclusivos quando habilitados.
 - A semantica de sinal/referencial permanece a mesma dos guards atuais.
 - `runtime_dispatch_enabled` permanece falso.
 

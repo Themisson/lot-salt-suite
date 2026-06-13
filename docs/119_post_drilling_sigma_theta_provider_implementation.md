@@ -37,19 +37,26 @@ legacy_equivalent = false
 
 ## Regras implementadas
 
-- Valores de sigma_theta devem ser finitos e positivos.
+- Para fontes diagnosticas explicitas, valores iniciais de sigma_theta devem ser
+  finitos e positivos; o valor current pode ser finito e trativo na convencao
+  compressao-positiva.
+- Para `ELASTIC_INITIAL_WELLBORE_STATE`, o provider calcula:
+  `sigma_theta_current = far_field_stress_compression_positive_Pa -
+  wellbore_pressure_Pa`.
 - `wellbore_pressure_Pa` e `tensile_strength_Pa` devem ser finitos e nao negativos.
 - `physically_validated=true` e rejeitado.
 - `legacy_equivalent=true` e rejeitado.
 - A fonte `UNKNOWN` e rejeitada.
 - `ELASTIC_INITIAL_WELLBORE_STATE` recebe caveat
-  `SEMI_PHYSICAL_ELASTIC_APPROXIMATION`.
+  `SEMI_PHYSICAL_ELASTIC_APPROXIMATION`, alem dos caveats
+  `ELASTIC_INITIAL_WELLBORE_APPROXIMATION` e
+  `ELASTIC_WELLBORE_APPROXIMATION_SIMPLIFIED`.
 
 ## Caveats
 
-O provider ainda nao esta conectado ao `FractureGateDiagnosticPreRunner`; isso
-fica para a Fase D. A rota elastica inicial e apenas semi-fisica nesta etapa e
-nao constitui validacao fisica.
+O provider esta conectado ao `FractureGateDiagnosticPreRunner` por rota opt-in
+diagnostica. A rota elastica inicial e apenas semi-fisica nesta etapa e nao
+constitui validacao fisica.
 
 ## Proxima fase
 

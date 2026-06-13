@@ -49,3 +49,18 @@ PHASE_IMPLEMENT_ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE
 Essa proxima fase deve implementar uma fonte semi-fisica elastica inicial para
 sigma-theta, ainda opt-in e sem habilitar dispatch fisico.
 
+## Atualizacao pos-implementacao
+
+A fonte `ELASTIC_INITIAL_WELLBORE_STATE` foi implementada como rota opt-in
+diagnostica do `PostDrillingSigmaThetaProvider`. Ela calcula
+`sigma_theta_current` por uma aproximacao elastica inicial simplificada e passa
+a alimentar o `limited_gate` quando `sigma_theta_provider.enabled=true`.
+
+O status da fase seguinte e:
+
+```text
+ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE_IMPLEMENTED
+```
+
+O resultado nao altera a decisao de readiness fisica: dispatch fisico,
+BUZ29-PENNY e validacao fisica permanecem bloqueados.

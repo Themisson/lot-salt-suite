@@ -1,0 +1,22 @@
+# Elastic sigma-theta source fixture.
+# Default disabled case; no provider and no diagnostic gate are active.
+fixture:
+  id: elastic_provider_disabled_default
+  phase: ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE
+  scenario: disabled_default
+  expected:
+    diagnostics_enabled: false
+    provider_enabled: false
+    diagnostic_output_expected: false
+    runtime_dispatch_enabled: false
+    buz29_execution_allowed: false
+    pkn_behavior_changed: false
+    penny_shaped_runtime_enabled: false
+
+case:
+  id: elastic_provider_disabled_default
+
+lot:
+  fracture:
+    fracture_model: PKN
+

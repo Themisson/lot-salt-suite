@@ -1,0 +1,34 @@
+# Elastic sigma-theta source fixture.
+# Wellbore pressure is required for the elastic source.
+fixture:
+  id: elastic_provider_invalid_missing_wellbore_pressure
+  phase: ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE
+  scenario: invalid_missing_wellbore_pressure
+  expected:
+    diagnostics_enabled: true
+    provider_enabled: true
+    provider_source: ELASTIC_INITIAL_WELLBORE_STATE
+    blocking_reason: MISSING_WELLBORE_PRESSURE
+    runtime_dispatch_enabled: false
+    buz29_execution_allowed: false
+    pkn_behavior_changed: false
+    penny_shaped_runtime_enabled: false
+
+case:
+  id: elastic_provider_invalid_missing_wellbore_pressure
+
+lot:
+  fracture:
+    fracture_model: PKN
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: limited_gate
+      dispatch_runtime_enabled: false
+    sigma_theta_provider:
+      enabled: true
+      source: ELASTIC_INITIAL_WELLBORE_STATE
+      far_field_stress_compression_positive_Pa: 5000000.0
+      tensile_strength_Pa: 0.0
+      physically_validated: false
+      legacy_equivalent: false
+

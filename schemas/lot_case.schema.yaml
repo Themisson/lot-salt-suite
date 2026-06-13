@@ -242,6 +242,43 @@ properties:
                 enum: [pre_runner, diagnostic_only, limited_gate]
               dispatch_runtime_enabled:
                 type: boolean
+          sigma_theta_provider:
+            type: object
+            required: [enabled]
+            additionalProperties: false
+            properties:
+              enabled:
+                type: boolean
+              source:
+                type: string
+                enum: [ELASTIC_INITIAL_WELLBORE_STATE]
+              far_field_stress_compression_positive_Pa:
+                type: number
+                exclusiveMinimum: 0
+              wellbore_pressure_Pa:
+                type: number
+                minimum: 0
+              tensile_strength_Pa:
+                type: number
+                minimum: 0
+              physically_validated:
+                type: boolean
+                const: false
+              legacy_equivalent:
+                type: boolean
+                const: false
+            allOf:
+              - if:
+                  properties:
+                    enabled:
+                      const: true
+                then:
+                  required:
+                    - source
+                    - far_field_stress_compression_positive_Pa
+                    - wellbore_pressure_Pa
+                    - physically_validated
+                    - legacy_equivalent
           sigma_theta_diagnostic_input:
             type: object
             required: [enabled]

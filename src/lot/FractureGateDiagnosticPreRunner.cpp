@@ -69,6 +69,52 @@ PostDrillingSigmaThetaSource provider_source_from_diagnostic_input(
   return PostDrillingSigmaThetaSource::Unknown;
 }
 
+PostDrillingSigmaThetaSource provider_source_from_provider(
+    const std::string& source) {
+  if (source == "ELASTIC_INITIAL_WELLBORE_STATE") {
+    return PostDrillingSigmaThetaSource::ElasticInitialWellboreState;
+  }
+  return PostDrillingSigmaThetaSource::Unknown;
+}
+
+SigmaThetaSource sigma_theta_source_from_provider(const std::string& source) {
+  if (source == "ELASTIC_INITIAL_WELLBORE_STATE") {
+    return SigmaThetaSource::ElasticInitialWellboreState;
+  }
+  return SigmaThetaSource::Unknown;
+}
+
+void fill_gate_input_from_provider_result(
+    FractureGateRuntimeInput& input,
+    const PostDrillingSigmaThetaProviderResult& provider_result,
+    const SigmaThetaSource sigma_theta_source) {
+  input.sigma_theta_initial_state.sigma_theta_initialized = true;
+  input.sigma_theta_initial_state.sigma_theta_initial_state_valid = true;
+  input.sigma_theta_initial_state.sigma_theta_initial_compression_positive_Pa =
+      provider_result.sigma_theta_initial_compression_positive_Pa;
+  input.sigma_theta_initial_state.sigma_theta_source = sigma_theta_source;
+  input.sigma_theta_initial_state.sigma_theta_state_time =
+      SigmaThetaStateTime::AfterDrillingBeforeLot;
+  input.sigma_theta_initial_state.sigma_theta_reference_frame =
+      SigmaThetaReferenceFrame::TotalStress;
+  input.sigma_theta_initial_state.sigma_theta_sign_convention =
+      SigmaThetaSignConvention::CompressionPositive;
+  input.sigma_theta_initial_state.pressure_semantics =
+      PressureSemantics::WellborePressureAbsolute;
+
+  input.pressure_sigma_theta_criterion
+      .sigma_theta_current_compression_positive_Pa =
+      provider_result.sigma_theta_current_compression_positive_Pa;
+  input.pressure_sigma_theta_criterion.tensile_strength_Pa =
+      provider_result.tensile_strength_Pa;
+  input.pressure_sigma_theta_criterion.pressure_semantics =
+      PressureSemantics::WellborePressureAbsolute;
+  input.pressure_sigma_theta_criterion.sigma_theta_reference_frame =
+      SigmaThetaReferenceFrame::TotalStress;
+  input.pressure_sigma_theta_criterion.sigma_theta_sign_convention =
+      SigmaThetaSignConvention::CompressionPositive;
+}
+
 }  // namespace
 
 FractureGateRuntimeInput make_fracture_gate_runtime_input_from_case(
@@ -99,8 +145,30 @@ FractureGateRuntimeInput make_fracture_gate_runtime_input_from_case(
   input.pressure_sigma_theta_criterion.sigma_theta_sign_convention =
       SigmaThetaSignConvention::Unknown;
 
+  const auto& provider = data.lot.sigma_theta_provider;
   const auto& diagnostic = data.lot.sigma_theta_diagnostic_input;
-  if (diagnostic.enabled) {
+  if (provider.enabled && diagnostic.enabled) {
+    throw std::runtime_error(
+        "FractureGateDiagnosticPreRunner: sigma_theta_provider and "
+        "sigma_theta_diagnostic_input cannot both be enabled");
+  }
+
+  if (provider.enabled) {
+    PostDrillingSigmaThetaProviderInput provider_input;
+    provider_input.source = provider_source_from_provider(provider.source);
+    provider_input.far_field_stress_compression_positive_Pa =
+        provider.far_field_stress_compression_positive_Pa;
+    provider_input.wellbore_pressure_Pa = provider.wellbore_pressure_Pa;
+    provider_input.tensile_strength_Pa = provider.tensile_strength_Pa;
+    provider_input.physically_validated = provider.physically_validated;
+    provider_input.legacy_equivalent = provider.legacy_equivalent;
+    const auto provider_result =
+        evaluate_post_drilling_sigma_theta(provider_input);
+
+    fill_gate_input_from_provider_result(
+        input, provider_result,
+        sigma_theta_source_from_provider(provider.source));
+  } else if (diagnostic.enabled) {
     PostDrillingSigmaThetaProviderInput provider_input;
     provider_input.source =
         provider_source_from_diagnostic_input(diagnostic.source);
@@ -115,32 +183,9 @@ FractureGateRuntimeInput make_fracture_gate_runtime_input_from_case(
     const auto provider_result =
         evaluate_post_drilling_sigma_theta(provider_input);
 
-    input.sigma_theta_initial_state.sigma_theta_initialized = true;
-    input.sigma_theta_initial_state.sigma_theta_initial_state_valid = true;
-    input.sigma_theta_initial_state.sigma_theta_initial_compression_positive_Pa =
-        provider_result.sigma_theta_initial_compression_positive_Pa;
-    input.sigma_theta_initial_state.sigma_theta_source =
-        sigma_theta_source_from_diagnostic_input(diagnostic.source);
-    input.sigma_theta_initial_state.sigma_theta_state_time =
-        SigmaThetaStateTime::AfterDrillingBeforeLot;
-    input.sigma_theta_initial_state.sigma_theta_reference_frame =
-        SigmaThetaReferenceFrame::TotalStress;
-    input.sigma_theta_initial_state.sigma_theta_sign_convention =
-        SigmaThetaSignConvention::CompressionPositive;
-    input.sigma_theta_initial_state.pressure_semantics =
-        PressureSemantics::WellborePressureAbsolute;
-
-    input.pressure_sigma_theta_criterion
-        .sigma_theta_current_compression_positive_Pa =
-        provider_result.sigma_theta_current_compression_positive_Pa;
-    input.pressure_sigma_theta_criterion.tensile_strength_Pa =
-        provider_result.tensile_strength_Pa;
-    input.pressure_sigma_theta_criterion.pressure_semantics =
-        PressureSemantics::WellborePressureAbsolute;
-    input.pressure_sigma_theta_criterion.sigma_theta_reference_frame =
-        SigmaThetaReferenceFrame::TotalStress;
-    input.pressure_sigma_theta_criterion.sigma_theta_sign_convention =
-        SigmaThetaSignConvention::CompressionPositive;
+    fill_gate_input_from_provider_result(
+        input, provider_result,
+        sigma_theta_source_from_diagnostic_input(diagnostic.source));
   }
 
   return input;

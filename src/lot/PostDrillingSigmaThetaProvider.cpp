@@ -51,12 +51,29 @@ PostDrillingSigmaThetaProviderResult evaluate_post_drilling_sigma_theta(
         "PostDrillingSigmaThetaProvider: legacy_equivalent must be false");
   }
 
-  require_positive_finite(input.sigma_theta_initial_compression_positive_Pa,
-                          "sigma_theta_initial_compression_positive_Pa");
-  if (!std::isfinite(input.sigma_theta_current_compression_positive_Pa)) {
-    throw std::runtime_error(
+  double sigma_theta_initial_compression_positive_Pa =
+      input.sigma_theta_initial_compression_positive_Pa;
+  double sigma_theta_current_compression_positive_Pa =
+      input.sigma_theta_current_compression_positive_Pa;
+
+  if (input.source == PostDrillingSigmaThetaSource::ElasticInitialWellboreState) {
+    require_positive_finite(input.far_field_stress_compression_positive_Pa,
+                            "far_field_stress_compression_positive_Pa");
+    require_nonnegative_finite(input.wellbore_pressure_Pa,
+                               "wellbore_pressure_Pa");
+    sigma_theta_initial_compression_positive_Pa =
+        input.far_field_stress_compression_positive_Pa;
+    sigma_theta_current_compression_positive_Pa =
+        input.far_field_stress_compression_positive_Pa -
+        input.wellbore_pressure_Pa;
+  } else {
+    require_positive_finite(input.sigma_theta_initial_compression_positive_Pa,
+                            "sigma_theta_initial_compression_positive_Pa");
+    if (!std::isfinite(input.sigma_theta_current_compression_positive_Pa)) {
+      throw std::runtime_error(
         "PostDrillingSigmaThetaProvider: "
         "sigma_theta_current_compression_positive_Pa must be finite");
+    }
   }
   require_nonnegative_finite(input.wellbore_pressure_Pa,
                              "wellbore_pressure_Pa");
@@ -66,9 +83,11 @@ PostDrillingSigmaThetaProviderResult evaluate_post_drilling_sigma_theta(
   PostDrillingSigmaThetaProviderResult result;
   result.available = true;
   result.sigma_theta_initial_compression_positive_Pa =
-      input.sigma_theta_initial_compression_positive_Pa;
+      sigma_theta_initial_compression_positive_Pa;
   result.sigma_theta_current_compression_positive_Pa =
-      input.sigma_theta_current_compression_positive_Pa;
+      sigma_theta_current_compression_positive_Pa;
+  result.far_field_stress_compression_positive_Pa =
+      input.far_field_stress_compression_positive_Pa;
   result.wellbore_pressure_Pa = input.wellbore_pressure_Pa;
   result.tensile_strength_Pa = input.tensile_strength_Pa;
   result.source = to_string(input.source);
@@ -79,6 +98,8 @@ PostDrillingSigmaThetaProviderResult evaluate_post_drilling_sigma_theta(
   result.legacy_equivalent = false;
 
   if (input.source == PostDrillingSigmaThetaSource::ElasticInitialWellboreState) {
+    result.caveats.push_back("ELASTIC_INITIAL_WELLBORE_APPROXIMATION");
+    result.caveats.push_back("ELASTIC_WELLBORE_APPROXIMATION_SIMPLIFIED");
     result.caveats.push_back("SEMI_PHYSICAL_ELASTIC_APPROXIMATION");
     result.caveats.push_back("NOT_PHYSICALLY_VALIDATED");
     result.caveats.push_back("NOT_LEGACY_EQUIVALENT");

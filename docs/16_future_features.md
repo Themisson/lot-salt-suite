@@ -1141,3 +1141,23 @@ RUNTIME_DISPATCH_NOT_ALLOWED
 A fase especifica `PostDrillingSigmaThetaProvider` como componente futuro. A
 proxima fase deve criar fixtures do contrato antes de implementar qualquer
 provider real.
+
+### Fonte elástica inicial de sigma-theta
+
+Status:
+
+```text
+ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE_IMPLEMENTED
+RUNTIME_DISPATCH_NOT_ENABLED
+BUZ29_EXECUTION_BLOCKED
+PENNY_SHAPED_RUNTIME_NOT_ENABLED
+```
+
+A fonte `ELASTIC_INITIAL_WELLBORE_STATE` foi implementada no
+`PostDrillingSigmaThetaProvider` como rota opt-in para alimentar o
+`limited_gate`. A aproximacao usa
+`sigma_theta_current = far_field_stress_compression_positive_Pa -
+wellbore_pressure_Pa`.
+
+Ela permanece semi-fisica e diagnostica: nao e validacao fisica plena, nao e
+equivalencia com legado, nao habilita dispatch fisico e nao libera BUZ29-PENNY.

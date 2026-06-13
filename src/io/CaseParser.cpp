@@ -306,7 +306,7 @@ void parse_fracture_gate_diagnostics(const YAML::Node& fracture,
 }
 
 void parse_sigma_theta_diagnostic_input(const YAML::Node& fracture,
-                                        lss::core::LotConfig& lot) {
+                                          lss::core::LotConfig& lot) {
   const YAML::Node node = fracture["sigma_theta_diagnostic_input"];
   if (!node) {
     return;
@@ -385,6 +385,73 @@ void parse_sigma_theta_diagnostic_input(const YAML::Node& fracture,
   if (input.legacy_equivalent) {
     throw std::runtime_error(
         "Validacao falhou: sigma_theta_diagnostic_input.legacy_equivalent "
+        "deve ser false");
+  }
+}
+
+void parse_sigma_theta_provider(const YAML::Node& fracture,
+                                lss::core::LotConfig& lot) {
+  const YAML::Node node = fracture["sigma_theta_provider"];
+  if (!node) {
+    return;
+  }
+
+  auto& provider = lot.sigma_theta_provider;
+  provider.enabled = require_as<bool>(
+      node["enabled"], "lot.fracture.sigma_theta_provider.enabled");
+  if (!provider.enabled) {
+    return;
+  }
+
+  provider.source = require_as<std::string>(
+      node["source"], "lot.fracture.sigma_theta_provider.source");
+  provider.far_field_stress_compression_positive_Pa = require_as<double>(
+      node["far_field_stress_compression_positive_Pa"],
+      "lot.fracture.sigma_theta_provider.far_field_stress_compression_positive_Pa");
+  provider.wellbore_pressure_Pa = require_as<double>(
+      node["wellbore_pressure_Pa"],
+      "lot.fracture.sigma_theta_provider.wellbore_pressure_Pa");
+  provider.tensile_strength_Pa =
+      node["tensile_strength_Pa"] ? node["tensile_strength_Pa"].as<double>()
+                                  : 0.0;
+  provider.physically_validated = require_as<bool>(
+      node["physically_validated"],
+      "lot.fracture.sigma_theta_provider.physically_validated");
+  provider.legacy_equivalent = require_as<bool>(
+      node["legacy_equivalent"],
+      "lot.fracture.sigma_theta_provider.legacy_equivalent");
+
+  if (provider.source != "ELASTIC_INITIAL_WELLBORE_STATE") {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_provider.source exige "
+        "ELASTIC_INITIAL_WELLBORE_STATE");
+  }
+  if (!std::isfinite(provider.far_field_stress_compression_positive_Pa) ||
+      provider.far_field_stress_compression_positive_Pa <= 0.0) {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_provider exige "
+        "far_field_stress_compression_positive_Pa finito e > 0");
+  }
+  if (!std::isfinite(provider.wellbore_pressure_Pa) ||
+      provider.wellbore_pressure_Pa < 0.0) {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_provider exige "
+        "wellbore_pressure_Pa finito e >= 0");
+  }
+  if (!std::isfinite(provider.tensile_strength_Pa) ||
+      provider.tensile_strength_Pa < 0.0) {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_provider exige "
+        "tensile_strength_Pa finito e >= 0");
+  }
+  if (provider.physically_validated) {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_provider.physically_validated "
+        "deve ser false");
+  }
+  if (provider.legacy_equivalent) {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_provider.legacy_equivalent "
         "deve ser false");
   }
 }
@@ -506,7 +573,14 @@ lss::core::CaseData parse_yaml(const std::filesystem::path& path) {
   apply_fracture_model_selection(
       lss::lot::select_fracture_model(fracture_model_input), data.lot);
   parse_fracture_gate_diagnostics(fracture, data.lot);
+  parse_sigma_theta_provider(fracture, data.lot);
   parse_sigma_theta_diagnostic_input(fracture, data.lot);
+  if (data.lot.sigma_theta_provider.enabled &&
+      data.lot.sigma_theta_diagnostic_input.enabled) {
+    throw std::runtime_error(
+        "Validacao falhou: sigma_theta_provider e "
+        "sigma_theta_diagnostic_input nao podem estar enabled simultaneamente");
+  }
   if (data.lot.model.empty()) {
     data.lot.model = data.lot.fracture_geometry;
   }

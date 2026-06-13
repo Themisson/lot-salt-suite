@@ -12,9 +12,9 @@
 Fase ativa  : 11.11O sigma-theta diagnostic controlled validation
 Branch      : main
 Repositório : https://github.com/Themisson/lot-salt-suite
-Último push : 2026-06-12
-Testes C++  : 387/387 em 2026-06-12
-Testes Py   : 936/936 em 2026-06-12
+Último push : 2026-06-13
+Testes C++  : 413/413 em 2026-06-13
+Testes Py   : 1038/1038 em 2026-06-13
 Baselines   : 4 capturados (LOT_APB_v5)
 Saltcreep   : 133/133 Catch2 baseline + 133/133 Catch2 LSS Eigen + 31/31 Python em 2026-06-04
 Eigen decisao: MIGRATION_COMPLETED
@@ -54,6 +54,49 @@ WDAC tests  : SUPORTADO (LSS_ENABLE_CLI_SUBPROCESS_TESTS=OFF desativa apenas sub
 ---
 
 ## Entradas de sessão
+
+---
+
+### [2026-06-13] Fonte elástica inicial de sigma-theta — Codex
+
+**Status:** Implementado; commit/push executado ao final se todos os gates
+passarem.
+
+**Classificacao:** `ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE_IMPLEMENTED`.
+
+**Fonte:** `ELASTIC_INITIAL_WELLBORE_STATE`.
+
+**Formula diagnostica:**
+
+```text
+sigma_theta_initial = far_field_stress_compression_positive_Pa
+sigma_theta_current = far_field_stress_compression_positive_Pa - wellbore_pressure_Pa
+```
+
+**Arquivos principais:**
+
+```text
+src/lot/PostDrillingSigmaThetaProvider.cpp
+src/lot/FractureGateDiagnosticPreRunner.cpp
+tools/audit_elastic_initial_wellbore_sigmatheta_source.py
+docs/123_elastic_initial_wellbore_sigmatheta_source.md
+tests/fixtures/comparison/phase_elastic_sigmatheta_source/
+```
+
+**Garantias preservadas:**
+
+```text
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_changed = false
+penny_shaped_runtime_enabled = false
+```
+
+**Proxima fase recomendada:**
+
+```text
+PHASE_VALIDATE_ELASTIC_SIGMATHETA_SOURCE_AGAINST_KNOWN_ANALYTIC_CASE
+```
 
 ---
 

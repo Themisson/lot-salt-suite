@@ -196,6 +196,7 @@ phases:
   master_phase_d_sigmatheta_provider_pre_runner_wiring: completed
   master_phase_e_sigmatheta_provider_controlled_validation: completed
   master_phase_f_sigmatheta_provider_readiness_decision: completed
+  phase_elastic_initial_wellbore_sigmatheta_source: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -318,6 +319,7 @@ docs:
   master_phase_d_sigmatheta_provider_pre_runner_wiring: implemented
   master_phase_e_sigmatheta_provider_controlled_validation: implemented
   master_phase_f_sigmatheta_provider_readiness_decision: implemented
+  phase_elastic_initial_wellbore_sigmatheta_source: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented

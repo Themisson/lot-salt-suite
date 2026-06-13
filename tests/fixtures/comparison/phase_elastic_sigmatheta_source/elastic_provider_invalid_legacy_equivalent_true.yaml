@@ -1,0 +1,35 @@
+# Elastic sigma-theta source fixture.
+# Legacy-equivalence claims are intentionally rejected for this diagnostic source.
+fixture:
+  id: elastic_provider_invalid_legacy_equivalent_true
+  phase: ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE
+  scenario: invalid_legacy_equivalent_true
+  expected:
+    diagnostics_enabled: true
+    provider_enabled: true
+    provider_source: ELASTIC_INITIAL_WELLBORE_STATE
+    blocking_reason: LEGACY_EQUIVALENCE_NOT_ALLOWED_FOR_ELASTIC_SIGMATHETA_SOURCE
+    runtime_dispatch_enabled: false
+    buz29_execution_allowed: false
+    pkn_behavior_changed: false
+    penny_shaped_runtime_enabled: false
+
+case:
+  id: elastic_provider_invalid_legacy_equivalent_true
+
+lot:
+  fracture:
+    fracture_model: PKN
+    fracture_gate_diagnostics:
+      enabled: true
+      mode: limited_gate
+      dispatch_runtime_enabled: false
+    sigma_theta_provider:
+      enabled: true
+      source: ELASTIC_INITIAL_WELLBORE_STATE
+      far_field_stress_compression_positive_Pa: 5000000.0
+      wellbore_pressure_Pa: 7000000.0
+      tensile_strength_Pa: 0.0
+      physically_validated: false
+      legacy_equivalent: true
+

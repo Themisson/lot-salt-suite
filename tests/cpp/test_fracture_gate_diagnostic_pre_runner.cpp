@@ -68,6 +68,21 @@ std::string sigma_theta_diagnostic_input_block(
          "      legacy_equivalent: false\n";
 }
 
+std::string sigma_theta_provider_block(
+    const double far_field_stress_compression_positive_Pa,
+    const double wellbore_pressure_Pa) {
+  return "    sigma_theta_provider:\n"
+         "      enabled: true\n"
+         "      source: ELASTIC_INITIAL_WELLBORE_STATE\n"
+         "      far_field_stress_compression_positive_Pa: " +
+         std::to_string(far_field_stress_compression_positive_Pa) + "\n"
+         "      wellbore_pressure_Pa: " +
+         std::to_string(wellbore_pressure_Pa) + "\n"
+         "      tensile_strength_Pa: 0.0\n"
+         "      physically_validated: false\n"
+         "      legacy_equivalent: false\n";
+}
+
 std::filesystem::path write_enabled_case_with_sigma_theta(
     const std::string& suffix,
     const double sigma_theta_current_compression_positive_Pa,
@@ -80,6 +95,22 @@ std::filesystem::path write_enabled_case_with_sigma_theta(
           "      dispatch_runtime_enabled: false\n" +
           sigma_theta_diagnostic_input_block(
               sigma_theta_current_compression_positive_Pa),
+      suffix);
+}
+
+std::filesystem::path write_enabled_case_with_sigma_theta_provider(
+    const std::string& suffix,
+    const double far_field_stress_compression_positive_Pa,
+    const double wellbore_pressure_Pa,
+    const std::string& fracture_model_line = "") {
+  return write_case_with_diagnostics(
+      fracture_model_line +
+          "    fracture_gate_diagnostics:\n"
+          "      enabled: true\n"
+          "      mode: limited_gate\n"
+          "      dispatch_runtime_enabled: false\n" +
+          sigma_theta_provider_block(far_field_stress_compression_positive_Pa,
+                                     wellbore_pressure_Pa),
       suffix);
 }
 
@@ -249,6 +280,29 @@ TEST_CASE("Diagnostic pre-runner fills sigma theta guards from diagnostic input"
   std::filesystem::remove(path);
 }
 
+TEST_CASE("Diagnostic pre-runner fills sigma theta guards from elastic provider") {
+  const auto path = write_enabled_case_with_sigma_theta_provider(
+      "elastic_provider", 5000000.0, 7000000.0);
+  const auto data = lss::io::parse_yaml(path);
+  const auto input = lss::lot::make_fracture_gate_runtime_input_from_case(data);
+
+  CHECK(input.sigma_theta_initial_state.sigma_theta_initialized);
+  CHECK(input.sigma_theta_initial_state.sigma_theta_initial_state_valid);
+  CHECK(input.sigma_theta_initial_state.sigma_theta_source ==
+        lss::lot::SigmaThetaSource::ElasticInitialWellboreState);
+  CHECK(input.sigma_theta_initial_state.sigma_theta_initial_compression_positive_Pa ==
+        Catch::Approx(5000000.0));
+  CHECK(input.pressure_sigma_theta_criterion
+            .sigma_theta_current_compression_positive_Pa ==
+        Catch::Approx(-2000000.0));
+  CHECK(input.pressure_sigma_theta_criterion.tensile_strength_Pa ==
+        Catch::Approx(0.0));
+  CHECK(input.pressure_sigma_theta_criterion.pressure_semantics ==
+        lss::lot::PressureSemantics::WellborePressureAbsolute);
+
+  std::filesystem::remove(path);
+}
+
 TEST_CASE("Diagnostic pre-runner reports ready not reached for compressive current sigma theta") {
   const auto path = write_enabled_case_with_sigma_theta("not_reached",
                                                        5000000.0);
@@ -267,9 +321,47 @@ TEST_CASE("Diagnostic pre-runner reports ready not reached for compressive curre
   std::filesystem::remove(path);
 }
 
+TEST_CASE("Diagnostic pre-runner elastic provider reports ready not reached") {
+  const auto path = write_enabled_case_with_sigma_theta_provider(
+      "elastic_not_reached", 8000000.0, 3000000.0);
+  const auto data = lss::io::parse_yaml(path);
+
+  const auto result =
+      lss::lot::evaluate_fracture_gate_diagnostic_pre_runner(data);
+
+  CHECK(result.runtime_result.gate_status ==
+        lss::lot::FractureGateStatus::ReadyNotReached);
+  CHECK(result.runtime_result.dispatch_status ==
+        lss::lot::FractureDispatchStatus::NotExecuted);
+  CHECK_FALSE(result.runtime_result.fracture_initiated);
+  CHECK_FALSE(result.dispatch_runtime_enabled);
+  CHECK_FALSE(result.pkn_model_called_by_diagnostic);
+
+  std::filesystem::remove(path);
+}
+
 TEST_CASE("Diagnostic pre-runner reports PKN eligible when sigma theta criterion is reached") {
   const auto path =
       write_enabled_case_with_sigma_theta("pkn_reached", -2000000.0);
+  const auto data = lss::io::parse_yaml(path);
+
+  const auto result =
+      lss::lot::evaluate_fracture_gate_diagnostic_pre_runner(data);
+
+  CHECK(result.runtime_result.gate_status ==
+        lss::lot::FractureGateStatus::Reached);
+  CHECK(result.runtime_result.dispatch_status ==
+        lss::lot::FractureDispatchStatus::PknEligible);
+  CHECK(result.runtime_result.fracture_initiated);
+  CHECK_FALSE(result.pkn_model_called_by_diagnostic);
+  CHECK_FALSE(result.dispatch_runtime_enabled);
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("Diagnostic pre-runner elastic provider reports PKN eligible when reached") {
+  const auto path = write_enabled_case_with_sigma_theta_provider(
+      "elastic_pkn_reached", 5000000.0, 7000000.0);
   const auto data = lss::io::parse_yaml(path);
 
   const auto result =
@@ -303,6 +395,41 @@ TEST_CASE("Diagnostic pre-runner reports PENNY diagnostic eligible without adapt
   CHECK_FALSE(result.penny_adapter_called_by_diagnostic);
   CHECK_FALSE(result.dispatch_runtime_enabled);
 
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("Diagnostic pre-runner elastic provider reports PENNY diagnostic eligible") {
+  const auto path = write_enabled_case_with_sigma_theta_provider(
+      "elastic_penny_reached", 5000000.0, 7000000.0,
+      "    fracture_model: PENNY_SHAPED\n");
+  const auto data = lss::io::parse_yaml(path);
+
+  const auto result =
+      lss::lot::evaluate_fracture_gate_diagnostic_pre_runner(data);
+
+  CHECK(result.runtime_result.selected_fracture_model == "PENNY_SHAPED");
+  CHECK(result.runtime_result.gate_status ==
+        lss::lot::FractureGateStatus::Reached);
+  CHECK(result.runtime_result.dispatch_status ==
+        lss::lot::FractureDispatchStatus::PennyDiagnosticEligible);
+  CHECK(result.runtime_result.fracture_initiated);
+  CHECK_FALSE(result.penny_adapter_called_by_diagnostic);
+  CHECK_FALSE(result.dispatch_runtime_enabled);
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("Diagnostic pre-runner rejects ambiguous sigma theta provider and input") {
+  const auto path = write_case_with_diagnostics(
+      "    fracture_gate_diagnostics:\n"
+      "      enabled: true\n"
+      "      mode: limited_gate\n"
+      "      dispatch_runtime_enabled: false\n" +
+          sigma_theta_provider_block(5000000.0, 7000000.0) +
+          sigma_theta_diagnostic_input_block(-2000000.0),
+      "ambiguous_provider_input");
+
+  CHECK_THROWS_AS(lss::io::parse_yaml(path), std::runtime_error);
   std::filesystem::remove(path);
 }
 

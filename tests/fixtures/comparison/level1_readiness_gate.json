@@ -3956,6 +3956,36 @@
       "The next source extension must remain opt-in until separately validated."
     ]
   },
+  "phase_elastic_initial_wellbore_sigmatheta_source": {
+    "status": "ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE_IMPLEMENTED",
+    "phase": "ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE",
+    "source": "ELASTIC_INITIAL_WELLBORE_STATE",
+    "provider_component": "PostDrillingSigmaThetaProvider",
+    "semi_physical": true,
+    "physically_validated": false,
+    "legacy_equivalent": false,
+    "runtime_dispatch_enabled": false,
+    "buz29_execution_allowed": false,
+    "pkn_behavior_changed": false,
+    "penny_shaped_runtime_enabled": false,
+    "ready_not_reached_case_valid": true,
+    "reached_pkn_case_valid": true,
+    "reached_penny_diagnostic_case_valid": true,
+    "ambiguous_provider_input_invalid": true,
+    "required_statuses": [
+      "ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE_IMPLEMENTED",
+      "RUNTIME_DISPATCH_NOT_ENABLED",
+      "BUZ29_EXECUTION_BLOCKED",
+      "PKN_BEHAVIOR_NOT_CHANGED",
+      "PENNY_SHAPED_RUNTIME_NOT_ENABLED"
+    ],
+    "recommended_next_phase": "PHASE_VALIDATE_ELASTIC_SIGMATHETA_SOURCE_AGAINST_KNOWN_ANALYTIC_CASE",
+    "caveats": [
+      "The elastic source is semi-physical and diagnostic.",
+      "The source does not claim physical validation or legacy equivalence.",
+      "Physical dispatch, BUZ29-PENNY execution and PENNY_SHAPED runtime remain blocked."
+    ]
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

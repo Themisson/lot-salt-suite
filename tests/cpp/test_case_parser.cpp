@@ -145,6 +145,30 @@ std::filesystem::path write_pkn_case_with_sigma_theta_diagnostic_input(
                          yaml);
 }
 
+std::string valid_sigma_theta_provider_block(
+    const std::string& source = "ELASTIC_INITIAL_WELLBORE_STATE") {
+  return "    sigma_theta_provider:\n"
+         "      enabled: true\n"
+         "      source: " + source + "\n"
+         "      far_field_stress_compression_positive_Pa: 5000000.0\n"
+         "      wellbore_pressure_Pa: 7000000.0\n"
+         "      tensile_strength_Pa: 0.0\n"
+         "      physically_validated: false\n"
+         "      legacy_equivalent: false\n";
+}
+
+std::filesystem::path write_pkn_case_with_sigma_theta_provider(
+    const std::string& block, const std::string& suffix) {
+  auto yaml = read_text_file(kPknMinimalCasePath);
+  const std::string geometry_line = "    geometry: pkn\n";
+  const auto pos = yaml.find(geometry_line);
+  REQUIRE(pos != std::string::npos);
+  yaml.insert(pos + geometry_line.size(), block);
+
+  return write_temp_case("lss_sigmatheta_provider_" + suffix + ".yaml",
+                         yaml);
+}
+
 void require_parse_error_contains(const std::filesystem::path& path,
                                   const std::string& expected_message) {
   try {
@@ -344,6 +368,108 @@ TEST_CASE("CaseParser accepts absent sigma theta diagnostic input") {
   const auto data = lss::io::parse_yaml(kPknMinimalCasePath);
 
   CHECK_FALSE(data.lot.sigma_theta_diagnostic_input.enabled);
+}
+
+TEST_CASE("CaseParser accepts absent sigma theta provider") {
+  const auto data = lss::io::parse_yaml(kPknMinimalCasePath);
+
+  CHECK_FALSE(data.lot.sigma_theta_provider.enabled);
+}
+
+TEST_CASE("CaseParser accepts disabled sigma theta provider") {
+  const auto path = write_pkn_case_with_sigma_theta_provider(
+      "    sigma_theta_provider:\n"
+      "      enabled: false\n",
+      "disabled");
+  const auto data = lss::io::parse_yaml(path);
+
+  CHECK_FALSE(data.lot.sigma_theta_provider.enabled);
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser accepts elastic initial wellbore sigma theta provider") {
+  const auto path = write_pkn_case_with_sigma_theta_provider(
+      valid_sigma_theta_provider_block(), "elastic");
+  const auto data = lss::io::parse_yaml(path);
+
+  const auto& provider = data.lot.sigma_theta_provider;
+  CHECK(provider.enabled);
+  CHECK(provider.source == "ELASTIC_INITIAL_WELLBORE_STATE");
+  CHECK(provider.far_field_stress_compression_positive_Pa ==
+        Catch::Approx(5000000.0));
+  CHECK(provider.wellbore_pressure_Pa == Catch::Approx(7000000.0));
+  CHECK(provider.tensile_strength_Pa == Catch::Approx(0.0));
+  CHECK_FALSE(provider.physically_validated);
+  CHECK_FALSE(provider.legacy_equivalent);
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects invalid sigma theta provider source") {
+  const auto path = write_pkn_case_with_sigma_theta_provider(
+      valid_sigma_theta_provider_block("UNKNOWN_SOURCE"), "bad_source");
+
+  require_parse_error_contains(path, "sigma_theta_provider.source");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects physically validated sigma theta provider") {
+  auto block = valid_sigma_theta_provider_block();
+  const auto pos = block.find("physically_validated: false");
+  REQUIRE(pos != std::string::npos);
+  block.replace(pos, std::string("physically_validated: false").size(),
+                "physically_validated: true");
+  const auto path =
+      write_pkn_case_with_sigma_theta_provider(block, "physically_validated");
+
+  require_parse_error_contains(path, "sigma_theta_provider.physically_validated");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects legacy equivalent sigma theta provider") {
+  auto block = valid_sigma_theta_provider_block();
+  const auto pos = block.find("legacy_equivalent: false");
+  REQUIRE(pos != std::string::npos);
+  block.replace(pos, std::string("legacy_equivalent: false").size(),
+                "legacy_equivalent: true");
+  const auto path =
+      write_pkn_case_with_sigma_theta_provider(block, "legacy_equivalent");
+
+  require_parse_error_contains(path, "sigma_theta_provider.legacy_equivalent");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects sigma theta provider without far field") {
+  auto block = valid_sigma_theta_provider_block();
+  const std::string line =
+      "      far_field_stress_compression_positive_Pa: 5000000.0\n";
+  const auto pos = block.find(line);
+  REQUIRE(pos != std::string::npos);
+  block.erase(pos, line.size());
+  const auto path =
+      write_pkn_case_with_sigma_theta_provider(block, "missing_far_field");
+
+  require_parse_error_contains(
+      path, "lot.fracture.sigma_theta_provider.far_field_stress_compression_positive_Pa");
+
+  std::filesystem::remove(path);
+}
+
+TEST_CASE("CaseParser rejects simultaneous sigma theta provider and diagnostic input") {
+  const auto path = write_pkn_case_with_sigma_theta_provider(
+      valid_sigma_theta_provider_block() +
+          valid_sigma_theta_diagnostic_input_block(),
+      "ambiguous");
+
+  require_parse_error_contains(
+      path,
+      "sigma_theta_provider e sigma_theta_diagnostic_input nao podem estar enabled simultaneamente");
+
+  std::filesystem::remove(path);
 }
 
 TEST_CASE("CaseParser accepts disabled sigma theta diagnostic input") {

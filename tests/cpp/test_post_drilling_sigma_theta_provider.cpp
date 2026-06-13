@@ -4,6 +4,7 @@
 #include <string>
 #include <stdexcept>
 
+#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "lot/PostDrillingSigmaThetaProvider.hpp"
@@ -17,6 +18,7 @@ lss::lot::PostDrillingSigmaThetaProviderInput valid_input(
   input.source = source;
   input.sigma_theta_initial_compression_positive_Pa = 5.0e6;
   input.sigma_theta_current_compression_positive_Pa = 4.5e6;
+  input.far_field_stress_compression_positive_Pa = 5.0e6;
   input.wellbore_pressure_Pa = 6.0e6;
   input.tensile_strength_Pa = 0.0;
   input.physically_validated = false;
@@ -65,14 +67,38 @@ TEST_CASE("PostDrillingSigmaThetaProvider accepts synthetic fixture source") {
 }
 
 TEST_CASE("PostDrillingSigmaThetaProvider marks elastic source as semi physical") {
-  const auto result = lss::lot::evaluate_post_drilling_sigma_theta(valid_input(
-      lss::lot::PostDrillingSigmaThetaSource::ElasticInitialWellboreState));
+  auto input = valid_input(
+      lss::lot::PostDrillingSigmaThetaSource::ElasticInitialWellboreState);
+  input.far_field_stress_compression_positive_Pa = 5.0e6;
+  input.wellbore_pressure_Pa = 6.0e6;
+  const auto result = lss::lot::evaluate_post_drilling_sigma_theta(input);
 
   CHECK(result.available);
   CHECK(result.source == "ELASTIC_INITIAL_WELLBORE_STATE");
+  CHECK(result.sigma_theta_initial_compression_positive_Pa ==
+        Catch::Approx(5.0e6));
+  CHECK(result.sigma_theta_current_compression_positive_Pa ==
+        Catch::Approx(-1.0e6));
+  CHECK(result.far_field_stress_compression_positive_Pa ==
+        Catch::Approx(5.0e6));
+  CHECK(contains(result.caveats, "ELASTIC_INITIAL_WELLBORE_APPROXIMATION"));
+  CHECK(contains(result.caveats, "ELASTIC_WELLBORE_APPROXIMATION_SIMPLIFIED"));
   CHECK(contains(result.caveats, "SEMI_PHYSICAL_ELASTIC_APPROXIMATION"));
   CHECK(contains(result.caveats, "NOT_PHYSICALLY_VALIDATED"));
   CHECK(contains(result.caveats, "NOT_LEGACY_EQUIVALENT"));
+}
+
+TEST_CASE("PostDrillingSigmaThetaProvider elastic source can remain compressive") {
+  auto input = valid_input(
+      lss::lot::PostDrillingSigmaThetaSource::ElasticInitialWellboreState);
+  input.far_field_stress_compression_positive_Pa = 8.0e6;
+  input.wellbore_pressure_Pa = 3.0e6;
+  const auto result = lss::lot::evaluate_post_drilling_sigma_theta(input);
+
+  CHECK(result.sigma_theta_initial_compression_positive_Pa ==
+        Catch::Approx(8.0e6));
+  CHECK(result.sigma_theta_current_compression_positive_Pa ==
+        Catch::Approx(5.0e6));
 }
 
 TEST_CASE("PostDrillingSigmaThetaProvider rejects unknown source") {
@@ -118,6 +144,15 @@ TEST_CASE("PostDrillingSigmaThetaProvider rejects invalid pressure values") {
                   std::runtime_error);
 }
 
+TEST_CASE("PostDrillingSigmaThetaProvider rejects invalid elastic far field") {
+  auto input = valid_input(
+      lss::lot::PostDrillingSigmaThetaSource::ElasticInitialWellboreState);
+  input.far_field_stress_compression_positive_Pa = 0.0;
+
+  CHECK_THROWS_AS(lss::lot::evaluate_post_drilling_sigma_theta(input),
+                  std::runtime_error);
+}
+
 TEST_CASE("PostDrillingSigmaThetaProvider rejects physical validation flags") {
   auto input = valid_input();
   input.physically_validated = true;
@@ -136,6 +171,7 @@ TEST_CASE("PostDrillingSigmaThetaProvider preserves numeric inputs") {
 
   CHECK(result.sigma_theta_initial_compression_positive_Pa == 5.0e6);
   CHECK(result.sigma_theta_current_compression_positive_Pa == 4.5e6);
+  CHECK(result.far_field_stress_compression_positive_Pa == 5.0e6);
   CHECK(result.wellbore_pressure_Pa == 6.0e6);
   CHECK(result.tensile_strength_Pa == 0.0);
 }

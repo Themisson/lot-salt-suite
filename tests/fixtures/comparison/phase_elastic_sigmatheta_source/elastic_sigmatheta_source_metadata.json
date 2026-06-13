@@ -1,0 +1,24 @@
+{
+  "phase": "ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE",
+  "fixture_type": "elastic_initial_wellbore_sigmatheta_source",
+  "source": "ELASTIC_INITIAL_WELLBORE_STATE",
+  "implementation_status": "ELASTIC_INITIAL_WELLBORE_SIGMATHETA_SOURCE_IMPLEMENTED",
+  "semi_physical": true,
+  "physically_validated": false,
+  "legacy_equivalent": false,
+  "runtime_dispatch_enabled": false,
+  "runtime_physical_dispatch_allowed": false,
+  "buz29_execution_allowed": false,
+  "pkn_behavior_changed": false,
+  "penny_shaped_runtime_enabled": false,
+  "required_caveats": [
+    "ELASTIC_INITIAL_WELLBORE_APPROXIMATION",
+    "ELASTIC_WELLBORE_APPROXIMATION_SIMPLIFIED",
+    "SEMI_PHYSICAL_ELASTIC_APPROXIMATION",
+    "NOT_PHYSICALLY_VALIDATED",
+    "NOT_LEGACY_EQUIVALENT",
+    "RUNTIME_DISPATCH_NOT_ENABLED",
+    "BUZ29_EXECUTION_BLOCKED",
+    "PENNY_SHAPED_RUNTIME_NOT_ENABLED"
+  ]
+}
