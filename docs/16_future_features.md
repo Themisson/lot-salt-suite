@@ -1231,3 +1231,20 @@ A validação analítica da source `AXISYMMETRIC_ELASTIC_WELLBORE_STATE` cobre
 cinco casos controlados e confirma que o threshold exato permanece classificado
 como atingido. O próximo gate deve decidir readiness diagnóstico da source sem
 promovê-la a validação física plena.
+
+### Readiness do upgrade axisimétrico sigma-theta
+
+Status:
+
+```text
+ELASTIC_SIGMATHETA_UPGRADE_READY_FOR_DIAGNOSTIC_USE
+AXISYMMETRIC_ELASTIC_WELLBORE_STATE
+READY_FOR_DIAGNOSTIC_USE
+READY_FOR_CONTROLLED_PHYSICAL_COMPARISON_FALSE
+READY_FOR_PHYSICAL_DISPATCH_FALSE
+```
+
+A source axisimétrica está pronta para uso diagnóstico controlado, mas continua
+fora de validação física plena, equivalência com o LOT_Tese e dispatch físico.
+Kirsch completo segue bloqueado até que `sigma_H`, `sigma_h` e azimute existam
+como campos auditados no contrato de entrada.

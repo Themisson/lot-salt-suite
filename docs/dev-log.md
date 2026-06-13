@@ -8431,3 +8431,41 @@ exato. A validação permanece diagnóstica e não declara validação física p
 
 **Próxima fase recomendada:**
 `PHASE_DECIDE_ELASTIC_SIGMATHETA_UPGRADE_READINESS`.
+
+---
+
+### [2026-06-13] Fase F — Readiness do upgrade elástico sigma-theta — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `ELASTIC_SIGMATHETA_UPGRADE_READY_FOR_DIAGNOSTIC_USE`.
+
+**Decisão:**
+
+```text
+source = AXISYMMETRIC_ELASTIC_WELLBORE_STATE
+selected_formula = AXISYMMETRIC_ELASTIC_WELLBORE_SOURCE
+ready_for_diagnostic_use = true
+ready_for_controlled_physical_comparison = false
+ready_for_physical_dispatch = false
+physically_validated = false
+legacy_equivalent = false
+runtime_dispatch_enabled = false
+buz29_execution_allowed = false
+pkn_behavior_change_allowed = false
+penny_shaped_runtime_enabled = false
+kirsch_full_blocked = true
+```
+
+**Interpretação:** a source axisimétrica está pronta para uso diagnóstico
+controlado no `limited_gate`, mas não deve ser promovida a validação física,
+equivalência legada ou dispatch físico. Kirsch completo permanece bloqueado até
+que `sigma_H`, `sigma_h` e azimute estejam disponíveis no contrato de entrada.
+
+**Entregáveis:**
+- `tools/decide_elastic_sigmatheta_upgrade_readiness.py`
+- `tests/python/test_decide_elastic_sigmatheta_upgrade_readiness.py`
+- `docs/131_elastic_sigmatheta_upgrade_readiness_decision.md`
+
+**Próxima fase recomendada:**
+`PHASE_COMPARE_ELASTIC_SIGMATHETA_SOURCE_WITH_LEGACY_OR_ANALYTIC_REFERENCE`.
