@@ -209,6 +209,7 @@ phases:
   phase_controlled_physical_comparison_readiness: completed
   phase_buz_or_legacy_comparison_gate: completed
   phase_first_controlled_reference_comparison: completed
+  phase_buz67d_pkn_reference_readiness: completed
   phase_6_11_eigen_migration: completed
   phase_6_12b_cli_subprocess_tests: completed
   phase_8_integration:      not_started
@@ -344,6 +345,7 @@ docs:
   phase_controlled_physical_comparison_readiness: implemented
   phase_buz_or_legacy_comparison_gate: implemented
   phase_first_controlled_reference_comparison: implemented
+  phase_buz67d_pkn_reference_readiness: implemented
   developer_guide:        implemented
   changelog:              in_progress
   saltcreep_governance:   implemented
@@ -409,12 +411,12 @@ validation:
 test_counts:
   cpp_tests: 418        # Catch2 lot-salt-suite — atualizado apos execucao do upgrade elastic sigma-theta readiness (2026-06-13)
   saltcreep_tests: 133  # Catch2 saltcreep — 133/133 baseline e 133/133 LSS Eigen passaram (2026-06-04)
-  python_tests: 1106    # pytest lot-salt-suite — atualizado apos primeira comparacao controlada (2026-06-13)
+  python_tests: 1112    # pytest lot-salt-suite — atualizado apos readiness BUZ67D PKN (2026-06-13)
   regression_baselines: 4
 
 # ============================================================
 # Metadados
 # ============================================================
 last_updated: "2026-06-13"
-updated_by: "codex (first controlled reference comparison)"
+updated_by: "codex (buz67d pkn reference readiness)"
 project_version: "0.1.0"

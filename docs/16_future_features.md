@@ -1317,3 +1317,20 @@ A primeira comparação após o gate BUZ/Legacy usa sete fixtures axisimétricas
 independentes para fixar a álgebra de `AXISYMMETRIC_ELASTIC_WELLBORE_STATE`.
 O próximo passo progressivo é
 `PHASE_DECIDE_BUZ67D_PKN_REFERENCE_READINESS`.
+
+### BUZ67D PKN Reference Readiness
+
+Status:
+
+```text
+BUZ67D_PKN_READY_FOR_DIAGNOSTIC_REFERENCE
+PHYSICAL_VALIDATION_NOT_CLAIMED
+LEGACY_EQUIVALENCE_NOT_CLAIMED
+BUZ29_PENNY_NOT_EXECUTED
+RUNTIME_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+BUZ67D/PKN pode ser usado como primeira referência diagnóstica controlada antes
+de qualquer BUZ29/PENNY. O próximo passo é preparar o manifesto de insumos
+BUZ29/PENNY sem executar o caso.

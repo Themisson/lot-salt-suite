@@ -8629,3 +8629,35 @@ legado e não executa BUZ29-PENNY.
 
 **Próxima fase recomendada:**
 `PHASE_DECIDE_BUZ67D_PKN_REFERENCE_READINESS`.
+
+---
+
+### [2026-06-13] Readiness BUZ67D/PKN como referência diagnóstica — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `BUZ67D_PKN_READY_FOR_DIAGNOSTIC_REFERENCE`.
+
+**Resultado:**
+
+```text
+buz67d_pkn_validate_ok = true
+buz67d_pkn_run_allowed = true
+physical_validation_claimed = false
+legacy_equivalence_claimed = false
+buz29_penny_executed = false
+runtime_dispatch_enabled = false
+pkn_behavior_changed = false
+```
+
+**Interpretação:** BUZ67D/PKN pode ser usado como referência diagnóstica
+controlada antes de qualquer BUZ29/PENNY. A fase não declara validação física,
+não declara equivalência com legado e não altera PKN.
+
+**Entregáveis:**
+- `tools/decide_buz67d_pkn_reference_readiness.py`
+- `tests/python/test_decide_buz67d_pkn_reference_readiness.py`
+- `docs/134_buz67d_pkn_reference_readiness_decision.md`
+
+**Próxima fase recomendada:**
+`PHASE_PREPARE_BUZ29_PENNY_DIAGNOSTIC_COMPARISON_INPUTS`.

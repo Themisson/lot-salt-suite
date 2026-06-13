@@ -1041,3 +1041,19 @@ PKN_BEHAVIOR_NOT_CHANGED
 ```
 
 A trilha não-PKN permanece bloqueada até gate diagnóstico específico.
+
+### Readiness BUZ67D/PKN antes de BUZ29/PENNY
+
+BUZ67D/PKN foi classificado como referência diagnóstica controlada:
+
+```text
+BUZ67D_PKN_READY_FOR_DIAGNOSTIC_REFERENCE
+BUZ29_PENNY_NOT_EXECUTED
+RUNTIME_DISPATCH_NOT_ENABLED
+PHYSICAL_VALIDATION_NOT_CLAIMED
+LEGACY_EQUIVALENCE_NOT_CLAIMED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+Isso autoriza apenas a preparação de insumos BUZ29/PENNY; a execução
+BUZ29/PENNY permanece bloqueada para fase futura.

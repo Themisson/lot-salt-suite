@@ -79,3 +79,17 @@ pkn_behavior_changed = false
 
 O próximo gate progressivo é
 `PHASE_DECIDE_BUZ67D_PKN_REFERENCE_READINESS`.
+
+## Readiness BUZ67D/PKN
+
+A fase `PHASE_DECIDE_BUZ67D_PKN_REFERENCE_READINESS` decidiu que BUZ67D/PKN
+está pronto apenas como referência diagnóstica controlada:
+
+```text
+BUZ67D_PKN_READY_FOR_DIAGNOSTIC_REFERENCE
+physical_validation_claimed = false
+legacy_equivalence_claimed = false
+buz29_penny_executed = false
+runtime_dispatch_enabled = false
+pkn_behavior_changed = false
+```
