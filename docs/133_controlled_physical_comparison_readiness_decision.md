@@ -55,3 +55,21 @@ necessária.
 ```text
 PHASE_PREPARE_BUZ_OR_LEGACY_COMPARISON_GATE
 ```
+
+## Primeiro passo executado após o gate
+
+O primeiro passo pós-readiness foi a comparação controlada analítica:
+
+```text
+PHASE_RUN_FIRST_CONTROLLED_REFERENCE_COMPARISON
+FIRST_CONTROLLED_REFERENCE_COMPARISON_VALID
+ANALYTIC_AXISYMMETRIC_CONTROLLED_REFERENCE
+PHYSICAL_VALIDATION_NOT_CLAIMED
+LEGACY_EQUIVALENCE_NOT_CLAIMED
+BUZ29_PENNY_NOT_EXECUTED
+RUNTIME_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+Essa execução mantém a decisão original: BUZ67D/PKN pode ser avaliado apenas
+como próxima referência diagnóstica controlada, não como validação física.

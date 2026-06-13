@@ -8592,3 +8592,40 @@ continua bloqueado, assim como validação física e equivalência legada.
 
 **Próxima fase recomendada:**
 `PHASE_RUN_FIRST_CONTROLLED_REFERENCE_COMPARISON`.
+
+---
+
+### [2026-06-13] Primeira comparação controlada axisimétrica — Codex
+
+**Status:** Concluído; commit/push executado ao final da fase.
+
+**Classificação:** `FIRST_CONTROLLED_REFERENCE_COMPARISON_VALID`.
+
+**Referência:** `ANALYTIC_AXISYMMETRIC_CONTROLLED_REFERENCE`.
+
+**Resultado:**
+
+```text
+implemented_source = AXISYMMETRIC_ELASTIC_WELLBORE_STATE
+case_count = 7
+max_abs_error_Pa = 0.0
+within_tolerance = true
+physical_validation_claimed = false
+legacy_equivalence_claimed = false
+runtime_dispatch_enabled = false
+buz29_penny_executed = false
+pkn_behavior_changed = false
+```
+
+**Interpretação:** a comparação confirma apenas a consistência algébrica
+axisimétrica controlada. Ela não é validação física, não é equivalência com
+legado e não executa BUZ29-PENNY.
+
+**Entregáveis:**
+- `tools/run_first_controlled_reference_comparison.py`
+- `tests/python/test_run_first_controlled_reference_comparison.py`
+- `tests/fixtures/comparison/phase_first_controlled_reference/`
+- `docs/133_first_controlled_reference_comparison.md`
+
+**Próxima fase recomendada:**
+`PHASE_DECIDE_BUZ67D_PKN_REFERENCE_READINESS`.

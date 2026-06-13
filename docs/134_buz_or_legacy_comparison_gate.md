@@ -59,3 +59,23 @@ comportamento PKN.
 ```text
 PHASE_RUN_FIRST_CONTROLLED_REFERENCE_COMPARISON
 ```
+
+## Comparação controlada executada
+
+`PHASE_RUN_FIRST_CONTROLLED_REFERENCE_COMPARISON` foi executada contra uma
+referência `ANALYTIC_AXISYMMETRIC_CONTROLLED_REFERENCE`, sem BUZ29-PENNY e sem
+dispatch físico.
+
+```text
+comparison_status = FIRST_CONTROLLED_REFERENCE_COMPARISON_VALID
+max_abs_error_Pa = 0.0
+within_tolerance = true
+physical_validation_claimed = false
+legacy_equivalence_claimed = false
+runtime_dispatch_enabled = false
+buz29_penny_executed = false
+pkn_behavior_changed = false
+```
+
+O próximo gate progressivo é
+`PHASE_DECIDE_BUZ67D_PKN_REFERENCE_READINESS`.

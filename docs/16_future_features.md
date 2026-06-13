@@ -1298,3 +1298,22 @@ O gate define que a primeira comparação futura deve permanecer em referência
 analítica ou BUZ67D/PKN diagnóstico. Antes de qualquer comparação com legado,
 devem ser alinhados pressão, tensão, tempo, semântica de pressão, referencial de
 tensão e convenção de sinais. BUZ29-PENNY continua bloqueado.
+
+### First Controlled Reference Comparison
+
+Status:
+
+```text
+FIRST_CONTROLLED_REFERENCE_COMPARISON_VALID
+ANALYTIC_AXISYMMETRIC_CONTROLLED_REFERENCE
+PHYSICAL_VALIDATION_NOT_CLAIMED
+LEGACY_EQUIVALENCE_NOT_CLAIMED
+BUZ29_PENNY_NOT_EXECUTED
+RUNTIME_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+A primeira comparação após o gate BUZ/Legacy usa sete fixtures axisimétricas
+independentes para fixar a álgebra de `AXISYMMETRIC_ELASTIC_WELLBORE_STATE`.
+O próximo passo progressivo é
+`PHASE_DECIDE_BUZ67D_PKN_REFERENCE_READINESS`.

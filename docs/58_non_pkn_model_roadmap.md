@@ -1024,3 +1024,20 @@ READY_FOR_KIRSCH_OR_AXISYMMETRIC_UPGRADE_SPEC
 Isso não desbloqueia `PENNY_SHAPED` como runtime físico. BUZ29-PENNY permanece
 bloqueado, `runtime_dispatch_enabled` permanece `false` e o próximo passo é
 especificar uma formulação Kirsch/hoop stress ou elástica axisimétrica.
+
+### Primeira comparação controlada axisimétrica
+
+A fase `PHASE_RUN_FIRST_CONTROLLED_REFERENCE_COMPARISON` foi executada antes de
+qualquer BUZ29/PENNY:
+
+```text
+FIRST_CONTROLLED_REFERENCE_COMPARISON_VALID
+ANALYTIC_AXISYMMETRIC_CONTROLLED_REFERENCE
+PHYSICAL_VALIDATION_NOT_CLAIMED
+LEGACY_EQUIVALENCE_NOT_CLAIMED
+BUZ29_PENNY_NOT_EXECUTED
+RUNTIME_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+```
+
+A trilha não-PKN permanece bloqueada até gate diagnóstico específico.

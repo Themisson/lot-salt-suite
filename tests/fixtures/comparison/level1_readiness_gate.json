@@ -4241,6 +4241,21 @@
     ],
     "recommended_next_phase": "PHASE_RUN_FIRST_CONTROLLED_REFERENCE_COMPARISON"
   },
+  "phase_first_controlled_reference_comparison": {
+    "phase": "PHASE_RUN_FIRST_CONTROLLED_REFERENCE_COMPARISON",
+    "status": "FIRST_CONTROLLED_REFERENCE_COMPARISON_VALID",
+    "reference_type": "ANALYTIC_AXISYMMETRIC_CONTROLLED_REFERENCE",
+    "implemented_source": "AXISYMMETRIC_ELASTIC_WELLBORE_STATE",
+    "case_count": 7,
+    "max_abs_error_Pa": 0.0,
+    "within_tolerance": true,
+    "physical_validation_claimed": false,
+    "legacy_equivalence_claimed": false,
+    "runtime_dispatch_enabled": false,
+    "buz29_penny_executed": false,
+    "pkn_behavior_changed": false,
+    "recommended_next_phase": "PHASE_DECIDE_BUZ67D_PKN_REFERENCE_READINESS"
+  },
   "phase11_5d_summary_fracture_leakoff_maxima": {
     "status": "SUMMARY_MAXIMA_PYTHON_ONLY_SAFE",
     "phase": "11.5D",

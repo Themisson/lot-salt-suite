@@ -70,3 +70,20 @@ Com `within_tolerance = true`, o próximo gate permitido é:
 ```text
 PHASE_DECIDE_CONTROLLED_PHYSICAL_COMPARISON_READINESS
 ```
+
+## Comparação controlada subsequente
+
+A fase `PHASE_RUN_FIRST_CONTROLLED_REFERENCE_COMPARISON` adicionou uma segunda
+camada de referência controlada, com fixtures independentes em
+`tests/fixtures/comparison/phase_first_controlled_reference/`.
+
+```text
+FIRST_CONTROLLED_REFERENCE_COMPARISON_VALID
+ANALYTIC_AXISYMMETRIC_CONTROLLED_REFERENCE
+max_abs_error_Pa = 0.0
+PHYSICAL_VALIDATION_NOT_CLAIMED
+LEGACY_EQUIVALENCE_NOT_CLAIMED
+BUZ29_PENNY_NOT_EXECUTED
+RUNTIME_DISPATCH_NOT_ENABLED
+PKN_BEHAVIOR_NOT_CHANGED
+```
